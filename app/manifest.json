@@ -1,0 +1,96 @@
+{
+  "manifest_version": 3,
+  "name": "KCG Portal Redesign Project",
+  "version": "2.0.1",
+  "description": "Modern, readable UI for the Kyoto Computer Gakuin student portal (home.kcg.ac.jp). Unofficial theme extension.",
+  "package_slug": "kcg-portal-redesign-project",
+  "author": "nnnnnnn0090",
+  "minimum_chrome_version": "111",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://home.kcg.ac.jp/*",
+    "https://king-lms.kcg.edu/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://home.kcg.ac.jp/portal*"],
+      "js": [
+        "early/theme.js",
+        "early/boot-cover.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://home.kcg.ac.jp/portal*"],
+      "js": [
+        "hooks/portal-fetch-hook.js",
+        "hooks/portal-fetch-bridge.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://king-lms.kcg.edu/*"],
+      "js": [
+        "bridges/king-lms-bridge.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://king-lms.kcg.edu/*"],
+      "js": [
+        "hooks/king-lms-fetch-hook.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://home.kcg.ac.jp/portal*"],
+      "js": [
+        "styles.js",
+        "core/dom.js",
+        "core/date.js",
+        "core/constants.js",
+        "core/storage.js",
+        "api/urls.js",
+        "ui/animation.js",
+        "ui/toast.js",
+        "ui/tooltip.js",
+        "ui/context-menu.js",
+        "ui/theme-manager.js",
+        "ui/settings-panel.js",
+        "calendar/kogi-helpers.js",
+        "calendar/grid-builder.js",
+        "calendar/controller.js",
+        "calendar/assignment-calendar.js",
+        "shell/header.js",
+        "shell/footer.js",
+        "renderers/news.js",
+        "renderers/links.js",
+        "renderers/kino.js",
+        "pages/home.js",
+        "pages/news.js",
+        "pages/detail.js",
+        "pages/kyuko.js",
+        "pages/survey.js",
+        "boot.js",
+        "main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "kcg-portal-redesign-project@nnnnnnn0090.com",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
+    }
+  }
+}

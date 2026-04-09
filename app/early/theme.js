@@ -1,0 +1,723 @@
+/**
+ * early/theme.js — カラーテーマ定義と CSS カスタムプロパティの生成
+ *
+ * ロード順: document_start (隔離ワールド) — 最初にロードされる。
+ * boot-cover.js が依存するため、このファイルは必ず先に読み込む。
+ *
+ * 公開: グローバル P.THEMES, P.getThemeCss, P.bootCoverBg, P.THEME_STORAGE_KEY
+ */
+(function (G) {
+  'use strict';
+
+  const P = (G.P = G.P || {});
+
+  // ────────────────────────────────────────────
+  // テーマ定義
+  //
+  // 各テーマは CSS カスタムプロパティにマッピングされるカラー値の集合。
+  // getThemeCss() で #portal-overlay 直下の変数として出力される。
+  //
+  // 新しいテーマを追加するには、このオブジェクトにエントリを追加するだけでよい。
+  // キー名がテーマ ID となり、shell/header.js の buildThemePickerButtons() が自動でボタン化する。
+  // ────────────────────────────────────────────
+
+  /** @type {Record<string, ThemeTokens>} */
+  const THEMES = {
+
+    // ダークテーマ（デフォルト）
+    dark: {
+      name: 'ダーク',
+      bg: '#09090b', bgSecondary: 'rgba(24,24,27,.6)', bgTertiary: 'rgba(24,24,27,.5)',
+      bgHover: 'rgba(39,39,42,.5)', border: 'rgba(39,39,42,.6)', borderLight: 'rgba(39,39,42,.4)',
+      borderHover: 'rgba(63,63,70,.8)', text: '#d4d4d8', textMuted: '#a1a1aa',
+      textDim: '#71717a', textDimmer: '#52525b', textBright: '#fafafa',
+      accent: '#3b82f6', accentLight: '#60a5fa', accentBg: 'rgba(59,130,246,.12)',
+      accentBorder: 'rgba(59,130,246,.55)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(0,0,0,.2)', shadowStrong: 'rgba(0,0,0,.5)',
+    },
+
+    // ライトテーマ
+    light: {
+      name: 'ライト',
+      bg: '#fafafa', bgSecondary: 'rgba(255,255,255,.9)', bgTertiary: 'rgba(250,250,250,.95)',
+      bgHover: 'rgba(244,244,245,.8)', border: 'rgba(228,228,231,.8)', borderLight: 'rgba(228,228,231,.5)',
+      borderHover: 'rgba(212,212,216,.9)', text: '#27272a', textMuted: '#52525b',
+      textDim: '#71717a', textDimmer: '#a1a1aa', textBright: '#18181b',
+      accent: '#2563eb', accentLight: '#3b82f6', accentBg: 'rgba(37,99,235,.08)',
+      accentBorder: 'rgba(37,99,235,.5)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(0,0,0,.06)', shadowStrong: 'rgba(0,0,0,.12)',
+    },
+
+    // ピンクテーマ
+    pink: {
+      name: 'ピンク',
+      bg: '#fdf2f8', bgSecondary: 'rgba(255,255,255,.85)', bgTertiary: 'rgba(253,242,248,.95)',
+      bgHover: 'rgba(252,231,243,.7)', border: 'rgba(251,207,232,.8)', borderLight: 'rgba(251,207,232,.5)',
+      borderHover: 'rgba(244,114,182,.6)', text: '#831843', textMuted: '#9d174d',
+      textDim: '#be185d', textDimmer: '#db2777', textBright: '#500724',
+      accent: '#db2777', accentLight: '#ec4899', accentBg: 'rgba(219,39,119,.1)',
+      accentBorder: 'rgba(219,39,119,.5)', danger: '#be123c', dangerHover: '#9f1239',
+      shadow: 'rgba(190,24,93,.06)', shadowStrong: 'rgba(190,24,93,.15)',
+    },
+
+    // 水色テーマ
+    cyan: {
+      name: '水色',
+      bg: '#ecfeff', bgSecondary: 'rgba(255,255,255,.85)', bgTertiary: 'rgba(236,254,255,.95)',
+      bgHover: 'rgba(207,250,254,.7)', border: 'rgba(165,243,252,.8)', borderLight: 'rgba(165,243,252,.5)',
+      borderHover: 'rgba(34,211,238,.6)', text: '#164e63', textMuted: '#155e75',
+      textDim: '#0e7490', textDimmer: '#06b6d4', textBright: '#083344',
+      accent: '#0891b2', accentLight: '#06b6d4', accentBg: 'rgba(8,145,178,.1)',
+      accentBorder: 'rgba(8,145,178,.5)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(8,145,178,.06)', shadowStrong: 'rgba(8,145,178,.15)',
+    },
+
+    midnight: {
+      name: 'ミッドナイト',
+      bg: '#0f172a', bgSecondary: 'rgba(30,41,59,.65)', bgTertiary: 'rgba(30,41,59,.55)',
+      bgHover: 'rgba(51,65,85,.5)', border: 'rgba(51,65,85,.6)', borderLight: 'rgba(51,65,85,.4)',
+      borderHover: 'rgba(71,85,105,.8)', text: '#cbd5e1', textMuted: '#94a3b8',
+      textDim: '#64748b', textDimmer: '#475569', textBright: '#f8fafc',
+      accent: '#38bdf8', accentLight: '#7dd3fc', accentBg: 'rgba(56,189,248,.12)',
+      accentBorder: 'rgba(56,189,248,.55)', danger: '#f87171', dangerHover: '#ef4444',
+      shadow: 'rgba(0,0,0,.25)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+    nord: {
+      name: 'ノード',
+      bg: '#2e3440', bgSecondary: 'rgba(59,66,82,.7)', bgTertiary: 'rgba(46,52,64,.6)',
+      bgHover: 'rgba(76,86,106,.55)', border: 'rgba(76,86,106,.65)', borderLight: 'rgba(76,86,106,.45)',
+      borderHover: 'rgba(94,129,172,.5)', text: '#eceff4', textMuted: '#d8dee9',
+      textDim: '#aeb3bb', textDimmer: '#7b8190', textBright: '#ffffff',
+      accent: '#88c0d0', accentLight: '#8fbcbb', accentBg: 'rgba(136,192,208,.15)',
+      accentBorder: 'rgba(136,192,208,.5)', danger: '#bf616a', dangerHover: '#a54e56',
+      shadow: 'rgba(0,0,0,.2)', shadowStrong: 'rgba(0,0,0,.45)',
+    },
+    forest: {
+      name: 'フォレスト',
+      bg: '#052e16', bgSecondary: 'rgba(20,83,45,.55)', bgTertiary: 'rgba(22,101,52,.5)',
+      bgHover: 'rgba(34,197,94,.1)', border: 'rgba(34,197,94,.28)', borderLight: 'rgba(34,197,94,.16)',
+      borderHover: 'rgba(74,222,128,.4)', text: '#bbf7d0', textMuted: '#86efac',
+      textDim: '#4ade80', textDimmer: '#22c55e', textBright: '#f0fdf4',
+      accent: '#4ade80', accentLight: '#86efac', accentBg: 'rgba(74,222,128,.12)',
+      accentBorder: 'rgba(74,222,128,.5)', danger: '#fca5a5', dangerHover: '#f87171',
+      shadow: 'rgba(0,0,0,.3)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+    ocean: {
+      name: 'ディープシー',
+      bg: '#082f49', bgSecondary: 'rgba(12,74,110,.55)', bgTertiary: 'rgba(8,47,73,.5)',
+      bgHover: 'rgba(14,116,144,.2)', border: 'rgba(14,116,144,.35)', borderLight: 'rgba(14,116,144,.22)',
+      borderHover: 'rgba(34,211,238,.45)', text: '#bae6fd', textMuted: '#7dd3fc',
+      textDim: '#38bdf8', textDimmer: '#0284c7', textBright: '#f0f9ff',
+      accent: '#22d3ee', accentLight: '#67e8f9', accentBg: 'rgba(34,211,238,.12)',
+      accentBorder: 'rgba(34,211,238,.55)', danger: '#fb923c', dangerHover: '#f97316',
+      shadow: 'rgba(0,0,0,.25)', shadowStrong: 'rgba(0,0,0,.5)',
+    },
+    grape: {
+      name: 'グレープ',
+      bg: '#2e1065', bgSecondary: 'rgba(76,29,149,.5)', bgTertiary: 'rgba(49,10,99,.55)',
+      bgHover: 'rgba(139,92,246,.15)', border: 'rgba(139,92,246,.3)', borderLight: 'rgba(139,92,246,.18)',
+      borderHover: 'rgba(196,181,253,.45)', text: '#ede9fe', textMuted: '#ddd6fe',
+      textDim: '#c4b5fd', textDimmer: '#a78bfa', textBright: '#faf5ff',
+      accent: '#a78bfa', accentLight: '#c4b5fd', accentBg: 'rgba(167,139,250,.15)',
+      accentBorder: 'rgba(167,139,250,.55)', danger: '#f472b6', dangerHover: '#ec4899',
+      shadow: 'rgba(0,0,0,.25)', shadowStrong: 'rgba(0,0,0,.5)',
+    },
+    indigo: {
+      name: 'インディゴ',
+      bg: '#1e1b4b', bgSecondary: 'rgba(49,46,129,.55)', bgTertiary: 'rgba(30,27,75,.5)',
+      bgHover: 'rgba(99,102,241,.15)', border: 'rgba(99,102,241,.3)', borderLight: 'rgba(99,102,241,.18)',
+      borderHover: 'rgba(165,180,252,.5)', text: '#e0e7ff', textMuted: '#c7d2fe',
+      textDim: '#a5b4fc', textDimmer: '#818cf8', textBright: '#eef2ff',
+      accent: '#818cf8', accentLight: '#a5b4fc', accentBg: 'rgba(129,140,248,.15)',
+      accentBorder: 'rgba(129,140,248,.55)', danger: '#f87171', dangerHover: '#ef4444',
+      shadow: 'rgba(0,0,0,.25)', shadowStrong: 'rgba(0,0,0,.5)',
+    },
+    stone: {
+      name: 'ストーン',
+      bg: '#1c1917', bgSecondary: 'rgba(41,37,36,.65)', bgTertiary: 'rgba(28,25,23,.55)',
+      bgHover: 'rgba(120,113,108,.25)', border: 'rgba(87,83,78,.5)', borderLight: 'rgba(87,83,78,.35)',
+      borderHover: 'rgba(168,162,158,.45)', text: '#e7e5e4', textMuted: '#d6d3d1',
+      textDim: '#a8a29e', textDimmer: '#78716c', textBright: '#fafaf9',
+      accent: '#f59e0b', accentLight: '#fbbf24', accentBg: 'rgba(245,158,11,.12)',
+      accentBorder: 'rgba(245,158,11,.5)', danger: '#ef4444', dangerHover: '#dc2626',
+      shadow: 'rgba(0,0,0,.22)', shadowStrong: 'rgba(0,0,0,.48)',
+    },
+    espresso: {
+      name: 'エスプレッソ',
+      bg: '#292524', bgSecondary: 'rgba(68,64,60,.6)', bgTertiary: 'rgba(41,37,36,.55)',
+      bgHover: 'rgba(120,53,15,.2)', border: 'rgba(120,53,15,.35)', borderLight: 'rgba(120,53,15,.22)',
+      borderHover: 'rgba(251,191,36,.4)', text: '#fafaf9', textMuted: '#e7e5e4',
+      textDim: '#d6d3d1', textDimmer: '#a8a29e', textBright: '#ffffff',
+      accent: '#d97706', accentLight: '#fbbf24', accentBg: 'rgba(217,119,6,.15)',
+      accentBorder: 'rgba(217,119,6,.5)', danger: '#ef4444', dangerHover: '#dc2626',
+      shadow: 'rgba(0,0,0,.22)', shadowStrong: 'rgba(0,0,0,.48)',
+    },
+    aurora: {
+      name: 'オーロラ',
+      bg: '#042f2e', bgSecondary: 'rgba(15,118,110,.45)', bgTertiary: 'rgba(4,47,46,.55)',
+      bgHover: 'rgba(45,212,191,.12)', border: 'rgba(45,212,191,.28)', borderLight: 'rgba(45,212,191,.16)',
+      borderHover: 'rgba(244,114,182,.45)', text: '#ccfbf1', textMuted: '#99f6e4',
+      textDim: '#5eead4', textDimmer: '#2dd4bf', textBright: '#f0fdfa',
+      accent: '#f472b6', accentLight: '#f9a8d4', accentBg: 'rgba(244,114,182,.12)',
+      accentBorder: 'rgba(244,114,182,.5)', danger: '#fca5a5', dangerHover: '#f87171',
+      shadow: 'rgba(0,0,0,.28)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+    twilight: {
+      name: 'トワイライト',
+      bg: '#3b0764', bgSecondary: 'rgba(88,28,135,.5)', bgTertiary: 'rgba(59,7,100,.5)',
+      bgHover: 'rgba(236,72,153,.12)', border: 'rgba(192,132,252,.3)', borderLight: 'rgba(192,132,252,.18)',
+      borderHover: 'rgba(244,114,182,.45)', text: '#faf5ff', textMuted: '#f3e8ff',
+      textDim: '#e9d5ff', textDimmer: '#d8b4fe', textBright: '#ffffff',
+      accent: '#e879f9', accentLight: '#f0abfc', accentBg: 'rgba(232,121,249,.12)',
+      accentBorder: 'rgba(232,121,249,.5)', danger: '#fb7185', dangerHover: '#f43f5e',
+      shadow: 'rgba(0,0,0,.25)', shadowStrong: 'rgba(0,0,0,.5)',
+    },
+    rosewood: {
+      name: 'ローズウッド',
+      bg: '#4c0519', bgSecondary: 'rgba(136,19,55,.45)', bgTertiary: 'rgba(76,5,25,.5)',
+      bgHover: 'rgba(251,113,133,.12)', border: 'rgba(251,113,133,.28)', borderLight: 'rgba(251,113,133,.16)',
+      borderHover: 'rgba(253,164,175,.45)', text: '#ffe4e6', textMuted: '#fda4af',
+      textDim: '#fb7185', textDimmer: '#f43f5e', textBright: '#fff1f2',
+      accent: '#fb7185', accentLight: '#fda4af', accentBg: 'rgba(251,113,133,.15)',
+      accentBorder: 'rgba(251,113,133,.5)', danger: '#fbbf24', dangerHover: '#f59e0b',
+      shadow: 'rgba(0,0,0,.28)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+
+    lavender: {
+      name: 'ラベンダー',
+      bg: '#faf5ff', bgSecondary: 'rgba(255,255,255,.9)', bgTertiary: 'rgba(250,245,255,.95)',
+      bgHover: 'rgba(243,232,255,.75)', border: 'rgba(233,213,255,.85)', borderLight: 'rgba(233,213,255,.5)',
+      borderHover: 'rgba(192,132,252,.55)', text: '#581c87', textMuted: '#6b21a8',
+      textDim: '#7c3aed', textDimmer: '#8b5cf6', textBright: '#3b0764',
+      accent: '#9333ea', accentLight: '#a855f7', accentBg: 'rgba(147,51,234,.08)',
+      accentBorder: 'rgba(147,51,234,.45)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(88,28,135,.06)', shadowStrong: 'rgba(88,28,135,.14)',
+    },
+    mint: {
+      name: 'ミント',
+      bg: '#f0fdf4', bgSecondary: 'rgba(255,255,255,.92)', bgTertiary: 'rgba(240,253,244,.95)',
+      bgHover: 'rgba(220,252,231,.8)', border: 'rgba(167,243,208,.85)', borderLight: 'rgba(167,243,208,.5)',
+      borderHover: 'rgba(52,211,153,.55)', text: '#14532d', textMuted: '#166534',
+      textDim: '#15803d', textDimmer: '#16a34a', textBright: '#052e16',
+      accent: '#16a34a', accentLight: '#22c55e', accentBg: 'rgba(22,163,74,.1)',
+      accentBorder: 'rgba(22,163,74,.45)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(20,83,45,.06)', shadowStrong: 'rgba(20,83,45,.12)',
+    },
+    paper: {
+      name: 'ペーパー',
+      bg: '#faf8f5', bgSecondary: 'rgba(255,255,255,.92)', bgTertiary: 'rgba(250,248,245,.96)',
+      bgHover: 'rgba(245,240,232,.85)', border: 'rgba(228,220,207,.9)', borderLight: 'rgba(228,220,207,.55)',
+      borderHover: 'rgba(180,160,130,.45)', text: '#44403c', textMuted: '#57534e',
+      textDim: '#78716c', textDimmer: '#a8a29e', textBright: '#1c1917',
+      accent: '#b45309', accentLight: '#d97706', accentBg: 'rgba(180,83,9,.1)',
+      accentBorder: 'rgba(180,83,9,.45)', danger: '#b91c1c', dangerHover: '#991b1b',
+      shadow: 'rgba(68,64,60,.05)', shadowStrong: 'rgba(68,64,60,.1)',
+    },
+    sage: {
+      name: 'セージ',
+      bg: '#f6f7f4', bgSecondary: 'rgba(255,255,255,.9)', bgTertiary: 'rgba(246,247,244,.95)',
+      bgHover: 'rgba(229,231,222,.85)', border: 'rgba(200,205,188,.85)', borderLight: 'rgba(200,205,188,.5)',
+      borderHover: 'rgba(132,169,140,.5)', text: '#3f4f3a', textMuted: '#4d5c47',
+      textDim: '#5c6d55', textDimmer: '#6b7c64', textBright: '#2d3a28',
+      accent: '#6b8f71', accentLight: '#84a989', accentBg: 'rgba(107,143,113,.12)',
+      accentBorder: 'rgba(107,143,113,.45)', danger: '#c2410c', dangerHover: '#9a3412',
+      shadow: 'rgba(63,79,58,.06)', shadowStrong: 'rgba(63,79,58,.12)',
+    },
+    coral: {
+      name: 'コーラル',
+      bg: '#fff7ed', bgSecondary: 'rgba(255,255,255,.9)', bgTertiary: 'rgba(255,247,237,.95)',
+      bgHover: 'rgba(255,237,213,.85)', border: 'rgba(254,215,170,.9)', borderLight: 'rgba(254,215,170,.55)',
+      borderHover: 'rgba(251,146,60,.5)', text: '#7c2d12', textMuted: '#9a3412',
+      textDim: '#c2410c', textDimmer: '#ea580c', textBright: '#431407',
+      accent: '#ea580c', accentLight: '#f97316', accentBg: 'rgba(234,88,12,.1)',
+      accentBorder: 'rgba(234,88,12,.45)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(124,45,18,.06)', shadowStrong: 'rgba(124,45,18,.12)',
+    },
+    cream: {
+      name: 'クリーム',
+      bg: '#fffbeb', bgSecondary: 'rgba(255,255,255,.92)', bgTertiary: 'rgba(255,251,235,.96)',
+      bgHover: 'rgba(254,243,199,.85)', border: 'rgba(253,230,138,.85)', borderLight: 'rgba(253,230,138,.5)',
+      borderHover: 'rgba(250,204,21,.5)', text: '#713f12', textMuted: '#854d0e',
+      textDim: '#a16207', textDimmer: '#ca8a04', textBright: '#422006',
+      accent: '#ca8a04', accentLight: '#eab308', accentBg: 'rgba(202,138,4,.1)',
+      accentBorder: 'rgba(202,138,4,.45)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(113,63,18,.05)', shadowStrong: 'rgba(113,63,18,.1)',
+    },
+    peach: {
+      name: 'ピーチ',
+      bg: '#fff1f2', bgSecondary: 'rgba(255,255,255,.9)', bgTertiary: 'rgba(255,241,242,.95)',
+      bgHover: 'rgba(255,228,230,.85)', border: 'rgba(254,205,211,.9)', borderLight: 'rgba(254,205,211,.55)',
+      borderHover: 'rgba(251,113,133,.5)', text: '#881337', textMuted: '#9f1239',
+      textDim: '#be123c', textDimmer: '#e11d48', textBright: '#4c0519',
+      accent: '#e11d48', accentLight: '#f43f5e', accentBg: 'rgba(225,29,72,.08)',
+      accentBorder: 'rgba(225,29,72,.45)', danger: '#c2410c', dangerHover: '#9a3412',
+      shadow: 'rgba(136,19,55,.06)', shadowStrong: 'rgba(136,19,55,.12)',
+    },
+    storm: {
+      name: 'ストーム',
+      bg: '#f8fafc', bgSecondary: 'rgba(255,255,255,.95)', bgTertiary: 'rgba(248,250,252,.95)',
+      bgHover: 'rgba(241,245,249,.9)', border: 'rgba(226,232,240,.9)', borderLight: 'rgba(226,232,240,.55)',
+      borderHover: 'rgba(148,163,184,.6)', text: '#1e293b', textMuted: '#334155',
+      textDim: '#475569', textDimmer: '#64748b', textBright: '#0f172a',
+      accent: '#3b82f6', accentLight: '#60a5fa', accentBg: 'rgba(59,130,246,.08)',
+      accentBorder: 'rgba(59,130,246,.45)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(15,23,42,.05)', shadowStrong: 'rgba(15,23,42,.1)',
+    },
+    sand: {
+      name: 'サンド',
+      bg: '#faf7f2', bgSecondary: 'rgba(255,255,255,.9)', bgTertiary: 'rgba(250,247,242,.95)',
+      bgHover: 'rgba(237,228,212,.85)', border: 'rgba(215,200,172,.85)', borderLight: 'rgba(215,200,172,.5)',
+      borderHover: 'rgba(180,148,108,.45)', text: '#422006', textMuted: '#713f12',
+      textDim: '#92400e', textDimmer: '#b45309', textBright: '#281205',
+      accent: '#d97706', accentLight: '#f59e0b', accentBg: 'rgba(217,119,6,.1)',
+      accentBorder: 'rgba(217,119,6,.45)', danger: '#b91c1c', dangerHover: '#991b1b',
+      shadow: 'rgba(66,32,6,.05)', shadowStrong: 'rgba(66,32,6,.1)',
+    },
+
+    void: {
+      name: 'ヴォイド',
+      bg: '#030712', bgSecondary: 'rgba(17,24,39,.7)', bgTertiary: 'rgba(3,7,18,.65)',
+      bgHover: 'rgba(99,102,241,.12)', border: 'rgba(55,48,163,.35)', borderLight: 'rgba(55,48,163,.22)',
+      borderHover: 'rgba(167,139,250,.45)', text: '#e0e7ff', textMuted: '#c7d2fe',
+      textDim: '#a5b4fc', textDimmer: '#6366f1', textBright: '#f5f3ff',
+      accent: '#a78bfa', accentLight: '#c4b5fd', accentBg: 'rgba(167,139,250,.12)',
+      accentBorder: 'rgba(167,139,250,.55)', danger: '#fb7185', dangerHover: '#f43f5e',
+      shadow: 'rgba(0,0,0,.35)', shadowStrong: 'rgba(0,0,0,.65)',
+    },
+    obsidian: {
+      name: 'オブシディアン',
+      bg: '#0d1117', bgSecondary: 'rgba(22,27,34,.75)', bgTertiary: 'rgba(13,17,23,.65)',
+      bgHover: 'rgba(56,139,253,.1)', border: 'rgba(48,54,61,.85)', borderLight: 'rgba(48,54,61,.55)',
+      borderHover: 'rgba(88,166,255,.45)', text: '#e6edf3', textMuted: '#8b949e',
+      textDim: '#6e7681', textDimmer: '#484f58', textBright: '#ffffff',
+      accent: '#58a6ff', accentLight: '#79c0ff', accentBg: 'rgba(88,166,255,.12)',
+      accentBorder: 'rgba(88,166,255,.5)', danger: '#f85149', dangerHover: '#da3633',
+      shadow: 'rgba(0,0,0,.35)', shadowStrong: 'rgba(0,0,0,.6)',
+    },
+    nocturne: {
+      name: 'ノクターン',
+      bg: '#1a1025', bgSecondary: 'rgba(45,27,61,.65)', bgTertiary: 'rgba(26,16,37,.58)',
+      bgHover: 'rgba(192,132,252,.1)', border: 'rgba(147,51,234,.28)', borderLight: 'rgba(147,51,234,.16)',
+      borderHover: 'rgba(216,180,254,.4)', text: '#f3e8ff', textMuted: '#e9d5ff',
+      textDim: '#d8b4fe', textDimmer: '#c084fc', textBright: '#faf5ff',
+      accent: '#c084fc', accentLight: '#e879f9', accentBg: 'rgba(192,132,252,.12)',
+      accentBorder: 'rgba(192,132,252,.5)', danger: '#fb7185', dangerHover: '#f43f5e',
+      shadow: 'rgba(0,0,0,.3)', shadowStrong: 'rgba(0,0,0,.58)',
+    },
+    tokyoNight: {
+      name: 'トウキョウナイト',
+      bg: '#1a1b26', bgSecondary: 'rgba(36,40,59,.7)', bgTertiary: 'rgba(26,27,38,.62)',
+      bgHover: 'rgba(122,162,247,.1)', border: 'rgba(86,95,137,.55)', borderLight: 'rgba(86,95,137,.35)',
+      borderHover: 'rgba(125,207,255,.45)', text: '#c0caf5', textMuted: '#a9b1d6',
+      textDim: '#565f89', textDimmer: '#414868', textBright: '#ffffff',
+      accent: '#7aa2f7', accentLight: '#89ddff', accentBg: 'rgba(122,162,247,.12)',
+      accentBorder: 'rgba(122,162,247,.5)', danger: '#f7768e', dangerHover: '#ff7a93',
+      shadow: 'rgba(0,0,0,.28)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+    mochaDark: {
+      name: 'モカ',
+      bg: '#2d2420', bgSecondary: 'rgba(62,49,42,.65)', bgTertiary: 'rgba(45,36,32,.58)',
+      bgHover: 'rgba(214,172,132,.12)', border: 'rgba(120,90,72,.45)', borderLight: 'rgba(120,90,72,.28)',
+      borderHover: 'rgba(214,172,132,.4)', text: '#f5e6d8', textMuted: '#d4b8a8',
+      textDim: '#a89080', textDimmer: '#7d6a5c', textBright: '#fffaf5',
+      accent: '#d6ac84', accentLight: '#e8c4a8', accentBg: 'rgba(214,172,132,.12)',
+      accentBorder: 'rgba(214,172,132,.45)', danger: '#e57373', dangerHover: '#ef5350',
+      shadow: 'rgba(0,0,0,.25)', shadowStrong: 'rgba(0,0,0,.5)',
+    },
+    copper: {
+      name: 'カッパー',
+      bg: '#1c1410', bgSecondary: 'rgba(58,42,32,.6)', bgTertiary: 'rgba(28,20,16,.55)',
+      bgHover: 'rgba(184,115,51,.12)', border: 'rgba(139,90,43,.4)', borderLight: 'rgba(139,90,43,.25)',
+      borderHover: 'rgba(217,119,6,.45)', text: '#fde8d4', textMuted: '#e8c4a0',
+      textDim: '#c49a6c', textDimmer: '#a67c52', textBright: '#fff8f0',
+      accent: '#ea8c55', accentLight: '#f4a460', accentBg: 'rgba(234,140,85,.12)',
+      accentBorder: 'rgba(234,140,85,.5)', danger: '#ef4444', dangerHover: '#dc2626',
+      shadow: 'rgba(0,0,0,.3)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+    oliveNight: {
+      name: 'オリーブナイト',
+      bg: '#1a1c10', bgSecondary: 'rgba(54,58,33,.6)', bgTertiary: 'rgba(26,28,16,.55)',
+      bgHover: 'rgba(163,230,53,.1)', border: 'rgba(101,120,50,.4)', borderLight: 'rgba(101,120,50,.25)',
+      borderHover: 'rgba(190,242,100,.4)', text: '#ecfccb', textMuted: '#d9f99d',
+      textDim: '#a3e635', textDimmer: '#84cc16', textBright: '#f7fee7',
+      accent: '#bef264', accentLight: '#d9f99d', accentBg: 'rgba(190,242,100,.12)',
+      accentBorder: 'rgba(190,242,100,.5)', danger: '#fb923c', dangerHover: '#f97316',
+      shadow: 'rgba(0,0,0,.28)', shadowStrong: 'rgba(0,0,0,.52)',
+    },
+    bloodMoon: {
+      name: 'ブラッドムーン',
+      bg: '#1c0a0a', bgSecondary: 'rgba(69,10,10,.55)', bgTertiary: 'rgba(28,10,10,.52)',
+      bgHover: 'rgba(248,113,113,.1)', border: 'rgba(127,29,29,.45)', borderLight: 'rgba(127,29,29,.28)',
+      borderHover: 'rgba(252,165,165,.45)', text: '#fecaca', textMuted: '#fca5a5',
+      textDim: '#f87171', textDimmer: '#ef4444', textBright: '#fff1f2',
+      accent: '#f87171', accentLight: '#fca5a5', accentBg: 'rgba(248,113,113,.12)',
+      accentBorder: 'rgba(248,113,113,.5)', danger: '#fbbf24', dangerHover: '#f59e0b',
+      shadow: 'rgba(0,0,0,.32)', shadowStrong: 'rgba(69,10,10,.45)',
+    },
+    neonCity: {
+      name: 'ネオンシティ',
+      bg: '#0c0a1a', bgSecondary: 'rgba(30,27,75,.55)', bgTertiary: 'rgba(12,10,26,.52)',
+      bgHover: 'rgba(34,211,238,.08)', border: 'rgba(139,92,246,.3)', borderLight: 'rgba(139,92,246,.18)',
+      borderHover: 'rgba(34,211,238,.45)', text: '#e0f2fe', textMuted: '#a5f3fc',
+      textDim: '#22d3ee', textDimmer: '#06b6d4', textBright: '#f0f9ff',
+      accent: '#e879f9', accentLight: '#f0abfc', accentBg: 'rgba(232,121,249,.12)',
+      accentBorder: 'rgba(232,121,249,.55)', danger: '#38bdf8', dangerHover: '#0ea5e9',
+      shadow: 'rgba(139,92,246,.15)', shadowStrong: 'rgba(0,0,0,.6)',
+    },
+    sapphire: {
+      name: 'サファイア',
+      bg: '#0c1929', bgSecondary: 'rgba(23,37,84,.6)', bgTertiary: 'rgba(12,25,41,.55)',
+      bgHover: 'rgba(96,165,250,.1)', border: 'rgba(30,58,138,.45)', borderLight: 'rgba(30,58,138,.28)',
+      borderHover: 'rgba(147,197,253,.45)', text: '#dbeafe', textMuted: '#bfdbfe',
+      textDim: '#60a5fa', textDimmer: '#3b82f6', textBright: '#eff6ff',
+      accent: '#3b82f6', accentLight: '#60a5fa', accentBg: 'rgba(59,130,246,.15)',
+      accentBorder: 'rgba(59,130,246,.55)', danger: '#f87171', dangerHover: '#ef4444',
+      shadow: 'rgba(0,0,0,.28)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+    onyx: {
+      name: 'オニキス',
+      bg: '#0a0a0a', bgSecondary: 'rgba(23,23,23,.75)', bgTertiary: 'rgba(10,10,10,.65)',
+      bgHover: 'rgba(64,64,64,.4)', border: 'rgba(38,38,38,.8)', borderLight: 'rgba(38,38,38,.5)',
+      borderHover: 'rgba(82,82,82,.75)', text: '#e5e5e5', textMuted: '#a3a3a3',
+      textDim: '#737373', textDimmer: '#525252', textBright: '#fafafa',
+      accent: '#eab308', accentLight: '#facc15', accentBg: 'rgba(234,179,8,.12)',
+      accentBorder: 'rgba(234,179,8,.5)', danger: '#ef4444', dangerHover: '#dc2626',
+      shadow: 'rgba(0,0,0,.4)', shadowStrong: 'rgba(0,0,0,.7)',
+    },
+    raven: {
+      name: 'レイヴン',
+      bg: '#0f1419', bgSecondary: 'rgba(30,41,59,.65)', bgTertiary: 'rgba(15,20,25,.58)',
+      bgHover: 'rgba(148,163,184,.12)', border: 'rgba(51,65,85,.55)', borderLight: 'rgba(51,65,85,.35)',
+      borderHover: 'rgba(148,163,184,.45)', text: '#cbd5e1', textMuted: '#94a3b8',
+      textDim: '#64748b', textDimmer: '#475569', textBright: '#f1f5f9',
+      accent: '#94a3b8', accentLight: '#cbd5e1', accentBg: 'rgba(148,163,184,.12)',
+      accentBorder: 'rgba(148,163,184,.5)', danger: '#f87171', dangerHover: '#ef4444',
+      shadow: 'rgba(0,0,0,.28)', shadowStrong: 'rgba(0,0,0,.55)',
+    },
+    abyssal: {
+      name: 'アビサル',
+      bg: '#020617', bgSecondary: 'rgba(15,23,42,.72)', bgTertiary: 'rgba(2,6,23,.65)',
+      bgHover: 'rgba(14,165,233,.1)', border: 'rgba(30,58,138,.4)', borderLight: 'rgba(30,58,138,.25)',
+      borderHover: 'rgba(56,189,248,.45)', text: '#bae6fd', textMuted: '#7dd3fc',
+      textDim: '#38bdf8', textDimmer: '#0284c7', textBright: '#f0f9ff',
+      accent: '#0ea5e9', accentLight: '#38bdf8', accentBg: 'rgba(14,165,233,.12)',
+      accentBorder: 'rgba(14,165,233,.55)', danger: '#fb923c', dangerHover: '#f97316',
+      shadow: 'rgba(0,0,0,.32)', shadowStrong: 'rgba(0,0,0,.62)',
+    },
+    terminal: {
+      name: 'ターミナル',
+      bg: '#0c0c0c', bgSecondary: 'rgba(26,26,26,.75)', bgTertiary: 'rgba(12,12,12,.68)',
+      bgHover: 'rgba(250,204,21,.08)', border: 'rgba(64,64,64,.6)', borderLight: 'rgba(64,64,64,.4)',
+      borderHover: 'rgba(250,204,21,.35)', text: '#fef9c3', textMuted: '#fde047',
+      textDim: '#eab308', textDimmer: '#ca8a04', textBright: '#fefce8',
+      accent: '#facc15', accentLight: '#fde047', accentBg: 'rgba(250,204,21,.1)',
+      accentBorder: 'rgba(250,204,21,.5)', danger: '#f87171', dangerHover: '#ef4444',
+      shadow: 'rgba(0,0,0,.35)', shadowStrong: 'rgba(0,0,0,.65)',
+    },
+    moss: {
+      name: 'モス',
+      bg: '#0f1f17', bgSecondary: 'rgba(34,55,43,.6)', bgTertiary: 'rgba(15,31,23,.55)',
+      bgHover: 'rgba(134,239,172,.1)', border: 'rgba(55,95,70,.45)', borderLight: 'rgba(55,95,70,.28)',
+      borderHover: 'rgba(134,239,172,.38)', text: '#dcfce7', textMuted: '#bbf7d0',
+      textDim: '#4ade80', textDimmer: '#22c55e', textBright: '#f0fdf4',
+      accent: '#4ade80', accentLight: '#86efac', accentBg: 'rgba(74,222,128,.12)',
+      accentBorder: 'rgba(74,222,128,.5)', danger: '#fb923c', dangerHover: '#f97316',
+      shadow: 'rgba(0,0,0,.28)', shadowStrong: 'rgba(0,0,0,.52)',
+    },
+    slateNight: {
+      name: 'スレートナイト',
+      bg: '#1e293b', bgSecondary: 'rgba(51,65,85,.65)', bgTertiary: 'rgba(30,41,59,.58)',
+      bgHover: 'rgba(148,163,184,.12)', border: 'rgba(71,85,105,.55)', borderLight: 'rgba(71,85,105,.35)',
+      borderHover: 'rgba(203,213,225,.4)', text: '#e2e8f0', textMuted: '#cbd5e1',
+      textDim: '#94a3b8', textDimmer: '#64748b', textBright: '#f8fafc',
+      accent: '#38bdf8', accentLight: '#7dd3fc', accentBg: 'rgba(56,189,248,.1)',
+      accentBorder: 'rgba(56,189,248,.5)', danger: '#f87171', dangerHover: '#ef4444',
+      shadow: 'rgba(0,0,0,.22)', shadowStrong: 'rgba(0,0,0,.48)',
+    },
+    emberDark: {
+      name: 'エンバー',
+      bg: '#1c1008', bgSecondary: 'rgba(67,33,16,.55)', bgTertiary: 'rgba(28,16,8,.52)',
+      bgHover: 'rgba(251,146,60,.12)', border: 'rgba(154,52,18,.4)', borderLight: 'rgba(154,52,18,.25)',
+      borderHover: 'rgba(253,186,116,.45)', text: '#ffedd5', textMuted: '#fed7aa',
+      textDim: '#fb923c', textDimmer: '#ea580c', textBright: '#fff7ed',
+      accent: '#fb923c', accentLight: '#fdba74', accentBg: 'rgba(251,146,60,.12)',
+      accentBorder: 'rgba(251,146,60,.5)', danger: '#ef4444', dangerHover: '#dc2626',
+      shadow: 'rgba(0,0,0,.3)', shadowStrong: 'rgba(67,33,16,.35)',
+    },
+
+    ice: {
+      name: 'アイス',
+      bg: '#f8fafc', bgSecondary: 'rgba(255,255,255,.95)', bgTertiary: 'rgba(248,250,252,.98)',
+      bgHover: 'rgba(224,242,254,.9)', border: 'rgba(186,230,253,.9)', borderLight: 'rgba(186,230,253,.55)',
+      borderHover: 'rgba(56,189,248,.45)', text: '#0c4a6e', textMuted: '#075985',
+      textDim: '#0369a1', textDimmer: '#0284c7', textBright: '#082f49',
+      accent: '#0284c7', accentLight: '#0ea5e9', accentBg: 'rgba(2,132,199,.08)',
+      accentBorder: 'rgba(2,132,199,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(8,47,73,.04)', shadowStrong: 'rgba(8,47,73,.09)',
+    },
+    spring: {
+      name: 'スプリング',
+      bg: '#f7fee7', bgSecondary: 'rgba(255,255,255,.92)', bgTertiary: 'rgba(247,254,231,.96)',
+      bgHover: 'rgba(217,249,157,.75)', border: 'rgba(190,242,100,.85)', borderLight: 'rgba(190,242,100,.5)',
+      borderHover: 'rgba(101,163,13,.45)', text: '#365314', textMuted: '#3f6212',
+      textDim: '#4d7c0f', textDimmer: '#65a30d', textBright: '#1a2e05',
+      accent: '#65a30d', accentLight: '#84cc16', accentBg: 'rgba(101,163,13,.1)',
+      accentBorder: 'rgba(101,163,13,.42)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(54,83,20,.05)', shadowStrong: 'rgba(54,83,20,.1)',
+    },
+    autumn: {
+      name: 'オータム',
+      bg: '#fff7ed', bgSecondary: 'rgba(255,252,248,.95)', bgTertiary: 'rgba(255,247,237,.97)',
+      bgHover: 'rgba(254,215,170,.8)', border: 'rgba(251,146,60,.35)', borderLight: 'rgba(251,146,60,.2)',
+      borderHover: 'rgba(194,65,12,.35)', text: '#7c2d12', textMuted: '#9a3412',
+      textDim: '#c2410c', textDimmer: '#ea580c', textBright: '#431407',
+      accent: '#c2410c', accentLight: '#ea580c', accentBg: 'rgba(194,65,12,.1)',
+      accentBorder: 'rgba(194,65,12,.4)', danger: '#991b1b', dangerHover: '#7f1d1d',
+      shadow: 'rgba(124,45,18,.06)', shadowStrong: 'rgba(124,45,18,.12)',
+    },
+    lemonade: {
+      name: 'レモネード',
+      bg: '#fefce8', bgSecondary: 'rgba(255,255,255,.93)', bgTertiary: 'rgba(254,252,232,.97)',
+      bgHover: 'rgba(254,240,138,.82)', border: 'rgba(250,204,21,.55)', borderLight: 'rgba(250,204,21,.35)',
+      borderHover: 'rgba(202,138,4,.4)', text: '#713f12', textMuted: '#854d0e',
+      textDim: '#a16207', textDimmer: '#ca8a04', textBright: '#422006',
+      accent: '#ca8a04', accentLight: '#eab308', accentBg: 'rgba(202,138,4,.1)',
+      accentBorder: 'rgba(202,138,4,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(113,63,18,.04)', shadowStrong: 'rgba(113,63,18,.09)',
+    },
+    periwinkle: {
+      name: 'ペリウィンクル',
+      bg: '#eef2ff', bgSecondary: 'rgba(255,255,255,.92)', bgTertiary: 'rgba(238,242,255,.96)',
+      bgHover: 'rgba(199,210,254,.82)', border: 'rgba(165,180,252,.75)', borderLight: 'rgba(165,180,252,.45)',
+      borderHover: 'rgba(99,102,241,.45)', text: '#312e81', textMuted: '#3730a3',
+      textDim: '#4338ca', textDimmer: '#4f46e5', textBright: '#1e1b4b',
+      accent: '#4f46e5', accentLight: '#6366f1', accentBg: 'rgba(79,70,229,.08)',
+      accentBorder: 'rgba(79,70,229,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(49,46,129,.06)', shadowStrong: 'rgba(49,46,129,.12)',
+    },
+    lilacMist: {
+      name: 'ライラックミスト',
+      bg: '#faf5ff', bgSecondary: 'rgba(255,255,255,.94)', bgTertiary: 'rgba(250,245,255,.97)',
+      bgHover: 'rgba(243,232,255,.88)', border: 'rgba(216,180,254,.65)', borderLight: 'rgba(216,180,254,.4)',
+      borderHover: 'rgba(168,85,247,.4)', text: '#581c87', textMuted: '#6b21a8',
+      textDim: '#7e22ce', textDimmer: '#9333ea', textBright: '#3b0764',
+      accent: '#a855f7', accentLight: '#c084fc', accentBg: 'rgba(168,85,247,.08)',
+      accentBorder: 'rgba(168,85,247,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(88,28,135,.05)', shadowStrong: 'rgba(88,28,135,.1)',
+    },
+    roseGold: {
+      name: 'ローズゴールド',
+      bg: '#fffbfb', bgSecondary: 'rgba(255,255,255,.95)', bgTertiary: 'rgba(255,251,251,.97)',
+      bgHover: 'rgba(254,215,226,.75)', border: 'rgba(251,182,206,.7)', borderLight: 'rgba(251,182,206,.45)',
+      borderHover: 'rgba(190,24,93,.35)', text: '#831843', textMuted: '#9d174d',
+      textDim: '#be185d', textDimmer: '#db2777', textBright: '#500724',
+      accent: '#e11d48', accentLight: '#f43f5e', accentBg: 'rgba(225,29,72,.07)',
+      accentBorder: 'rgba(225,29,72,.38)', danger: '#b45309', dangerHover: '#92400e',
+      shadow: 'rgba(131,24,56,.05)', shadowStrong: 'rgba(131,24,56,.1)',
+    },
+    porcelain: {
+      name: '磁器',
+      bg: '#fafaf9', bgSecondary: 'rgba(255,255,255,.96)', bgTertiary: 'rgba(250,250,249,.98)',
+      bgHover: 'rgba(245,245,244,.92)', border: 'rgba(214,211,209,.85)', borderLight: 'rgba(214,211,209,.5)',
+      borderHover: 'rgba(120,113,108,.4)', text: '#292524', textMuted: '#44403c',
+      textDim: '#57534e', textDimmer: '#78716c', textBright: '#1c1917',
+      accent: '#57534e', accentLight: '#78716c', accentBg: 'rgba(87,83,78,.08)',
+      accentBorder: 'rgba(87,83,78,.35)', danger: '#b91c1c', dangerHover: '#991b1b',
+      shadow: 'rgba(28,25,23,.04)', shadowStrong: 'rgba(28,25,23,.08)',
+    },
+    mist: {
+      name: 'ミスト',
+      bg: '#f4f4f5', bgSecondary: 'rgba(255,255,255,.94)', bgTertiary: 'rgba(244,244,245,.97)',
+      bgHover: 'rgba(228,228,231,.9)', border: 'rgba(212,212,216,.85)', borderLight: 'rgba(212,212,216,.5)',
+      borderHover: 'rgba(113,113,122,.45)', text: '#27272a', textMuted: '#3f3f46',
+      textDim: '#52525b', textDimmer: '#71717a', textBright: '#18181b',
+      accent: '#71717a', accentLight: '#a1a1aa', accentBg: 'rgba(113,113,122,.1)',
+      accentBorder: 'rgba(113,113,122,.38)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(0,0,0,.05)', shadowStrong: 'rgba(0,0,0,.1)',
+    },
+    sepia: {
+      name: 'セピア',
+      bg: '#f4ecd8', bgSecondary: 'rgba(255,252,240,.92)', bgTertiary: 'rgba(244,236,216,.95)',
+      bgHover: 'rgba(235,220,188,.88)', border: 'rgba(202,184,148,.75)', borderLight: 'rgba(202,184,148,.45)',
+      borderHover: 'rgba(146,118,82,.4)', text: '#422006', textMuted: '#57534e',
+      textDim: '#78716c', textDimmer: '#a8a29e', textBright: '#1c1917',
+      accent: '#92400e', accentLight: '#b45309', accentBg: 'rgba(146,64,14,.1)',
+      accentBorder: 'rgba(146,64,14,.38)', danger: '#991b1b', dangerHover: '#7f1d1d',
+      shadow: 'rgba(66,32,6,.06)', shadowStrong: 'rgba(66,32,6,.12)',
+    },
+    newspaper: {
+      name: 'ニュースペーパー',
+      bg: '#f5f5f4', bgSecondary: 'rgba(255,255,255,.93)', bgTertiary: 'rgba(245,245,244,.96)',
+      bgHover: 'rgba(231,229,228,.9)', border: 'rgba(214,211,209,.8)', borderLight: 'rgba(214,211,209,.48)',
+      borderHover: 'rgba(68,64,60,.35)', text: '#1c1917', textMuted: '#292524',
+      textDim: '#44403c', textDimmer: '#57534e', textBright: '#0c0a09',
+      accent: '#1c1917', accentLight: '#44403c', accentBg: 'rgba(28,25,23,.06)',
+      accentBorder: 'rgba(28,25,23,.3)', danger: '#b91c1c', dangerHover: '#991b1b',
+      shadow: 'rgba(0,0,0,.06)', shadowStrong: 'rgba(0,0,0,.11)',
+    },
+    azure: {
+      name: 'アジュール',
+      bg: '#eff6ff', bgSecondary: 'rgba(255,255,255,.94)', bgTertiary: 'rgba(239,246,255,.97)',
+      bgHover: 'rgba(191,219,254,.82)', border: 'rgba(147,197,253,.8)', borderLight: 'rgba(147,197,253,.48)',
+      borderHover: 'rgba(37,99,235,.4)', text: '#1e3a8a', textMuted: '#1e40af',
+      textDim: '#2563eb', textDimmer: '#3b82f6', textBright: '#172554',
+      accent: '#2563eb', accentLight: '#3b82f6', accentBg: 'rgba(37,99,235,.08)',
+      accentBorder: 'rgba(37,99,235,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(30,58,138,.05)', shadowStrong: 'rgba(30,58,138,.1)',
+    },
+    emeraldLight: {
+      name: 'エメラルド',
+      bg: '#ecfdf5', bgSecondary: 'rgba(255,255,255,.94)', bgTertiary: 'rgba(236,253,245,.97)',
+      bgHover: 'rgba(167,243,208,.82)', border: 'rgba(110,231,183,.78)', borderLight: 'rgba(110,231,183,.48)',
+      borderHover: 'rgba(5,150,105,.4)', text: '#064e3b', textMuted: '#065f46',
+      textDim: '#047857', textDimmer: '#059669', textBright: '#022c22',
+      accent: '#059669', accentLight: '#10b981', accentBg: 'rgba(5,150,105,.08)',
+      accentBorder: 'rgba(5,150,105,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(6,78,59,.05)', shadowStrong: 'rgba(6,78,59,.1)',
+    },
+    cherryBlossom: {
+      name: 'サクラ',
+      bg: '#fdf2f8', bgSecondary: 'rgba(255,255,255,.93)', bgTertiary: 'rgba(253,242,248,.97)',
+      bgHover: 'rgba(251,207,232,.78)', border: 'rgba(249,168,212,.75)', borderLight: 'rgba(249,168,212,.45)',
+      borderHover: 'rgba(219,39,119,.38)', text: '#831843', textMuted: '#9d174d',
+      textDim: '#be185d', textDimmer: '#db2777', textBright: '#500724',
+      accent: '#ec4899', accentLight: '#f472b6', accentBg: 'rgba(236,72,153,.08)',
+      accentBorder: 'rgba(236,72,153,.4)', danger: '#c2410c', dangerHover: '#9a3412',
+      shadow: 'rgba(131,24,56,.05)', shadowStrong: 'rgba(131,24,56,.1)',
+    },
+    honey: {
+      name: 'ハニー',
+      bg: '#fffbeb', bgSecondary: 'rgba(255,255,255,.93)', bgTertiary: 'rgba(255,251,235,.97)',
+      bgHover: 'rgba(254,243,199,.85)', border: 'rgba(253,224,71,.65)', borderLight: 'rgba(253,224,71,.4)',
+      borderHover: 'rgba(202,138,4,.42)', text: '#713f12', textMuted: '#854d0e',
+      textDim: '#a16207', textDimmer: '#ca8a04', textBright: '#422006',
+      accent: '#d97706', accentLight: '#f59e0b', accentBg: 'rgba(217,119,6,.1)',
+      accentBorder: 'rgba(217,119,6,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(113,63,18,.04)', shadowStrong: 'rgba(113,63,18,.09)',
+    },
+    arctic: {
+      name: 'アークティック',
+      bg: '#ffffff', bgSecondary: 'rgba(248,250,252,.98)', bgTertiary: 'rgba(241,245,249,.95)',
+      bgHover: 'rgba(226,232,240,.92)', border: 'rgba(203,213,225,.85)', borderLight: 'rgba(203,213,225,.5)',
+      borderHover: 'rgba(100,116,139,.4)', text: '#334155', textMuted: '#475569',
+      textDim: '#64748b', textDimmer: '#94a3b8', textBright: '#0f172a',
+      accent: '#0ea5e9', accentLight: '#38bdf8', accentBg: 'rgba(14,165,233,.08)',
+      accentBorder: 'rgba(14,165,233,.4)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(15,23,42,.04)', shadowStrong: 'rgba(15,23,42,.08)',
+    },
+    powder: {
+      name: 'パウダー',
+      bg: '#f0f9ff', bgSecondary: 'rgba(255,255,255,.95)', bgTertiary: 'rgba(240,249,255,.98)',
+      bgHover: 'rgba(224,242,254,.88)', border: 'rgba(125,211,252,.75)', borderLight: 'rgba(125,211,252,.45)',
+      borderHover: 'rgba(14,165,233,.38)', text: '#0c4a6e', textMuted: '#075985',
+      textDim: '#0369a1', textDimmer: '#0284c7', textBright: '#082f49',
+      accent: '#0ea5e9', accentLight: '#38bdf8', accentBg: 'rgba(14,165,233,.07)',
+      accentBorder: 'rgba(14,165,233,.38)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(8,47,73,.04)', shadowStrong: 'rgba(8,47,73,.09)',
+    },
+    vanilla: {
+      name: 'バニラ',
+      bg: '#fffef7', bgSecondary: 'rgba(255,255,255,.95)', bgTertiary: 'rgba(255,254,247,.98)',
+      bgHover: 'rgba(254,252,232,.9)', border: 'rgba(254,249,195,.8)', borderLight: 'rgba(254,249,195,.5)',
+      borderHover: 'rgba(202,138,4,.35)', text: '#422006', textMuted: '#57534e',
+      textDim: '#78716c', textDimmer: '#a8a29e', textBright: '#1c1917',
+      accent: '#ca8a04', accentLight: '#eab308', accentBg: 'rgba(202,138,4,.09)',
+      accentBorder: 'rgba(202,138,4,.35)', danger: '#b91c1c', dangerHover: '#991b1b',
+      shadow: 'rgba(66,32,6,.04)', shadowStrong: 'rgba(66,32,6,.08)',
+    },
+    denim: {
+      name: 'デニム',
+      bg: '#f1f5f9', bgSecondary: 'rgba(255,255,255,.93)', bgTertiary: 'rgba(241,245,249,.96)',
+      bgHover: 'rgba(203,213,225,.82)', border: 'rgba(148,163,184,.75)', borderLight: 'rgba(148,163,184,.45)',
+      borderHover: 'rgba(51,65,85,.4)', text: '#1e293b', textMuted: '#334155',
+      textDim: '#475569', textDimmer: '#64748b', textBright: '#0f172a',
+      accent: '#334155', accentLight: '#475569', accentBg: 'rgba(51,65,85,.1)',
+      accentBorder: 'rgba(51,65,85,.38)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(15,23,42,.05)', shadowStrong: 'rgba(15,23,42,.1)',
+    },
+    blush: {
+      name: 'ブラッシュ',
+      bg: '#fdf4ff', bgSecondary: 'rgba(255,255,255,.94)', bgTertiary: 'rgba(253,244,255,.97)',
+      bgHover: 'rgba(250,232,255,.85)', border: 'rgba(233,213,255,.78)', borderLight: 'rgba(233,213,255,.48)',
+      borderHover: 'rgba(168,85,247,.38)', text: '#581c87', textMuted: '#6b21a8',
+      textDim: '#7c3aed', textDimmer: '#8b5cf6', textBright: '#3b0764',
+      accent: '#8b5cf6', accentLight: '#a78bfa', accentBg: 'rgba(139,92,246,.07)',
+      accentBorder: 'rgba(139,92,246,.38)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(88,28,135,.05)', shadowStrong: 'rgba(88,28,135,.1)',
+    },
+    seafoam: {
+      name: 'シーフォーム',
+      bg: '#f0fdfa', bgSecondary: 'rgba(255,255,255,.94)', bgTertiary: 'rgba(240,253,250,.97)',
+      bgHover: 'rgba(153,246,228,.78)', border: 'rgba(94,234,212,.72)', borderLight: 'rgba(94,234,212,.45)',
+      borderHover: 'rgba(13,148,136,.38)', text: '#134e4a', textMuted: '#115e59',
+      textDim: '#0f766e', textDimmer: '#14b8a6', textBright: '#042f2e',
+      accent: '#0d9488', accentLight: '#14b8a6', accentBg: 'rgba(13,148,136,.08)',
+      accentBorder: 'rgba(13,148,136,.38)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(19,78,74,.05)', shadowStrong: 'rgba(19,78,74,.1)',
+    },
+    buttercream: {
+      name: 'バタークリーム',
+      bg: '#fffbeb', bgSecondary: 'rgba(255,255,255,.94)', bgTertiary: 'rgba(255,251,235,.97)',
+      bgHover: 'rgba(254,243,199,.86)', border: 'rgba(253,230,138,.72)', borderLight: 'rgba(253,230,138,.45)',
+      borderHover: 'rgba(217,119,6,.38)', text: '#78350f', textMuted: '#92400e',
+      textDim: '#b45309', textDimmer: '#d97706', textBright: '#451a03',
+      accent: '#d97706', accentLight: '#f59e0b', accentBg: 'rgba(217,119,6,.09)',
+      accentBorder: 'rgba(217,119,6,.38)', danger: '#b91c1c', dangerHover: '#991b1b',
+      shadow: 'rgba(120,53,15,.04)', shadowStrong: 'rgba(120,53,15,.09)',
+    },
+    graphiteLight: {
+      name: 'グラファイト',
+      bg: '#f8fafc', bgSecondary: 'rgba(255,255,255,.95)', bgTertiary: 'rgba(248,250,252,.97)',
+      bgHover: 'rgba(226,232,240,.88)', border: 'rgba(148,163,184,.65)', borderLight: 'rgba(148,163,184,.4)',
+      borderHover: 'rgba(71,85,105,.42)', text: '#0f172a', textMuted: '#1e293b',
+      textDim: '#334155', textDimmer: '#475569', textBright: '#020617',
+      accent: '#64748b', accentLight: '#94a3b8', accentBg: 'rgba(100,116,139,.1)',
+      accentBorder: 'rgba(100,116,139,.38)', danger: '#dc2626', dangerHover: '#b91c1c',
+      shadow: 'rgba(15,23,42,.04)', shadowStrong: 'rgba(15,23,42,.09)',
+    },
+  };
+
+  // ────────────────────────────────────────────
+  // CSS 変数生成
+  //
+  // テーマオブジェクトから #portal-overlay スコープの
+  // CSS カスタムプロパティ文字列を生成する。
+  // boot.js が <style id="portal-theme-vars"> に書き込む。
+  // ────────────────────────────────────────────
+
+  /**
+   * @param {ThemeTokens} t
+   * @returns {string} CSS テキスト
+   */
+  function getThemeCss(t) {
+    return `#portal-overlay{`
+      + `--p-bg:${t.bg};--p-bg2:${t.bgSecondary};--p-bg3:${t.bgTertiary};--p-bg-hover:${t.bgHover};`
+      + `--p-border:${t.border};--p-border-light:${t.borderLight};--p-border-hover:${t.borderHover};`
+      + `--p-text:${t.text};--p-text-muted:${t.textMuted};--p-text-dim:${t.textDim};`
+      + `--p-text-dimmer:${t.textDimmer};--p-text-bright:${t.textBright};`
+      + `--p-accent:${t.accent};--p-accent-light:${t.accentLight};`
+      + `--p-accent-bg:${t.accentBg};--p-accent-border:${t.accentBorder};`
+      + `--p-danger:${t.danger};--p-danger-hover:${t.dangerHover};`
+      + `--p-shadow:${t.shadow};--p-shadow-strong:${t.shadowStrong}}`;
+  }
+
+  // storage のテーマ名キー（core/constants.js SK.theme と同一の文字列を使う）
+  const THEME_STORAGE_KEY = 'portalThemeColorTheme';
+
+  /**
+   * boot-cover.js 専用。テーマ名から背景色だけを返す。
+   * @param {string} [themeName]
+   * @returns {string} CSS カラー値
+   */
+  function bootCoverBg(themeName) {
+    const t = THEMES[themeName] || THEMES.dark;
+    return t.bg;
+  }
+
+  // ────────────────────────────────────────────
+  // グローバルに公開
+  // ────────────────────────────────────────────
+
+  Object.assign(P, { THEMES, getThemeCss, bootCoverBg, THEME_STORAGE_KEY });
+
+})(typeof globalThis !== 'undefined' ? globalThis : window);
