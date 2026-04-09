@@ -38,8 +38,9 @@
   var KEY_RETURN_URL     = 'portalThemeKingLmsSyncReturnUrl';
   var KEY_AWAIT_COURSE   = 'portalThemeKingLmsSyncAwaitCourse';
 
-  var KEY_ASSIGNMENT_PENDING    = 'portalThemeKingLmsAssignmentSyncPending';
-  var KEY_ASSIGNMENT_RETURN_URL = 'portalThemeKingLmsAssignmentSyncReturnUrl';
+  var KEY_ASSIGNMENT_PENDING      = 'portalThemeKingLmsAssignmentSyncPending';
+  var KEY_ASSIGNMENT_RETURN_URL   = 'portalThemeKingLmsAssignmentSyncReturnUrl';
+  var KEY_ASSIGNMENT_AWAIT_STREAM = 'portalThemeKingLmsAssignmentSyncAwaitStream';
 
   var SYNC_DONE_HASH               = 'portal-king-lms-sync-ok';
   var SYNC_TIMEOUT_HASH            = 'portal-king-lms-sync-timeout';
@@ -219,10 +220,14 @@
   }
 
   /** ログイン画面用。ポータルからの同期フローで returnUrl があるときだけ呼ぶ。 */
-  function mountLoginHint() {
+  function mountLoginHint(isAssignment) {
     if (!isLoginRedirectPage()) return;
     ensureUiStyles();
     if (document.getElementById(LOGIN_HINT_ID)) return;
+
+    var sub = isAssignment
+      ? 'ログイン後、課題を取得してポータルに戻ります。'
+      : 'ログイン後、コース一覧を保存してポータルに戻ります。';
 
     var bar = document.createElement('div');
     bar.id = LOGIN_HINT_ID;
@@ -230,7 +235,7 @@
     bar.setAttribute('aria-live', 'polite');
     bar.innerHTML =
       '<p class="kcg-portal-ext-login-hint-msg">ログインしてください</p>' +
-      '<p class="kcg-portal-ext-login-hint-sub">ログイン後、コース一覧を保存してポータルに戻ります。</p>';
+      '<p class="kcg-portal-ext-login-hint-sub">' + sub + '</p>';
     (document.body || document.documentElement).appendChild(bar);
   }
 
@@ -283,14 +288,24 @@
     } catch (e) { return false; }
   }
 
+  function isStreamPage() {
+    try {
+      if (location.hostname !== 'king-lms.kcg.edu') return false;
+      return /\/ultra\/stream/.test(location.pathname || '');
+    } catch (e) { return false; }
+  }
+
   // ────────────────────────────────────────────
   // 同期フロー
   // ────────────────────────────────────────────
 
   function maybeShowOverlayFromStorage() {
-    storageGet([KEY_PENDING, KEY_ASSIGNMENT_PENDING], function (data) {
+    storageGet([KEY_PENDING, KEY_ASSIGNMENT_PENDING, KEY_ASSIGNMENT_AWAIT_STREAM, KEY_ASSIGNMENT_RETURN_URL], function (data) {
       if (!data) return;
       if (data[KEY_ASSIGNMENT_PENDING]) {
+        mountSyncOverlay('課題を取得しています…');
+        startAssignmentSyncSafetyTimer();
+      } else if (data[KEY_ASSIGNMENT_AWAIT_STREAM] && data[KEY_ASSIGNMENT_RETURN_URL] && isStreamPage()) {
         mountSyncOverlay('課題を取得しています…');
         startAssignmentSyncSafetyTimer();
       } else if (data[KEY_PENDING]) {
@@ -306,14 +321,16 @@
     removeSyncOverlay();
     storageGet([KEY_RETURN_URL, KEY_ASSIGNMENT_RETURN_URL], function (data) {
       if (!data) return;
-      var returnUrl = data[KEY_RETURN_URL] || data[KEY_ASSIGNMENT_RETURN_URL];
-      var hadReturn = !!(returnUrl && typeof returnUrl === 'string');
+      var hadCourseReturn     = !!(data[KEY_RETURN_URL] && typeof data[KEY_RETURN_URL] === 'string');
+      var hadAssignmentReturn = !!(data[KEY_ASSIGNMENT_RETURN_URL] && typeof data[KEY_ASSIGNMENT_RETURN_URL] === 'string');
+      var hadReturn = hadCourseReturn || hadAssignmentReturn;
       var toSet = {};
-      toSet[KEY_PENDING]              = false;
-      toSet[KEY_AWAIT_COURSE]         = hadReturn;
-      toSet[KEY_ASSIGNMENT_PENDING]   = false;
+      toSet[KEY_PENDING]                = false;
+      toSet[KEY_AWAIT_COURSE]           = hadCourseReturn;
+      toSet[KEY_ASSIGNMENT_PENDING]     = false;
+      toSet[KEY_ASSIGNMENT_AWAIT_STREAM] = hadAssignmentReturn;
       storageSet(toSet, function () {
-        if (hadReturn) mountLoginHint();
+        if (hadReturn) mountLoginHint(hadAssignmentReturn && !hadCourseReturn);
       });
     });
   }
@@ -424,18 +441,39 @@
    * @param {string} [captureState] 'error' のとき既存の課題キャッシュは書き換えずポータルへ戻す
    */
   function saveAssignmentDue(items, capturedAt, captureState) {
-    storageGet(KEY_ASSIGNMENT_PENDING, function (data) {
-      var syncPending = !!(data && data[KEY_ASSIGNMENT_PENDING]);
+    storageGet([KEY_ASSIGNMENT_PENDING, KEY_ASSIGNMENT_AWAIT_STREAM, KEY_ASSIGNMENT_RETURN_URL], function (data) {
+      if (!data) return;
+
+      var syncPending = !!data[KEY_ASSIGNMENT_PENDING];
+      var hadAwait    = !!data[KEY_ASSIGNMENT_AWAIT_STREAM];
+
+      if (!syncPending && hadAwait && data[KEY_ASSIGNMENT_RETURN_URL] && isStreamPage()) {
+        syncPending = true;
+      }
+
       if (syncPending) mountSyncOverlay('課題を取得しています…');
 
       if (captureState === 'error') {
-        redirectToPortalAfterAssignmentSync(ASSIGNMENT_SYNC_ERROR_HASH);
+        if (syncPending) {
+          var errSet = {};
+          if (hadAwait) {
+            errSet[KEY_ASSIGNMENT_AWAIT_STREAM] = false;
+            errSet[KEY_ASSIGNMENT_PENDING]      = true;
+          }
+          storageSet(errSet, function () {
+            redirectToPortalAfterAssignmentSync(ASSIGNMENT_SYNC_ERROR_HASH);
+          });
+        }
         return;
       }
 
       var duePayload = { items: items, capturedAt: capturedAt };
       var toSet = {};
       toSet[KEY_STREAMS_DUE] = duePayload;
+      if (syncPending && hadAwait) {
+        toSet[KEY_ASSIGNMENT_AWAIT_STREAM] = false;
+        toSet[KEY_ASSIGNMENT_PENDING]      = true;
+      }
       storageSet(toSet, function (ok) {
         if (ok && syncPending) redirectAfterAssignmentSync();
       });

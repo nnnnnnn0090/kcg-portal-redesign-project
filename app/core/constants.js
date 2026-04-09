@@ -39,8 +39,9 @@
     kingLmsSyncPending:   'portalThemeKingLmsSyncPending',     // King LMS コース同期中フラグ
     kingLmsSyncReturnUrl: 'portalThemeKingLmsSyncReturnUrl',   // コース同期後の戻り先 URL
     kingLmsSyncAwaitCourse: 'portalThemeKingLmsSyncAwaitCourse', // ログイン後コース画面待機フラグ
-    kingLmsAssignmentSyncPending:   'portalThemeKingLmsAssignmentSyncPending',   // 課題同期中フラグ
-    kingLmsAssignmentSyncReturnUrl: 'portalThemeKingLmsAssignmentSyncReturnUrl', // 課題同期後の戻り先 URL
+    kingLmsAssignmentSyncPending:     'portalThemeKingLmsAssignmentSyncPending',     // 課題同期中フラグ
+    kingLmsAssignmentSyncReturnUrl:   'portalThemeKingLmsAssignmentSyncReturnUrl',   // 課題同期後の戻り先 URL
+    kingLmsAssignmentSyncAwaitStream: 'portalThemeKingLmsAssignmentSyncAwaitStream', // ログイン後ストリーム画面待機フラグ
     shortcutConfig:       'portalThemeShortcutConfig',           // ショートカットのカスタム設定（JSON）
   };
 
