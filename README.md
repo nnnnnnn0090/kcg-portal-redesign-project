@@ -1,191 +1,175 @@
 # KCG Portal Redesign Project
 
-京都コンピュータ学院（KCG）の学生向けポータル（`home.kcg.ac.jp`）向けの**非公式**ブラウザ拡張です。公式サイトの見た目と操作性を、読みやすいレイアウトに置き換えます。
+京都コンピュータ学院（KCG）の学生向けポータル（`https://home.kcg.ac.jp`）向けの**非公式**ブラウザ拡張です。公式ページの表示を読みやすい UI に差し替えます。
 
-> バージョン: `2.0.1` — Manifest V3 対応
+- **スタック**: [WXT](https://wxt.dev/) · React 19 · TypeScript · Manifest V3  
+- **バージョン**: `app/package.json` / `wxt.config.ts` の `version` を参照（ストア用メタデータと同期）
 
 ---
 
 ## 免責事項
 
 - 本拡張は**学校・運営元とは一切関係ありません**。有志によるオープンソースです。
-- ポータル本体のサーバーや API を改変するものではなく、**ブラウザ上で表示を上書きする**仕組みです。
+- ポータルや King LMS のサーバーを改変するものではなく、**ブラウザ内で DOM を上書き表示する**拡張です。
 - 利用は自己責任でお願いします。不具合やアカウントへの影響について、作者は責任を負いません。
 
 ---
 
 ## 主な機能
 
-### ページUI の再設計
+### ページ UI
 
 | ページ | 概要 |
 |--------|------|
-| ホーム (`/portal`) | 情報を整理した見やすいトップページ |
-| お知らせ一覧 (`/portal/News`) | 読みやすいニュースリスト |
-| お知らせ詳細 (`/portal/News/Detail/:id`) | 記事の詳細表示 |
-| 休講・補講・教室変更 (`/portal/KyukoHokoEtc`) | 変更情報をわかりやすく整理 |
-| アンケート (`/portal/Questionnaire`) | アンケート画面を再デザイン |
+| ホーム（`/portal`） | カレンダー・お知らせ・ショートカットなどを整理したトップ |
+| お知らせ一覧（`/portal/News`） | 一覧の再レイアウト |
+| お知らせ詳細（`/portal/News/Detail/:id`） | 記事ビュー |
+| 休講・補講・教室変更（`/portal/KyukoHokoEtc`） | 変更情報の見やすい表示 |
+| アンケート（`/portal/Questionnaire`） | アンケート画面の再デザイン |
 
 ### カレンダー
 
-- **講義カレンダー** — 時間割をカレンダー形式で表示。コンテキストメニューで詳細確認
-- **補講・休講カレンダー** — 補講・休講情報を日付ベースで表示
-- **キャンパスカレンダー** — 学院行事の一覧
-- **課題カレンダー** — King LMS の提出期限をカレンダーに統合表示
+- **講義カレンダー**（講義コマ・ツールチップ・コンテキストメニューなど）
+- **補修・休講・キャンパス**の各カレンダー
+- **課題カレンダー** — King LMS の提出期限をストレージ経由で表示
 
 ### King LMS 連携
 
-- King LMS（`king-lms.kcg.edu`）のネットワーク通信を拡張機能のフックで傍受し、コース情報・課題情報を取得
-- 取得データを `chrome.storage` 経由でポータル側のカレンダーに自動反映
-- ポータル←→King LMS 間のシームレスな同期フロー
+- `king-lms.kcg.edu` 上で MAIN world のフックが通信を捕捉し、隔離ワールドのブリッジが `chrome.storage`（Firefox では `browser.storage`）に保存
+- ポータル側の React UI がそのデータを読み取り、課題カレンダーなどに反映
+- 同期中のオーバーレイ・タイムアウト・ログインリダイレクト時の扱いを実装済み
 
-### テーマ・カスタマイズ
+### テーマ・設定
 
-- **ライト / ダーク テーマ** の切り替え（起動時のちらつき防止処理付き）
-- **ショートカットリンク** の編集・並び替えが可能
-- **設定パネル** から各種オプションを変更できる
-- 設定は `chrome.storage` に永続保存
-
-### UX 向上
-
-- トースト通知（同期完了・共有ボタン押下時など）
-- カレンダーツールチップ（日程にカーソルを当てると詳細表示）
-- コンテキストメニュー（講義コマを右クリックしてアクション実行）
-- アニメーション付きの滑らかなUI遷移
+- ライト / ダークなど複数テーマ
+- ショートカットの編集・並び順
+- 設定は拡張の `storage` に保存
 
 ---
 
 ## 対応ブラウザ
 
-| ブラウザ | 対応状況 |
-|----------|----------|
-| Google Chrome | ✅ |
-| Microsoft Edge | ✅ |
-| Mozilla Firefox | ✅（Manifest V3 対応環境） |
+| ブラウザ | 備考 |
+|----------|------|
+| Google Chrome | MV3（`minimum_chrome_version` は `wxt.config.ts` 参照） |
+| Microsoft Edge | 同上 |
+| Mozilla Firefox | `wxt.config.ts` の `browser_specific_settings.gecko` を参照 |
 
 ---
 
-## 必要環境（開発・ビルド）
+## 必要環境
 
-- **bash**、**Python 3**（ビルドスクリプトで `manifest.json` を加工）
-- **zip**（macOS / Linux 標準）
-- Firefox 向けパッケージを `web-ext` で作る場合: [web-ext](https://github.com/mozilla/web-ext)（未インストール時は zip のみ生成）
-
----
-
-## 開発（未パッケージで読み込む）
-
-1. リポジトリを取得する。
-
-   ```bash
-   git clone https://github.com/<ユーザー名>/kcg-portal-redesign-project.git
-   cd kcg-portal-redesign-project
-   ```
-
-2. 各ブラウザの「開発者向け / 一時的な拡張機能の読み込み」から、**リポジトリ内の `app` フォルダ**（`app/manifest.json` がある階層）を指定する。
-
-`app/manifest.json` にはビルド用の `package_slug` が含まれる場合があります。ストア提出用と同じ中身で試す場合は、下記 `./build.sh` の成果物を展開して読み込んでも構いません。
+- **Node.js**（20 系 LTS 以上を推奨）
+- **npm**
+- リポジトリルートの **`./build.sh`** を使う場合: **bash**（macOS / Linux 標準、Git Bash 等でも可）
 
 ---
 
-## ビルド
+## 開発
 
-リポジトリルートで:
+すべて **`app/` ディレクトリ**で実行します。
+
+```bash
+cd app
+npm install
+```
+
+### ウォッチ開発（未パッケージの読み込み）
+
+```bash
+npm run dev          # Chromium 系（既定）
+npm run dev:firefox  # Firefox
+```
+
+WXT が `app/.output/` にブラウザ別の拡張ディレクトリを出力します。Chrome では「デベロッパーモード」→「パッケージ化されていない拡張機能を読み込む」から、例: `app/.output/chrome-mv3` を指定します。
+
+### ビルドのみ
+
+```bash
+npm run build           # Chromium 向け
+npm run build:firefox   # Firefox 向け
+```
+
+### 品質
+
+```bash
+npm run lint
+npm run format          # 書き込み
+npm run format:check
+npm run test            # Vitest
+```
+
+### E2E（任意）
+
+実拡張ディレクトリを渡したときだけスモークテストが走ります。
+
+```bash
+npm run build
+EXTENSION_PATH=.output/chrome-mv3 npm run test:e2e
+```
+
+`EXTENSION_PATH` が未設定またはパスが無効な場合、該当スイートはスキップされます。
+
+---
+
+## 配布用 ZIP（リポジトリルート）
+
+リポジトリのルートから:
 
 ```bash
 ./build.sh
 ```
 
-- 一時ディレクトリに `app` をコピーし、`package_slug` を除いた `manifest.json` でパッケージ化します。
-- 成果物は **`build/` 直下**に出力されます（ファイル名は `manifest.json` の `package_slug` と `version` に基づく）。
-  - Chrome / Edge 用の `.zip`
-  - Firefox 用の `.zip`（`web-ext` 利用時は Mozilla 向けビルド形式）
+`app` で `npm run zip` と `npm run zip:firefox` を実行し、生成された **`app/.output/*.zip`** を **`build/`** にコピーします。
 
 ---
 
-## リポジトリ構成
+## リポジトリ構成（概要）
 
 ```
 kcg-portal-redesign-project/
-├── app/                        # 拡張のソース
-│   ├── manifest.json           # 拡張メタデータ・パーミッション定義（MV3）
-│   ├── main.js                 # URLルーター（パスを各ページにマッピング）
-│   ├── boot.js                 # オーバーレイ起動・DOM構築・メッセージ管理
-│   │
-│   ├── api/
-│   │   └── urls.js             # ポータルAPIのURL生成・認証済みfetchブリッジ
-│   │
-│   ├── bridges/
-│   │   └── king-lms-bridge.js  # King LMSデータをストレージ経由でポータルに橋渡し
-│   │
-│   ├── calendar/
-│   │   ├── controller.js       # カレンダー汎用コントローラ
-│   │   ├── assignment-calendar.js  # King LMS課題カレンダー
-│   │   ├── grid-builder.js     # カレンダーグリッドのレイアウト生成
-│   │   └── kogi-helpers.js     # 講義カレンダー用ヘルパー・コンテキストメニュー
-│   │
-│   ├── core/
-│   │   ├── constants.js        # 定数（ストレージキー・ページID・テーマ定義）
-│   │   ├── date.js             # 日付ユーティリティ
-│   │   ├── dom.js              # DOMヘルパー・オーバーレイCSS管理
-│   │   └── storage.js          # chrome.storageラッパー
-│   │
-│   ├── early/                  # document_start 時点で最初に実行
-│   │   ├── theme.js            # 起動時の早期テーマ適用（ちらつき防止）
-│   │   └── boot-cover.js       # オーバーレイ読み込み完了までのカバー
-│   │
-│   ├── hooks/                  # MAIN world でfetch/XHRを傍受
-│   │   ├── portal-fetch-hook.js    # ポータルのfetch/XHRをインターセプト
-│   │   ├── portal-fetch-bridge.js  # pageFetch / リプレイ用ブリッジ
-│   │   └── king-lms-fetch-hook.js  # King LMSのネットワーク通信を傍受
-│   │
-│   ├── pages/                  # 各ページのHTML生成とセットアップ
-│   │   ├── home.js             # ホームページ
-│   │   ├── news.js             # お知らせ一覧
-│   │   ├── detail.js           # お知らせ詳細
-│   │   ├── kyuko.js            # 休講・補講・教室変更
-│   │   └── survey.js           # アンケート
-│   │
-│   ├── renderers/              # データからUIへのレンダリング
-│   │   ├── news.js             # お知らせリストのレンダリング
-│   │   ├── links.js            # ショートカットリンク・リンク編集
-│   │   └── kino.js             # ポータルメッセージパネル
-│   │
-│   ├── shell/                  # 共通レイアウト
-│   │   ├── header.js           # ヘッダーHTML・元ポータルからの情報同期
-│   │   └── footer.js           # フッター同期
-│   │
-│   └── ui/                     # UIコンポーネント
-│       ├── animation.js        # アニメーション
-│       ├── toast.js            # トースト通知
-│       ├── tooltip.js          # カレンダーツールチップ
-│       ├── context-menu.js     # コンテキストメニュー
-│       ├── theme-manager.js    # テーマ切り替え管理
-│       └── settings-panel.js  # 設定パネルUI
-│
-├── build.sh                    # ビルドスクリプト
-├── build/                      # ビルド生成物（.gitignore対象）
-└── LICENSE                     # MIT License
+├── app/
+│   ├── wxt.config.ts          # WXT / manifest 設定
+│   ├── package.json
+│   ├── src/
+│   │   ├── entrypoints/       # コンテンツスクリプトのエントリ
+│   │   │   ├── portal-early.content/   # document_start（早期テーマ・ブートカバー）
+│   │   │   ├── portal-hooks.content/   # MAIN: fetch/XHR 傍受・postMessage
+│   │   │   ├── portal.content/         # document_end: React マウント
+│   │   │   ├── king-lms-hooks.content/
+│   │   │   └── king-lms-bridge.content/  # King LMS 側ストレージブリッジ
+│   │   ├── portal/            # React ルート・アプリ
+│   │   ├── components/        # ページ・レイアウト・UI
+│   │   ├── features/calendar/ # カレンダー機能
+│   │   ├── hooks/             # React フック
+│   │   ├── lib/               # API・DOM・メッセージ処理など
+│   │   ├── themes/            # テーマ CSS 変数
+│   │   └── styles/            # グローバル CSS
+│   ├── e2e/                   # Playwright
+│   └── .output/               # ビルド出力（gitignore 想定）
+├── build.sh                   # ZIP を build/ に集約
+├── build/                     # build.sh の出力先
+├── LICENSE
+└── README.md
 ```
 
 ---
 
-## 動作の仕組み
+## 動作のざっくりした流れ
 
-1. **早期スクリプト（`early/`）** が `document_start` で実行され、テーマ適用とちらつき防止カバーを設置する。
-2. **フックスクリプト（`hooks/`）** が MAIN world で `fetch` / XHR を上書きし、APIレスポンスを拡張機能側に `postMessage` で転送する。
-3. **`main.js`** が現在のURLパスを判定し、対応するページモジュールを呼び出す。
-4. **`boot.js`** がDOM・テーマ・設定・カレンダーを初期化し、`postMessage` のルーティングを担う。
-5. **King LMS ブリッジ（`bridges/king-lms-bridge.js`）** が King LMS 側のデータを `chrome.storage` に書き込み、ポータル側のカレンダーと同期する。
+1. **`portal-early`** が早い段階でテーマ用スタイルとブートカバーを置き、ちらつきを抑える。  
+2. **`portal-hooks`** がポータル origin の MAIN world でネットワークをフックし、API 結果を隔離ワールドへ `postMessage`。  
+3. **`portal`** が `#portal-overlay` に React をマウントし、ルートに応じたページを表示。  
+4. King LMS では **`king-lms-hooks`** と **`king-lms-bridge`** が同様に連携し、コース・課題データをストレージへ保存してからポータルへ戻るフローを処理。
 
 ---
 
 ## コントリビューション
 
-Issue・Pull Request を歓迎します。変更は既存のコードスタイルに合わせ、必要なら `app/manifest.json` の `version` を更新してください。
+Issue・Pull Request を歓迎します。変更は既存の TypeScript / React のスタイルに合わせ、リリースに含める場合は `app/package.json` と `wxt.config.ts` の **version** を揃えて更新してください。
 
 ---
 
 ## ライセンス
 
-[MIT License](LICENSE)（オープンソースとして自由に利用・改変・再配布できます。詳細は `LICENSE` を参照）。
+[MIT License](LICENSE)
