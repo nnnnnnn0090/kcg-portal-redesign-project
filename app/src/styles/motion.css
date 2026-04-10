@@ -1,0 +1,32 @@
+/* 入場フェード（@keyframes p-fade-in は base.css） */
+
+#portal-overlay .p-main-head{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) var(--p-enter-delay-head) both}
+#portal-overlay .p-site-footer{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .16s) both}
+#portal-overlay .p-grid{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) both;
+  animation-delay:calc(var(--p-enter-delay-head) + .28s)}
+#portal-overlay .p-fab-cluster{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .2s) both}
+
+#portal-overlay .p-news-nendo-nav,
+#portal-overlay .p-kyuko-jump{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .04s) both}
+#portal-overlay .p-news-nendo-msg{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .08s) both}
+#portal-overlay .p-news-aside > .p-news-filter-page-title{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .06s) both}
+#portal-overlay .p-news-aside > .p-news-mat{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) both}
+#portal-overlay .p-news-aside > .p-news-mat:nth-of-type(1){animation-delay:calc(var(--p-enter-delay-head) + .1s)}
+#portal-overlay .p-news-aside > .p-news-mat:nth-of-type(2){animation-delay:calc(var(--p-enter-delay-head) + .13s)}
+#portal-overlay .p-news-aside > .p-news-mat:nth-of-type(3){animation-delay:calc(var(--p-enter-delay-head) + .16s)}
+#portal-overlay .p-news-aside > .p-news-mat:nth-of-type(4){animation-delay:calc(var(--p-enter-delay-head) + .19s)}
+#portal-overlay .p-news-aside > .p-news-mat:nth-of-type(5){animation-delay:calc(var(--p-enter-delay-head) + .22s)}
+#portal-overlay .p-news-aside > .p-news-clear{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .24s) both}
+#portal-overlay .p-news-detail-foot{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .1s) both}
+#portal-overlay .p-questionnaire-list-error{
+  animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + .06s) both}

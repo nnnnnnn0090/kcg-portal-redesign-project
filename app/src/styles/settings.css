@@ -1,0 +1,38 @@
+#portal-overlay .p-settings-wrap{position:relative;z-index:60}
+#portal-overlay .p-settings-open{padding:.45rem .75rem;border-radius:8px;border:1px solid var(--p-border);background:transparent;
+  color:var(--p-text-muted);font-size:.75rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s ease}
+#portal-overlay .p-settings-open:hover{border-color:var(--p-border-hover);background:var(--p-bg-hover);color:var(--p-text-bright)}
+#portal-overlay .p-settings-pop{position:absolute;top:calc(100% + .35rem);left:0;right:auto;z-index:70;width:min(22rem,calc(100vw - 2rem));
+  animation:p-scale-in var(--p-pop-dur) var(--p-enter-ease) both}
+#portal-overlay .p-settings-pop.is-closing{animation:p-scale-out var(--p-pop-dur) var(--p-enter-ease) forwards}
+@media (prefers-reduced-motion:reduce){#portal-overlay .p-settings-pop,#portal-overlay .p-settings-pop.is-closing{animation-duration:.01ms!important}}
+#portal-overlay .p-settings-pop[hidden]{display:none!important}
+#portal-overlay .p-settings-dialog{width:100%;margin:0;background:var(--p-bg);border:1px solid var(--p-border);border-radius:14px;
+  box-shadow:0 16px 48px var(--p-shadow-strong);padding:1rem 1.1rem}
+#portal-overlay .p-settings-dialog h2{margin:0 0 .85rem;font-size:.95rem;color:var(--p-text-bright);font-weight:600;letter-spacing:-.01em}
+#portal-overlay .p-settings-version{margin:.65rem 0 0;padding-top:.65rem;border-top:1px solid var(--p-border-light);font-size:.68rem;color:var(--p-text-dimmer);line-height:1.45;text-align:right;letter-spacing:.02em}
+#portal-overlay .p-settings-section{margin:0 0 1rem;padding:0 0 .75rem;border-bottom:1px solid var(--p-border-light)}
+#portal-overlay .p-settings-section:last-of-type{margin-bottom:.5rem;padding-bottom:0;border-bottom:none}
+#portal-overlay .p-settings-section-title{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--p-text-dim);margin:0 0 .5rem;padding:0 .55rem}
+#portal-overlay .p-settings-row{display:flex;align-items:flex-start;gap:.65rem;margin:0 0 .65rem;font-size:.8125rem;line-height:1.45;
+  color:var(--p-text-muted);cursor:pointer;padding:.5rem .55rem;border-radius:8px;transition:background .15s ease}
+#portal-overlay .p-settings-row:hover{background:var(--p-bg-hover)}
+#portal-overlay .p-settings-dialog .p-settings-row:last-child{margin-bottom:0}
+#portal-overlay .p-settings-row-actions{padding-top:.15rem;justify-content:flex-start;cursor:default}
+#portal-overlay .p-settings-row-actions:hover{background:transparent}
+#portal-overlay #p-settings-king-lms-resync-wrap[hidden]{display:none!important}
+#portal-overlay .p-settings-resync-btn{padding:.5rem .95rem;border-radius:8px;border:1px solid var(--p-accent-border);background:var(--p-accent-bg);color:var(--p-accent-light);font-size:.8125rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
+#portal-overlay .p-settings-resync-btn:hover{background:color-mix(in srgb,var(--p-accent) 22%,transparent);border-color:var(--p-accent)}
+#portal-overlay .p-theme-picker{display:flex;flex-wrap:wrap;gap:.4rem;padding:.25rem .55rem;max-height:min(42vh,14.5rem);overflow-y:auto;overscroll-behavior:contain}
+#portal-overlay .p-theme-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;
+  flex:1 1 calc(50% - .2rem);min-width:4.75rem;padding:.4rem .5rem .45rem;border-radius:8px;border:2px solid var(--p-border);
+  background:var(--p-bg3);color:var(--p-text-muted);font-size:.72rem;font-weight:500;cursor:pointer;transition:all .2s ease;
+  font-family:inherit;line-height:1.25}
+#portal-overlay .p-theme-btn-swatches{display:inline-flex;align-items:center;justify-content:center;gap:.18rem}
+#portal-overlay .p-theme-btn-swatch{width:.55rem;height:.55rem;border-radius:2px;flex-shrink:0;
+  box-sizing:border-box;border:1px solid color-mix(in srgb,var(--p-border) 70%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--p-text-bright) 12%,transparent)}
+#portal-overlay .p-theme-btn-label{display:block;text-align:center}
+#portal-overlay .p-theme-btn:hover{border-color:var(--p-border-hover);background:var(--p-bg-hover);color:var(--p-text)}
+#portal-overlay .p-theme-btn.is-active{border-color:var(--p-accent);background:var(--p-accent-bg);color:var(--p-accent)}

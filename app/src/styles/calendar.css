@@ -1,0 +1,101 @@
+#portal-overlay .p-panel-cal{margin:0}
+/* マスコットは .p-panel-cal-wrap 直下で section と兄弟にし、パネルは overflow:hidden のまま角のボーダーを保つ。
+   入場フェードはラップに付け、内側 .p-panel の二重アニメを避ける（panels.css で内側は animation:none） */
+#portal-overlay .p-panel-cal-wrap{position:relative;animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) both}
+#portal-overlay .p-panel-cal-wrap .p-cal-kogi-sleep-mascot{
+  position:absolute;z-index:3;pointer-events:none;width:13%;height:auto;
+  right:15.5%;left:auto;top:0;transform:translateY(-80%);transform-origin:50% 100%;
+  filter:drop-shadow(0 4px 12px var(--p-shadow-strong));user-select:none;-webkit-user-drag:none}
+#portal-overlay .p-assignment-head-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem .75rem;padding:.85rem 1.15rem;border-bottom:1px solid var(--p-border-light);background:var(--p-bg3)}
+#portal-overlay .p-assignment-head-row .p-panel-head{margin:0;padding:0;border:none;background:transparent}
+#portal-overlay .p-assignment-fetch-wrap{text-align:center}
+#portal-overlay .p-assignment-fetch-wrap .p-empty{margin:0}
+#portal-overlay .p-assignment-cache-note{margin:0;padding:.55rem 1.15rem .55rem 1rem;font-size:.75rem;line-height:1.45;color:var(--p-text-dim);
+  background:var(--p-bg3);border-bottom:1px solid var(--p-border-light);border-left:3px solid color-mix(in srgb,var(--p-accent) 40%,var(--p-border))}
+#portal-overlay .p-assignment-cache-note[hidden]{display:none!important}
+#portal-overlay .p-cal-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;
+  padding:.65rem 1.15rem;border-bottom:1px solid var(--p-border-light);background:var(--p-bg3)}
+#portal-overlay .p-cal-title{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--p-text-dim);flex-shrink:0}
+#portal-overlay .p-cal-mode{display:inline-flex;border-radius:8px;background:var(--p-bg-hover);overflow:hidden;padding:2px}
+#portal-overlay .p-cal-mode-btn{padding:.35rem .7rem;border:none;background:transparent;color:var(--p-text-dim);font-size:.75rem;
+  font-weight:500;cursor:pointer;transition:all .2s ease;border-radius:6px}
+#portal-overlay .p-cal-mode-btn.is-active{background:var(--p-text-bright);color:var(--p-bg);box-shadow:0 2px 8px var(--p-shadow)}
+#portal-overlay .p-cal-mode-btn:not(.is-active):hover{color:var(--p-text);background:var(--p-bg-hover)}
+#portal-overlay .p-cal-nav{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+#portal-overlay .p-cal-range{font-size:.8rem;color:var(--p-text-muted);font-weight:500;min-width:10rem;text-align:center}
+#portal-overlay .p-cal-btn{padding:.4rem .85rem;border-radius:8px;border:1px solid var(--p-border);background:transparent;
+  color:var(--p-text-muted);font-size:.75rem;font-weight:500;cursor:pointer;transition:all .2s ease}
+#portal-overlay .p-cal-btn:hover:not(:disabled){border-color:var(--p-border-hover);background:var(--p-bg-hover);color:var(--p-text-bright)}
+#portal-overlay .p-cal-btn:disabled{opacity:.35;cursor:not-allowed}
+#portal-overlay .p-btn{display:inline-flex;align-items:center;justify-content:center;padding:.5rem 1rem;border-radius:8px;border:1px solid var(--p-accent-border);
+  background:var(--p-accent-bg);color:var(--p-accent-light);font-size:.8125rem;font-weight:600;cursor:pointer;font-family:inherit;
+  transition:background .15s,border-color .15s;margin-top:.65rem}
+#portal-overlay .p-btn:hover{background:color-mix(in srgb,var(--p-accent) 22%,transparent);border-color:var(--p-accent)}
+#portal-overlay .p-cal-scroll{max-height:none;overflow:visible;transition:min-height .42s cubic-bezier(.33,1,.32,1)}
+#portal-overlay .p-panel-body.p-cal-scroll>div{transition:min-height .42s cubic-bezier(.33,1,.32,1)}
+#portal-overlay .p-cal-scroll>div[data-cal-loading]{display:flex;flex-direction:column;justify-content:center;box-sizing:border-box}
+#portal-overlay .p-cal-scroll>div[data-cal-loading][data-cal-mode=\"week\"]{min-height:min(72vh,24rem)}
+#portal-overlay .p-cal-scroll>div[data-cal-loading][data-cal-mode=\"month\"]{min-height:min(90vh,42rem)}
+#portal-overlay .p-cal-scroll>div[data-cal-loading] .p-cal-loading-msg{margin-block:auto;text-align:center}
+#portal-overlay .p-cal-swipe-viewport{overflow:hidden;width:100%}
+#portal-overlay .p-cal-swipe-track{display:flex;flex-direction:row;width:200%;transition:transform var(--p-enter-dur) var(--p-enter-ease);will-change:transform}
+#portal-overlay .p-cal-swipe-cell{flex:0 0 50%;min-width:50%;max-width:50%;box-sizing:border-box}
+#portal-overlay .p-cal-swipe--next{transform:translateX(0)}
+#portal-overlay .p-cal-swipe--next.is-mid{transform:translateX(-50%)}
+#portal-overlay .p-cal-swipe--prev{transform:translateX(-50%)}
+#portal-overlay .p-cal-swipe--prev.is-mid{transform:translateX(0)}
+@media (prefers-reduced-motion:reduce){#portal-overlay .p-cal-swipe-track{transition:none!important}}
+#portal-overlay .p-cal-grid.p-cal-mode-swap-in,#portal-overlay .p-cal-scroll .p-empty.p-cal-mode-swap-in{animation:p-cal-mode-swap var(--p-enter-dur) var(--p-enter-ease) both}
+@media (prefers-reduced-motion:reduce){#portal-overlay .p-cal-grid.p-cal-mode-swap-in,#portal-overlay .p-cal-scroll .p-empty.p-cal-mode-swap-in{animation:none!important}}
+#portal-overlay .p-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem;width:100%;padding:.75rem}
+#portal-overlay .p-cal-wd{text-align:center;font-size:.65rem;font-weight:600;color:var(--p-text-dimmer);padding:.25rem 0 .5rem;
+  text-transform:uppercase;letter-spacing:.05em}
+#portal-overlay .p-cal-cell{background:var(--p-bg2);border:1px solid var(--p-border-light);border-radius:12px;
+  min-height:0;display:flex;flex-direction:column;overflow:hidden;transition:all .2s ease}
+#portal-overlay .p-cal-cell:hover{border-color:var(--p-border-hover);background:var(--p-bg-hover)}
+#portal-overlay .p-cal-cell.is-muted{opacity:.4}
+#portal-overlay .p-cal-cell.is-today{border-color:var(--p-accent-border);background:var(--p-accent-bg);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--p-accent) 22%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--p-accent) 12%,transparent)}
+#portal-overlay .p-cal-cell.is-today:hover{border-color:var(--p-accent-light);background:color-mix(in srgb,var(--p-accent) 18%,transparent)}
+#portal-overlay .p-cal-cell.is-today .p-cal-day-num{color:var(--p-accent-light);font-weight:700}
+#portal-overlay .p-cal-cell.is-muted.is-today{opacity:1}
+#portal-overlay .p-cal-day-num{padding:.4rem .5rem;font-size:.7rem;font-weight:600;color:var(--p-text-dim);
+  border-bottom:1px solid var(--p-border-light);flex-shrink:0}
+#portal-overlay .p-cal-grid.is-week .p-cal-cell{min-height:12rem}
+#portal-overlay .p-cal-grid.is-month .p-cal-cell{min-height:5rem;overflow:visible}
+#portal-overlay .p-cal-grid.is-month .p-cal-day-num{padding:.28rem .4rem}
+#portal-overlay .p-cal-day-body{padding:.4rem .5rem;flex:1;min-height:0;overflow:auto;max-height:11rem}
+#portal-overlay .p-cal-grid.is-week .p-cal-day-body{max-height:none;min-height:auto;overflow:visible;
+  display:flex;flex-direction:column;gap:.5rem}
+#portal-overlay .p-cal-grid.is-month .p-cal-day-body{flex:0 0 auto;max-height:none;min-height:auto;overflow:visible;
+  display:flex;flex-direction:column;gap:.1rem;padding:.2rem .35rem}
+#portal-overlay .p-cal-ev{font-size:.7rem;line-height:1.4;margin-bottom:.5rem;padding:.35rem .45rem;
+  background:var(--p-accent-bg);border-left:2px solid var(--p-accent);border-radius:0 6px 6px 0}
+#portal-overlay a.p-cal-ev{text-decoration:none;color:inherit;cursor:pointer;outline-offset:2px}
+#portal-overlay a.p-cal-ev:hover{background:color-mix(in srgb,var(--p-accent) 20%,transparent);border-left-color:var(--p-accent-light)}
+#portal-overlay a.p-cal-ev:focus-visible{box-shadow:0 0 0 2px color-mix(in srgb,var(--p-accent) 50%,transparent)}
+#portal-overlay .p-cal-ev:last-child{margin-bottom:0}
+#portal-overlay .p-cal-ev-title{display:block;color:var(--p-text);font-weight:500}
+#portal-overlay .p-cal-ev-meta{display:block;color:var(--p-text-dim);font-size:.65rem;margin-top:.2rem}
+#portal-overlay .p-cal-grid.is-week .p-cal-ev{margin-bottom:0;flex-shrink:0;box-sizing:border-box;min-height:4.25rem;height:4.25rem;
+  display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden}
+#portal-overlay .p-cal-grid.is-week .p-cal-ev-title{display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;flex:0 1 auto;max-height:2.8em;line-height:1.4;word-break:break-word}
+#portal-overlay .p-cal-grid.is-week .p-cal-ev-meta{margin-top:.15rem;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#portal-overlay .p-cal-grid.is-month .p-cal-ev{margin-bottom:0;flex-shrink:0;box-sizing:border-box;min-height:1.95rem;height:1.95rem;
+  display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:.1rem .3rem;font-size:.65rem}
+#portal-overlay .p-cal-grid.is-month .p-cal-ev-title{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;
+  overflow:hidden;font-size:.65rem;line-height:1.25}
+#portal-overlay .p-cal-ev-gap{flex-shrink:0;width:100%;pointer-events:none;box-sizing:border-box}
+#portal-overlay .p-cal-grid.is-week .p-cal-ev-gap{min-height:4.25rem;height:4.25rem}
+#portal-overlay .p-cal-grid.is-month .p-cal-ev-gap{min-height:1.95rem;height:1.95rem}
+#portal-overlay .p-cal-hover-pop{position:fixed;z-index:2147483646;max-width:min(22rem,calc(100vw - 1.5rem));
+  padding:.75rem .9rem;border-radius:12px;border:1px solid var(--p-border);background:var(--p-bg2);
+  box-shadow:0 16px 48px var(--p-shadow-strong);pointer-events:none;
+  backdrop-filter:blur(10px);color:var(--p-text);font-size:.8125rem;line-height:1.45;word-break:break-word}
+#portal-overlay .p-cal-hover-pop[hidden]{display:none!important}
+#portal-overlay .p-cal-pop-title{font-weight:600;color:var(--p-text-bright);font-size:.875rem;margin:0 0 .35rem;letter-spacing:-.01em}
+#portal-overlay .p-cal-pop-time{font-size:.8rem;font-weight:500;color:var(--p-text-muted);margin:0 0 .35rem;letter-spacing:.02em}
+#portal-overlay .p-cal-pop-meta{font-size:.75rem;color:var(--p-text-muted);margin:0 0 .4rem}
+#portal-overlay .p-cal-pop-detail{display:flex;flex-direction:column;gap:.35rem;font-size:.75rem;color:var(--p-text-muted);margin:0;
+  border-top:1px solid color-mix(in srgb,var(--p-border-hover) 55%,var(--p-text-dim));padding-top:.45rem;margin-top:.35rem}

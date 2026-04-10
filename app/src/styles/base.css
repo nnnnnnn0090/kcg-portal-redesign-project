@@ -1,0 +1,19 @@
+/* コンテンツの「ふわっと」出現（時間・イージングは #portal-overlay の --p-enter-* で統一） */
+@keyframes p-fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/** @deprecated p-fade-in と同一モーション。既存指定互換のため残す */
+@keyframes p-slide-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes p-scale-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes p-scale-out{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.96)}}
+@keyframes p-shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes p-cal-mode-swap{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes p-toast-from-top{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes p-toast-out{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.96)}}
+@keyframes p-toast-out-top{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-10px)}}
+#portal-overlay{position:fixed;inset:0;z-index:2147483647;overflow-y:auto;overscroll-behavior:contain;
+  --p-enter-dur:.45s;--p-enter-ease:cubic-bezier(.4,0,.2,1);--p-enter-delay-head:.08s;--p-pop-dur:.2s;
+  font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--p-text,#d4d4d8);background:var(--p-bg,#09090b);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .3s ease,color .3s ease}
+@media (prefers-reduced-motion:reduce){
+  #portal-overlay{--p-enter-dur:.01ms;--p-pop-dur:.01ms}
+}
+#portal-overlay *{box-sizing:border-box}

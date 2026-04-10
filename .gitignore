@@ -1,2 +1,5 @@
 .DS_Store
 /build
+/app/.output
+/app/.wxt
+/app/node_modules
