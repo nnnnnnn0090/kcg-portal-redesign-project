@@ -12,6 +12,7 @@ import { Footer } from '../components/layout/Footer';
 import { SettingsPanel, type SettingsPanelHandle } from '../components/layout/SettingsPanel';
 import { EXTENSION_PROMO_PAGE_URL, PAGE, SK } from '../shared/constants';
 import storage from '../lib/storage';
+import { attachSmoothOverlayWheelScroll } from '../lib/smooth-overlay-wheel-scroll';
 import { useCalendarInteractions } from '../features/calendar';
 import type { PortalRoute } from './router';
 import { PortalPageOutlet } from './routes';
@@ -76,6 +77,9 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
 
   // カレンダーの tooltip / コンテキストメニューをオーバーレイに配線
   useCalendarInteractions();
+
+  // Windows のマウスホイール等（段階的 delta）でメイン縦スクロールがカクつくのを補間
+  useEffect(() => attachSmoothOverlayWheelScroll(overlayRoot), [overlayRoot]);
 
   // 拡張機能紹介 URL のコピー
   const handleShareClick = useCallback(async () => {

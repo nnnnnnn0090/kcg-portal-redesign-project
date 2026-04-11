@@ -18,6 +18,9 @@ import {
 import { THEMES } from '../../themes';
 import type { Settings } from '../../context/settings';
 import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
+import { readExtensionVersion } from '../../lib/extension-version';
+
+const extensionVersion = readExtensionVersion();
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -255,6 +258,12 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
               </button>
             </div>
           </div>
+
+          {extensionVersion ? (
+            <p className="p-settings-version" role="note">
+              バージョン {extensionVersion}
+            </p>
+          ) : null}
         </div>
       </div>
     );

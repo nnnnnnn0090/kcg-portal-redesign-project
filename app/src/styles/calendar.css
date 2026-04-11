@@ -99,7 +99,11 @@
   backdrop-filter:blur(10px);color:var(--p-text);font-size:.8125rem;line-height:1.45;word-break:break-word}
 #portal-overlay .p-cal-hover-pop[hidden]{display:none!important}
 #portal-overlay .p-cal-pop-title{font-weight:600;color:var(--p-text-bright);font-size:.875rem;margin:0 0 .35rem;letter-spacing:-.01em}
-#portal-overlay .p-cal-pop-time{font-size:.8rem;font-weight:500;color:var(--p-text-muted);margin:0 0 .35rem;letter-spacing:.02em}
+#portal-overlay .p-cal-pop-time{display:flex;flex-direction:column;align-items:flex-start;gap:.2rem;
+  font-size:.8rem;font-weight:500;color:var(--p-text-muted);margin:0 0 .35rem;letter-spacing:.02em}
+#portal-overlay .p-cal-pop-remain{font-size:.72rem;font-weight:600;color:var(--p-accent-light);
+  letter-spacing:0;line-height:1.35;padding:.12rem .45rem;border-radius:6px;
+  background:color-mix(in srgb,var(--p-accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--p-accent-border) 55%,transparent)}
 #portal-overlay .p-cal-pop-meta{font-size:.75rem;color:var(--p-text-muted);margin:0 0 .4rem}
 #portal-overlay .p-cal-pop-detail{display:flex;flex-direction:column;gap:.35rem;font-size:.75rem;color:var(--p-text-muted);margin:0;
   border-top:1px solid color-mix(in srgb,var(--p-border-hover) 55%,var(--p-text-dim));padding-top:.45rem;margin-top:.35rem}

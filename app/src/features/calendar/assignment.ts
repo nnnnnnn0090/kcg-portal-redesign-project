@@ -51,6 +51,37 @@ export function formatDueLabel(iso: string): string {
   }
 }
 
+/**
+ * 課題ツールチップ用: 締切まで（または超過後）の残り時間を日本語で返す。
+ * 解釈できない日時は null。
+ */
+export function formatRemainingUntilDue(iso: string, nowMs = Date.now()): string | null {
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return null;
+  let ms = t - nowMs;
+  if (ms <= 0) {
+    const over = -ms;
+    const days = Math.floor(over / 86400000);
+    if (days >= 1) return `期限から${days}日経過`;
+    const hours = Math.floor(over / 3600000);
+    if (hours >= 1) return `期限から約${hours}時間経過`;
+    const mins = Math.floor(over / 60000);
+    if (mins >= 1) return `期限から約${mins}分経過`;
+    return '締切済み';
+  }
+  const days = Math.floor(ms / 86400000);
+  ms -= days * 86400000;
+  const hours = Math.floor(ms / 3600000);
+  ms -= hours * 3600000;
+  const mins = Math.floor(ms / 60000);
+  const parts: string[] = [];
+  if (days) parts.push(`${days}日`);
+  if (hours) parts.push(`${hours}時間`);
+  if (!days && !hours && mins) parts.push(`${mins}分`);
+  if (!days && !hours && !mins) return 'まもなく締切';
+  return `残り ${parts.join('')}`;
+}
+
 /** 課題データ配列をカレンダーイベント配列に変換する */
 export function dueItemsToCalEvents(raw: DueItem[]): CalEvent[] {
   const out: CalEvent[] = [];

@@ -13,7 +13,40 @@
   --p-enter-dur:.45s;--p-enter-ease:cubic-bezier(.4,0,.2,1);--p-enter-delay-head:.08s;--p-pop-dur:.2s;
   font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   color:var(--p-text,#d4d4d8);background:var(--p-bg,#09090b);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .3s ease,color .3s ease}
+/* スクロールバー用トークン（テーマ変数に追随）— Firefox scrollbar-color / WebKit 共通 */
+#portal-overlay{
+  --p-scroll-track:color-mix(in srgb,var(--p-bg2,#18181b) 78%,var(--p-bg,#09090b));
+  --p-scroll-thumb:color-mix(in srgb,var(--p-accent,#6366f1) 38%,var(--p-border-hover,#3f3f46));
+  --p-scroll-thumb-hover:color-mix(in srgb,var(--p-accent,#6366f1) 58%,var(--p-border-hover,#3f3f46));
+  --p-scroll-thumb-active:color-mix(in srgb,var(--p-accent,#6366f1) 72%,var(--p-border,#27272a));
+  scrollbar-width:thin;
+  scrollbar-color:var(--p-scroll-thumb) var(--p-scroll-track)}
+/* Firefox: オーバーレイ内のスクロール領域にも同じ配色（scrollbar-color は継承されない） */
+#portal-overlay *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--p-scroll-thumb) var(--p-scroll-track)}
+/* WebKit / Blink: #portal-overlay 自身がスクロール容器のため疑似要素は結合子必須 */
+#portal-overlay::-webkit-scrollbar{width:12px;height:12px}
+#portal-overlay::-webkit-scrollbar-track{background:var(--p-scroll-track);border-radius:999px}
+#portal-overlay::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  border:3px solid var(--p-scroll-track);
+  background:linear-gradient(160deg,
+    color-mix(in srgb,var(--p-accent-light,#a5b4fc) 42%,var(--p-scroll-thumb)) 0%,
+    var(--p-scroll-thumb) 42%,
+    color-mix(in srgb,var(--p-accent,#6366f1) 28%,var(--p-border,#27272a)) 100%);
+  background-clip:padding-box;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--p-text-bright,#fafafa) 12%,transparent)}
+#portal-overlay::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(160deg,
+    color-mix(in srgb,var(--p-accent-light,#a5b4fc) 52%,var(--p-scroll-thumb-hover)) 0%,
+    var(--p-scroll-thumb-hover) 42%,
+    color-mix(in srgb,var(--p-accent,#6366f1) 40%,var(--p-border-hover,#3f3f46)) 100%);
+  background-clip:padding-box;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--p-text-bright,#fafafa) 16%,transparent)}
+#portal-overlay::-webkit-scrollbar-thumb:active{
+  background:var(--p-scroll-thumb-active);
+  background-clip:padding-box;
+  box-shadow:none}
+#portal-overlay::-webkit-scrollbar-corner{background:var(--p-bg,#09090b)}
 @media (prefers-reduced-motion:reduce){
   #portal-overlay{--p-enter-dur:.01ms;--p-pop-dur:.01ms}
 }
-#portal-overlay *{box-sizing:border-box}

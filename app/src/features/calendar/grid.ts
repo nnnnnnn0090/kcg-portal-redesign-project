@@ -47,10 +47,13 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: ViewMeta): string {
 
     const metaHtml  = mode !== 'month' && meta ? `<span class="p-cal-ev-meta">${esc(meta)}</span>` : '';
     const kindAttr  = calKind ? ` data-cal-kind="${escAttr(calKind)}"` : '';
+    const dueIsoAttr = calKind === 'assignment' && String(ev.start ?? '').trim()
+      ? ` data-cal-due-iso="${escAttr(String(ev.start).trim())}"`
+      : '';
     const dataAttrs = `data-cal-title="${escAttr(ev.title ?? '')}" `
       + `data-cal-meta="${escAttr(meta)}" `
       + `data-cal-tip="${escAttr(tipPlain)}" `
-      + `data-cal-time="${escAttr(timeRange)}"${kindAttr}`;
+      + `data-cal-time="${escAttr(timeRange)}"${kindAttr}${dueIsoAttr}`;
     const inner = `<span class="p-cal-ev-title">${esc(ev.title ?? '')}</span>${metaHtml}`;
 
     parts.push(href

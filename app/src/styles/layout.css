@@ -4,9 +4,8 @@
 #portal-overlay .p-header-inner{max-width:1100px;margin:0 auto;padding:.75rem 1.25rem;
   display:flex;flex-wrap:nowrap;align-items:center;gap:.6rem 1rem;min-width:0}
 #portal-overlay .p-site-nav{display:flex;flex-wrap:nowrap;flex:1 1 auto;align-items:center;gap:.4rem;min-width:0;
-  justify-content:flex-start;margin:0;padding:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
-#portal-overlay .p-site-nav::-webkit-scrollbar{height:4px}
-#portal-overlay .p-site-nav::-webkit-scrollbar-thumb{border-radius:99px;background:color-mix(in srgb,var(--p-text-dimmer) 35%,transparent)}
+  justify-content:flex-start;margin:0;padding:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-ms-overflow-style:none}
+#portal-overlay .p-site-nav::-webkit-scrollbar{display:none}
 #portal-overlay .p-site-nav:empty{display:none}
 #portal-overlay .p-nav-btn{display:inline-flex;align-items:center;padding:.4rem .7rem;border-radius:8px;border:none;
   background:transparent;color:var(--p-text-muted);font-size:.75rem;font-weight:500;text-decoration:none;white-space:nowrap;cursor:pointer;

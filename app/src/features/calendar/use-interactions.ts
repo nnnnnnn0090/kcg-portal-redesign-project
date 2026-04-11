@@ -7,6 +7,7 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import { esc, setHtml } from '../../lib/dom';
 import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
+import { formatRemainingUntilDue } from './assignment';
 import { syllabusUrl, findKingLmsUrl } from './kogi';
 import { useCourses, type CourseRow } from '../../context/courses';
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
@@ -52,7 +53,14 @@ function attachCalendarTooltipAndContextMenu(
     if (!title && !meta && !tip && !time) return;
 
     const parts = [`<div class="p-cal-pop-title">${esc(title || '（無題）')}</div>`];
-    if (time) parts.push(`<div class="p-cal-pop-time">${esc(time)}</div>`);
+    if (time) {
+      const dueIso = (anchor.dataset.calDueIso || '').trim();
+      const remain = dueIso ? formatRemainingUntilDue(dueIso) : null;
+      const remainHtml = remain
+        ? `<span class="p-cal-pop-remain">${esc(remain)}</span>`
+        : '';
+      parts.push(`<div class="p-cal-pop-time">${esc(time)}${remainHtml}</div>`);
+    }
     if (meta) parts.push(`<div class="p-cal-pop-meta">${esc(meta)}</div>`);
     if (tip && tip !== title.trim()) {
       const lines = tip.split('\n').map((l) => l.trimEnd()).filter(Boolean);
