@@ -13,7 +13,6 @@ import { useHomeStorageBootstrap } from '../../hooks/useHomeStorageBootstrap';
 import { useKogiNewsPrefetch } from '../../hooks/useKogiNewsPrefetch';
 import { useHomePortalInbox } from '../../hooks/useHomePortalInbox';
 import { useLastLogin } from '../../hooks/useLastLogin';
-import type { NewsListItem } from '../../lib/portal-messages-pages';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
@@ -46,9 +45,6 @@ export function HomePage({ settings }: HomePageProps) {
   );
   const getKingLmsCourses = useCallback(() => courses, [courses]);
   const lastLogin         = useLastLogin();
-
-  const kogi   = kogiNews as NewsListItem[];
-  const topics = newTopicsItems as NewsListItem[];
 
   return (
     <PageShell
@@ -102,7 +98,7 @@ export function HomePage({ settings }: HomePageProps) {
         <section className="p-panel">
           <span className="p-panel-head">授業に関するお知らせ</span>
           <div className="p-panel-body" id="p-kogi-news">
-            <NewsList items={kogi} />
+            <NewsList items={kogiNews} />
           </div>
         </section>
 
@@ -111,7 +107,7 @@ export function HomePage({ settings }: HomePageProps) {
           <section className="p-panel">
             <span className="p-panel-head">お知らせ</span>
             <div className="p-panel-body" id="p-news">
-              <NewsList items={topics} />
+              <NewsList items={newTopicsItems} />
             </div>
           </section>
           <section className="p-panel p-panel-links">

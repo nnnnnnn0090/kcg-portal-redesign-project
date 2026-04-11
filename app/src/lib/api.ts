@@ -87,10 +87,7 @@ export const urls = {
 
 // ─── pageFetch ────────────────────────────────────────────────────────────
 
-/**
- * MAIN world の portal-fetch-bridge にフェッチを依頼する。
- * レスポンスは portal-hooks → postMessage → 隔離ワールド側に届く。
- */
+/** pageFetch 用 postMessage（portal-hooks のブリッジが処理） */
 export function pageFetch(url: string): void {
   window.postMessage({ type: FETCH_HOOK.pageFetch, url: String(url) }, '*');
 }

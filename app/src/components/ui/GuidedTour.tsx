@@ -11,6 +11,7 @@ import {
   useId,
   useRef,
   type CSSProperties,
+  type ReactNode,
 } from 'react';
 import { PAGE, SK } from '../../shared/constants';
 import type { PortalRoute } from '../../portal/router';
@@ -95,7 +96,13 @@ const STEPS: TourStep[] = [
     body:   '困ったときは「設定」からいつでもこの案内を確認できます。\n\n気に入ったら、ぜひ友だちにも教えてあげてください❤️',
   },
 ];
-const HOLE_PAD = 10;
+
+const HOLE_PAD                      = 10;
+const MIN_SPOTLIGHT_EL_PX           = 2;
+const SCROLL_INTO_VIEW_SUPPLEMENT_MS = 420;
+const HOLE_RETRY_MS                 = 100;
+const HOLE_RETRY_MAX                = 15;
+const SPOTLIGHT_CARD_EST_HEIGHT_PX  = 220;
 
 interface Hole {
   x: number;
@@ -108,7 +115,7 @@ function readHole(selector: string, root: Document | HTMLElement): Hole | null {
   const el = root.querySelector(selector);
   if (!(el instanceof HTMLElement)) return null;
   const r = el.getBoundingClientRect();
-  if (r.width < 2 || r.height < 2) return null;
+  if (r.width < MIN_SPOTLIGHT_EL_PX || r.height < MIN_SPOTLIGHT_EL_PX) return null;
   return {
     x:  r.left - HOLE_PAD,
     y:  r.top - HOLE_PAD,
@@ -128,9 +135,39 @@ function querySpotlightElement(step: Extract<TourStep, { kind: 'spotlight' }>, r
     const el = root.querySelector(selector);
     if (!(el instanceof HTMLElement)) return null;
     const r = el.getBoundingClientRect();
-    return r.width >= 2 && r.height >= 2 ? el : null;
+    return r.width >= MIN_SPOTLIGHT_EL_PX && r.height >= MIN_SPOTLIGHT_EL_PX ? el : null;
   };
   return pick(step.selector) ?? (step.selectorFallback ? pick(step.selectorFallback) : null);
+}
+
+function tourCardBody(
+  step: TourStep,
+  stepIndex: number,
+  isLast: boolean,
+  primaryLabel: string,
+  goNext: () => void,
+  finishTour: () => void,
+): ReactNode {
+  const showSkip = step.kind === 'spotlight' || !isLast;
+  return (
+    <div className="p-tour-card-inner" key={stepIndex}>
+      <h2 id={`p-tour-h-${step.id}`}>{step.title}</h2>
+      <p>{step.body}</p>
+      <div className="p-tour-card-actions">
+        <button type="button" className="p-tour-primary" onClick={goNext}>
+          {primaryLabel}
+        </button>
+        {showSkip && (
+          <button type="button" className="p-tour-skip" onClick={finishTour}>
+            チュートリアルを終了
+          </button>
+        )}
+      </div>
+      <div className="p-tour-progress" aria-hidden>
+        {stepIndex + 1} / {STEPS.length}
+      </div>
+    </div>
+  );
 }
 
 export interface GuidedTourProps {
@@ -149,6 +186,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
   const maskSuffix = useId().replace(/:/g, '');
   const maskId     = `p-tour-mask-${maskSuffix}`;
   const cardRef    = useRef<HTMLDivElement>(null);
+  const retryRef   = useRef(0);
 
   useEffect(() => {
     if (route.page !== PAGE.HOME || !settingsReady) {
@@ -188,7 +226,6 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
     updateViewport();
   }, [updateViewport, phase, stepIndex]);
 
-  /** 「以上です」は画面下から戻ってきた直後でも読みやすいよう、オーバーレイを先頭へ */
   useLayoutEffect(() => {
     if (phase !== 'on') return;
     const step = STEPS[stepIndex];
@@ -221,7 +258,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
       const t = window.setTimeout(() => {
         updateViewport();
         refreshHole();
-      }, 420);
+      }, SCROLL_INTO_VIEW_SUPPLEMENT_MS);
       return () => window.clearTimeout(t);
     }
   }, [refreshHole, viewport, stepIndex, phase, overlayRoot, updateViewport]);
@@ -236,11 +273,10 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
     overlayRoot.addEventListener('scroll', onResizeOrScroll, { capture: true, passive: true });
     return () => {
       window.removeEventListener('resize', onResizeOrScroll);
-      overlayRoot.removeEventListener('scroll', onResizeOrScroll, { capture: true } as AddEventListenerOptions);
+      overlayRoot.removeEventListener('scroll', onResizeOrScroll, true);
     };
   }, [phase, overlayRoot, updateViewport, refreshHole]);
 
-  const retryRef = useRef(0);
   useEffect(() => {
     if (phase !== 'on') return;
     const step = STEPS[stepIndex];
@@ -249,11 +285,11 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
       retryRef.current = 0;
       return;
     }
-    if (retryRef.current >= 15) return;
+    if (retryRef.current >= HOLE_RETRY_MAX) return;
     retryRef.current += 1;
     const t = window.setTimeout(() => {
       setHole(readSpotlightHole(step, overlayRoot));
-    }, 100);
+    }, HOLE_RETRY_MS);
     return () => window.clearTimeout(t);
   }, [phase, stepIndex, hole, overlayRoot]);
 
@@ -299,7 +335,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
         width:     cardW,
       };
     }
-    const estH = 220;
+    const estH = SPOTLIGHT_CARD_EST_HEIGHT_PX;
     let top = hole.y + hole.h + 14;
     if (top + estH > vh - 16) top = Math.max(12, hole.y - estH - 14);
     let left = hole.x + hole.w / 2 - cardW / 2;
@@ -370,23 +406,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
           aria-modal="true"
           aria-labelledby={`p-tour-h-${step.id}`}
         >
-          <div className="p-tour-card-inner" key={stepIndex}>
-            <h2 id={`p-tour-h-${step.id}`}>{step.title}</h2>
-            <p>{step.body}</p>
-            <div className="p-tour-card-actions">
-              <button type="button" className="p-tour-primary" onClick={goNext}>
-                {primaryLabel}
-              </button>
-              {!isLast && (
-                <button type="button" className="p-tour-skip" onClick={finishTour}>
-                  チュートリアルを終了
-                </button>
-              )}
-            </div>
-            <div className="p-tour-progress" aria-hidden>
-              {stepIndex + 1} / {STEPS.length}
-            </div>
-          </div>
+          {tourCardBody(step, stepIndex, isLast, primaryLabel, goNext, finishTour)}
         </div>
       )}
 
@@ -399,21 +419,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
           aria-modal="true"
           aria-labelledby={`p-tour-h-${step.id}`}
         >
-          <div className="p-tour-card-inner" key={stepIndex}>
-            <h2 id={`p-tour-h-${step.id}`}>{step.title}</h2>
-            <p>{step.body}</p>
-            <div className="p-tour-card-actions">
-              <button type="button" className="p-tour-primary" onClick={goNext}>
-                {primaryLabel}
-              </button>
-              <button type="button" className="p-tour-skip" onClick={finishTour}>
-                チュートリアルを終了
-              </button>
-            </div>
-            <div className="p-tour-progress" aria-hidden>
-              {stepIndex + 1} / {STEPS.length}
-            </div>
-          </div>
+          {tourCardBody(step, stepIndex, isLast, primaryLabel, goNext, finishTour)}
         </div>
       )}
     </div>

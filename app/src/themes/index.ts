@@ -3,6 +3,7 @@
  * CSS カスタムプロパティの生成と、ポータル全体へのテーマ適用を担う。
  */
 
+import { PORTAL_DOM } from '../shared/constants';
 import { THEMES, DEFAULT_THEME } from './definitions';
 import type { ThemeTokens } from './theme-tokens';
 
@@ -12,7 +13,7 @@ export { THEMES, DEFAULT_THEME, type ThemeTokens };
 
 /** ThemeTokens → #portal-overlay スコープの CSS 変数文字列 */
 export function getThemeCss(t: ThemeTokens): string {
-  return `#portal-overlay{`
+  return `#${PORTAL_DOM.overlayRoot}{`
     + `--p-bg:${t.bg};--p-bg2:${t.bgSecondary};--p-bg3:${t.bgTertiary};--p-bg-hover:${t.bgHover};`
     + `--p-border:${t.border};--p-border-light:${t.borderLight};--p-border-hover:${t.borderHover};`
     + `--p-text:${t.text};--p-text-muted:${t.textMuted};--p-text-dim:${t.textDim};`
@@ -77,8 +78,8 @@ export function applyThemeToElement(el: HTMLElement, t: ThemeTokens): void {
  */
 export function syncPortalTheme(name: string): void {
   const t   = themeTokensForName(name);
-  const styleEl = document.getElementById('portal-theme-vars');
+  const styleEl = document.getElementById(PORTAL_DOM.headThemeStyle);
   if (styleEl) styleEl.textContent = portalHeadThemeCss(t);
-  const overlay = document.getElementById('portal-overlay') as HTMLElement | null;
+  const overlay = document.getElementById(PORTAL_DOM.overlayRoot) as HTMLElement | null;
   if (overlay) applyThemeToElement(overlay, t);
 }

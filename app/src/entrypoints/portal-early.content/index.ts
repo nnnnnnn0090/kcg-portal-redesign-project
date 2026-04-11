@@ -1,13 +1,11 @@
-/**
- * portal-early.content — テーマ適用 + 起動カバー（隔離ワールド、document_start）
- */
+/** portal-early.content — 起動時のテーマ CSS とブートカバー */
 
 import { bootCoverBg, portalHeadThemeCssByName } from '../../themes';
-import { SK } from '../../shared/constants';
+import { PORTAL_CONTENT_SCRIPT_MATCHES, PORTAL_DOM, SK } from '../../shared/constants';
 import storage from '../../lib/storage';
 
 export default defineContentScript({
-  matches: ['https://home.kcg.ac.jp/portal*'],
+  matches: [PORTAL_CONTENT_SCRIPT_MATCHES],
   runAt: 'document_start',
 
   main() {
@@ -16,7 +14,7 @@ export default defineContentScript({
     function paintBootCover(color: string): void {
       if (!bootCoverEl) {
         bootCoverEl = document.createElement('div');
-        bootCoverEl.id = 'kcg-portal-boot-cover';
+        bootCoverEl.id = PORTAL_DOM.bootCover;
         bootCoverEl.setAttribute('aria-hidden', 'true');
         bootCoverEl.style.cssText =
           'position:fixed;inset:0;z-index:2147483646;pointer-events:none;margin:0;padding:0;border:0';
@@ -26,7 +24,7 @@ export default defineContentScript({
     }
 
     const themeStyle = document.createElement('style');
-    themeStyle.id = 'portal-theme-vars';
+    themeStyle.id = PORTAL_DOM.headThemeStyle;
     themeStyle.textContent = portalHeadThemeCssByName('dark');
     (document.head ?? document.documentElement).appendChild(themeStyle);
 
@@ -34,7 +32,7 @@ export default defineContentScript({
 
     void storage.get(SK.theme).then((data) => {
       const name = String(data[SK.theme] ?? '');
-      const el = document.getElementById('portal-theme-vars');
+      const el = document.getElementById(PORTAL_DOM.headThemeStyle);
       if (el) el.textContent = portalHeadThemeCssByName(name);
       paintBootCover(bootCoverBg(name));
     }).catch(() => {});

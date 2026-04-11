@@ -6,8 +6,41 @@ import { useEffect } from 'react';
 import { SK } from '../shared/constants';
 import storage from '../lib/storage';
 import type { CourseRow } from '../context/courses';
-import type { LinkConfig } from '../shared/types';
+import type { CustomLink, LinkConfig } from '../shared/types';
 import type { DuePayload } from '../features/calendar';
+
+function isCustomLink(x: unknown): x is CustomLink {
+  if (!x || typeof x !== 'object') return false;
+  const o = x as Record<string, unknown>;
+  return typeof o.id === 'string' && typeof o.midashi === 'string' && typeof o.url === 'string';
+}
+
+function isLinkConfig(x: unknown): x is LinkConfig {
+  if (!x || typeof x !== 'object') return false;
+  const o = x as Record<string, unknown>;
+  if (!Array.isArray(o.order) || !o.order.every((e): e is string => typeof e === 'string')) return false;
+  if (!Array.isArray(o.hidden) || !o.hidden.every((e): e is string => typeof e === 'string')) return false;
+  if (!Array.isArray(o.custom) || !o.custom.every(isCustomLink)) return false;
+  return true;
+}
+
+function isDuePayload(x: unknown): x is DuePayload {
+  if (!x || typeof x !== 'object') return false;
+  const o = x as Record<string, unknown>;
+  return Array.isArray(o.items) && typeof o.capturedAt === 'number';
+}
+
+function isCourseRow(x: unknown): x is CourseRow {
+  if (!x || typeof x !== 'object') return false;
+  const o = x as Record<string, unknown>;
+  if (o.displayName != null && typeof o.displayName !== 'string') return false;
+  if (o.externalAccessUrl != null && typeof o.externalAccessUrl !== 'string') return false;
+  return true;
+}
+
+function isCourseRowArray(x: unknown): x is CourseRow[] {
+  return Array.isArray(x) && x.every(isCourseRow);
+}
 
 export interface HomeStorageBootstrapParams {
   setLinkConfig:        (cfg: LinkConfig) => void;
@@ -23,13 +56,13 @@ export function useHomeStorageBootstrap({
   useEffect(() => {
     void storage.get([SK.shortcutConfig, SK.kingLmsStreamsUltraDue, SK.kingLmsCourses]).then((data) => {
       const cfg = data[SK.shortcutConfig];
-      if (cfg && typeof cfg === 'object') setLinkConfig(cfg as LinkConfig);
+      if (isLinkConfig(cfg)) setLinkConfig(cfg);
 
       const due = data[SK.kingLmsStreamsUltraDue];
-      if (due && typeof due === 'object') setAssignmentPayload(due as DuePayload);
+      if (isDuePayload(due)) setAssignmentPayload(due);
 
       const c = data[SK.kingLmsCourses];
-      if (Array.isArray(c)) setCourses(c as CourseRow[]);
+      if (isCourseRowArray(c)) setCourses(c);
     });
   }, [setLinkConfig, setAssignmentPayload, setCourses]);
 }

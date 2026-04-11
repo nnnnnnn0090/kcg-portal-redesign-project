@@ -1,13 +1,9 @@
-/**
- * king-lms-hooks.content — King LMS fetch フック（MAIN world）
- *
- * document_start、MAIN world で動作する。king-lms.kcg.edu のみ。
- * memberships API と streams/ultra API を傍受してコース/課題データを postMessage で送る。
- * ログインリダイレクトも検知して中断通知を送る。
- */
+/** king-lms-hooks.content — King LMS の fetch / XHR フック */
+
+import { KING_LMS_HOOK, KING_LMS_HOSTNAME, KING_LMS_ORIGIN } from '../../shared/constants';
 
 export default defineContentScript({
-  matches: ['https://king-lms.kcg.edu/*'],
+  matches: [`${KING_LMS_ORIGIN}/*`],
   runAt: 'document_start',
   world: 'MAIN',
 
@@ -15,13 +11,6 @@ export default defineContentScript({
     installKingLmsHook();
   },
 });
-
-// ─── 定数 ─────────────────────────────────────────────────────────────────────
-
-const MSG_TYPE         = 'portalThemeKingLmsCourses';
-const STREAMS_DUE_TYPE = 'portalThemeKingLmsStreamsUltraDue';
-const ABORT_TYPE       = 'portalThemeKingLmsSyncAbort';
-const MSG_SRC          = 'portalThemeKingLmsHook';
 
 // ─── URL 判定 ─────────────────────────────────────────────────────────────────
 
@@ -64,7 +53,9 @@ function handleMemberships(json: unknown): void {
       externalAccessUrl: c?.externalAccessUrl != null ? String(c.externalAccessUrl) : null,
     };
   });
-  try { window.postMessage({ type: MSG_TYPE, source: MSG_SRC, courses }, '*'); } catch {}
+  try {
+    window.postMessage({ type: KING_LMS_HOOK.coursesPostType, source: KING_LMS_HOOK.source, courses }, '*');
+  } catch {}
 }
 
 function courseIdToNameMap(json: unknown): Record<string, string> {
@@ -81,7 +72,13 @@ function courseIdToNameMap(json: unknown): Record<string, string> {
 
 function notifyStreamsFailure(): void {
   try {
-    window.postMessage({ type: STREAMS_DUE_TYPE, source: MSG_SRC, items: [], capturedAt: Date.now(), captureState: 'error' }, '*');
+    window.postMessage({
+      type: KING_LMS_HOOK.streamsDuePostType,
+      source: KING_LMS_HOOK.source,
+      items: [],
+      capturedAt: Date.now(),
+      captureState: 'error',
+    }, '*');
   } catch {}
 }
 
@@ -107,14 +104,18 @@ function handleStreamsUltra(json: unknown): void {
         dueDate:    String(dd),
       });
     }
-    window.postMessage({ type: STREAMS_DUE_TYPE, source: MSG_SRC, items: slim, capturedAt: Date.now() }, '*');
+    window.postMessage({
+      type: KING_LMS_HOOK.streamsDuePostType,
+      source: KING_LMS_HOOK.source,
+      items: slim,
+      capturedAt: Date.now(),
+    }, '*');
   } catch { notifyStreamsFailure(); }
 }
 
 // ─── フック インストール ───────────────────────────────────────────────────────
 
 function installKingLmsHook(): void {
-  // fetch パッチ
   const origFetch = window.fetch;
   window.fetch = function (input, init) {
     const url = typeof input === 'string' ? input
@@ -135,7 +136,6 @@ function installKingLmsHook(): void {
     return p;
   };
 
-  // XHR パッチ
   const origOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method: string, url: string | URL) {
     (this as XMLHttpRequest & { _kingLmsUrl?: string })._kingLmsUrl = String(url);
@@ -165,11 +165,11 @@ function installKingLmsHook(): void {
   // ログインリダイレクト検知
   function notifyLoginRedirect(): void {
     try {
-      if (location.hostname !== 'king-lms.kcg.edu') return;
+      if (location.hostname !== KING_LMS_HOSTNAME) return;
       const path = location.pathname ?? '';
       if (path !== '/' && path !== '') return;
       if (!new URLSearchParams(location.search).has('new_loc')) return;
-      window.postMessage({ type: ABORT_TYPE, source: MSG_SRC, reason: 'loginRedirect' }, '*');
+      window.postMessage({ type: KING_LMS_HOOK.syncAbortType, source: KING_LMS_HOOK.source, reason: 'loginRedirect' }, '*');
     } catch {}
   }
 

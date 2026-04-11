@@ -3,8 +3,10 @@
  * シラバス URL（コンテキストメニュー用）と King LMS コース URL のマッチングを担当する。
  */
 
+import { PORTAL_ORIGIN } from '../../shared/constants';
+
 const SYLLABUS_BASE =
-  'https://home.kcg.ac.jp/Gakusei/web/Syllabus/WebSyllabusSansho/UI/WSL_SyllabusSansho.aspx';
+  `${PORTAL_ORIGIN}/Gakusei/web/Syllabus/WebSyllabusSansho/UI/WSL_SyllabusSansho.aspx`;
 
 const PERIOD_TIMES: Record<number, string> = {
   1: '09:30 ~ 11:00',

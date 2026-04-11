@@ -1,11 +1,8 @@
-/**
- * King LMS 同期結果を location.hash から読み取るユーティリティ。
- * 同期ページから戻ってきたとき、hash を消費してトーストメッセージ文字列を返す。
- */
+/** King LMS 同期結果の location.hash 読み取り */
 
-import { SYNC_HASH } from '../shared/constants';
+import { SK, SYNC_HASH } from '../shared/constants';
+import storage from '../lib/storage';
 
-/** 講義クリックなどからの同期成功時トースト（設定からの再取得時は短文化される） */
 export const KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST =
   '初回セットアップは完了しました。King LMS を開くには、該当の講義をもう一度クリックしてください。';
 
@@ -17,10 +14,6 @@ const HASH_MESSAGES: Record<string, string> = {
   [SYNC_HASH.assignmentError]:   '課題データを読み取れませんでした（King LMS の変更の可能性があります）',
 };
 
-/**
- * location.hash を消費し、対応するトーストメッセージを返す。
- * 該当する hash がなければ空文字を返す。
- */
 export function consumeKingLmsSyncReturnHash(): string {
   const hash = location.hash.replace(/^#/, '');
   const msg  = HASH_MESSAGES[hash] ?? '';
@@ -33,4 +26,17 @@ export function consumeKingLmsSyncReturnHash(): string {
     }
   }
   return msg;
+}
+
+/** 起動時トースト: location.hash と storage の quiet フラグを解決する */
+export async function resolveKingLmsMountToastMessage(): Promise<string> {
+  let syncToastMsg = consumeKingLmsSyncReturnHash();
+  const bootSnap = await storage.get([SK.kingLmsCourseSyncToastQuiet]);
+  if (bootSnap[SK.kingLmsCourseSyncToastQuiet]) {
+    await storage.set({ [SK.kingLmsCourseSyncToastQuiet]: false });
+    if (syncToastMsg === KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST) {
+      syncToastMsg = 'コース一覧を保存しました';
+    }
+  }
+  return syncToastMsg;
 }

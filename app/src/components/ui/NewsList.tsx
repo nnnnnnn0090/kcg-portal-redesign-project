@@ -2,10 +2,10 @@
  * お知らせ一覧コンポーネント（ホームページのパネル用）。
  */
 
-import type { NewsListItem } from '../../lib/portal-messages-pages';
+import type { NewsListItem } from '../../shared/types';
 import { newsHref } from '../../lib/dom';
 
-export type { NewsListItem };
+export type { NewsListItem } from '../../shared/types';
 
 interface NewsListProps {
   items:     NewsListItem[];

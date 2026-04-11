@@ -1,4 +1,5 @@
 import { defineConfig } from 'wxt';
+import { KING_LMS_ORIGIN, PORTAL_ORIGIN } from './src/shared/constants';
 
 type WxtGeckoBaseline = {
   id?: string;
@@ -20,8 +21,8 @@ export default defineConfig({
     minimum_chrome_version: '111',
     permissions: ['storage'],
     host_permissions: [
-      'https://home.kcg.ac.jp/*',
-      'https://king-lms.kcg.edu/*',
+      `${PORTAL_ORIGIN}/*`,
+      `${KING_LMS_ORIGIN}/*`,
     ],
     browser_specific_settings: {
       gecko: {

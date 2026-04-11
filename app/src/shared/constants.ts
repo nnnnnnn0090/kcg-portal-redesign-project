@@ -29,6 +29,15 @@ export const SK = {
 
 export type StorageKey = (typeof SK)[keyof typeof SK];
 
+// ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
+
+export const KING_LMS_HOOK = {
+  source:          'portalThemeKingLmsHook',
+  syncAbortType:   'portalThemeKingLmsSyncAbort',
+  coursesPostType:   SK.kingLmsCourses,
+  streamsDuePostType: SK.kingLmsStreamsUltraDue,
+} as const;
+
 // ─── ポータルページ識別子 ────────────────────────────────────────────────────
 
 export const PAGE = {
@@ -40,6 +49,30 @@ export const PAGE = {
 } as const;
 
 export type PageType = (typeof PAGE)[keyof typeof PAGE];
+
+// ─── ポータル boot / オーバーレイの element id（early / content / themes で共有） ─
+
+export const PORTAL_DOM = {
+  bootCover:       'kcg-portal-boot-cover',
+  headThemeStyle: 'portal-theme-vars',
+  overlayRoot:    'portal-overlay',
+  overlayCss:     'portal-overlay-css',
+} as const;
+
+/** portal.content: ブートカバーを外すまでの requestAnimationFrame 段階 */
+export const PORTAL_BOOT_COVER_RAF_FRAMES = {
+  withToast: 5,
+  default:   3,
+} as const;
+
+/** 学生ポータル（拡張の主対象オリジン） */
+export const PORTAL_ORIGIN = 'https://home.kcg.ac.jp' as const;
+
+/** `location.hostname` 比較用 */
+export const PORTAL_HOSTNAME = new URL(PORTAL_ORIGIN).hostname;
+
+/** ポータル配下コンテンツスクリプトの manifest `matches` */
+export const PORTAL_CONTENT_SCRIPT_MATCHES = `${PORTAL_ORIGIN}/portal*` as const;
 
 // ─── postMessage type（fetch フックが送るキャプチャ種別）────────────────────
 
@@ -64,11 +97,11 @@ export type MsgType = (typeof MSG)[keyof typeof MSG];
 // ─── fetch インターセプト用 postMessage 識別子 ─────────────────────────────
 
 export const FETCH_HOOK = {
-  /** portal-hooks.content が送るメッセージの source フィールド値 */
+  /** postMessage の source（fetch フック由来） */
   source:        'portalThemeFetchObserver',
-  /** 隔離ワールドがキャプチャ済みメッセージの再送を要求する type */
+  /** キャプチャ済みメッセージの再送要求 */
   replayRequest: 'portalThemeReplayIntercepted',
-  /** 隔離ワールドが MAIN world に fetch 実行を依頼する type */
+  /** pageFetch 依頼 */
   pageFetch:     'portalThemePageFetchRequest',
 } as const;
 
@@ -92,20 +125,28 @@ export const SYNC_HASH = {
 
 // ─── 外部 URL ────────────────────────────────────────────────────────────────
 
-/** King LMS のオリジン（コースリンク・課題リンク生成に使用） */
-export const KING_LMS_ORIGIN              = 'https://king-lms.kcg.edu';
+/** King LMS のオリジン（コースリンク・課題リンク・コンテンツスクリプト matches に使用） */
+export const KING_LMS_ORIGIN = 'https://king-lms.kcg.edu' as const;
+
+/** `location.hostname` 比較用（KING_LMS_ORIGIN と一致） */
+export const KING_LMS_HOSTNAME = new URL(KING_LMS_ORIGIN).hostname;
+
 /** King LMS コース同期のエントリ URL（授業カレンダー → King LMS リンク用） */
-export const KING_LMS_COURSE_SYNC_URL     = 'https://king-lms.kcg.edu/ultra/course';
+export const KING_LMS_COURSE_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/course` as const;
+
 /** King LMS 課題同期のエントリ URL */
-export const KING_LMS_ASSIGNMENT_SYNC_URL = 'https://king-lms.kcg.edu/ultra/stream';
+export const KING_LMS_ASSIGNMENT_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/stream` as const;
 /** 拡張機能紹介ページ */
-export const EXTENSION_PROMO_PAGE_URL     = 'https://kcg-portal-redesign-project-web.vercel.app/';
+export const EXTENSION_PROMO_PAGE_URL = 'https://kcg-portal-redesign-project-web.vercel.app/';
+
+/** フッタークレジットの作者プロフィール（X） */
+export const EXTENSION_AUTHOR_PROFILE_URL = 'https://x.com/nnnnnnn0090';
 
 // ─── ホームのショートカットに常に含める固定リンク ──────────────────────────
 
-export const HOME_SHORTCUT_EXTRAS: Array<{ midashi: string; url: string }> = [
+export const HOME_SHORTCUT_EXTRAS: ReadonlyArray<{ readonly midashi: string; readonly url: string }> = [
   {
     midashi: '学生出欠登録',
-    url: 'https://home.kcg.ac.jp/gakusei/web/skt/WebSktGakuseiShukketsuShinsei/UI/WSK_GakuseiShukketsuShinsei.aspx',
+    url: `${PORTAL_ORIGIN}/gakusei/web/skt/WebSktGakuseiShukketsuShinsei/UI/WSK_GakuseiShukketsuShinsei.aspx`,
   },
 ];

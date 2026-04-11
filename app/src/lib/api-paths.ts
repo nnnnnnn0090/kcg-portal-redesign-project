@@ -1,8 +1,4 @@
-/**
- * ポータル REST API のパス断片と URL ユーティリティ（単一ソース）。
- * 隔離ワールドの URL ビルダー（lib/api）と MAIN ワールドのフック判定（portal-hooks.content）
- * の両方で同じ文字列・関数を使うためここに集約する。
- */
+/** ポータル REST API のパス断片と URL ユーティリティ */
 
 export const PORTAL_API = {
   newTopics:          'NewTopics',

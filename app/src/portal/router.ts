@@ -3,7 +3,7 @@
  * マウント対象でないページでは null を返し、拡張を起動しない。
  */
 
-import { PAGE, type PageType } from '../shared/constants';
+import { PAGE, PORTAL_HOSTNAME, type PageType } from '../shared/constants';
 
 export interface PortalRoute {
   page:      PageType;
@@ -12,7 +12,7 @@ export interface PortalRoute {
 
 /** 現在の URL がポータルオーバーレイを表示するパスか判定する */
 export function matchPortalRoute(): PortalRoute | null {
-  if (location.hostname !== 'home.kcg.ac.jp') return null;
+  if (location.hostname !== PORTAL_HOSTNAME) return null;
   const path = location.pathname.replace(/\/+$/, '') || '/portal';
 
   if (path === '/portal')              return { page: PAGE.HOME };

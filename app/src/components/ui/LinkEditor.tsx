@@ -62,7 +62,7 @@ interface LinkEditorProps {
 }
 
 export function LinkEditor({ items, config, onConfigChange, editing }: LinkEditorProps) {
-  const extras = HOME_SHORTCUT_EXTRAS as ApiLink[];
+  const extras: ApiLink[] = HOME_SHORTCUT_EXTRAS.map((e) => ({ midashi: e.midashi, url: e.url }));
   const [localCfg, setLocalCfg] = useState<LinkConfig>(config);
   const [addName,  setAddName]  = useState('');
   const [addUrl,   setAddUrl]   = useState('');

@@ -10,7 +10,7 @@ import { useToast, Toast, copyToClipboard } from '../components/ui/Toast';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { SettingsPanel, type SettingsPanelHandle } from '../components/layout/SettingsPanel';
-import { EXTENSION_PROMO_PAGE_URL, PAGE, SK } from '../shared/constants';
+import { EXTENSION_PROMO_PAGE_URL, PAGE, PORTAL_ORIGIN, SK } from '../shared/constants';
 import storage from '../lib/storage';
 import { attachSmoothOverlayWheelScroll } from '../lib/smooth-overlay-wheel-scroll';
 import { useCalendarInteractions } from '../features/calendar';
@@ -54,7 +54,7 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
     overlayRoot.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     void storage.set({ [SK.portalGuidedTourDone]: false }).then(() => {
       if (route.page !== PAGE.HOME) {
-        window.location.assign('/portal/');
+        window.location.assign(`${PORTAL_ORIGIN}/portal/`);
         return;
       }
       requestAnimationFrame(() => {
@@ -65,15 +65,14 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
     });
   }, [route.page, overlayRoot]);
 
-  // King LMS 同期完了トーストを初回のみ表示
+  // King LMS 同期完了トースト（親から渡された初回メッセージのみ）
   useEffect(() => {
     if (!syncToastMsg) return;
     showToast(syncToastMsg, {
       placement: 'top',
       durationMs: syncToastMsg.length > 48 ? 5800 : undefined,
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- syncToastMsg はマウント時の初期値のみ使う。再レンダーのたびに表示するのは意図しない動作のため deps から意図的に除外。
-  }, []);
+  }, [syncToastMsg, showToast]);
 
   // カレンダーの tooltip / コンテキストメニューをオーバーレイに配線
   useCalendarInteractions();

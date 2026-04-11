@@ -7,8 +7,8 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { urls, pageFetch, portalLastLoginRaw } from '../../lib/api';
 import { currentNendo } from '../../lib/date';
 import { usePortalMessage, type PortalCapturedMessage } from '../../hooks/usePortalMessage';
+import type { NewsListItem } from '../../shared/types';
 import {
-  type NewsListItem,
   reduceNewsListPortalMessage,
   type NewsListPortalState,
 } from '../../lib/portal-messages-pages';

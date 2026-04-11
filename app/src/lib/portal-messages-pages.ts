@@ -1,11 +1,8 @@
-/**
- * 各ページ向け portal postMessage の純粋な畳み込み（ホーム以外）。
- * お知らせ一覧・詳細・アンケート・休講補講教室変更の各 reducer を提供する。
- */
+/** ホーム以外のページ向け portal postMessage の reducer */
 
 import { MSG } from '../shared/constants';
-import type { PortalCapturedMessage } from '../shared/types';
-import { isKinoMessagePayload, type KinoMessagePayload } from './portal-messages-home';
+import type { NewsListItem, PortalCapturedMessage } from '../shared/types';
+import { isKinoMessagePayload, isNewsListItem, type KinoMessagePayload } from './portal-messages-home';
 
 // ─── 共通ユーティリティ ───────────────────────────────────────────────────────
 
@@ -23,20 +20,13 @@ export function pick(obj: Record<string, unknown> | null, keys: string[]): strin
   return '';
 }
 
+function isPlainObject(x: unknown): x is Record<string, unknown> {
+  return typeof x === 'object' && x !== null && !Array.isArray(x);
+}
+
 // ─── お知らせ一覧 ─────────────────────────────────────────────────────────
 
-export interface NewsListItem {
-  id?:           unknown;
-  title?:        string;
-  newsDate?:     string;
-  sender?:       string;
-  category?:     string;
-  categoryCd?:   string;
-  importanceCd?: string;
-  importance?:   string;
-  readFlg?:      string | number;
-  newFlg?:       string | number;
-}
+export type { NewsListItem } from '../shared/types';
 
 export interface NewsListPortalState {
   kinoData: KinoMessagePayload | null;
@@ -52,14 +42,7 @@ export function nendoFromDeliveredNewsUrl(href: string): string {
   }
 }
 
-/**
- * お知らせ一覧の postMessage を状態に畳み込む。
- *
- * `pendingNendo` は呼び出し側が保持する mutable ref で、リクエスト送信時に
- * 「現在リクエスト中の年度」をセットしておく。レスポンスの年度が一致しない場合は
- * 古いリクエストへの返答とみなして state を変えずに返す。
- * （純粋関数に保ちながら "最後に送ったリクエスト" を追跡するための慣用パターン）
- */
+/** お知らせ一覧: `pendingNendo` で年度リクエストとレスポンスを突き合わせる */
 export function reduceNewsListPortalMessage(
   prev: NewsListPortalState,
   msg: PortalCapturedMessage,
@@ -69,13 +52,13 @@ export function reduceNewsListPortalMessage(
     return { ...prev, kinoData: msg.data };
   }
   if (msg.type === MSG.deliveredNews) {
-    const reqUrl    = String((msg as Record<string, unknown>).requestUrl ?? '');
+    const reqUrl    = String(msg.requestUrl ?? '');
     const respNendo = nendoFromDeliveredNewsUrl(reqUrl);
     if (respNendo && respNendo !== pendingNendo.current) return prev;
     pendingNendo.current = null;
     return {
       ...prev,
-      raw: Array.isArray(msg.items) ? (msg.items as NewsListItem[]) : [],
+      raw: Array.isArray(msg.items) ? msg.items.filter(isNewsListItem) : [],
     };
   }
   return prev;
@@ -99,11 +82,10 @@ export function reduceNewsDetailPortalMessage(
   newsDetailId: string,
 ): NewsDetailPayload | null {
   if (msg.type !== MSG.deliveredNewsDetail) return prev;
-  const d = (msg as Record<string, unknown>).data;
-  if (!d || typeof d !== 'object') return prev;
-  const data = d as Record<string, unknown>;
-  if (String(data.id ?? '') !== String(newsDetailId)) return prev;
-  return data as unknown as NewsDetailPayload;
+  const d = msg.data;
+  if (!isPlainObject(d)) return prev;
+  if (String(d.id ?? '') !== String(newsDetailId)) return prev;
+  return d as NewsDetailPayload;
 }
 
 // ─── アンケート一覧 ─────────────────────────────────────────────────────────
@@ -120,7 +102,7 @@ export function reduceSurveyPortalMessage(prev: SurveyPortalState, msg: PortalCa
     return { ...prev, kinoData: msg.data };
   }
   if (msg.type === MSG.questionnaireInfo && Array.isArray(msg.items)) {
-    return { ...prev, raw: msg.items as SurveyRow[] };
+    return { ...prev, raw: msg.items.filter(isPlainObject) };
   }
   return prev;
 }
@@ -158,15 +140,15 @@ export function reduceKyukoPortalMessage(prev: KyukoPortalState, msg: PortalCapt
     return { ...prev, kinoData: msg.data };
   }
   if (msg.type === MSG.kyukoInfo && Array.isArray(msg.items)) {
-    const items = msg.items as KyukoRow[];
+    const items = msg.items.filter(isPlainObject);
     return { ...prev, kkRaw: items, ...withRishuBootstrap(prev, items) };
   }
   if (msg.type === MSG.hokoInfo && Array.isArray(msg.items)) {
-    const items = msg.items as KyukoRow[];
+    const items = msg.items.filter(isPlainObject);
     return { ...prev, hkRaw: items, ...withRishuBootstrap(prev, items) };
   }
   if (msg.type === MSG.kyoshitsuChange && Array.isArray(msg.items)) {
-    const items = msg.items as KyukoRow[];
+    const items = msg.items.filter(isPlainObject);
     return { ...prev, kcRaw: items, ...withRishuBootstrap(prev, items) };
   }
   return prev;

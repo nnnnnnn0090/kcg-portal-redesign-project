@@ -6,7 +6,11 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { EXTENSION_PROMO_PAGE_URL } from '../../shared/constants';
+import {
+  EXTENSION_AUTHOR_PROFILE_URL,
+  EXTENSION_PROMO_PAGE_URL,
+  PORTAL_DOM,
+} from '../../shared/constants';
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
 import { usePortalDom } from '../../context/portalDom';
 
@@ -34,7 +38,7 @@ export function Footer({ onShareClick }: FooterProps) {
       if (found) return found;
       try {
         return [...document.querySelectorAll(sel)]
-          .find((c) => !c.closest('#portal-overlay') && c.querySelector('small')) ?? null;
+          .find((c) => !c.closest(`#${PORTAL_DOM.overlayRoot}`) && c.querySelector('small')) ?? null;
       } catch { return null; }
     }, null);
 
@@ -51,7 +55,7 @@ export function Footer({ onShareClick }: FooterProps) {
     creditEl.className = 'p-footer-credit';
     creditEl.appendChild(document.createTextNode('Redesigned by '));
     const creditLink = document.createElement('a');
-    creditLink.href    = 'https://x.com/nnnnnnn0090';
+    creditLink.href    = EXTENSION_AUTHOR_PROFILE_URL;
     creditLink.target  = '_blank';
     creditLink.rel     = 'noopener noreferrer';
     creditLink.textContent = 'nnnnnnn0090';

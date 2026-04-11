@@ -1,7 +1,4 @@
-/**
- * King LMS のコース一覧をフック経由で取得するための同期遷移。
- * 現在ページを返却先として保存し、コース一覧ページへ移動する。
- */
+/** King LMS コース一覧同期の開始（返却 URL を保存して遷移） */
 
 import { SK, KING_LMS_COURSE_SYNC_URL } from '../shared/constants';
 import storage from './storage';

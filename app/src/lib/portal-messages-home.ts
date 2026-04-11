@@ -1,10 +1,7 @@
-/**
- * ポータル fetch フックから届く postMessage をホームページ向け状態へ畳み込む純粋ロジック。
- * 各ページ向けの reducer は portal-messages-pages.ts を参照。
- */
+/** ホーム用 portal postMessage の状態更新 */
 
 import { MSG } from '../shared/constants';
-import type { PortalCapturedMessage } from '../shared/types';
+import type { NewsListItem, PortalCapturedMessage } from '../shared/types';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -21,8 +18,8 @@ export interface UserHtmlLinkItem {
 
 export interface HomePortalInboxState {
   kinoData:       KinoMessagePayload | null;
-  kogiNews:       unknown[];
-  newTopicsItems: unknown[];
+  kogiNews:       NewsListItem[];
+  newTopicsItems: NewsListItem[];
   linkItems:      UserHtmlLinkItem[];
 }
 
@@ -46,13 +43,16 @@ export function isUserHtmlLinkItem(x: unknown): x is UserHtmlLinkItem {
   return typeof x.midashi === 'string' && typeof x.url === 'string';
 }
 
+export function isNewsListItem(x: unknown): x is NewsListItem {
+  return isRecord(x);
+}
+
 function narrowUserHtmlLinkItems(items: unknown[]): UserHtmlLinkItem[] {
   return items.filter(isUserHtmlLinkItem);
 }
 
-// ─── 畳み込み ─────────────────────────────────────────────────────────────
+// ─── reducer ─────────────────────────────────────────────────────────────
 
-/** 1 メッセージ分の状態更新（純粋関数・テスト可能） */
 export function applyHomePortalMessage(
   prev: HomePortalInboxState,
   msg: PortalCapturedMessage,
@@ -66,13 +66,13 @@ export function applyHomePortalMessage(
 
     case MSG.kogiNews:
       if (Array.isArray(msg.items)) {
-        return { ...prev, kogiNews: msg.items };
+        return { ...prev, kogiNews: msg.items.filter(isNewsListItem) };
       }
       return prev;
 
     case MSG.newTopics:
       if (Array.isArray(msg.items)) {
-        return { ...prev, newTopicsItems: msg.items };
+        return { ...prev, newTopicsItems: msg.items.filter(isNewsListItem) };
       }
       return prev;
 

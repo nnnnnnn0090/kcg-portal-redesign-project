@@ -48,3 +48,19 @@ export interface LinkConfig {
   hidden: string[];
   custom: CustomLink[];
 }
+
+// ─── お知らせ一覧行（KogiNews / NewTopics / DeliveredNews 等で共通）────────
+
+/** ポータル API のお知らせ一覧行（キーは API 差分を吸収するため緩め） */
+export interface NewsListItem {
+  id?:           unknown;
+  title?:        string;
+  newsDate?:     string;
+  sender?:       string;
+  category?:     string;
+  categoryCd?:   string;
+  importanceCd?: string;
+  importance?:   string;
+  readFlg?:      string | number;
+  newFlg?:       string | number;
+}

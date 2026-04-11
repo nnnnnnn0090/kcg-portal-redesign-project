@@ -19,6 +19,7 @@ import { THEMES } from '../../themes';
 import type { Settings } from '../../context/settings';
 import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
 import { readExtensionVersion } from '../../lib/extension-version';
+import { PORTAL_DOM } from '../../shared/constants';
 
 const extensionVersion = readExtensionVersion();
 
@@ -112,7 +113,8 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     // パネル外クリックで閉じる（設定ボタン自体はヘッダー側でトグル処理するため除外）
     useEffect(() => {
       if (!isOpen || closing) return;
-      const root = (popRef.current?.closest('#portal-overlay') ?? document.getElementById('portal-overlay')) as HTMLElement | null;
+      const sel = `#${PORTAL_DOM.overlayRoot}`;
+      const root = (popRef.current?.closest(sel) ?? document.getElementById(PORTAL_DOM.overlayRoot)) as HTMLElement | null;
       if (!root) return;
       function onPointerDown(e: PointerEvent) {
         const t = e.target as Node;
