@@ -14,7 +14,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'KCG Portal Redesign Project',
-    version: '3.0.2',
+    version: '3.0.5',
     description:
       'Modern, readable UI for the Kyoto Computer Gakuin student portal (home.kcg.ac.jp). Unofficial theme extension.',
     author: 'nnnnnnn0090',
