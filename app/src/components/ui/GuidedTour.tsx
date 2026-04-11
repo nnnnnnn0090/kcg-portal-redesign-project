@@ -47,7 +47,7 @@ const STEPS: TourStep[] = [
     kind:     'spotlight',
     id:       'settings',
     title:    'まずはここ：設定',
-    body:     '右上のこのボタンから開けます。\n\nテーマカラーの変更や、コース一覧の再取得などが行えます。',
+    body:     '右上のこのボタンから開けます。\n\nテーマカラーの変更や、コース一覧の再取得（King LMSとの連携）などが行えます。',
     selector: '#p-open-settings',
   },
   {
@@ -92,7 +92,7 @@ const STEPS: TourStep[] = [
     kind:   'card',
     id:     'done',
     title:  '以上です',
-    body:   '困ったときは「設定」からいつでも変更できます。\n\n気に入ったら、ぜひ友だちにも教えてあげてください。',
+    body:   '困ったときは「設定」からいつでもこの案内を確認できます。\n\n気に入ったら、ぜひ友だちにも教えてあげてください。',
   },
 ];
 const HOLE_PAD = 10;
@@ -187,6 +187,14 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
   useLayoutEffect(() => {
     updateViewport();
   }, [updateViewport, phase, stepIndex]);
+
+  /** 「以上です」は画面下から戻ってきた直後でも読みやすいよう、オーバーレイを先頭へ */
+  useLayoutEffect(() => {
+    if (phase !== 'on') return;
+    const step = STEPS[stepIndex];
+    if (step.kind !== 'card' || step.id !== 'done') return;
+    overlayRoot.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [phase, stepIndex, overlayRoot]);
 
   useLayoutEffect(() => {
     if (phase !== 'on') return;
