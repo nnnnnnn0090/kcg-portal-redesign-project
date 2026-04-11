@@ -77,7 +77,7 @@ const STEPS: TourStep[] = [
     kind:     'spotlight',
     id:       'shortcuts',
     title:    'ショートカット',
-    body:     'ポータルやよく使うページへのリンクをまとめられます。「編集」から、並べ替え・非表示・独自リンクの追加ができます。',
+    body:     'よく使うページへのリンクをまとめられます。「編集」から、並べ替え・非表示・独自リンクの追加ができます。',
     selector: 'section.p-panel.p-panel-links',
   },
   {
@@ -92,7 +92,7 @@ const STEPS: TourStep[] = [
     kind:   'card',
     id:     'done',
     title:  '以上です',
-    body:   '困ったときは「設定」からいつでもこの案内を確認できます。\n\n気に入ったら、ぜひ友だちにも教えてあげてください。',
+    body:   '困ったときは「設定」からいつでもこの案内を確認できます。\n\n気に入ったら、ぜひ友だちにも教えてあげてください❤️',
   },
 ];
 const HOLE_PAD = 10;
