@@ -30,6 +30,10 @@ function resolveHref(href: string): string {
   try { return new URL(href, location.origin).href; } catch { return href; }
 }
 
+function portalNavDisplayLabel(trimmedLabel: string): string {
+  return trimmedLabel === 'Webサービス' ? 'キャンパスプラン' : trimmedLabel;
+}
+
 function parseNavItems(ul: HTMLUListElement): NavItem[] {
   const out: NavItem[] = [];
   for (const li of ul.children) {
@@ -43,7 +47,7 @@ function parseNavItems(ul: HTMLUListElement): NavItem[] {
 
       const clone = toggle.cloneNode(true) as HTMLElement;
       clone.querySelectorAll('.caret').forEach((c) => c.remove());
-      const groupLabel = clone.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+      const groupLabel = portalNavDisplayLabel(clone.textContent?.replace(/\s+/g, ' ').trim() ?? '');
 
       const subs: NavLink[] = [];
       for (const a of menu.querySelectorAll<HTMLAnchorElement>('a[href]')) {
@@ -51,7 +55,7 @@ function parseNavItems(ul: HTMLUListElement): NavItem[] {
         if (!h || h === '#' || h.startsWith('javascript:')) continue;
         subs.push({
           type:   'link',
-          label:  a.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+          label:  portalNavDisplayLabel(a.textContent?.replace(/\s+/g, ' ').trim() ?? ''),
           href:   h,
           target: a.getAttribute('target') ?? '',
           title:  a.getAttribute('title')  ?? '',
@@ -67,7 +71,7 @@ function parseNavItems(ul: HTMLUListElement): NavItem[] {
       if (!h || h === '#' || h.startsWith('javascript:')) continue;
       out.push({
         type:   'link',
-        label:  a.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        label:  portalNavDisplayLabel(a.textContent?.replace(/\s+/g, ' ').trim() ?? ''),
         href:   h,
         target: a.getAttribute('target') ?? '',
         title:  a.getAttribute('title')  ?? '',
