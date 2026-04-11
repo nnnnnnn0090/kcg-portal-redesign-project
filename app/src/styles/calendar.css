@@ -20,7 +20,9 @@
 #portal-overlay .p-cal-mode-btn{padding:.35rem .7rem;border:none;background:transparent;color:var(--p-text-dim);font-size:.75rem;
   font-weight:500;cursor:pointer;transition:all .2s ease;border-radius:6px}
 #portal-overlay .p-cal-mode-btn.is-active{background:var(--p-text-bright);color:var(--p-bg);box-shadow:0 2px 8px var(--p-shadow)}
-#portal-overlay .p-cal-mode-btn:not(.is-active):hover{color:var(--p-text);background:var(--p-bg-hover)}
+#portal-overlay .p-cal-mode-btn:not(.is-active):hover:not(:disabled){color:var(--p-text);background:var(--p-bg-hover)}
+#portal-overlay .p-cal-mode-btn:disabled{opacity:.35;cursor:not-allowed}
+#portal-overlay .p-cal-mode-btn:disabled.is-active{background:var(--p-bg-hover);color:var(--p-text-muted);box-shadow:none}
 #portal-overlay .p-cal-nav{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 #portal-overlay .p-cal-range{font-size:.8rem;color:var(--p-text-muted);font-weight:500;min-width:10rem;text-align:center}
 #portal-overlay .p-cal-btn{padding:.4rem .85rem;border-radius:8px;border:1px solid var(--p-border);background:transparent;

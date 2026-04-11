@@ -17,6 +17,8 @@ export interface CalendarShellProps {
   toolbarHidden?: boolean;
   bodyHidden?:    boolean;
   navDisabled?:   boolean;
+  /** true のとき週/月・前後ナビを無効化（課題未取り込みなど） */
+  controlsDisabled?: boolean;
 }
 
 export function CalendarShell({
@@ -27,10 +29,12 @@ export function CalendarShell({
   switchMode,
   navigate,
   calBodyRef,
-  toolbarHidden = false,
-  bodyHidden    = false,
-  navDisabled   = false,
+  toolbarHidden     = false,
+  bodyHidden        = false,
+  navDisabled       = false,
+  controlsDisabled  = false,
 }: CalendarShellProps) {
+  const navLocked = navDisabled || controlsDisabled;
   return (
     <>
       <div className="p-cal-toolbar" hidden={toolbarHidden}>
@@ -41,6 +45,7 @@ export function CalendarShell({
           <button
             type="button"
             className={`p-cal-mode-btn${viewMode === 'week' ? ' is-active' : ''}`}
+            disabled={controlsDisabled}
             onClick={() => switchMode('week')}
           >
             週
@@ -48,6 +53,7 @@ export function CalendarShell({
           <button
             type="button"
             className={`p-cal-mode-btn${viewMode === 'month' ? ' is-active' : ''}`}
+            disabled={controlsDisabled}
             onClick={() => switchMode('month')}
           >
             月
@@ -60,7 +66,7 @@ export function CalendarShell({
             type="button"
             className="p-cal-btn"
             aria-label="前へ"
-            disabled={navDisabled}
+            disabled={navLocked}
             onClick={() => navigate('prev')}
           >
             戻る
@@ -70,7 +76,7 @@ export function CalendarShell({
             type="button"
             className="p-cal-btn"
             aria-label="次へ"
-            disabled={navDisabled}
+            disabled={navLocked}
             onClick={() => navigate('next')}
           >
             次へ

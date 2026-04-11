@@ -53,6 +53,8 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
   const calBodyRef    = useRef<HTMLDivElement>(null);
   // スワイプ中は useLayoutEffect による DOM 更新をスキップする
   const skipDomSyncRef = useRef(false);
+  /** 週/月切替直後の1回だけグリッドにフェードイン（授業カレンダーと同じ playCalModeEnterAnim） */
+  const pendingModeEnterAnimRef = useRef(false);
 
   // ── 現在表示範囲の HTML を生成する ────────────────────────────────────
   const gridHtml = useMemo(() => {
@@ -73,7 +75,9 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     const el = calBodyRef.current;
     if (!el || skipDomSyncRef.current) return;
     clearCalBodyLoadingAttrs(el);
-    setCalBodyHtmlSmooth(el, gridHtml, undefined, { playEnterAnim: false });
+    const playEnter = pendingModeEnterAnimRef.current;
+    pendingModeEnterAnimRef.current = false;
+    setCalBodyHtmlSmooth(el, gridHtml, undefined, { playEnterAnim: playEnter });
   }, [gridHtml, hasData]);
 
   // ── King LMS 課題データの再取得（同期ページへ遷移）──────────────────
@@ -140,7 +144,8 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
 
   // ── 週/月 モード切替 ─────────────────────────────────────────────────
   function switchMode(mode: 'week' | 'month') {
-    if (mode === viewMode || swipeAnimating) return;
+    if (!hasData || mode === viewMode || swipeAnimating) return;
+    pendingModeEnterAnimRef.current = true;
     setViewMode(mode);
     const el = calBodyRef.current;
     if (el) {
@@ -167,6 +172,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
         <span className="p-panel-head">課題カレンダー</span>
         <button
           type="button"
+          id="p-assignment-refresh-btn"
           className="p-settings-resync-btn"
           onClick={() => void handleRefresh()}
         >
@@ -194,9 +200,8 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
         switchMode={switchMode}
         navigate={navigate}
         calBodyRef={calBodyRef}
-        toolbarHidden={!hasData}
         bodyHidden={!hasData}
-        navDisabled={swipeAnimating}
+        controlsDisabled={!hasData}
       />
     </section>
   );

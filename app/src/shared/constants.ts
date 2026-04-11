@@ -23,6 +23,8 @@ export const SK = {
   kingLmsAssignmentSyncReturnUrl:   'portalThemeKingLmsAssignmentSyncReturnUrl',
   kingLmsAssignmentSyncAwaitStream: 'portalThemeKingLmsAssignmentSyncAwaitStream',
   shortcutConfig:                   'portalThemeShortcutConfig',
+  /** 初回の案内チュートリアルを完了（またはスキップ）したら true */
+  portalGuidedTourDone:             'portalThemePortalGuidedTourDone',
 } as const;
 
 export type StorageKey = (typeof SK)[keyof typeof SK];

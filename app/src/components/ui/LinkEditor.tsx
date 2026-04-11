@@ -163,7 +163,14 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
       : (
         <div className="p-link-list">
           {visible.map((r) => (
-            <a key={r.key} className="p-link" href={r.url} target="_blank" rel="noopener noreferrer">
+            <a
+              key={r.key}
+              className="p-link"
+              href={r.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              id={r.midashi === '学生出欠登録' ? 'p-shortcut-attendance' : undefined}
+            >
               <span className="p-link-title">{r.midashi}</span>
               {r.biko && <span className="p-link-meta">{r.biko}</span>}
             </a>

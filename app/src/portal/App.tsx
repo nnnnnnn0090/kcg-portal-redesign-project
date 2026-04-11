@@ -10,11 +10,13 @@ import { useToast, Toast, copyToClipboard } from '../components/ui/Toast';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { SettingsPanel, type SettingsPanelHandle } from '../components/layout/SettingsPanel';
-import { EXTENSION_PROMO_PAGE_URL } from '../shared/constants';
+import { EXTENSION_PROMO_PAGE_URL, PAGE, SK } from '../shared/constants';
+import storage from '../lib/storage';
 import { useCalendarInteractions } from '../features/calendar';
 import type { PortalRoute } from './router';
 import { PortalPageOutlet } from './routes';
 import { AppProviders } from './providers';
+import { GuidedTour } from '../components/ui/GuidedTour';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -40,10 +42,27 @@ export function PortalApp(props: PortalAppProps) {
 
 function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
   const { settings, settingsReady, updateSetting, updateTheme } = useSettings();
-  const { settingsPopRef } = usePortalDom();
+  const { settingsPopRef, overlayRoot } = usePortalDom();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [guidedTourReplayToken, setGuidedTourReplayToken] = useState(0);
   const settingsPanelRef = useRef<SettingsPanelHandle | null>(null);
   const { toast, show: showToast, onAnimationEnd } = useToast();
+
+  const handleReplayGuidedTour = useCallback(() => {
+    settingsPanelRef.current?.requestClose();
+    overlayRoot.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    void storage.set({ [SK.portalGuidedTourDone]: false }).then(() => {
+      if (route.page !== PAGE.HOME) {
+        window.location.assign('/portal/');
+        return;
+      }
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setGuidedTourReplayToken((n) => n + 1);
+        });
+      });
+    });
+  }, [route.page, overlayRoot]);
 
   // King LMS 同期完了トーストを初回のみ表示
   useEffect(() => {
@@ -93,6 +112,7 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
             onClose={closeSettings}
             onThemeChange={updateTheme}
             onSettingChange={updateSetting}
+            onReplayGuidedTour={handleReplayGuidedTour}
           />
         )}
       />
@@ -100,6 +120,11 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
       <PortalPageOutlet route={route} settings={settings} />
 
       <Footer onShareClick={handleShareClick} />
+      <GuidedTour
+        route={route}
+        settingsReady={settingsReady}
+        guidedTourReplayToken={guidedTourReplayToken}
+      />
       <Toast toast={toast} onAnimationEnd={onAnimationEnd} />
     </>
   );

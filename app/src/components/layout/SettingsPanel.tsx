@@ -1,7 +1,7 @@
 /**
  * 設定パネルコンポーネント。
  * ヘッダーの「設定」ボタンの直下に表示されるポップオーバー形式のダイアログ。
- * テーマ選択・表示設定・King LMS コース一覧の再取得を提供する。
+ * テーマ選択・表示設定・King LMS コース一覧の再取得・案内チュートリアルの再表示を提供する。
  */
 
 import {
@@ -29,6 +29,8 @@ interface SettingsPanelProps {
   onClose:         () => void;
   onThemeChange:   (name: string) => void;
   onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  /** 初回案内チュートリアルを先頭から再表示する */
+  onReplayGuidedTour: () => void;
 }
 
 export interface SettingsPanelHandle {
@@ -39,7 +41,7 @@ export interface SettingsPanelHandle {
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>(
-  function SettingsPanel({ popoverSurfaceRef, isOpen, settings, onClose, onThemeChange, onSettingChange }, ref) {
+  function SettingsPanel({ popoverSurfaceRef, isOpen, settings, onClose, onThemeChange, onSettingChange, onReplayGuidedTour }, ref) {
     const popRef  = useRef<HTMLDivElement>(null);
     const [closing, setClosing] = useState(false);
 
@@ -241,6 +243,16 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
               <p className="p-settings-hint">
                 講義のクリックで King LMS のコースへ移動するために使用します。一覧取得のため一度 King LMS へ移動します（終了後にポータルへ戻ります）。
               </p>
+            </div>
+
+            <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+              <button
+                type="button"
+                className="p-settings-tour-replay-btn"
+                onClick={onReplayGuidedTour}
+              >
+                はじめの案内をもう一度見る
+              </button>
             </div>
           </div>
         </div>
