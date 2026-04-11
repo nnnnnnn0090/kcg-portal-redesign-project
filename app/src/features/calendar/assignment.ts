@@ -23,9 +23,8 @@ export interface DuePayload {
 
 // ─── 定数 ─────────────────────────────────────────────────────────────────
 
-/** 課題カレンダーの描画オプション（King LMS コースリンクは使用しない） */
+/** 課題カレンダーの描画オプション（授業カレンダー用のコース一覧は使わない） */
 export const assignmentViewMeta = {
-  calLinkKingLms: false as const,
   kingLmsCourses: [] as Array<{ displayName?: string; externalAccessUrl?: string }>,
   calKind:        'assignment' as const,
 };

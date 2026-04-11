@@ -1,9 +1,7 @@
 /**
  * 講義カレンダー（KogiCalendar）のデータ解析・リンク生成ヘルパー。
- * シラバス URL の構築と King LMS コース URL のマッチングを担当する。
+ * シラバス URL（コンテキストメニュー用）と King LMS コース URL のマッチングを担当する。
  */
-
-import { plainFromHtml } from '../../lib/dom';
 
 const SYLLABUS_BASE =
   'https://home.kcg.ac.jp/Gakusei/web/Syllabus/WebSyllabusSansho/UI/WSL_SyllabusSansho.aspx';
@@ -100,18 +98,4 @@ export function findKingLmsUrl(
     return false;
   });
   return String(withPeriod.length >= 1 ? withPeriod[0].externalAccessUrl : candidates[0].externalAccessUrl);
-}
-
-/**
- * 講義イベントのリンク先 URL を決定する。
- * calLinkKingLms が true なら King LMS コース URL、そうでなければシラバス URL。
- */
-export function kogiEventHref(
-  tooltip: string,
-  title: string,
-  useKingLms: boolean,
-  kingLmsCourses: Array<{ displayName?: string; externalAccessUrl?: string }>,
-): string {
-  if (useKingLms) return findKingLmsUrl(kingLmsCourses, title);
-  return syllabusUrl(tooltip, plainFromHtml(tooltip));
 }

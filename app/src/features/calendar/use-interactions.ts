@@ -6,6 +6,7 @@
 
 import { useEffect, useRef, type RefObject } from 'react';
 import { esc, setHtml } from '../../lib/dom';
+import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
 import { syllabusUrl, findKingLmsUrl } from './kogi';
 import { useCourses, type CourseRow } from '../../context/courses';
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
@@ -79,6 +80,19 @@ function attachCalendarTooltipAndContextMenu(
     hideTimer = window.setTimeout(hide, 60);
   }
 
+  function onKogiPrimaryClick(e: MouseEvent) {
+    if (e.button !== 0) return;
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    const ev = t.closest('.p-cal-ev[data-cal-kind="kogi"]');
+    if (!ev || !overlayRoot.contains(ev)) return;
+    if (ev instanceof HTMLAnchorElement) return;
+    e.preventDefault();
+    e.stopPropagation();
+    void beginKingLmsCourseListSync();
+  }
+
+  overlayRoot.addEventListener('click', onKogiPrimaryClick);
   overlayRoot.addEventListener('mouseover', onMouseOver);
   overlayRoot.addEventListener('mouseout',  onMouseOut);
   overlayRoot.addEventListener('scroll', hide, { passive: true, capture: true });
@@ -147,6 +161,7 @@ function attachCalendarTooltipAndContextMenu(
   document.addEventListener('keydown', onKeyDown);
 
   return () => {
+    overlayRoot.removeEventListener('click', onKogiPrimaryClick);
     overlayRoot.removeEventListener('mouseover', onMouseOver);
     overlayRoot.removeEventListener('mouseout',  onMouseOut);
     overlayRoot.removeEventListener('scroll', hide, { capture: true } as AddEventListenerOptions);

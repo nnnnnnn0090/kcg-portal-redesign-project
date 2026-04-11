@@ -3,7 +3,7 @@
  * 授業カレンダー・課題カレンダー・お知らせ・ショートカットを統合表示する。
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { MSG } from '../../shared/constants';
 import { urls } from '../../lib/api';
 import type { Settings } from '../../context/settings';
@@ -40,8 +40,10 @@ export function HomePage({ settings }: HomePageProps) {
   useHomeStorageBootstrap({ setLinkConfig, setAssignmentPayload, setCourses });
   useKogiNewsPrefetch();
 
-  // King LMS 再描画の依存文字列（calLinkKingLms または courses が変わったら再描画）
-  const kogiDisplayDeps = `${settings.calLinkKingLms}|${courses.length}`;
+  const kogiDisplayDeps = useMemo(
+    () => courses.map((c) => `${String(c.displayName ?? '')}\t${String(c.externalAccessUrl ?? '')}`).join('\n'),
+    [courses],
+  );
   const getKingLmsCourses = useCallback(() => courses, [courses]);
   const lastLogin         = useLastLogin();
 
@@ -63,7 +65,6 @@ export function HomePage({ settings }: HomePageProps) {
           calKind="kogi"
           titles={{ week: '今週の授業', month: '今月の授業' }}
           msgType={MSG.kogiCalendar}
-          getCalLinkKingLms={() => settings.calLinkKingLms}
           getKingLmsCourses={getKingLmsCourses}
           kogiDisplayDeps={kogiDisplayDeps}
           sleepMascotSlot

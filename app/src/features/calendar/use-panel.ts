@@ -43,11 +43,9 @@ export interface CalendarPanelConfig {
   hideWhenEmpty?: boolean;
   /** パネルを強制表示するかどうか（設定から読む） */
   getForceVisible?: () => boolean;
-  /** King LMS リンクを使うかどうか（設定から読む） */
-  getCalLinkKingLms?: () => boolean;
-  /** King LMS コース一覧（設定から読む） */
+  /** King LMS コース一覧（授業カレンダーでリンク解決に使う） */
   getKingLmsCourses?: () => Array<{ displayName?: string; externalAccessUrl?: string }>;
-  /** King LMS リンク設定変更時に再描画を促す文字列（変わったら useEffect が走る） */
+  /** コース一覧の内容が変わったとき再描画を促す値（変わると useEffect が走る） */
   kogiDisplayDeps?: string;
   /** 強制表示設定変更時に再描画を促す文字列 */
   forceVisibleDeps?: string;
@@ -64,7 +62,6 @@ export function useCalendarPanel({
   msgType,
   hideWhenEmpty = false,
   getForceVisible   = () => false,
-  getCalLinkKingLms = () => false,
   getKingLmsCourses = () => [],
   kogiDisplayDeps,
   forceVisibleDeps,
@@ -84,8 +81,8 @@ export function useCalendarPanel({
   const pendingEnterAnimRef = useRef(false);
 
   // ── props を ref で保持（コールバック内での古い値参照を防ぐ）──────────
-  const propsRef = useRef({ calUrl, calKind, hideWhenEmpty, getForceVisible, getCalLinkKingLms, getKingLmsCourses, msgType });
-  propsRef.current = { calUrl, calKind, hideWhenEmpty, getForceVisible, getCalLinkKingLms, getKingLmsCourses, msgType };
+  const propsRef = useRef({ calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType });
+  propsRef.current = { calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType };
 
   // ── 可変な表示パラメータを ref で保持（state と同期） ─────────────────
   const calRef = useRef({
@@ -115,7 +112,6 @@ export function useCalendarPanel({
   const viewMetaForRender = useCallback(() => ({
     mode:           viewModeRef.current,
     monthRef:       viewModeRef.current === 'month' ? monthRefRef.current : null,
-    calLinkKingLms: propsRef.current.getCalLinkKingLms(),
     kingLmsCourses: propsRef.current.getKingLmsCourses(),
     calKind:        propsRef.current.calKind,
   }), []);
@@ -385,7 +381,7 @@ export function useCalendarPanel({
     }
   }, [fetchRange, redrawFromClient]);
 
-  // ── King LMS リンク/コース設定変更 → 再描画 ──────────────────────────
+  // ── 授業カレンダー: King LMS コース一覧の更新 → 再描画 ────────────────
   useEffect(() => {
     if (kogiDisplayDeps === undefined) return;
     const m = calRef.current;

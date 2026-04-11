@@ -21,12 +21,13 @@ export function useToast() {
   const hideTimerRef       = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cancelAnimRef      = useRef<(() => void) | null>(null);
 
-  const show = useCallback((msg: string, opts?: { placement?: 'bottom' | 'top' }) => {
+  const show = useCallback((msg: string, opts?: { placement?: 'bottom' | 'top'; durationMs?: number }) => {
     if (hideTimerRef.current) { clearTimeout(hideTimerRef.current); hideTimerRef.current = null; }
     if (cancelAnimRef.current) { cancelAnimRef.current(); cancelAnimRef.current = null; }
 
     setToast({ message: msg, placement: opts?.placement ?? 'bottom', visible: true, closing: false });
 
+    const durationMs = typeof opts?.durationMs === 'number' && opts.durationMs > 0 ? opts.durationMs : DURATION_MS;
     hideTimerRef.current = setTimeout(() => {
       hideTimerRef.current = null;
       const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -40,7 +41,7 @@ export function useToast() {
         setToast((prev) => ({ ...prev, visible: false, closing: false }));
       }, CLOSE_FALLBACK_MS);
       cancelAnimRef.current = () => clearTimeout(fallback);
-    }, DURATION_MS);
+    }, durationMs);
   }, []);
 
   function onAnimationEnd(e: React.AnimationEvent<HTMLDivElement>) {

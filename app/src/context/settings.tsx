@@ -24,7 +24,6 @@ export interface Settings {
   hoshuCalForce:      boolean;
   campusCalForce:     boolean;
   hideProfileName:    boolean;
-  calLinkKingLms:     boolean;
   showKogiCalMascot:  boolean;
 }
 
@@ -44,7 +43,6 @@ const DEFAULTS: Settings = {
   hoshuCalForce:     false,
   campusCalForce:    false,
   hideProfileName:   false,
-  calLinkKingLms:    false,
   showKogiCalMascot: false,
 };
 
@@ -56,7 +54,6 @@ const SETTINGS_TO_SK = {
   hoshuCalForce:   SK.hoshuCalForce,
   campusCalForce:  SK.campusCalForce,
   hideProfileName: SK.hideProfileName,
-  calLinkKingLms:     SK.calLinkKingLms,
   showKogiCalMascot:  SK.showKogiCalMascot,
 } satisfies Record<keyof Settings, string>;
 
@@ -66,7 +63,6 @@ const STORAGE_KEYS = [
   SK.hoshuCalForce,
   SK.campusCalForce,
   SK.hideProfileName,
-  SK.calLinkKingLms,
   SK.showKogiCalMascot,
 ] as const;
 
@@ -77,7 +73,6 @@ function parseSettings(data: Record<string, unknown>): Settings {
     hoshuCalForce:   Boolean(data[SK.hoshuCalForce]   ?? DEFAULTS.hoshuCalForce),
     campusCalForce:  Boolean(data[SK.campusCalForce]  ?? DEFAULTS.campusCalForce),
     hideProfileName: Boolean(data[SK.hideProfileName] ?? DEFAULTS.hideProfileName),
-    calLinkKingLms:    Boolean(data[SK.calLinkKingLms]    ?? DEFAULTS.calLinkKingLms),
     showKogiCalMascot: Boolean(data[SK.showKogiCalMascot] ?? DEFAULTS.showKogiCalMascot),
   };
 }

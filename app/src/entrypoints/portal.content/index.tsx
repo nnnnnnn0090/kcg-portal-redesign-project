@@ -11,7 +11,10 @@
 import { createElement } from 'react';
 import overlayCss from '../../styles/overlay.css?inline';
 import { matchPortalRoute } from '../../portal/router';
-import { consumeKingLmsSyncReturnHash } from '../../portal/sync-hash';
+import {
+  consumeKingLmsSyncReturnHash,
+  KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST,
+} from '../../portal/sync-hash';
 import { applyThemeToElement, portalHeadThemeCssByName, themeTokensForName } from '../../themes';
 import storage from '../../lib/storage';
 import { SK } from '../../shared/constants';
@@ -35,12 +38,18 @@ export default defineContentScript({
       return;
     }
 
-    const syncToastMsg = consumeKingLmsSyncReturnHash();
-
     void (async () => {
       try {
-        const snap = await storage.get(SK.theme);
-        const themeName = String(snap[SK.theme] ?? '').trim() || 'dark';
+        let syncToastMsg = consumeKingLmsSyncReturnHash();
+        const bootSnap = await storage.get([SK.theme, SK.kingLmsCourseSyncToastQuiet]);
+        if (bootSnap[SK.kingLmsCourseSyncToastQuiet]) {
+          await storage.set({ [SK.kingLmsCourseSyncToastQuiet]: false });
+          if (syncToastMsg === KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST) {
+            syncToastMsg = 'コース一覧を保存しました';
+          }
+        }
+
+        const themeName = String(bootSnap[SK.theme] ?? '').trim() || 'dark';
 
         const preservedTheme = document.getElementById('portal-theme-vars')?.textContent ?? '';
         const title = document.querySelector('title')?.cloneNode(true) ?? null;

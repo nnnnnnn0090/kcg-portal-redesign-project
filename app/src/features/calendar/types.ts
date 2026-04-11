@@ -24,7 +24,7 @@ export interface CalEvent {
 export interface ViewMeta {
   mode:           'week' | 'month';
   monthRef:       { y: number; m: number } | null;
-  calLinkKingLms: boolean;
+  /** 授業カレンダー（kogi）で King LMS コース URL の解決に使う */
   kingLmsCourses: Array<{ displayName?: string; externalAccessUrl?: string }>;
   calKind:        string;
 }

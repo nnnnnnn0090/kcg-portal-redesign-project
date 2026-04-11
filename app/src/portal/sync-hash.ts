@@ -5,8 +5,12 @@
 
 import { SYNC_HASH } from '../shared/constants';
 
+/** 講義クリックなどからの同期成功時トースト（設定からの再取得時は短文化される） */
+export const KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST =
+  '初回セットアップは完了しました。King LMS を開くには、該当の講義をもう一度クリックしてください。';
+
 const HASH_MESSAGES: Record<string, string> = {
-  [SYNC_HASH.courseDone]:        'コース一覧を保存しました',
+  [SYNC_HASH.courseDone]: KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST,
   [SYNC_HASH.courseTimeout]:     'コース一覧の取得が時間内に完了しませんでした',
   [SYNC_HASH.assignmentDone]:    '課題を取得しました',
   [SYNC_HASH.assignmentTimeout]: '課題の取得が時間内に完了しませんでした',

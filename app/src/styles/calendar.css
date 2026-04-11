@@ -69,6 +69,8 @@
   display:flex;flex-direction:column;gap:.5rem}
 #portal-overlay .p-cal-grid.is-month .p-cal-day-body{flex:0 0 auto;max-height:none;min-height:auto;overflow:visible;
   display:flex;flex-direction:column;gap:.1rem;padding:.2rem .35rem}
+#portal-overlay div.p-cal-ev[data-cal-kind="kogi"]{cursor:pointer}
+#portal-overlay div.p-cal-ev[data-cal-kind="kogi"]:hover{background:color-mix(in srgb,var(--p-accent) 20%,transparent);border-left-color:var(--p-accent-light)}
 #portal-overlay .p-cal-ev{font-size:.7rem;line-height:1.4;margin-bottom:.5rem;padding:.35rem .45rem;
   background:var(--p-accent-bg);border-left:2px solid var(--p-accent);border-radius:0 6px 6px 0}
 #portal-overlay a.p-cal-ev{text-decoration:none;color:inherit;cursor:pointer;outline-offset:2px}

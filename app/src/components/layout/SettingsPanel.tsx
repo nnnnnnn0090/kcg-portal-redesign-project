@@ -1,7 +1,7 @@
 /**
  * 設定パネルコンポーネント。
  * ヘッダーの「設定」ボタンの直下に表示されるポップオーバー形式のダイアログ。
- * テーマ選択・表示設定・King LMS 連携設定を提供する。
+ * テーマ選択・表示設定・King LMS コース一覧の再取得を提供する。
  */
 
 import {
@@ -17,8 +17,7 @@ import {
 } from 'react';
 import { THEMES } from '../../themes';
 import type { Settings } from '../../context/settings';
-import { SK, KING_LMS_COURSE_SYNC_URL } from '../../shared/constants';
-import storage from '../../lib/storage';
+import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -138,16 +137,6 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       return () => document.removeEventListener('keydown', onKeyDown);
     }, [isOpen, requestClose]);
 
-    // King LMS コース一覧の再取得（現在の URL を返却先として保存してから遷移）
-    async function handleResync() {
-      await storage.set({
-        [SK.kingLmsSyncPending]:    true,
-        [SK.kingLmsSyncReturnUrl]:  location.href,
-        [SK.kingLmsSyncAwaitCourse]: false,
-      });
-      window.location.href = KING_LMS_COURSE_SYNC_URL;
-    }
-
     return (
       <div
         ref={assignPopSurface}
@@ -241,33 +230,18 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
               <span>ヘッダーに名前を表示しない</span>
             </label>
 
-            <label className="p-settings-row">
-              <input
-                type="checkbox"
-                checked={settings.calLinkKingLms}
-                onChange={(e) => {
-                  const next = e.target.checked;
-                  onSettingChange('calLinkKingLms', next);
-                  if (next) void handleResync();
-                }}
-              />
-              <span>
-                授業カレンダーの講義をクリックで King LMS のコース画面に移動する
-                （オンにするとコース一覧へ移動し、保存が終わるとポータルに戻ります）
-              </span>
-            </label>
-
-            {settings.calLinkKingLms && (
-              <div className="p-settings-row p-settings-row-actions">
-                <button
-                  type="button"
-                  className="p-settings-resync-btn"
-                  onClick={handleResync}
-                >
-                  コース一覧を再取得
-                </button>
-              </div>
-            )}
+            <div className="p-settings-row p-settings-row-actions p-settings-king-lms-sync">
+              <button
+                type="button"
+                className="p-settings-resync-btn"
+                onClick={() => void beginKingLmsCourseListSync({ toastQuiet: true })}
+              >
+                コース一覧を再取得
+              </button>
+              <p className="p-settings-hint">
+                講義のクリックで King LMS のコースへ移動するために使用します。一覧取得のため一度 King LMS へ移動します（終了後にポータルへ戻ります）。
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -47,7 +47,11 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
 
   // King LMS 同期完了トーストを初回のみ表示
   useEffect(() => {
-    if (syncToastMsg) showToast(syncToastMsg, { placement: 'top' });
+    if (!syncToastMsg) return;
+    showToast(syncToastMsg, {
+      placement: 'top',
+      durationMs: syncToastMsg.length > 48 ? 5800 : undefined,
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps -- syncToastMsg はマウント時の初期値のみ使う。再レンダーのたびに表示するのは意図しない動作のため deps から意図的に除外。
   }, []);
 

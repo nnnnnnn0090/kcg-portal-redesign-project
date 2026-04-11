@@ -5,7 +5,7 @@
 
 import { enumerateRange, parseIsoLocal, toIsoLocal, calEventDayIso } from '../../lib/date';
 import { esc, escAttr, plainFromHtml } from '../../lib/dom';
-import { parseKogiMeta, parseLeadingPeriodTitle, kogiPeriodNum, kogiPeriodTimeRange, kogiEventHref } from './kogi';
+import { parseKogiMeta, parseLeadingPeriodTitle, kogiPeriodNum, kogiPeriodTimeRange, findKingLmsUrl, syllabusUrl } from './kogi';
 import type { CalEvent, ViewMeta } from './types';
 
 const WEEKDAY_LABELS = ['月', '火', '水', '木', '金', '土', '日'];
@@ -13,7 +13,7 @@ const WEEKDAY_LABELS = ['月', '火', '水', '木', '金', '土', '日'];
 // ─── 1 日分のイベント HTML ────────────────────────────────────────────────
 
 function buildDayEventsHtml(dayItems: CalEvent[], opts: ViewMeta): string {
-  const { calKind, mode, calLinkKingLms, kingLmsCourses } = opts;
+  const { calKind, mode, kingLmsCourses } = opts;
   const parts: string[] = [];
   let prevPeriod: number | null = null;
 
@@ -35,7 +35,14 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: ViewMeta): string {
 
     const tipPlain    = plainFromHtml(ev.tooltip ?? '');
     const hrefFromEv  = String(ev.href ?? '').trim();
-    const href        = hrefFromEv || kogiEventHref(ev.tooltip ?? '', ev.title ?? '', calLinkKingLms, kingLmsCourses);
+    let href          = hrefFromEv;
+    if (!href) {
+      if (calKind === 'kogi') {
+        href = findKingLmsUrl(kingLmsCourses, ev.title ?? '');
+      } else {
+        href = syllabusUrl(ev.tooltip ?? '', tipPlain);
+      }
+    }
     const timeRange   = calKind === 'kogi' ? kogiPeriodTimeRange(period) : String(ev.calTime ?? '');
 
     const metaHtml  = mode !== 'month' && meta ? `<span class="p-cal-ev-meta">${esc(meta)}</span>` : '';
@@ -75,7 +82,6 @@ export function buildCalendarGridHtml(
 
   const mode           = viewMeta?.mode === 'month' ? 'month' : 'week';
   const monthRef       = viewMeta?.monthRef ?? null;
-  const calLinkKingLms = !!viewMeta?.calLinkKingLms;
   const kingLmsCourses = Array.isArray(viewMeta?.kingLmsCourses) ? viewMeta.kingLmsCourses : [];
   const calKind        = viewMeta?.calKind ?? '';
   const todayIso       = toIsoLocal(new Date());
@@ -114,7 +120,7 @@ export function buildCalendarGridHtml(
       });
     }
 
-    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, calLinkKingLms, kingLmsCourses, monthRef });
+    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, kingLmsCourses, monthRef });
     const cls     = ['p-cal-cell', isMuted && 'is-muted', isToday && 'is-today'].filter(Boolean).join(' ');
     const ariaCur = isToday ? ' aria-current="date"' : '';
 
