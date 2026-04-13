@@ -30,6 +30,8 @@ interface Row {
 /** URL の末尾スラッシュを除いたものをキーとして使う */
 function linkKey(url: string): string { return String(url ?? '').replace(/\/+$/, ''); }
 
+const EXTRAS: ApiLink[] = HOME_SHORTCUT_EXTRAS.map((e) => ({ midashi: e.midashi, url: e.url }));
+
 /** API リンク・固定リンク・カスタムリンクを統合して重複除去・順序適用する */
 function buildRows(items: ApiLink[], extras: ApiLink[], config: LinkConfig): Row[] {
   const extraUrls = new Set(extras.filter((i) => i.midashi && i.url).map((i) => linkKey(i.url)));
@@ -62,11 +64,10 @@ interface LinkEditorProps {
 }
 
 export function LinkEditor({ items, config, onConfigChange, editing }: LinkEditorProps) {
-  const extras: ApiLink[] = HOME_SHORTCUT_EXTRAS.map((e) => ({ midashi: e.midashi, url: e.url }));
   const [localCfg, setLocalCfg] = useState<LinkConfig>(config);
   const [addName,  setAddName]  = useState('');
   const [addUrl,   setAddUrl]   = useState('');
-  const [rows,     setRows]     = useState<Row[]>(() => buildRows(items, extras, config));
+  const [rows,     setRows]     = useState<Row[]>(() => buildRows(items, EXTRAS, config));
   /** ドラッグ中の見た目（CSS .is-dragging / .is-drag-over） */
   const [dragUi, setDragUi]     = useState<{ from: number; over: number | null } | null>(null);
   const dragSrcIdx    = useRef(-1);
@@ -88,8 +89,8 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
   // config が外部から変わった場合は同期する（編集中は無視）
   useEffect(() => { if (!editing) setLocalCfg(config); }, [config, editing]);
 
-  // items または localCfg が変わったら行を再構築する（extras はモジュール定数）
-  useEffect(() => { setRows(buildRows(items, extras, localCfg)); }, [items, localCfg, extras]);
+  // items または localCfg が変わったら行を再構築する
+  useEffect(() => { setRows(buildRows(items, EXTRAS, localCfg)); }, [items, localCfg]);
 
   function toggleHidden(key: string): void {
     const hidden = localCfg.hidden.includes(key)
