@@ -141,7 +141,7 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
         {/* 本文 */}
         <section className="p-panel p-panel-kino">
           <span className="p-panel-head">本文</span>
-          <div className="p-panel-body p-kino-message">
+          <div id="p-news-detail-body" className="p-panel-body p-kino-message">
             {detail
               ? <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
               : <p className="p-empty">読み込み中…</p>

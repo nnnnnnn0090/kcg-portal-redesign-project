@@ -40,53 +40,50 @@ function formatDeadline(raw: string): string {
   return m ? `${m[1]}年${m[2]}月${m[3]}日 ${m[4]}:${m[5]}` : s;
 }
 
-function buildDetailHref(row: Row): string {
-  // 直接 URL が指定されていればそちらを優先
-  const direct = pick(row, ['detailUrl','DetailUrl','url','Url','href','Href','link','Link']);
-  if (direct) {
-    try {
-      return /^https?:\/\//i.test(direct) ? direct : new URL(direct, location.origin).href;
-    } catch { /* skip */ }
-  }
+/** アンケート一覧行を一度だけ pick して束ねる（API 確定キー） */
+function parseSurveyRow(row: Row) {
+  return {
+    nendo:           pick(row, ['nendo']),
+    questionnaireCd: pick(row, ['questionnaireCd']),
+    kogiCd:          pick(row, ['kogiCd']),
+    periodCd:        pick(row, ['periodCd']),
+    periodNo:        pick(row, ['periodNo']),
+    kogi:            pick(row, ['kogi']),
+    yobiRNm:         pick(row, ['yobiRNm']),
+    jigenRNm:        pick(row, ['jigenRNm']),
+    kyoinFullNm:     pick(row, ['kyoinFullNm']),
+    dispEndDateTime: pick(row, ['dispEndDateTime']),
+  };
+}
 
-  // 単一 ID 形式
-  const singleId = pick(row, ['detailId','DetailId','questionnaireId','QuestionnaireId','id','Id']);
-  if (singleId && /^[0-9A-Za-z-]+$/.test(singleId)) {
-    try {
-      return new URL(`/portal/Questionnaire/Detail/${encodeURIComponent(singleId)}`, location.origin).href;
-    } catch { /* skip */ }
-  }
-
-  // 複合キー形式
-  const nendo  = pick(row, ['nendo','Nendo']);
-  const jisshi = pick(row, ['jisshiKikanCd','JisshiKikanCd','jisshiKikanCD','JissiKikanCd','jissiKikanCd']);
-  const renban = pick(row, ['renban','Renban','seq','Seq','renBan']);
-  const cd     = pick(row, ['questionnaireCd','QuestionnaireCd','anketoCd','AnketoCd','anketoCD']);
-  if (nendo && jisshi && renban && cd) {
+/** 現行ポータル: /Questionnaire/Detail/{nendo}/{questionnaireCd}/{kogiCd}/{periodCd}/{periodNo} */
+function buildDetailHrefParsed(s: ReturnType<typeof parseSurveyRow>): string {
+  const { nendo, questionnaireCd, kogiCd, periodCd, periodNo } = s;
+  if (nendo && questionnaireCd && kogiCd && periodCd && periodNo) {
     try {
       return new URL(
-        `/portal/Questionnaire/Detail/${encodeURIComponent(nendo)}/${encodeURIComponent(jisshi)}/${encodeURIComponent(renban)}/${encodeURIComponent(cd)}`,
+        `/portal/Questionnaire/Detail/${encodeURIComponent(nendo)}/${encodeURIComponent(questionnaireCd)}/${encodeURIComponent(kogiCd)}/${encodeURIComponent(periodCd)}/${encodeURIComponent(periodNo)}`,
         location.origin,
       ).href;
     } catch { /* skip */ }
   }
-
   return '';
 }
 
 /** 一覧行の安定キー（フィルタ変更時の不要な再マウントを減らす） */
 function surveyRowKey(row: Row): string {
-  const href = buildDetailHref(row);
+  const s = parseSurveyRow(row);
+  const href = buildDetailHrefParsed(s);
   if (href) return href;
   const composite = [
-    pick(row, ['nendo', 'Nendo']),
-    pick(row, ['jisshiKikanCd', 'JisshiKikanCd', 'jisshiKikanCD', 'JissiKikanCd', 'jissiKikanCd']),
-    pick(row, ['renban', 'Renban', 'seq', 'Seq', 'renBan']),
-    pick(row, ['questionnaireCd', 'QuestionnaireCd', 'anketoCd', 'AnketoCd', 'anketoCD']),
-    pick(row, ['detailId', 'DetailId', 'questionnaireId', 'QuestionnaireId', 'id', 'Id']),
-    pick(row, ['kogi', 'Kogi', 'kogiNm', 'KogiNm', 'kogiName', 'KogiName']),
-    pick(row, ['summaryDatetime', 'SummaryDatetime', 'shimekiri', 'Shimekiri']),
-    pick(row, ['kyoinFullNm', 'KyoinFullNm', 'tantoKyoinNm', 'TantoKyoinNm']),
+    s.nendo,
+    s.questionnaireCd,
+    s.kogiCd,
+    s.periodCd,
+    s.periodNo,
+    s.kogi,
+    s.dispEndDateTime,
+    s.kyoinFullNm,
   ].join('|');
   if (composite.replace(/\|/g, '').length > 0) return composite;
   return JSON.stringify(row);
@@ -96,20 +93,20 @@ function applyFilters(raw: Row[], onlyUnanswered: boolean, kogiKw: string, kyoin
   let list = raw.slice();
   if (onlyUnanswered) {
     list = list.filter((row) => {
-      const ex = pickRaw(row, ['existsAnswer','ExistsAnswer']);
+      const ex = pickRaw(row, ['existsAnswer']);
       return ex.length > 0 && ex.includes('未回答');
     });
   }
   const fk = kogiKw.trim();
   if (fk) {
     list = list.filter((row) =>
-      pick(row, ['kogi','Kogi','kogiNm','KogiNm','kogiName','KogiName']).includes(fk),
+      pick(row, ['kogi']).includes(fk),
     );
   }
   const fe = kyoinKw.trim();
   if (fe) {
     list = list.filter((row) =>
-      pick(row, ['kyoinFullNm','KyoinFullNm','tantoKyoinNm','TantoKyoinNm','kyoinNm','KyoinNm','kyoinNms','KyoinNms']).includes(fe),
+      pick(row, ['kyoinFullNm']).includes(fe),
     );
   }
   return list;
@@ -118,12 +115,10 @@ function applyFilters(raw: Row[], onlyUnanswered: boolean, kogiKw: string, kyoin
 // ─── 行コンポーネント ─────────────────────────────────────────────────────
 
 function SurveyRow({ row }: { row: Row }) {
-  const kogi     = pick(row, ['kogi','Kogi','kogiNm','KogiNm','kogiName','KogiName']);
-  const yobi     = pick(row, ['yobiNm','YobiNm','yobi','Yobi']);
-  const jigen    = pick(row, ['jigenNm','JigenNm','jigen','Jigen']);
-  const kyoin    = pick(row, ['kyoinFullNm','KyoinFullNm','tantoKyoinNm','TantoKyoinNm','kyoinNm','KyoinNm','kyoinNms','KyoinNms']);
-  const deadline = formatDeadline(pick(row, ['summaryDatetime','SummaryDatetime','shimekiri','Shimekiri']));
-  const href     = buildDetailHref(row);
+  const s        = parseSurveyRow(row);
+  const href     = buildDetailHrefParsed(s);
+  const deadline = formatDeadline(s.dispEndDateTime);
+  const { kogi, yobiRNm: yobi, jigenRNm: jigen, kyoinFullNm: kyoin } = s;
   return (
     <tr>
       <td>{href ? <a href={href}>{kogi}</a> : kogi}</td>

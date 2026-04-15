@@ -10,8 +10,13 @@ import { usePortalMessage, type PortalCapturedMessage } from '../../hooks/usePor
 import {
   initialKyukoPortalState,
   reduceKyukoPortalMessage,
-  pick,
+  pickUnderscore,
 } from '../../lib/portal-messages-pages';
+import {
+  PORTAL_HOKO_RISHU_KEYS,
+  PORTAL_KYOSHITSU_CHANGE_RISHU_KEYS,
+  PORTAL_KYUKO_RISHU_KEYS,
+} from '../../shared/kyoshitsu-change-portal-schema';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 
@@ -25,20 +30,17 @@ interface KyukoPageProps {
 
 // ─── ヘルパー ─────────────────────────────────────────────────────────────
 
-/** 履修 token（userId + "_isRishu"）でフィルタリングする */
+/** 履修 token（userId + "_isRishu"）でフィルタリングする（ポータル `arrayFilter` と同じ 2 キーのみ） */
 function filterByRishuToken(
   list: Row[] | null,
   token: string,
-  keys: { rishu: string; rishuUnder: string; kyoin: string; kyoin2?: string },
+  keys: { rishu: readonly string[]; kyoin: readonly string[] },
 ): Row[] {
   if (!Array.isArray(list)) return [];
   if (!token) return list.slice();
   return list.filter((item) => {
     const check = (v: unknown) => v != null && String(v).includes(token);
-    return check(item[keys.rishu])
-      || check(item[keys.rishuUnder])
-      || check(item[keys.kyoin])
-      || (keys.kyoin2 != null && check(item[keys.kyoin2]));
+    return keys.rishu.some((k) => check(item[k])) || keys.kyoin.some((k) => check(item[k]));
   });
 }
 
@@ -47,12 +49,14 @@ function filterByRishuToken(
 function KyukoRow({ row }: { row: Row }) {
   return (
     <tr>
-      <td>{pick(row, ['kyukoDate','KyukoDate','hiduke','Hiduke'])}</td>
-      <td>{pick(row, ['yobi','Yobi','yobiNm','YobiNm'])}</td>
-      <td>{pick(row, ['jigen','Jigen','jigenNm','JigenNm'])}</td>
-      <td>{pick(row, ['kogiNm','KogiNm','kogiName','KogiName'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['kyoinNms','KyoinNms','kyoinNm','KyoinNm','tantoKyoinNm','TantoKyoinNm'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['biko','Biko','renrakuJiko','RenrakuJiko'])}</td>
+      <td>{pickUnderscore(row, 'kyukoDate')}</td>
+      <td>{pickUnderscore(row, 'yobi')}</td>
+      <td>{pickUnderscore(row, 'jigen')}</td>
+      <td>{pickUnderscore(row, 'kogiNm')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'kyoinNms')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'biko')}</td>
+      <td>{pickUnderscore(row, 'kyoinCds')}</td>
+      <td>{pickUnderscore(row, 'gakuseiRishuFlgKyuko')}</td>
     </tr>
   );
 }
@@ -60,13 +64,15 @@ function KyukoRow({ row }: { row: Row }) {
 function HokoRow({ row }: { row: Row }) {
   return (
     <tr>
-      <td>{pick(row, ['hokoDate','HokoDate','hiduke','Hiduke'])}</td>
-      <td>{pick(row, ['yobi','Yobi','yobiNm','YobiNm'])}</td>
-      <td>{pick(row, ['jigen','Jigen','jigenNm','JigenNm'])}</td>
-      <td>{pick(row, ['kogiNm','KogiNm','kogiName','KogiName'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['kyoinNms','KyoinNms','kyoinNm','KyoinNm','tantoKyoinNm','TantoKyoinNm'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['hokoKyoshitsuNms','HokoKyoshitsuNms','kyoshitsuNms','KyoshitsuNms','hokoKyoshitsuNm','HokoKyoshitsuNm','kyoshitsuNm','KyoshitsuNm','_kyoshitsuNm','_hokoKyoshitsuNm'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['biko','Biko','renrakuJiko','RenrakuJiko'])}</td>
+      <td>{pickUnderscore(row, 'hokoDate')}</td>
+      <td>{pickUnderscore(row, 'hokoYobi')}</td>
+      <td>{pickUnderscore(row, 'hokoJigen')}</td>
+      <td>{pickUnderscore(row, 'hokoKogiNm')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'hokoKyoinNms')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'hokoKyoshitsuNms')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'hokoBiko')}</td>
+      <td>{pickUnderscore(row, 'hokoKyoinCds')}</td>
+      <td>{pickUnderscore(row, 'gakuseiRishuFlgHoko')}</td>
     </tr>
   );
 }
@@ -74,14 +80,16 @@ function HokoRow({ row }: { row: Row }) {
 function KcRow({ row }: { row: Row }) {
   return (
     <tr>
-      <td>{pick(row, ['kcDate','KcDate','kyoshitsuChangeDate','KyoshitsuChangeDate','hiduke','Hiduke'])}</td>
-      <td>{pick(row, ['yobi','Yobi','yobiNm','YobiNm'])}</td>
-      <td>{pick(row, ['jigen','Jigen','jigenNm','JigenNm'])}</td>
-      <td>{pick(row, ['kogiNm','KogiNm','kogiName','KogiName'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['kyoinNms','KyoinNms','kyoinNm','KyoinNm','tantoKyoinNm','TantoKyoinNm'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['kyoshitsuNmOld','KyoshitsuNmOld','_kyoshitsuNmOld','kyoshitsuOld','KyoshitsuOld','henkoMaeKyoshitsuNm','HenkoMaeKyoshitsuNm'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['kyoshitsuNmNew','KyoshitsuNmNew','_kyoshitsuNmNew','kyoshitsuNew','KyoshitsuNew','henkoGoKyoshitsuNm','HenkoGoKyoshitsuNm'])}</td>
-      <td className="p-kyuko-hide-narrow">{pick(row, ['biko','Biko','renrakuJiko','RenrakuJiko'])}</td>
+      <td>{pickUnderscore(row, 'kcDate')}</td>
+      <td>{pickUnderscore(row, 'kcYobi')}</td>
+      <td>{pickUnderscore(row, 'kcJigen')}</td>
+      <td>{pickUnderscore(row, 'kcKogiNm')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'kcKyoinNms')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'kyoshitsuNmsOld')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'kyoshitsuNmsNew')}</td>
+      <td className="p-kyuko-hide-narrow">{pickUnderscore(row, 'kcBiko')}</td>
+      <td>{pickUnderscore(row, 'kcKyoinCds')}</td>
+      <td>{pickUnderscore(row, 'gakuseiRishuFlgKc')}</td>
     </tr>
   );
 }
@@ -137,13 +145,13 @@ export function KyukoPage({ kinoForce }: KyukoPageProps) {
   const token = onlyRishu && rishuToken ? rishuToken : '';
 
   const kkFiltered = token
-    ? filterByRishuToken(kkRaw, token, { rishu: 'gakuseiRishuFlgKyuko', rishuUnder: '_gakuseiRishuFlgKyuko', kyoin: '_kyoinCds' })
+    ? filterByRishuToken(kkRaw, token, PORTAL_KYUKO_RISHU_KEYS)
     : kkRaw ?? [];
   const hkFiltered = token
-    ? filterByRishuToken(hkRaw, token, { rishu: 'gakuseiRishuFlgHoko', rishuUnder: '_gakuseiRishuFlgHoko', kyoin: '_hokoKyoinCds', kyoin2: 'hokoKyoinCds' })
+    ? filterByRishuToken(hkRaw, token, PORTAL_HOKO_RISHU_KEYS)
     : hkRaw ?? [];
   const kcFiltered = token
-    ? filterByRishuToken(kcRaw, token, { rishu: 'gakuseiRishuFlgKc', rishuUnder: '_gakuseiRishuFlgKc', kyoin: '_kcKyoinCds', kyoin2: 'kcKyoinCds' })
+    ? filterByRishuToken(kcRaw, token, PORTAL_KYOSHITSU_CHANGE_RISHU_KEYS)
     : kcRaw ?? [];
 
   return (
@@ -177,9 +185,11 @@ export function KyukoPage({ kinoForce }: KyukoPageProps) {
                   <th scope="col">講義名</th>
                   <th scope="col" className="p-kyuko-hide-narrow">担当教員</th>
                   <th scope="col" className="p-kyuko-hide-narrow">連絡事項</th>
+                  <th scope="col">担当教員コード</th>
+                  <th scope="col">学生履修フラグ</th>
                 </tr></thead>
                 <tbody>
-                  <TableBody rows={kkRaw === null ? null : kkFiltered} emptyMsg="表示する休講情報はありません。" colSpan={6} RowComp={KyukoRow} />
+                  <TableBody rows={kkRaw === null ? null : kkFiltered} emptyMsg="表示する休講情報はありません。" colSpan={8} RowComp={KyukoRow} />
                 </tbody>
               </table>
             </div>
@@ -195,9 +205,11 @@ export function KyukoPage({ kinoForce }: KyukoPageProps) {
                   <th scope="col" className="p-kyuko-hide-narrow">担当教員</th>
                   <th scope="col" className="p-kyuko-hide-narrow">教室</th>
                   <th scope="col" className="p-kyuko-hide-narrow">連絡事項</th>
+                  <th scope="col">担当教員コード</th>
+                  <th scope="col">学生履修フラグ</th>
                 </tr></thead>
                 <tbody>
-                  <TableBody rows={hkRaw === null ? null : hkFiltered} emptyMsg="表示する補講情報はありません。" colSpan={7} RowComp={HokoRow} />
+                  <TableBody rows={hkRaw === null ? null : hkFiltered} emptyMsg="表示する補講情報はありません。" colSpan={9} RowComp={HokoRow} />
                 </tbody>
               </table>
             </div>
@@ -214,9 +226,11 @@ export function KyukoPage({ kinoForce }: KyukoPageProps) {
                   <th scope="col" className="p-kyuko-hide-narrow">変更前</th>
                   <th scope="col" className="p-kyuko-hide-narrow">変更後</th>
                   <th scope="col" className="p-kyuko-hide-narrow">連絡事項</th>
+                  <th scope="col">担当教員コード</th>
+                  <th scope="col">学生履修フラグ</th>
                 </tr></thead>
                 <tbody>
-                  <TableBody rows={kcRaw === null ? null : kcFiltered} emptyMsg="表示する教室変更情報はありません。" colSpan={8} RowComp={KcRow} />
+                  <TableBody rows={kcRaw === null ? null : kcFiltered} emptyMsg="表示する教室変更情報はありません。" colSpan={10} RowComp={KcRow} />
                 </tbody>
               </table>
             </div>

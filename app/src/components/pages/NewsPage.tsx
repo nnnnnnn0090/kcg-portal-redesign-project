@@ -12,7 +12,10 @@ import {
   reduceNewsListPortalMessage,
   type NewsListPortalState,
 } from '../../lib/portal-messages-pages';
-import { NEWS_FILTER_CATEGORIES, NEWS_FILTER_SENDERS } from '../../shared/news-list-filters';
+import {
+  parsePortalNewsListFilters,
+  type ParsedNewsListFilters,
+} from '../../shared/news-list-filters';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 
@@ -34,9 +37,33 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
   const [checkedSenders, setCheckedSenders] = useState<Set<string>>(new Set());
   const [checkedCats,    setCheckedCats]    = useState<Set<string>>(new Set());
   const [keyword,        setKeyword]        = useState('');
+  const [filterOptions,  setFilterOptions]  = useState<ParsedNewsListFilters>(() =>
+    parsePortalNewsListFilters(),
+  );
 
   // 応答が古い年度のものでないかを確認するために保持する
   const pendingNendo = useRef<string | null>(initialNendo);
+
+  // 素ページの「絞り込み条件」DOM が後から出る場合に数回まで再読み取りする
+  useEffect(() => {
+    let cancelled = false;
+    let timeoutId = 0;
+    let tries = 0;
+    function schedule() {
+      if (cancelled) return;
+      const parsed = parsePortalNewsListFilters();
+      setFilterOptions(parsed);
+      tries++;
+      const done =
+        (parsed.senders.length > 0 && parsed.categories.length > 0) || tries >= 50;
+      if (!done) timeoutId = window.setTimeout(schedule, 100);
+    }
+    schedule();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   // 初回フェッチ
   useEffect(() => {
@@ -185,15 +212,15 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
           <div className="p-news-mat">
             <h3>配信元で選択</h3>
             <ul className="p-news-checklist">
-              {NEWS_FILTER_SENDERS.map((s, i) => (
-                <li key={s}>
+              {filterOptions.senders.map((s, i) => (
+                <li key={`${s.value}\t${i}`}>
                   <input
                     type="checkbox"
                     id={`p-nfs-${i}`}
-                    checked={checkedSenders.has(s)}
-                    onChange={() => toggleSender(s)}
+                    checked={checkedSenders.has(s.value)}
+                    onChange={() => toggleSender(s.value)}
                   />
-                  <label htmlFor={`p-nfs-${i}`}>{s}</label>
+                  <label htmlFor={`p-nfs-${i}`}>{s.label}</label>
                 </li>
               ))}
             </ul>
@@ -203,7 +230,7 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
           <div className="p-news-mat">
             <h3>カテゴリで選択</h3>
             <ul className="p-news-checklist">
-              {NEWS_FILTER_CATEGORIES.map((c) => (
+              {filterOptions.categories.map((c) => (
                 <li key={c.value}>
                   <input
                     type="checkbox"

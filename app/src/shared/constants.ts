@@ -27,8 +27,6 @@ export const SK = {
   portalGuidedTourDone:             'portalThemePortalGuidedTourDone',
 } as const;
 
-export type StorageKey = (typeof SK)[keyof typeof SK];
-
 // ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
 
 export const KING_LMS_HOOK = {
@@ -105,14 +103,6 @@ export const FETCH_HOOK = {
   pageFetch:     'portalThemePageFetchRequest',
 } as const;
 
-// ─── キノメッセージ ID ────────────────────────────────────────────────────
-
-export const KINO_ID = {
-  home:   7,
-  news:   8,
-  survey: 16,
-} as const;
-
 // ─── King LMS 同期ハッシュ（location.hash で結果を伝達する） ───────────────
 
 export const SYNC_HASH = {
@@ -136,8 +126,14 @@ export const KING_LMS_COURSE_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/course` as con
 
 /** King LMS 課題同期のエントリ URL */
 export const KING_LMS_ASSIGNMENT_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/stream` as const;
+/** 拡張紹介ページ・開発者お知らせ JSON のオリジン（host_permissions と URL 生成用） */
+export const EXTENSION_PROMO_ORIGIN = 'https://kcg-portal-redesign-project-web.vercel.app' as const;
+
 /** 拡張機能紹介ページ */
-export const EXTENSION_PROMO_PAGE_URL = 'https://kcg-portal-redesign-project-web.vercel.app/';
+export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;
+
+/** ホーム最上部「開発者からのお知らせ」用 JSON */
+export const DEVELOPER_NOTICE_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/notice.json` as const;
 
 /** フッタークレジットの作者プロフィール（X） */
 export const EXTENSION_AUTHOR_PROFILE_URL = 'https://x.com/nnnnnnn0090';

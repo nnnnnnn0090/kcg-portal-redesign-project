@@ -2,16 +2,11 @@
 
 import { MSG } from '../shared/constants';
 import type { NewsListItem, PortalCapturedMessage } from '../shared/types';
-import { isKinoMessagePayload, isNewsListItem, type KinoMessagePayload } from './portal-messages-home';
+import { isKinoMessagePayload, isNewsListItem, isRecord, type KinoMessagePayload } from './portal-messages-home';
 
 // ─── 共通ユーティリティ ───────────────────────────────────────────────────────
 
-/**
- * ポータル API の行オブジェクトから、複数のキー候補のうち最初に値があるフィールドを
- * 文字列として返す。空白のみの値はスキップする。
- *
- * API バージョンによってキー名が異なる場合（例: `kogiNm` / `kogiName`）に使用する。
- */
+/** 複数キー候補のうち最初に非空（trim 後）の値を文字列で返す */
 export function pick(obj: Record<string, unknown> | null, keys: string[]): string {
   if (!obj) return '';
   for (const k of keys) {
@@ -20,8 +15,9 @@ export function pick(obj: Record<string, unknown> | null, keys: string[]): strin
   return '';
 }
 
-function isPlainObject(x: unknown): x is Record<string, unknown> {
-  return typeof x === 'object' && x !== null && !Array.isArray(x);
+/** `key` と先頭 `_` のペア（ポータル JSON の整列用）のうち、最初に非空の値がある方を返す */
+export function pickUnderscore(obj: Record<string, unknown> | null, key: string): string {
+  return pick(obj, [key, `_${key}`]);
 }
 
 // ─── お知らせ一覧 ─────────────────────────────────────────────────────────
@@ -83,7 +79,7 @@ export function reduceNewsDetailPortalMessage(
 ): NewsDetailPayload | null {
   if (msg.type !== MSG.deliveredNewsDetail) return prev;
   const d = msg.data;
-  if (!isPlainObject(d)) return prev;
+  if (!isRecord(d)) return prev;
   if (String(d.id ?? '') !== String(newsDetailId)) return prev;
   return d as NewsDetailPayload;
 }
@@ -102,7 +98,7 @@ export function reduceSurveyPortalMessage(prev: SurveyPortalState, msg: PortalCa
     return { ...prev, kinoData: msg.data };
   }
   if (msg.type === MSG.questionnaireInfo && Array.isArray(msg.items)) {
-    return { ...prev, raw: msg.items.filter(isPlainObject) };
+    return { ...prev, raw: msg.items.filter(isRecord) };
   }
   return prev;
 }
@@ -140,15 +136,15 @@ export function reduceKyukoPortalMessage(prev: KyukoPortalState, msg: PortalCapt
     return { ...prev, kinoData: msg.data };
   }
   if (msg.type === MSG.kyukoInfo && Array.isArray(msg.items)) {
-    const items = msg.items.filter(isPlainObject);
+    const items = msg.items.filter(isRecord);
     return { ...prev, kkRaw: items, ...withRishuBootstrap(prev, items) };
   }
   if (msg.type === MSG.hokoInfo && Array.isArray(msg.items)) {
-    const items = msg.items.filter(isPlainObject);
+    const items = msg.items.filter(isRecord);
     return { ...prev, hkRaw: items, ...withRishuBootstrap(prev, items) };
   }
   if (msg.type === MSG.kyoshitsuChange && Array.isArray(msg.items)) {
-    const items = msg.items.filter(isPlainObject);
+    const items = msg.items.filter(isRecord);
     return { ...prev, kcRaw: items, ...withRishuBootstrap(prev, items) };
   }
   return prev;

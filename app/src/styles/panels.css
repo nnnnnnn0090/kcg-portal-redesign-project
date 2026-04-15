@@ -27,6 +27,8 @@
 #portal-overlay .p-panel-body{padding:1rem 1.15rem;max-height:420px;overflow:auto}
 #portal-overlay .p-panel-body.p-cal-scroll{max-height:none;overflow:visible}
 #portal-overlay #p-news.p-panel-body,#portal-overlay #p-kogi-news.p-panel-body{padding-top:.55rem;padding-bottom:.55rem}
+#portal-overlay #p-developer-notice.p-panel-body{padding-top:.75rem;padding-bottom:.75rem}
+#portal-overlay .p-developer-notice-text{margin:0;font-size:.875rem;line-height:1.55;color:var(--p-text);word-break:break-word;white-space:pre-wrap}
 #portal-overlay #p-news > .p-empty,#portal-overlay #p-kogi-news > .p-empty{padding:.5rem 0;margin:0}
 #portal-overlay .p-empty{font-size:.875rem;color:var(--p-text-dimmer);padding:.75rem 0;margin:0}
 #portal-overlay .p-news{padding:.85rem 0;border-bottom:1px solid var(--p-border-light);margin:0;transition:background .15s ease}
@@ -49,7 +51,6 @@
   box-shadow:0 8px 24px var(--p-shadow)}
 #portal-overlay .p-link-title{font-weight:500;color:var(--p-text)}
 #portal-overlay .p-link-meta{font-size:.7rem;color:var(--p-text-dimmer)}
-#portal-overlay .p-panel-kino{border-left:3px solid var(--p-accent)}
 #portal-overlay .p-panel-kino .p-kino-message{font-size:.875rem;line-height:1.65;color:var(--p-text);word-break:break-word}
 #portal-overlay .p-panel-kino .p-kino-message a{color:var(--p-accent-light);font-weight:500;text-decoration:none;
   border-bottom:1px solid transparent;transition:border-color .15s}

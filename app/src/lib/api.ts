@@ -41,12 +41,6 @@ export const urls = {
     return u.href;
   },
 
-  kinoMessage(id: number): string {
-    const u = new URL(`/portal/api/${PORTAL_API.portalKinoMessage}/`, location.origin);
-    u.searchParams.set('id', String(id));
-    return u.href;
-  },
-
   deliveredNendo(nendo: string | number, lastLogin: string): string {
     const u = new URL(
       `/portal/api/${PORTAL_API.deliveredNews}/Nendo/${encodeURIComponent(String(nendo))}/`,

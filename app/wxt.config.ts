@@ -1,5 +1,5 @@
 import { defineConfig } from 'wxt';
-import { KING_LMS_ORIGIN, PORTAL_ORIGIN } from './src/shared/constants';
+import { EXTENSION_PROMO_ORIGIN, KING_LMS_ORIGIN, PORTAL_ORIGIN } from './src/shared/constants';
 
 type WxtGeckoBaseline = {
   id?: string;
@@ -14,7 +14,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'KCG Portal Redesign Project',
-    version: '3.0.7',
+    version: '3.1.0',
     description:
       'Modern, readable UI for the Kyoto Computer Gakuin student portal (home.kcg.ac.jp). Unofficial theme extension.',
     author: 'nnnnnnn0090',
@@ -23,6 +23,7 @@ export default defineConfig({
     host_permissions: [
       `${PORTAL_ORIGIN}/*`,
       `${KING_LMS_ORIGIN}/*`,
+      `${EXTENSION_PROMO_ORIGIN}/*`,
     ],
     browser_specific_settings: {
       gecko: {

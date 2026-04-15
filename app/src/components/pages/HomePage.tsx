@@ -13,6 +13,7 @@ import { useHomeStorageBootstrap } from '../../hooks/useHomeStorageBootstrap';
 import { useKogiNewsPrefetch } from '../../hooks/useKogiNewsPrefetch';
 import { useHomePortalInbox } from '../../hooks/useHomePortalInbox';
 import { useLastLogin } from '../../hooks/useLastLogin';
+import { useDeveloperNotice } from '../../hooks/useDeveloperNotice';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
@@ -45,6 +46,7 @@ export function HomePage({ settings }: HomePageProps) {
   );
   const getKingLmsCourses = useCallback(() => courses, [courses]);
   const lastLogin         = useLastLogin();
+  const developerNotice   = useDeveloperNotice();
 
   return (
     <PageShell
@@ -52,6 +54,15 @@ export function HomePage({ settings }: HomePageProps) {
       headExtra={lastLogin ? <span className="p-last-login">{lastLogin}</span> : undefined}
     >
       <div className="p-stack">
+
+        {developerNotice ? (
+          <section className="p-panel">
+            <span className="p-panel-head">開発者からのお知らせ</span>
+            <div className="p-panel-body" id="p-developer-notice">
+              <p className="p-developer-notice-text">{developerNotice}</p>
+            </div>
+          </section>
+        ) : null}
 
         <KinoPanel data={kinoData} forceVisible={settings.kinoEmptyForce} />
 

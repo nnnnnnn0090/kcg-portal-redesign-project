@@ -25,7 +25,8 @@ export interface HomePortalInboxState {
 
 // ─── 型ガード ─────────────────────────────────────────────────────────────
 
-function isRecord(x: unknown): x is Record<string, unknown> {
+/** ポータル API の行オブジェクトなど「プレーンなオブジェクト」かどうか */
+export function isRecord(x: unknown): x is Record<string, unknown> {
   return x !== null && typeof x === 'object' && !Array.isArray(x);
 }
 
