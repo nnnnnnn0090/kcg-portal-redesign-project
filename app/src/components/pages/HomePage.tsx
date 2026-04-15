@@ -57,10 +57,14 @@ export function HomePage({ settings }: HomePageProps) {
 
         {developerNotice ? (
           <section className="p-panel">
-            <span className="p-panel-head">開発者からのお知らせ</span>
-            <div className="p-panel-body" id="p-developer-notice">
-              <p className="p-developer-notice-text">{developerNotice}</p>
-            </div>
+            <span className="p-panel-head">
+              {developerNotice.title || '開発者からのお知らせ'}
+            </span>
+            {developerNotice.message ? (
+              <div className="p-panel-body" id="p-developer-notice">
+                <p className="p-developer-notice-text">{developerNotice.message}</p>
+              </div>
+            ) : null}
           </section>
         ) : null}
 

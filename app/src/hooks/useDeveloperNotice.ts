@@ -1,17 +1,27 @@
 /**
- * ホーム用の開発者お知らせ JSON（notice フィールド）を取得する。
+ * ホーム用の開発者お知らせ JSON（`title` / `message`）を取得する。
  */
 
 import { useState, useEffect } from 'react';
 import { DEVELOPER_NOTICE_JSON_URL } from '../shared/constants';
 
-interface NoticeJson {
-  notice?: unknown;
+export interface DeveloperNotice {
+  title:   string;
+  message: string;
 }
 
-/** 非空の `notice` のときだけ文字列。それ以外（未取得・失敗・空・非文字列）は null。 */
-export function useDeveloperNotice(): string | null {
-  const [text, setText] = useState<string | null>(null);
+interface NoticeJson {
+  title?:   unknown;
+  message?: unknown;
+}
+
+function str(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : '';
+}
+
+/** `title` と `message` のどちらかが非空のときだけオブジェクト。それ以外は null。 */
+export function useDeveloperNotice(): DeveloperNotice | null {
+  const [data, setData] = useState<DeveloperNotice | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -20,14 +30,14 @@ export function useDeveloperNotice(): string | null {
         if (!r.ok) throw new Error(String(r.status));
         return r.json() as Promise<NoticeJson>;
       })
-      .then((data) => {
+      .then((json) => {
         if (cancelled) return;
-        const n = data?.notice;
-        const s = typeof n === 'string' ? n.trim() : '';
-        setText(s.length > 0 ? s : null);
+        const title   = str(json?.title);
+        const message = str(json?.message);
+        setData(title.length > 0 || message.length > 0 ? { title, message } : null);
       })
       .catch(() => {
-        if (!cancelled) setText(null);
+        if (!cancelled) setData(null);
       });
 
     return () => {
@@ -35,5 +45,5 @@ export function useDeveloperNotice(): string | null {
     };
   }, []);
 
-  return text;
+  return data;
 }

@@ -132,7 +132,7 @@ export const EXTENSION_PROMO_ORIGIN = 'https://kcg-portal-redesign-project-web.v
 /** 拡張機能紹介ページ */
 export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;
 
-/** ホーム最上部「開発者からのお知らせ」用 JSON */
+/** ホーム最上部「開発者からのお知らせ」用 JSON（`title` / `message`） */
 export const DEVELOPER_NOTICE_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/notice.json` as const;
 
 /** フッタークレジットの作者プロフィール（X） */
