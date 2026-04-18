@@ -12,6 +12,7 @@ import { Footer } from '../components/layout/Footer';
 import { SettingsPanel, type SettingsPanelHandle } from '../components/layout/SettingsPanel';
 import { EXTENSION_PROMO_PAGE_URL, PAGE, PORTAL_ORIGIN, SK } from '../shared/constants';
 import storage from '../lib/storage';
+import { consumeExtensionUpdateToastMessage } from '../lib/extension-update-notice';
 import { useCalendarInteractions } from '../features/calendar';
 import type { PortalRoute } from './router';
 import type { PortalAppRoute, PortalSurface } from './app-types';
@@ -88,6 +89,22 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
       durationMs: syncToastMsg.length > 48 ? 5800 : undefined,
     });
   }, [syncToastMsg, showToast]);
+
+  // 拡張機能の manifest バージョンが上がったときのトースト（同一タブ・同一メッセージは一度だけ）
+  useEffect(() => {
+    if (!settingsReady) return;
+    void consumeExtensionUpdateToastMessage().then((msg) => {
+      if (!msg) return;
+      const mark = `kcg-portal-ext-up-toast:${msg}`;
+      try {
+        if (sessionStorage.getItem(mark)) return;
+        sessionStorage.setItem(mark, '1');
+      } catch {
+        /* ストレージ不可時はそのまま表示 */
+      }
+      showToast(msg, { placement: 'top', durationMs: 5200 });
+    });
+  }, [settingsReady, showToast]);
 
   // カレンダーの tooltip / コンテキストメニューをオーバーレイに配線
   useCalendarInteractions();

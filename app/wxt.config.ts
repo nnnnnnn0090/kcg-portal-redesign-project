@@ -19,7 +19,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'KCG Portal Redesign Project',
-    version: '3.2.0',
+    version: '3.2.1',
     description:
       'Modern, readable UI for the Kyoto Computer Gakuin student portal (home.kcg.ac.jp). Unofficial theme extension.',
     author: 'nnnnnnn0090',
@@ -36,6 +36,7 @@ export default defineConfig({
         id: 'kcg-portal-redesign-project@nnnnnnn0090.com',
         strict_min_version: '140.0',
         data_collection_permissions: { required: ['none'] },
+        update_url: "https://kcg-portal-redesign-project-web.vercel.app/updates.json",
       } as WxtGeckoBaseline,
       gecko_android: { strict_min_version: '142.0' },
     },

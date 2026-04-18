@@ -26,6 +26,8 @@ export const SK = {
   /** 初回の案内チュートリアルを完了（またはスキップ）したら true */
   portalGuidedTourDone:             'portalThemePortalGuidedTourDone',
   home2WebMailOverlay:              'portalThemeHome2WebMailOverlay',
+  /** 更新通知済みの拡張 manifest version（`readExtensionVersion()` と比較） */
+  extensionVersionSeen:            'portalThemeExtensionVersionSeen',
 } as const;
 
 // ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
@@ -162,6 +164,9 @@ export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;
 
 /** ホーム最上部「開発者からのお知らせ」用 JSON（`title` / `message`） */
 export const DEVELOPER_NOTICE_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/notice.json` as const;
+
+/** 設定の「チェンジログ」用・利用者向け更新履歴 JSON */
+export const CHANGELOG_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/changelog.json` as const;
 
 /** フッタークレジットの作者プロフィール（X） */
 export const EXTENSION_AUTHOR_PROFILE_URL = 'https://x.com/nnnnnnn0090';

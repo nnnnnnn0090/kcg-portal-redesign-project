@@ -90,6 +90,14 @@ const STEPS: TourStep[] = [
     selectorFallback:   '#p-links',
   },
   {
+    kind:               'spotlight',
+    id:                 'webmail',
+    title:              'Web メール（KCG WebMail）',
+    body:               'ここから Home2 の Web メールを別タブで開けます。\n\n画面は拡張のオーバーレイで見やすく表示されます。オフにしたいときは「設定」の「Web メール」から切り替えられます。',
+    selector:           '#p-shortcut-webmail',
+    selectorFallback:   '#p-links',
+  },
+  {
     kind:   'card',
     id:     'done',
     title:  '以上です',

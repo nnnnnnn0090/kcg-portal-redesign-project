@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { SK, HOME_SHORTCUT_EXTRAS } from '../../shared/constants';
+import { SK, HOME_SHORTCUT_EXTRAS, HOME2_MAIL_DIRECTORY_URL } from '../../shared/constants';
 import type { LinkConfig } from '../../shared/types';
 import storage from '../../lib/storage';
 
@@ -170,7 +170,13 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
               href={r.url}
               target="_blank"
               rel="noopener noreferrer"
-              id={r.midashi === '学生出欠登録' ? 'p-shortcut-attendance' : undefined}
+              id={
+                r.midashi === '学生出欠登録'
+                  ? 'p-shortcut-attendance'
+                  : linkKey(r.url) === linkKey(HOME2_MAIL_DIRECTORY_URL)
+                    ? 'p-shortcut-webmail'
+                    : undefined
+              }
             >
               <span className="p-link-title">{r.midashi}</span>
               {r.biko && <span className="p-link-meta">{r.biko}</span>}

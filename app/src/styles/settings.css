@@ -34,6 +34,41 @@
   border:1px solid var(--p-border);background:var(--p-bg3);color:var(--p-text-muted);font-size:.8125rem;font-weight:600;
   cursor:pointer;font-family:inherit;text-align:center;transition:background .15s,border-color .15s,color .15s}
 #portal-overlay .p-settings-tour-replay-btn:hover{background:var(--p-bg-hover);border-color:var(--p-border-hover);color:var(--p-text)}
+#portal-overlay .p-settings-tour-replay-btn:disabled{opacity:.55;cursor:not-allowed}
+#portal-overlay .p-settings-changelog-list{margin:.45rem 0 0;padding:0}
+#portal-overlay .p-settings-changelog-rel{margin:0 0 .65rem;padding:.55rem .65rem;background:var(--p-bg3);border-radius:10px;border:1px solid var(--p-border-light)}
+#portal-overlay .p-settings-changelog-rel:last-child{margin-bottom:0}
+#portal-overlay .p-settings-changelog-rel-heading{margin:0 0 .35rem;font-size:.75rem;font-weight:600;color:var(--p-text-bright);letter-spacing:-.01em}
+#portal-overlay .p-settings-changelog-rel-title{margin:0 0 .45rem;font-size:.8125rem;line-height:1.45;color:var(--p-text-muted)}
+#portal-overlay .p-settings-changelog-ul{margin:0;padding-left:1.05rem;font-size:.75rem;line-height:1.5;color:var(--p-text-muted)}
+#portal-overlay .p-settings-changelog-ul li{margin:.3rem 0}
+#portal-overlay .p-settings-changelog-note{margin:.5rem 0 0;font-size:.68rem;line-height:1.45;color:var(--p-text-dimmer)}
+#portal-overlay .p-settings-section .p-settings-hint a{color:var(--p-accent-light);text-decoration:underline;text-underline-offset:.12em}
+#portal-overlay .p-settings-section .p-settings-hint a:hover{color:var(--p-accent)}
+#portal-overlay .p-settings-section-changelog-only{margin-bottom:.5rem;padding-bottom:0;border-bottom:none}
+#portal-overlay .p-settings-section-changelog-only .p-settings-row{margin-bottom:0}
+#portal-overlay .p-settings-changelog-after-tour{margin-top:.4rem;padding-top:0}
+@keyframes p-changelog-modal-root-in{from{opacity:0}to{opacity:1}}
+@keyframes p-changelog-modal-root-out{from{opacity:1}to{opacity:0}}
+#portal-overlay .p-changelog-modal-root{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:max(.75rem,env(safe-area-inset-top)) max(.75rem,env(safe-area-inset-right)) max(.75rem,env(safe-area-inset-bottom)) max(.75rem,env(safe-area-inset-left));box-sizing:border-box;pointer-events:auto;
+  animation:p-changelog-modal-root-in var(--p-enter-dur) var(--p-enter-ease) both}
+#portal-overlay .p-changelog-modal-root.is-closing{animation:p-changelog-modal-root-out var(--p-pop-dur) var(--p-enter-ease) forwards}
+#portal-overlay .p-changelog-modal-backdrop{position:absolute;inset:0;margin:0;padding:0;border:0;border-radius:0;background:rgba(8,10,18,0.52);cursor:pointer;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#portal-overlay .p-changelog-modal-panel{position:relative;z-index:1;display:flex;flex-direction:column;width:min(26rem,calc(100vw - 1.5rem));max-height:min(72dvh,34rem);background:var(--p-bg);border:1px solid var(--p-border);border-radius:14px;box-shadow:0 20px 56px var(--p-shadow-strong);overflow:hidden;box-sizing:border-box;
+  animation:p-changelog-modal-panel-in var(--p-enter-dur) var(--p-enter-ease) .08s both}
+@keyframes p-changelog-modal-panel-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+#portal-overlay .p-changelog-modal-root.is-closing .p-changelog-modal-panel{animation:none}
+#portal-overlay .p-changelog-modal-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem 1rem;border-bottom:1px solid var(--p-border-light);flex-shrink:0}
+#portal-overlay .p-changelog-modal-head h2{margin:0;font-size:.95rem;font-weight:600;color:var(--p-text-bright);letter-spacing:-.01em}
+#portal-overlay .p-changelog-modal-close{display:flex;align-items:center;justify-content:center;width:2rem;height:2rem;margin:0;padding:0;border:0;border-radius:8px;background:transparent;color:var(--p-text-muted);font-size:1.35rem;line-height:1;cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+#portal-overlay .p-changelog-modal-close:hover{background:var(--p-bg-hover);color:var(--p-text-bright)}
+#portal-overlay .p-changelog-modal-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:.85rem 1rem 1rem;-webkit-overflow-scrolling:touch}
+#portal-overlay .p-changelog-modal-status{margin:0 0 .65rem;font-size:.8125rem;line-height:1.5;color:var(--p-text-muted)}
+#portal-overlay .p-changelog-modal-status--error{color:var(--p-danger)}
+#portal-overlay .p-changelog-modal-body .p-settings-changelog-list{margin-top:0}
+@media (prefers-reduced-motion:reduce){
+  #portal-overlay .p-changelog-modal-root,#portal-overlay .p-changelog-modal-root.is-closing,#portal-overlay .p-changelog-modal-panel{animation-duration:.01ms!important}
+}
 #portal-overlay .p-theme-picker{display:flex;flex-wrap:wrap;gap:.4rem;padding:.25rem .55rem;max-height:min(42vh,14.5rem);overflow-y:auto;overscroll-behavior:contain}
 #portal-overlay .p-theme-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;
   flex:1 1 calc(50% - .2rem);min-width:4.75rem;padding:.4rem .5rem .45rem;border-radius:8px;border:2px solid var(--p-border);
