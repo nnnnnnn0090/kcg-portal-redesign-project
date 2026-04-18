@@ -69,7 +69,14 @@ export default defineContentScript({
           import('../../portal/App'),
         ]);
         const root = createRoot(overlay);
-        root.render(createElement(PortalApp, { route, syncToastMsg, overlayRoot: overlay }));
+        root.render(
+          createElement(PortalApp, {
+            surface:      'portal',
+            route,
+            syncToastMsg,
+            overlayRoot: overlay,
+          }),
+        );
 
         const coverFrames = syncToastMsg
           ? PORTAL_BOOT_COVER_RAF_FRAMES.withToast

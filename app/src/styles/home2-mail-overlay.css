@@ -1,0 +1,929 @@
+/* Home2 Mail: ホストのフォントを継承 */
+#portal-overlay.p-surface-home2-mail {
+  font-family: inherit;
+  -webkit-font-smoothing: auto;
+}
+
+#portal-overlay.p-surface-home2-mail :where(button, input, select, textarea, optgroup) {
+  font-family: inherit;
+}
+
+/* ホストの h1〜 グローバル指定を打ち消し */
+#portal-overlay.p-surface-home2-mail :where(h1, h2, h3, h4, h5, h6) {
+  font-variant: normal;
+  text-transform: none;
+}
+
+/* Home2 .p-main の入場フェード */
+#portal-overlay.p-surface-home2-mail .p-main {
+  animation: p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + 0.1s) both;
+}
+
+/* ヘッダー下の影 */
+#portal-overlay.p-surface-home2-mail:not(.p-surface-home2-mail-header-only) .p-header {
+  box-shadow: 0 8px 28px -10px color-mix(in srgb, var(--p-shadow-strong) 50%, transparent);
+}
+
+#portal-overlay.p-surface-home2-mail-header-only .p-header {
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--p-border) 85%, transparent),
+    0 14px 44px -12px var(--p-shadow-strong);
+}
+
+/* header-only: 背後へクリック・スクロールを通す */
+#portal-overlay.p-surface-home2-mail-header-only {
+  position: fixed;
+  inset: auto 0 auto 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: auto;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+  overscroll-behavior: auto;
+  pointer-events: none;
+  background: transparent;
+  /* ルートは透過のまま。影は .p-header 側で付与 */
+  box-shadow: none;
+}
+
+#portal-overlay.p-surface-home2-mail-header-only .p-header {
+  pointer-events: auto;
+}
+
+/* WebMail login */
+#portal-overlay .p-main.p-home2-mail-login-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: none;
+  min-height: calc(100dvh - 4.5rem);
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1rem, 3vw, 1.5rem) clamp(2rem, 5vw, 3rem);
+  box-sizing: border-box;
+  isolation: isolate;
+}
+
+#portal-overlay .p-home2-mail-login-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -10%, color-mix(in srgb, var(--p-accent) 22%, transparent), transparent 58%),
+    radial-gradient(ellipse 70% 45% at 100% 60%, color-mix(in srgb, var(--p-accent) 12%, transparent), transparent 50%),
+    radial-gradient(ellipse 55% 40% at 0% 85%, color-mix(in srgb, var(--p-accent) 10%, transparent), transparent 45%),
+    var(--p-bg);
+}
+
+#portal-overlay .p-home2-mail-login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 24.5rem;
+  padding: clamp(1.5rem, 4vw, 2.25rem) clamp(1.35rem, 3.5vw, 2rem) clamp(1.75rem, 4vw, 2.35rem);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--p-bg2) 88%, transparent);
+  border: 1px solid var(--p-border-light);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--p-text) 5%, transparent) inset,
+    0 28px 80px -12px var(--p-shadow-strong);
+  backdrop-filter: blur(14px) saturate(160%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #portal-overlay .p-home2-mail-login-card {
+    backdrop-filter: none;
+  }
+}
+
+#portal-overlay .p-home2-mail-login-card-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 1.65rem;
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid var(--p-border-light);
+}
+
+#portal-overlay .p-home2-mail-login-mark {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 14px;
+  background: var(--p-bg3);
+  border: 1px solid var(--p-border);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--p-shadow) 40%, transparent);
+  overflow: hidden;
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.12s ease;
+}
+
+#portal-overlay .p-home2-mail-login-mark:hover {
+  border-color: var(--p-border-hover);
+  transform: translateY(-1px);
+}
+
+#portal-overlay .p-home2-mail-login-mark img {
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+#portal-overlay .p-home2-mail-login-brand-text {
+  min-width: 0;
+}
+
+#portal-overlay .p-home2-mail-login-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 3.5vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--p-text-bright);
+}
+
+#portal-overlay .p-home2-mail-login-lead {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--p-text-muted);
+}
+
+/* フォーム */
+#portal-overlay .p-home2-mail-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+#portal-overlay .p-home2-mail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+#portal-overlay .p-home2-mail-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-mail-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--p-border);
+  background: var(--p-bg);
+  color: var(--p-text);
+  font-size: 1rem;
+  line-height: 1.35;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#portal-overlay .p-home2-mail-input:hover {
+  border-color: var(--p-border-hover);
+}
+
+#portal-overlay .p-home2-mail-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--p-accent) 55%, var(--p-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-accent) 22%, transparent);
+}
+
+#portal-overlay .p-home2-mail-actions {
+  margin-top: 0.35rem;
+}
+
+#portal-overlay .p-home2-mail-submit {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--p-accent-light) 35%, var(--p-accent)) 0%,
+    var(--p-accent) 100%
+  );
+  color: #fff;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--p-accent) 35%, transparent);
+  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+#portal-overlay .p-home2-mail-submit:hover {
+  filter: brightness(1.07);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--p-accent) 42%, transparent);
+}
+
+#portal-overlay .p-home2-mail-submit:active {
+  transform: scale(0.99);
+}
+
+/* mailhead list */
+#portal-overlay .p-home2-send-note.p-home2-gm-caption {
+  margin: 0;
+  padding: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-gm--list-loading .p-home2-gm-list-shell {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+#portal-overlay .p-home2-send-toolbar .p-home2-gm-toolbar-start {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#portal-overlay .p-home2-gm-select-btn--on {
+  border-color: color-mix(in srgb, var(--p-accent) 45%, var(--p-border)) !important;
+  background: color-mix(in srgb, var(--p-accent) 14%, transparent) !important;
+  color: var(--p-accent-light) !important;
+}
+
+#portal-overlay .p-home2-gm-seg {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid var(--p-border-light);
+  background: var(--p-bg2);
+  overflow: hidden;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--p-shadow) 35%, transparent);
+}
+
+#portal-overlay .p-home2-gm-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0;
+  border: none;
+  border-right: 1px solid var(--p-border-light);
+  background: transparent;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+#portal-overlay .p-home2-gm-seg-btn:last-child {
+  border-right: none;
+}
+
+#portal-overlay .p-home2-gm-seg-btn:hover:not(:disabled) {
+  background: var(--p-bg-hover);
+  color: var(--p-text-bright);
+}
+
+#portal-overlay .p-home2-gm-seg-btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+#portal-overlay .p-home2-gm-list-shell {
+  border-radius: 16px;
+  border: 1px solid var(--p-border);
+  background: color-mix(in srgb, var(--p-bg) 55%, var(--p-bg2));
+  box-shadow: 0 4px 24px var(--p-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+#portal-overlay .p-home2-gm-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#portal-overlay .p-home2-gm-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 1px solid var(--p-border-light);
+  transition: background 0.1s ease;
+}
+
+#portal-overlay .p-home2-gm-row:last-child {
+  border-bottom: none;
+}
+
+#portal-overlay .p-home2-gm-row:not(.p-home2-gm-row--muted):hover {
+  background: color-mix(in srgb, var(--p-accent) 6%, var(--p-bg-hover));
+}
+
+#portal-overlay .p-home2-gm-row--clickable {
+  cursor: pointer;
+}
+
+#portal-overlay .p-home2-gm-row--muted {
+  opacity: 0.45;
+}
+
+#portal-overlay .p-home2-gm-row-chk {
+  flex-shrink: 0;
+  width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--p-border-light);
+}
+
+#portal-overlay .p-home2-gm-row-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.65rem 1rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+#portal-overlay .p-home2-gm-row-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+#portal-overlay .p-home2-gm-from {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--p-text-bright);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#portal-overlay .p-home2-gm-date {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--p-text-dimmer);
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+#portal-overlay .p-home2-gm-subject {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.1rem 0 0;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--p-text-muted);
+  line-height: 1.45;
+  cursor: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#portal-overlay .p-home2-gm-row--clickable .p-home2-gm-subject:hover:not([aria-disabled="true"]) {
+  color: var(--p-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#portal-overlay .p-home2-gm-subject[aria-disabled="true"] {
+  color: var(--p-text-dimmer);
+  cursor: inherit;
+  text-decoration: none;
+}
+
+#portal-overlay .p-home2-gm-row-bottom {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.1rem;
+}
+
+#portal-overlay .p-home2-gm-meta-num {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-gm-meta-size {
+  font-size: 0.68rem;
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-gm-empty {
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--p-text-dimmer);
+  line-height: 1.5;
+}
+
+#portal-overlay .p-home2-gm-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--p-border-light);
+}
+
+#portal-overlay .p-home2-gm-footer-spacer {
+  flex: 1 1 auto;
+  min-width: 0.5rem;
+}
+
+#portal-overlay .p-home2-send-act.p-home2-gm-delete {
+  border-color: color-mix(in srgb, var(--p-danger) 35%, var(--p-border));
+  background: color-mix(in srgb, var(--p-danger) 10%, transparent);
+  color: var(--p-danger-hover);
+  box-shadow: none;
+}
+
+#portal-overlay .p-home2-send-act.p-home2-gm-delete:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--p-danger) 18%, transparent);
+  border-color: var(--p-danger);
+  color: var(--p-danger-hover);
+  filter: none;
+}
+
+@media (max-width: 560px) {
+  #portal-overlay .p-home2-gm-date {
+    display: none;
+  }
+}
+
+/* readmail: スクロールはオーバーレイ側 */
+#portal-overlay #p-home2-mail-read .p-home2-send-body.p-home2-mail-read-body {
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+  resize: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#portal-overlay #p-home2-mail-read .p-home2-mail-read-link {
+  color: var(--p-accent-light, #a5b4fc);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+#portal-overlay #p-home2-mail-read .p-home2-mail-read-link:hover {
+  color: var(--p-text-bright);
+}
+
+/* readmail メタ行（send と同系） */
+#portal-overlay #p-home2-mail-read .p-home2-send-fields > .p-home2-send-row {
+  align-items: start;
+}
+
+#portal-overlay #p-home2-mail-read .p-home2-send-fields > .p-home2-send-row > .p-home2-send-rowk {
+  padding-top: 0.58rem;
+}
+
+#portal-overlay #p-home2-mail-read .p-home2-mail-read-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.25rem;
+  margin: 0;
+  padding: 0.45rem 0.5rem;
+  box-sizing: border-box;
+  border: 1px solid var(--p-border-light);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-bg) 55%, var(--p-bg2));
+  color: var(--p-text-bright);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+#portal-overlay #p-home2-mail-read .p-home2-send-card {
+  min-width: 0;
+}
+
+/* sendmail form */
+#portal-overlay .p-main.p-home2-send {
+  max-width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem 5rem;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#portal-overlay .p-home2-send-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  margin: 0 0 1rem;
+  min-width: 0;
+}
+
+#portal-overlay .p-home2-send-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#portal-overlay .p-home2-send-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.5rem;
+  padding: 0 0.95rem 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--p-border-light);
+  background: var(--p-bg2);
+  color: var(--p-text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  #portal-overlay .p-home2-send-tools {
+    flex-basis: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}
+
+#portal-overlay .p-home2-send-back:hover:not(:disabled) {
+  background: var(--p-bg-hover);
+  border-color: var(--p-border-hover);
+  color: var(--p-text-bright);
+}
+
+#portal-overlay .p-home2-send-back:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+#portal-overlay .p-home2-send-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.35rem;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--p-border);
+  background: var(--p-bg3);
+  color: var(--p-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+
+#portal-overlay .p-home2-send-act:hover:not(:disabled) {
+  background: var(--p-bg-hover);
+  border-color: var(--p-border-hover);
+  color: var(--p-text-bright);
+}
+
+#portal-overlay .p-home2-send-act:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+#portal-overlay .p-home2-send-act--muted {
+  border-color: var(--p-border-light);
+  background: transparent;
+}
+
+#portal-overlay .p-home2-send-act--primary {
+  border-color: color-mix(in srgb, var(--p-accent) 65%, var(--p-border));
+  background: var(--p-accent);
+  color: var(--p-on-accent, #fff);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--p-shadow) 30%, transparent);
+}
+
+#portal-overlay .p-home2-send-act--primary:hover:not(:disabled) {
+  background: var(--p-accent-hover, var(--p-accent));
+  border-color: var(--p-accent-hover, var(--p-accent));
+  color: var(--p-on-accent, #fff);
+}
+
+#portal-overlay .p-home2-send-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.1rem 1.25rem 1.35rem;
+  border-radius: 16px;
+  border: 1px solid var(--p-border);
+  background: var(--p-bg2);
+  box-shadow: 0 4px 24px var(--p-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#portal-overlay .p-home2-send-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--p-border-light);
+  min-width: 0;
+}
+
+#portal-overlay .p-home2-send-title {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--p-text-bright);
+  min-width: 0;
+  flex: 1 1 12rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+#portal-overlay .p-home2-send-from {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--p-text-dimmer);
+  flex-shrink: 0;
+  text-align: right;
+  max-width: 100%;
+}
+
+@media (max-width: 520px) {
+  #portal-overlay .p-home2-send-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #portal-overlay .p-home2-send-from {
+    text-align: left;
+  }
+}
+
+#portal-overlay .p-home2-send-from span {
+  margin-left: 0.4rem;
+  color: var(--p-text-muted);
+  font-weight: 500;
+}
+
+#portal-overlay .p-home2-send-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+#portal-overlay .p-home2-send-row {
+  display: grid;
+  grid-template-columns: minmax(4.25rem, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 0 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--p-border-light) 70%, transparent);
+  min-width: 0;
+}
+
+#portal-overlay .p-home2-send-row:last-child {
+  border-bottom: none;
+}
+
+#portal-overlay .p-home2-send-rowk {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-send-rowv {
+  width: 100%;
+  min-width: 0;
+  height: 2.25rem;
+  padding: 0 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--p-text-bright);
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+#portal-overlay .p-home2-send-rowv::placeholder {
+  color: var(--p-text-dimmer);
+}
+
+/* 宛先・件名（本文と同系トーン） */
+#portal-overlay .p-home2-send-rowv--tone {
+  background: color-mix(in srgb, var(--p-bg) 55%, var(--p-bg2));
+  border: 1px solid var(--p-border-light);
+  border-radius: 12px;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+#portal-overlay .p-home2-send-rowv--tone:focus {
+  background: var(--p-bg);
+  border-color: color-mix(in srgb, var(--p-accent) 50%, var(--p-border));
+}
+
+#portal-overlay .p-home2-send-rowv:focus:not(.p-home2-send-rowv--tone) {
+  background: color-mix(in srgb, var(--p-accent) 8%, transparent);
+  border-radius: 6px;
+}
+
+#portal-overlay .p-home2-send-body {
+  width: 100%;
+  min-height: 14rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--p-border-light);
+  background: color-mix(in srgb, var(--p-bg) 55%, var(--p-bg2));
+  color: var(--p-text-bright);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+#portal-overlay .p-home2-send-body::placeholder {
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-send-body:focus {
+  border-color: color-mix(in srgb, var(--p-accent) 50%, var(--p-border));
+  background: var(--p-bg);
+}
+
+#portal-overlay .p-home2-send-attach {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--p-border-light);
+}
+
+#portal-overlay .p-home2-send-attach-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#portal-overlay .p-home2-send-file-name {
+  flex: 1 1 12rem;
+  min-width: 0;
+  padding: 0 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--p-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#portal-overlay .p-home2-send-attach-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+
+#portal-overlay .p-home2-send-chip {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 999px;
+  border: 1px solid var(--p-border-light);
+  background: var(--p-bg3);
+  overflow: hidden;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+#portal-overlay .p-home2-send-chip.is-selected {
+  border-color: color-mix(in srgb, var(--p-accent) 55%, var(--p-border));
+  background: color-mix(in srgb, var(--p-accent) 12%, var(--p-bg3));
+}
+
+#portal-overlay .p-home2-send-chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem 0.35rem 0.55rem;
+  border: none;
+  background: transparent;
+  color: var(--p-text-muted);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  max-width: 18rem;
+}
+
+#portal-overlay .p-home2-send-chip.is-selected .p-home2-send-chip-label {
+  color: var(--p-text-bright);
+}
+
+#portal-overlay .p-home2-send-chip-label > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#portal-overlay .p-home2-send-chip-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  border: none;
+  border-left: 1px solid var(--p-border-light);
+  background: transparent;
+  color: var(--p-text-dimmer);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+#portal-overlay .p-home2-send-chip-x:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--p-danger) 18%, transparent);
+  color: var(--p-danger-hover);
+}
+
+#portal-overlay .p-home2-send-chip-x:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+#portal-overlay .p-home2-send-empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-send-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--p-text-dimmer);
+}
+
+#portal-overlay .p-home2-send-copyme {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+#portal-overlay .p-home2-send-copyme input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--p-accent);
+  cursor: pointer;
+}
+
+#portal-overlay .p-home2-send-error {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--p-danger) 40%, var(--p-border));
+  background: color-mix(in srgb, var(--p-danger) 12%, transparent);
+  color: var(--p-danger-hover);
+  font-size: 0.8125rem;
+}

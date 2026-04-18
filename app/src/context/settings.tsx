@@ -25,6 +25,7 @@ export interface Settings {
   campusCalForce:     boolean;
   hideProfileName:    boolean;
   showKogiCalMascot:  boolean;
+  home2WebMailOverlay: boolean;
 }
 
 export interface SettingsContextValue {
@@ -44,6 +45,7 @@ const DEFAULTS: Settings = {
   campusCalForce:    false,
   hideProfileName:   false,
   showKogiCalMascot: false,
+  home2WebMailOverlay: true,
 };
 
 // Settings キーから storage キーへの明示的マッピング。
@@ -55,6 +57,7 @@ const SETTINGS_TO_SK = {
   campusCalForce:  SK.campusCalForce,
   hideProfileName: SK.hideProfileName,
   showKogiCalMascot:  SK.showKogiCalMascot,
+  home2WebMailOverlay: SK.home2WebMailOverlay,
 } satisfies Record<keyof Settings, string>;
 
 const STORAGE_KEYS = [
@@ -64,6 +67,7 @@ const STORAGE_KEYS = [
   SK.campusCalForce,
   SK.hideProfileName,
   SK.showKogiCalMascot,
+  SK.home2WebMailOverlay,
 ] as const;
 
 function parseSettings(data: Record<string, unknown>): Settings {
@@ -74,6 +78,7 @@ function parseSettings(data: Record<string, unknown>): Settings {
     campusCalForce:  Boolean(data[SK.campusCalForce]  ?? DEFAULTS.campusCalForce),
     hideProfileName: Boolean(data[SK.hideProfileName] ?? DEFAULTS.hideProfileName),
     showKogiCalMascot: Boolean(data[SK.showKogiCalMascot] ?? DEFAULTS.showKogiCalMascot),
+    home2WebMailOverlay: Boolean(data[SK.home2WebMailOverlay] ?? DEFAULTS.home2WebMailOverlay),
   };
 }
 

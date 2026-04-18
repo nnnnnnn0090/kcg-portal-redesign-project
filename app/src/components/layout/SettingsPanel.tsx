@@ -35,6 +35,8 @@ interface SettingsPanelProps {
   onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   /** 初回案内チュートリアルを先頭から再表示する */
   onReplayGuidedTour: () => void;
+  /** Home2 Mail ではカラーテーマとバージョンのみ */
+  variant?: 'portal' | 'home2';
 }
 
 export interface SettingsPanelHandle {
@@ -45,7 +47,16 @@ export interface SettingsPanelHandle {
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>(
-  function SettingsPanel({ popoverSurfaceRef, isOpen, settings, onClose, onThemeChange, onSettingChange, onReplayGuidedTour }, ref) {
+  function SettingsPanel({
+    popoverSurfaceRef,
+    isOpen,
+    settings,
+    onClose,
+    onThemeChange,
+    onSettingChange,
+    onReplayGuidedTour,
+    variant = 'portal',
+  }, ref) {
     const popRef  = useRef<HTMLDivElement>(null);
     const [closing, setClosing] = useState(false);
 
@@ -184,82 +195,103 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
             </div>
           </div>
 
-          {/* ── ホームの装飾 ─────────────────────────────────── */}
           <div className="p-settings-section">
-            <div className="p-settings-section-title">ホームの装飾</div>
+            <div className="p-settings-section-title">Web メール</div>
             <label className="p-settings-row">
               <input
                 type="checkbox"
-                checked={settings.showKogiCalMascot}
-                onChange={(e) => onSettingChange('showKogiCalMascot', e.target.checked)}
+                checked={settings.home2WebMailOverlay}
+                onChange={(e) => {
+                  const next = e.target.checked;
+                  onSettingChange('home2WebMailOverlay', next);
+                  if (variant === 'home2' && !next) window.location.reload();
+                }}
               />
-              <span>授業カレンダーにマスコットを表示する</span>
+              <span>拡張のオーバーレイを表示する</span>
             </label>
+            <p className="p-settings-hint">オフにしたあと反映するにはページを再読み込みしてください。</p>
           </div>
 
-          {/* ── 表示設定 ──────────────────────────────────────── */}
-          <div className="p-settings-section">
-            <div className="p-settings-section-title">表示設定</div>
+          {variant === 'portal' ? (
+            <>
+              {/* ── ホームの装飾 ─────────────────────────────────── */}
+              <div className="p-settings-section">
+                <div className="p-settings-section-title">ホームの装飾</div>
+                <label className="p-settings-row">
+                  <input
+                    type="checkbox"
+                    checked={settings.showKogiCalMascot}
+                    onChange={(e) => onSettingChange('showKogiCalMascot', e.target.checked)}
+                  />
+                  <span>授業カレンダーにマスコットを表示する</span>
+                </label>
+              </div>
 
-            <label className="p-settings-row">
-              <input
-                type="checkbox"
-                checked={settings.kinoEmptyForce}
-                onChange={(e) => onSettingChange('kinoEmptyForce', e.target.checked)}
-              />
-              <span>お知らせを、内容がなくても表示する</span>
-            </label>
+              {/* ── 表示設定 ──────────────────────────────────────── */}
+              <div className="p-settings-section">
+                <div className="p-settings-section-title">表示設定</div>
 
-            <label className="p-settings-row">
-              <input
-                type="checkbox"
-                checked={settings.hoshuCalForce}
-                onChange={(e) => onSettingChange('hoshuCalForce', e.target.checked)}
-              />
-              <span>補修カレンダーを、予定がなくても表示する</span>
-            </label>
+                <label className="p-settings-row">
+                  <input
+                    type="checkbox"
+                    checked={settings.kinoEmptyForce}
+                    onChange={(e) => onSettingChange('kinoEmptyForce', e.target.checked)}
+                  />
+                  <span>お知らせを、内容がなくても表示する</span>
+                </label>
 
-            <label className="p-settings-row">
-              <input
-                type="checkbox"
-                checked={settings.campusCalForce}
-                onChange={(e) => onSettingChange('campusCalForce', e.target.checked)}
-              />
-              <span>キャンパスカレンダーを、予定がなくても表示する</span>
-            </label>
+                <label className="p-settings-row">
+                  <input
+                    type="checkbox"
+                    checked={settings.hoshuCalForce}
+                    onChange={(e) => onSettingChange('hoshuCalForce', e.target.checked)}
+                  />
+                  <span>補修カレンダーを、予定がなくても表示する</span>
+                </label>
 
-            <label className="p-settings-row">
-              <input
-                type="checkbox"
-                checked={settings.hideProfileName}
-                onChange={(e) => onSettingChange('hideProfileName', e.target.checked)}
-              />
-              <span>ヘッダーに名前を表示しない</span>
-            </label>
+                <label className="p-settings-row">
+                  <input
+                    type="checkbox"
+                    checked={settings.campusCalForce}
+                    onChange={(e) => onSettingChange('campusCalForce', e.target.checked)}
+                  />
+                  <span>キャンパスカレンダーを、予定がなくても表示する</span>
+                </label>
 
-            <div className="p-settings-row p-settings-row-actions p-settings-king-lms-sync">
-              <button
-                type="button"
-                className="p-settings-resync-btn"
-                onClick={() => void beginKingLmsCourseListSync({ toastQuiet: true })}
-              >
-                コース一覧を再取得
-              </button>
-              <p className="p-settings-hint">
-                講義のクリックで King LMS のコースへ移動するために使用します。一覧取得のため一度 King LMS へ移動します（終了後にポータルへ戻ります）。
-              </p>
-            </div>
+                <label className="p-settings-row">
+                  <input
+                    type="checkbox"
+                    checked={settings.hideProfileName}
+                    onChange={(e) => onSettingChange('hideProfileName', e.target.checked)}
+                  />
+                  <span>ヘッダーに名前を表示しない</span>
+                </label>
 
-            <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
-              <button
-                type="button"
-                className="p-settings-tour-replay-btn"
-                onClick={onReplayGuidedTour}
-              >
-                はじめの案内をもう一度見る
-              </button>
-            </div>
-          </div>
+                <div className="p-settings-row p-settings-row-actions p-settings-king-lms-sync">
+                  <button
+                    type="button"
+                    className="p-settings-resync-btn"
+                    onClick={() => void beginKingLmsCourseListSync({ toastQuiet: true })}
+                  >
+                    コース一覧を再取得
+                  </button>
+                  <p className="p-settings-hint">
+                    講義のクリックで King LMS のコースへ移動するために使用します。一覧取得のため一度 King LMS へ移動します（終了後にポータルへ戻ります）。
+                  </p>
+                </div>
+
+                <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+                  <button
+                    type="button"
+                    className="p-settings-tour-replay-btn"
+                    onClick={onReplayGuidedTour}
+                  >
+                    はじめの案内をもう一度見る
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : null}
 
           {extensionVersion ? (
             <p className="p-settings-version" role="note">

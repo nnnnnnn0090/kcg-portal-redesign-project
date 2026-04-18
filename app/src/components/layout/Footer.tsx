@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react';
 import {
+  EXTENSION_AUTHOR_CREDIT_TEXT,
   EXTENSION_AUTHOR_PROFILE_URL,
   EXTENSION_PROMO_PAGE_URL,
   PORTAL_DOM,
@@ -16,9 +17,51 @@ import { usePortalDom } from '../../context/portalDom';
 
 interface FooterProps {
   onShareClick: () => void;
+  /** Home2 Mail ヘッダー帯のみのとき背後ページをスクロールする */
+  scrollTarget?: 'overlay' | 'window';
 }
 
-export function Footer({ onShareClick }: FooterProps) {
+/** ポータル用フッターが無いとき、ホストの `.footer` 文言を載せる */
+function appendHostPlainFooterLine(mount: HTMLElement): void {
+  if (mount.querySelector('.p-footer-host-copy')) return;
+  const sels = ['.page .footer', 'body > .footer', '.footer'];
+  for (const sel of sels) {
+    let found: HTMLElement | undefined;
+    try {
+      found = [...document.querySelectorAll(sel)].find(
+        (n): n is HTMLElement => n instanceof HTMLElement && !n.closest(`#${PORTAL_DOM.overlayRoot}`),
+      );
+    } catch {
+      continue;
+    }
+    if (!found) continue;
+    const text = found.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+    if (!text) continue;
+    const p = document.createElement('p');
+    p.className = 'p-footer-host-copy';
+    p.textContent = text;
+    mount.appendChild(p);
+    return;
+  }
+}
+
+function appendRedesignedCredit(mount: HTMLElement): void {
+  if (mount.querySelector('.p-footer-credit')) return;
+  const creditEl = document.createElement('small');
+  creditEl.className = 'p-footer-credit';
+  creditEl.appendChild(document.createTextNode('Redesigned by '));
+  const creditLink = document.createElement('a');
+  creditLink.href    = EXTENSION_AUTHOR_PROFILE_URL;
+  creditLink.target  = '_blank';
+  creditLink.rel       = 'noopener noreferrer';
+  creditLink.textContent = EXTENSION_AUTHOR_CREDIT_TEXT;
+  creditEl.appendChild(creditLink);
+  const copyrightSm = mount.querySelector('small');
+  if (copyrightSm) copyrightSm.after(creditEl);
+  else mount.appendChild(creditEl);
+}
+
+export function Footer({ onShareClick, scrollTarget = 'overlay' }: FooterProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const { overlayRoot } = usePortalDom();
   const { hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef } = useCalendarOverlayUiRefs();
@@ -42,34 +85,25 @@ export function Footer({ onShareClick }: FooterProps) {
       } catch { return null; }
     }, null);
 
-    if (!src) return;
-
-    // 子要素をコピーして配置（script は除外）
     mount.replaceChildren();
-    for (const child of src.children) {
-      if (child.tagName !== 'SCRIPT') mount.appendChild(child.cloneNode(true));
+
+    if (src) {
+      for (const child of src.children) {
+        if (child.tagName !== 'SCRIPT') mount.appendChild(child.cloneNode(true));
+      }
+      mount.querySelectorAll('.pageTop, a[href="#top"], a[href="#Top"]').forEach((el) => el.remove());
+    } else {
+      appendHostPlainFooterLine(mount);
     }
 
-    // 制作クレジットを追加
-    const creditEl  = document.createElement('small');
-    creditEl.className = 'p-footer-credit';
-    creditEl.appendChild(document.createTextNode('Redesigned by '));
-    const creditLink = document.createElement('a');
-    creditLink.href    = EXTENSION_AUTHOR_PROFILE_URL;
-    creditLink.target  = '_blank';
-    creditLink.rel     = 'noopener noreferrer';
-    creditLink.textContent = 'nnnnnnn0090';
-    creditEl.appendChild(creditLink);
-
-    const copyrightSm = mount.querySelector('small');
-    if (copyrightSm) copyrightSm.after(creditEl);
-    else mount.appendChild(creditEl);
-
-    // ページトップへのリンクは自前ボタンで代替するため除去
-    mount.querySelectorAll('.pageTop, a[href="#top"], a[href="#Top"]').forEach((el) => el.remove());
+    appendRedesignedCredit(mount);
   }, []);
 
   function scrollTop() {
+    if (scrollTarget === 'window') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     overlayRoot.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

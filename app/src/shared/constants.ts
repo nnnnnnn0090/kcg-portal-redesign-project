@@ -25,6 +25,7 @@ export const SK = {
   shortcutConfig:                   'portalThemeShortcutConfig',
   /** 初回の案内チュートリアルを完了（またはスキップ）したら true */
   portalGuidedTourDone:             'portalThemePortalGuidedTourDone',
+  home2WebMailOverlay:              'portalThemeHome2WebMailOverlay',
 } as const;
 
 // ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
@@ -55,7 +56,15 @@ export const PORTAL_DOM = {
   headThemeStyle: 'portal-theme-vars',
   overlayRoot:    'portal-overlay',
   overlayCss:     'portal-overlay-css',
+  /** Home2 Mail ログイン画面でホスト側の重複 UI を隠す style タグ */
+  home2HostTweak: 'kcg-portal-home2-host-tweak',
 } as const;
+
+/** `#portal-overlay` に付与。Home2 Web Mail のとき（ホストのフォントを継承する CSS 用） */
+export const HOME2_MAIL_OVERLAY_SURFACE_CLASS = 'p-surface-home2-mail' as const;
+
+/** `#portal-overlay` に付与。`/Mail/*` でヘッダー帯のみのとき */
+export const HOME2_MAIL_OVERLAY_HEADER_ONLY_CLASS = 'p-surface-home2-mail-header-only' as const;
 
 /** portal.content: ブートカバーを外すまでの requestAnimationFrame 段階 */
 export const PORTAL_BOOT_COVER_RAF_FRAMES = {
@@ -71,6 +80,25 @@ export const PORTAL_HOSTNAME = new URL(PORTAL_ORIGIN).hostname;
 
 /** ポータル配下コンテンツスクリプトの manifest `matches` */
 export const PORTAL_CONTENT_SCRIPT_MATCHES = `${PORTAL_ORIGIN}/portal*` as const;
+
+/** Home2 Web メール（専用 content script） */
+export const HOME2_ORIGIN = 'https://home2.kcg.ac.jp' as const;
+
+export const HOME2_HOSTNAME = new URL(HOME2_ORIGIN).hostname;
+
+/** `/Mail`・`/Mail/`・`/Mail/*` いずれにもマッチさせる */
+export const HOME2_MAIL_CONTENT_SCRIPT_MATCHES = [
+  `${HOME2_ORIGIN}/Mail`,
+  `${HOME2_ORIGIN}/Mail/`,
+  `${HOME2_ORIGIN}/Mail/*`,
+] as const;
+
+export const HOME2_MAIL_DEFAULT_URL = `${HOME2_ORIGIN}/Mail/Default.aspx` as const;
+
+export const HOME2_MAIL_DIRECTORY_URL = `${HOME2_ORIGIN}/Mail/` as const;
+
+/** ヘッダー「ホーム」→ Default.aspx */
+export const HOME2_TOP_PAGE_URL = `${HOME2_ORIGIN}/Default.aspx` as const;
 
 // ─── postMessage type（fetch フックが送るキャプチャ種別）────────────────────
 
@@ -138,11 +166,18 @@ export const DEVELOPER_NOTICE_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/notice.json`
 /** フッタークレジットの作者プロフィール（X） */
 export const EXTENSION_AUTHOR_PROFILE_URL = 'https://x.com/nnnnnnn0090';
 
+/** `Redesigned by` のリンク文言（`EXTENSION_AUTHOR_PROFILE_URL` と対） */
+export const EXTENSION_AUTHOR_CREDIT_TEXT = 'nnnnnnn0090' as const;
+
 // ─── ホームのショートカットに常に含める固定リンク ──────────────────────────
 
 export const HOME_SHORTCUT_EXTRAS: ReadonlyArray<{ readonly midashi: string; readonly url: string }> = [
   {
     midashi: '学生出欠登録',
     url: `${PORTAL_ORIGIN}/gakusei/web/skt/WebSktGakuseiShukketsuShinsei/UI/WSK_GakuseiShukketsuShinsei.aspx`,
+  },
+  {
+    midashi: 'KCG WebMail',
+    url:     HOME2_MAIL_DIRECTORY_URL,
   },
 ];

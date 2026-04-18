@@ -1,5 +1,10 @@
 import { defineConfig } from 'wxt';
-import { EXTENSION_PROMO_ORIGIN, KING_LMS_ORIGIN, PORTAL_ORIGIN } from './src/shared/constants';
+import {
+  EXTENSION_PROMO_ORIGIN,
+  HOME2_ORIGIN,
+  KING_LMS_ORIGIN,
+  PORTAL_ORIGIN,
+} from './src/shared/constants';
 
 type WxtGeckoBaseline = {
   id?: string;
@@ -24,6 +29,7 @@ export default defineConfig({
       `${PORTAL_ORIGIN}/*`,
       `${KING_LMS_ORIGIN}/*`,
       `${EXTENSION_PROMO_ORIGIN}/*`,
+      `${HOME2_ORIGIN}/*`,
     ],
     browser_specific_settings: {
       gecko: {

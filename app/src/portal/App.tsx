@@ -14,6 +14,8 @@ import { EXTENSION_PROMO_PAGE_URL, PAGE, PORTAL_ORIGIN, SK } from '../shared/con
 import storage from '../lib/storage';
 import { useCalendarInteractions } from '../features/calendar';
 import type { PortalRoute } from './router';
+import type { PortalAppRoute, PortalSurface } from './app-types';
+import { isHome2MailRoute } from './app-types';
 import { PortalPageOutlet } from './routes';
 import { AppProviders } from './providers';
 import { GuidedTour } from '../components/ui/GuidedTour';
@@ -21,9 +23,11 @@ import { GuidedTour } from '../components/ui/GuidedTour';
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
 export interface PortalAppProps {
-  route:        PortalRoute;
+  surface: PortalSurface;
+  route:   PortalAppRoute;
+  /** King LMS 同期完了トースト（ポータルのみ） */
   syncToastMsg: string;
-  /** portal.content が作成した #portal-overlay 要素（スクロール・イベント委譲の基点） */
+  /** コンテンツスクリプトが作成した #portal-overlay 要素（スクロール・イベント委譲の基点） */
   overlayRoot: HTMLElement;
 }
 
@@ -40,7 +44,7 @@ export function PortalApp(props: PortalAppProps) {
 
 // ─── アプリシェル ─────────────────────────────────────────────────────────
 
-function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
+function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
   const { settings, settingsReady, updateSetting, updateTheme } = useSettings();
   const { settingsPopRef, overlayRoot } = usePortalDom();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -48,11 +52,23 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
   const settingsPanelRef = useRef<SettingsPanelHandle | null>(null);
   const { toast, show: showToast, onAnimationEnd } = useToast();
 
+  const portalRoute = surface === 'portal' ? (route as PortalRoute) : null;
+
+  const showFullChrome = surface === 'portal'
+    || (isHome2MailRoute(route) && (route.layout === 'full' || route.layout === 'mailHead' || route.layout === 'readMail' || route.layout === 'sendMail'));
+
+  const footerScrollTarget = surface === 'home2-mail'
+    && isHome2MailRoute(route)
+    && route.layout === 'headerOnly'
+    ? 'window' as const
+    : 'overlay' as const;
+
   const handleReplayGuidedTour = useCallback(() => {
+    if (!portalRoute) return;
     settingsPanelRef.current?.requestClose();
     overlayRoot.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     void storage.set({ [SK.portalGuidedTourDone]: false }).then(() => {
-      if (route.page !== PAGE.HOME) {
+      if (portalRoute.page !== PAGE.HOME) {
         window.location.assign(`${PORTAL_ORIGIN}/portal/`);
         return;
       }
@@ -62,7 +78,7 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
         });
       });
     });
-  }, [route.page, overlayRoot]);
+  }, [portalRoute, overlayRoot]);
 
   // King LMS 同期完了トースト（親から渡された初回メッセージのみ）
   useEffect(() => {
@@ -95,9 +111,12 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
 
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
 
+  const settingsVariant = surface === 'home2-mail' ? 'home2' : 'portal';
+
   return (
     <>
       <Header
+        navSource={surface === 'home2-mail' ? 'home2-mail' : 'portal'}
         settings={settings}
         settingsReady={settingsReady}
         settingsOpen={settingsOpen}
@@ -108,6 +127,7 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
             popoverSurfaceRef={settingsPopRef}
             isOpen={settingsOpen}
             settings={settings}
+            variant={settingsVariant}
             onClose={closeSettings}
             onThemeChange={updateTheme}
             onSettingChange={updateSetting}
@@ -118,12 +138,17 @@ function PortalAppShell({ route, syncToastMsg }: PortalAppProps) {
 
       <PortalPageOutlet route={route} settings={settings} />
 
-      <Footer onShareClick={handleShareClick} />
-      <GuidedTour
-        route={route}
-        settingsReady={settingsReady}
-        guidedTourReplayToken={guidedTourReplayToken}
-      />
+      {showFullChrome ? (
+        <Footer onShareClick={handleShareClick} scrollTarget={footerScrollTarget} />
+      ) : null}
+
+      {surface === 'portal' && portalRoute ? (
+        <GuidedTour
+          route={portalRoute}
+          settingsReady={settingsReady}
+          guidedTourReplayToken={guidedTourReplayToken}
+        />
+      ) : null}
       <Toast toast={toast} onAnimationEnd={onAnimationEnd} />
     </>
   );

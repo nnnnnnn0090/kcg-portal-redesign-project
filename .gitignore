@@ -3,3 +3,7 @@
 /app/.output
 /app/.wxt
 /app/node_modules
+
+# ブラウザで保存したページ参照用（リポジトリに含めない）
+KCG WebMail*
+kcg.edu*
