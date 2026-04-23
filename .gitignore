@@ -4,6 +4,11 @@
 /app/.wxt
 /app/node_modules
 
+# 非公開 URL（Discord 招待・フォーム等）用。`app/.env.example` を参照。
+/app/.env
+/app/.env.local
+/app/.env.*.local
+
 # ブラウザで保存したページ参照用（リポジトリに含めない）
 KCG WebMail*
 kcg.edu*
