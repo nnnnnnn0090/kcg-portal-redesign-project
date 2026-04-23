@@ -174,6 +174,23 @@ export const EXTENSION_AUTHOR_PROFILE_URL = 'https://x.com/nnnnnnn0090';
 /** `Redesigned by` のリンク文言（`EXTENSION_AUTHOR_PROFILE_URL` と対） */
 export const EXTENSION_AUTHOR_CREDIT_TEXT = 'nnnnnnn0090' as const;
 
+function vitePrivateUrl(key: 'VITE_PORTAL_DISCORD_INVITE_URL' | 'VITE_EXTENSION_FEEDBACK_FORM_URL'): string {
+  const raw = import.meta.env[key];
+  return typeof raw === 'string' ? raw.trim() : '';
+}
+
+/**
+ * Discord 招待 URL。`VITE_PORTAL_DISCORD_INVITE_URL` を `app/.env.local` などに書きビルドする（Git に含めない）。
+ * 未設定・空のときは設定パネルに Discord ボタンを出さない。
+ */
+export const PORTAL_COMMUNITY_DISCORD_INVITE_URL = vitePrivateUrl('VITE_PORTAL_DISCORD_INVITE_URL');
+
+/**
+ * バグ報告・機能リクエスト用フォーム URL。`VITE_EXTENSION_FEEDBACK_FORM_URL` を同様に設定。
+ * 未設定のときはフォーム用ボタンを出さない。
+ */
+export const EXTENSION_FEEDBACK_FORM_URL = vitePrivateUrl('VITE_EXTENSION_FEEDBACK_FORM_URL');
+
 // ─── ホームのショートカットに常に含める固定リンク ──────────────────────────
 
 export const HOME_SHORTCUT_EXTRAS: ReadonlyArray<{ readonly midashi: string; readonly url: string }> = [

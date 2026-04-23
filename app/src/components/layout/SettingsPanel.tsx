@@ -1,7 +1,8 @@
 /**
  * 設定パネルコンポーネント。
  * ヘッダーの「設定」ボタンの直下に表示されるポップオーバー形式のダイアログ。
- * テーマ選択・表示設定・King LMS コース一覧の再取得・案内チュートリアルの再表示・更新履歴（チェンジログ）を提供する。
+ * カラーテーマ、（ポータル時）ホームの装飾・表示設定、Web メール、フィードバック（.env で設定したときのみフォーム・Discord）、（Home2 時）チェンジログ、
+ * バージョン表記などをまとめるパネル。表示設定内の操作は案内再表示 → チェンジログ → King LMS 再取得の順。
  */
 
 import {
@@ -20,7 +21,12 @@ import { THEMES } from '../../themes';
 import type { Settings } from '../../context/settings';
 import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
 import { readExtensionVersion } from '../../lib/extension-version';
-import { CHANGELOG_JSON_URL, PORTAL_DOM } from '../../shared/constants';
+import {
+  CHANGELOG_JSON_URL,
+  EXTENSION_FEEDBACK_FORM_URL,
+  PORTAL_COMMUNITY_DISCORD_INVITE_URL,
+  PORTAL_DOM,
+} from '../../shared/constants';
 
 type ParsedChangelogRelease = {
   version:    string;
@@ -368,6 +374,17 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       )
       : null;
 
+    const feedbackFormUrl = EXTENSION_FEEDBACK_FORM_URL;
+    const discordInviteUrl = PORTAL_COMMUNITY_DISCORD_INVITE_URL;
+    const hasFeedbackForm = feedbackFormUrl.length > 0;
+    const hasDiscordCommunity = discordInviteUrl.length > 0;
+    const showFeedbackSection = hasFeedbackForm || hasDiscordCommunity;
+    const feedbackSectionTitle = hasFeedbackForm && hasDiscordCommunity
+      ? 'フィードバック・コミュニティ'
+      : hasFeedbackForm
+        ? 'フィードバック'
+        : 'コミュニティ';
+
     return (
       <>
       <div
@@ -409,23 +426,6 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
             </div>
           </div>
 
-          <div className="p-settings-section">
-            <div className="p-settings-section-title">Web メール</div>
-            <label className="p-settings-row">
-              <input
-                type="checkbox"
-                checked={settings.home2WebMailOverlay}
-                onChange={(e) => {
-                  const next = e.target.checked;
-                  onSettingChange('home2WebMailOverlay', next);
-                  if (variant === 'home2' && !next) window.location.reload();
-                }}
-              />
-              <span>拡張のオーバーレイを表示する</span>
-            </label>
-            <p className="p-settings-hint">オフにしたあと反映するにはページを再読み込みしてください。</p>
-          </div>
-
           {variant === 'portal' ? (
             <>
               {/* ── ホームの装飾 ─────────────────────────────────── */}
@@ -444,6 +444,15 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
               {/* ── 表示設定 ──────────────────────────────────────── */}
               <div className="p-settings-section">
                 <div className="p-settings-section-title">表示設定</div>
+
+                <label className="p-settings-row">
+                  <input
+                    type="checkbox"
+                    checked={settings.hideProfileName}
+                    onChange={(e) => onSettingChange('hideProfileName', e.target.checked)}
+                  />
+                  <span>ヘッダーに名前を表示しない</span>
+                </label>
 
                 <label className="p-settings-row">
                   <input
@@ -472,28 +481,6 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
                   <span>キャンパスカレンダーを、予定がなくても表示する</span>
                 </label>
 
-                <label className="p-settings-row">
-                  <input
-                    type="checkbox"
-                    checked={settings.hideProfileName}
-                    onChange={(e) => onSettingChange('hideProfileName', e.target.checked)}
-                  />
-                  <span>ヘッダーに名前を表示しない</span>
-                </label>
-
-                <div className="p-settings-row p-settings-row-actions p-settings-king-lms-sync">
-                  <button
-                    type="button"
-                    className="p-settings-resync-btn"
-                    onClick={() => void beginKingLmsCourseListSync({ toastQuiet: true })}
-                  >
-                    コース一覧を再取得
-                  </button>
-                  <p className="p-settings-hint">
-                    講義のクリックで King LMS のコースへ移動するために使用します。一覧取得のため一度 King LMS へ移動します（終了後にポータルへ戻ります）。
-                  </p>
-                </div>
-
                 <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
                   <button
                     type="button"
@@ -513,8 +500,88 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
                     チェンジログを確認
                   </button>
                 </div>
+
+                <div className="p-settings-row p-settings-row-actions p-settings-king-lms-sync">
+                  <button
+                    type="button"
+                    className="p-settings-resync-btn"
+                    onClick={() => void beginKingLmsCourseListSync({ toastQuiet: true })}
+                  >
+                    コース一覧を再取得
+                  </button>
+                  <p className="p-settings-hint">
+                    講義のクリックで King LMS のコースへ移動するために使用します。一覧取得のため一度 King LMS へ移動します（終了後にポータルへ戻ります）。
+                  </p>
+                </div>
               </div>
             </>
+          ) : null}
+
+          <div className="p-settings-section">
+            <div className="p-settings-section-title">Web メール</div>
+            <label className="p-settings-row">
+              <input
+                type="checkbox"
+                checked={settings.home2WebMailOverlay}
+                onChange={(e) => {
+                  const next = e.target.checked;
+                  onSettingChange('home2WebMailOverlay', next);
+                  if (variant === 'home2' && !next) window.location.reload();
+                }}
+              />
+              <span>拡張のオーバーレイを表示する</span>
+            </label>
+            <p className="p-settings-hint">オフにしたあと反映するにはページを再読み込みしてください。</p>
+          </div>
+
+          {showFeedbackSection ? (
+            <div className="p-settings-section">
+              <div className="p-settings-section-title">{feedbackSectionTitle}</div>
+              {hasFeedbackForm ? (
+                <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+                  <a
+                    className="p-settings-tour-replay-btn"
+                    href={feedbackFormUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {hasDiscordCommunity ? 'バグ報告 / 機能リクエスト（フォーム）' : 'バグ報告 / 機能リクエスト'}
+                  </a>
+                </div>
+              ) : null}
+              {hasDiscordCommunity ? (
+                <>
+                  {hasFeedbackForm ? (
+                    <p className="p-settings-hint p-settings-hint--tight">
+                      Discord からもバグ報告・機能リクエストを受け付けています。
+                    </p>
+                  ) : null}
+                  <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+                    <a
+                      className="p-settings-tour-replay-btn p-settings-discord-btn"
+                      href={discordInviteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <svg
+                        className="p-settings-discord-icon"
+                        width={20}
+                        height={20}
+                        viewBox="0 0 24 24"
+                        aria-hidden={true}
+                        focusable="false"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"
+                        />
+                      </svg>
+                      <span>Discord サーバーへ</span>
+                    </a>
+                  </div>
+                </>
+              ) : null}
+            </div>
           ) : null}
 
           {variant === 'home2' ? (

@@ -25,6 +25,7 @@
 #portal-overlay .p-settings-row-actions:hover{background:transparent}
 #portal-overlay .p-settings-king-lms-sync{flex-direction:column;align-items:stretch;gap:.45rem}
 #portal-overlay .p-settings-hint{margin:0;font-size:.72rem;line-height:1.45;color:var(--p-text-dimmer);font-weight:400}
+#portal-overlay .p-settings-hint--tight{margin:.4rem .55rem .1rem;padding:0 .55rem}
 #portal-overlay .p-settings-resync-btn{padding:.5rem .95rem;border-radius:8px;border:1px solid var(--p-accent-border);background:var(--p-accent-bg);color:var(--p-accent-light);font-size:.8125rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
 #portal-overlay .p-settings-resync-btn:hover{background:color-mix(in srgb,var(--p-accent) 22%,transparent);border-color:var(--p-accent)}
 #portal-overlay .p-settings-tour-replay{display:flex;flex-direction:column;align-items:stretch;width:100%;
@@ -35,6 +36,9 @@
   cursor:pointer;font-family:inherit;text-align:center;transition:background .15s,border-color .15s,color .15s}
 #portal-overlay .p-settings-tour-replay-btn:hover{background:var(--p-bg-hover);border-color:var(--p-border-hover);color:var(--p-text)}
 #portal-overlay .p-settings-tour-replay-btn:disabled{opacity:.55;cursor:not-allowed}
+#portal-overlay a.p-settings-tour-replay-btn{display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;box-sizing:border-box}
+#portal-overlay .p-settings-discord-btn{gap:.5rem}
+#portal-overlay .p-settings-discord-icon{flex-shrink:0;display:block}
 #portal-overlay .p-settings-changelog-list{margin:.45rem 0 0;padding:0}
 #portal-overlay .p-settings-changelog-rel{margin:0 0 .65rem;padding:.55rem .65rem;background:var(--p-bg3);border-radius:10px;border:1px solid var(--p-border-light)}
 #portal-overlay .p-settings-changelog-rel:last-child{margin-bottom:0}
