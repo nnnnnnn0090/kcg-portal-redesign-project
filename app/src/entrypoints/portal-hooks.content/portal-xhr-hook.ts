@@ -1,4 +1,6 @@
-/** XMLHttpRequest のラップ、対象ポータル API の JSON を dispatch へ渡す */
+/**
+ * `XMLHttpRequest` をラップし、フック対象のポータル API のレスポンス JSON を `dispatch` へ渡します。
+ */
 
 import { devWarn } from '../../lib/debug';
 import { dispatch } from './portal-hook-dispatch';

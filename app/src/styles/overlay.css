@@ -1,4 +1,4 @@
-/* Portal overlay: split styles (import order = cascade order). */
+/* ポータルオーバーレイ用スタイル。分割ファイルを @import する順序がカスケードの優先度に影響します。 */
 @import './base.css';
 @import './checkboxes.css';
 @import './layout.css';

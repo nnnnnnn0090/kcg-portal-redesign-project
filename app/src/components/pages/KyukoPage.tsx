@@ -1,6 +1,6 @@
 /**
- * 休講・補講・教室変更情報ページ。
- * 履修科目のみ絞り込む機能を持つ。
+ * 休講・補講・教室変更の一覧ページです。
+ * 履修科目のみに絞り込む切替を持ちます。
  */
 
 import { useReducer, useCallback, useEffect, useRef, useState } from 'react';

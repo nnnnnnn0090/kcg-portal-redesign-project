@@ -1,10 +1,25 @@
 /**
- * ポータルカレンダーパネルのロジックを束ねるカスタムフック。
- * postMessage 受信 → バルクフェッチ管理 → グリッド HTML 更新 → スワイプアニメーションを一元管理する。
+ * 公式カレンダーパネル（授業・補修・キャンパス）の表示とデータ取得を束ねるフックです。
+ * `postMessage` の受信、バルク取得、グリッド HTML の更新、スワイプ演出までをまとめます。
  *
- * コールバック内で常に最新の props を参照するために propsRef パターンを使用している。
- * 可変な表示パラメータ（フェッチ状態・バルクデータ等）は calRef にまとめ、
- * React の再レンダーを必要とするものだけ state で管理する。
+ * クロージャに古い props が閉じないよう `propsRef` を用い、
+ * フェッチ状態など再レンダーを抑えたい値は `calRef` に集約します。
+ *
+ * ── calRef（ミュータブル）の役割と照合キー ─────────────────────────────
+ * - `pendingKey` … `fetchRange` が投げた週／月の `pageFetch` とだけ照合する（`rangeKey(start,end)`）。
+ * - `bulkPendingKey` … `queueBulkYearFetch` / `queueBulkExtend` の年レンジ専用。週の再取得とキーを分離し、
+ *   設定の「週始まり」整列などで `fetchRange` が走ってもバルク完了判定が壊れないようにする。
+ * - `loading` … 上記「直接フェッチ」が未完了。`navigate` は loading / bulkFetching / swipe 中はブロック。
+ *   `fetchRange` は `bulkFetching` 中は開始しない（重なると loading が取り残されツールバーがロックしたままになる）。
+ * - `bulkFetching` … 年バルクまたは延長フェッチ進行中。完了は `calendar-panel-process-inbound` の [1]。
+ * - `clientDataMode` + `bulkItems` + `bulkParsed` … バルク済み。週送りは `navigateClientSide` + `applyCalSwipe`。
+ * - `pendingExtend` … 境界で `queueBulkExtend` したあと、バルク応答で週／月 state を確定させるための保留。
+ * - `lastItems` / `lastParsed` … 直近の描画入力（コース一覧更新時の再描画など）。
+ *
+ * ざっくりした遷移（正常系）:
+ *   初回メッセージ → inbound [3] で描画 → `queueBulkYearFetch` → `bulkPendingKey` でバルク
+ *   → inbound [1] で `clientDataMode` → 以降の週移動は `navigateClientSide`（スワイプ）。
+ *   境界超えは `queueBulkExtend` → 応答 [1] で `pendingExtend` を state に反映。
  */
 
 import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
@@ -18,8 +33,13 @@ import {
   calendarYearRangeFromIso,
   calendarYearRangeBeforeInclusiveStart,
   filterCalItemsByRange,
+  toIsoLocal,
+  weekRangeContaining,
+  calParamsAfterWeekStartChange,
+  type CalendarWeekStart,
 } from '../../lib/date';
 import { pageFetch } from '../../lib/api';
+import { useSettings } from '../../context/settings';
 import { buildCalendarGridHtml } from './grid';
 import { usePortalMessage, type PortalCapturedMessage } from '../../hooks/usePortalMessage';
 import { rangeKey } from './merge';
@@ -67,6 +87,9 @@ export function useCalendarPanel({
   forceVisibleDeps,
 }: CalendarPanelConfig) {
 
+  const { settings, settingsReady } = useSettings();
+  const weekStart = settings.calendarWeekStart;
+
   // ── 表示状態 ──────────────────────────────────────────────────────────
   const [viewMode,      setViewMode]      = useState<'week' | 'month'>('week');
   const [weekParams,    setWeekParams]    = useState<CalParams | null>(null);
@@ -84,9 +107,10 @@ export function useCalendarPanel({
   const propsRef = useRef({ calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType });
   propsRef.current = { calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType };
 
-  // ── 可変な表示パラメータを ref で保持（state と同期） ─────────────────
+  // ── 可変な表示パラメータを ref で保持（state と同期・上記モジュールコメント参照） ─
   const calRef = useRef({
     pendingKey:     null as string | null,
+    bulkPendingKey: null as string | null,
     loading:        false,
     bulkFetching:   false,
     bulkFetchKind:  null as null | 'initial' | 'extend-next' | 'extend-prev',
@@ -107,6 +131,26 @@ export function useCalendarPanel({
   weekParamsRef.current  = weekParams;
   monthRefRef.current    = monthRef;
   viewModeRef.current    = viewMode;
+  const loadingWatchdogRef = useRef<number | null>(null);
+  const bulkWatchdogRef    = useRef<number | null>(null);
+
+  const [toolbarLocked, setToolbarLocked] = useState(false);
+  const syncToolbarLockedFromRef = useCallback(() => {
+    const m = calRef.current;
+    setToolbarLocked(Boolean(m.loading || m.bulkFetching || m.swipeAnimating));
+  }, []);
+  const clearLoadingWatchdog = useCallback(() => {
+    if (loadingWatchdogRef.current !== null) {
+      window.clearTimeout(loadingWatchdogRef.current);
+      loadingWatchdogRef.current = null;
+    }
+  }, []);
+  const clearBulkWatchdog = useCallback(() => {
+    if (bulkWatchdogRef.current !== null) {
+      window.clearTimeout(bulkWatchdogRef.current);
+      bulkWatchdogRef.current = null;
+    }
+  }, []);
 
   // ── ビューメタ（描画時に使う設定まとめ） ────────────────────────────
   const viewMetaForRender = useCallback(() => ({
@@ -114,7 +158,8 @@ export function useCalendarPanel({
     monthRef:       viewModeRef.current === 'month' ? monthRefRef.current : null,
     kingLmsCourses: propsRef.current.getKingLmsCourses(),
     calKind:        propsRef.current.calKind,
-  }), []);
+    weekStart,
+  }), [weekStart]);
 
   // ── 現在表示している範囲の CalParams ─────────────────────────────────
   const visibleParsed = useCallback((): CalParams | null => {
@@ -122,12 +167,12 @@ export function useCalendarPanel({
     const uK = m.storedUKbn || weekParamsRef.current?.uKbn;
     if (!uK) return null;
     if (viewModeRef.current === 'month' && monthRefRef.current) {
-      const r = sixWeekRange(monthRefRef.current.y, monthRefRef.current.m);
+      const r = sixWeekRange(monthRefRef.current.y, monthRefRef.current.m, weekStart);
       return { uKbn: uK, ...r };
     }
     if (weekParamsRef.current) return { ...weekParamsRef.current, uKbn: uK };
     return null;
-  }, []);
+  }, [weekStart]);
 
   // ── パネル表示切替 ────────────────────────────────────────────────────
   const applyPanelVisibility = useCallback((html: string, hasItems: boolean, opts?: { enterAnim?: boolean }) => {
@@ -174,12 +219,23 @@ export function useCalendarPanel({
     const uK = m.storedUKbn || wp?.uKbn;
     if (!uK || !wp || m.loading) return;
 
-    m.bulkFetching  = true;
-    m.bulkFetchKind = 'initial';
-    const yr        = calendarYearRangeFromIso(wp.start);
-    m.pendingKey    = rangeKey(yr.start, yr.end);
+    m.bulkFetching   = true;
+    m.bulkFetchKind  = 'initial';
+    const yr         = calendarYearRangeFromIso(wp.start);
+    m.bulkPendingKey = rangeKey(yr.start, yr.end);
     pageFetch(propsRef.current.calUrl({ uKbn: uK, start: yr.start, end: yr.end }));
-  }, []);
+    clearBulkWatchdog();
+    bulkWatchdogRef.current = window.setTimeout(() => {
+      const mm = calRef.current;
+      if (!mm.bulkFetching || mm.bulkPendingKey !== rangeKey(yr.start, yr.end)) return;
+      mm.bulkFetching = false;
+      mm.bulkPendingKey = null;
+      mm.bulkFetchKind = null;
+      mm.pendingExtend = null;
+      syncToolbarLockedFromRef();
+    }, 15000);
+    syncToolbarLockedFromRef();
+  }, [clearBulkWatchdog, syncToolbarLockedFromRef]);
 
   // ── ナビゲーション境界チェック（バルク範囲を超えるか） ────────────────
   const atNavBoundary = useCallback((dir: 'prev' | 'next'): boolean => {
@@ -225,10 +281,21 @@ export function useCalendarPanel({
       return;
     }
 
-    m.bulkFetching = true;
-    m.pendingKey   = rangeKey(yr.start, yr.end);
+    m.bulkFetching   = true;
+    m.bulkPendingKey = rangeKey(yr.start, yr.end);
     pageFetch(propsRef.current.calUrl({ uKbn: uK, start: yr.start, end: yr.end }));
-  }, []);
+    clearBulkWatchdog();
+    bulkWatchdogRef.current = window.setTimeout(() => {
+      const mm = calRef.current;
+      if (!mm.bulkFetching || mm.bulkPendingKey !== rangeKey(yr.start, yr.end)) return;
+      mm.bulkFetching = false;
+      mm.bulkPendingKey = null;
+      mm.bulkFetchKind = null;
+      mm.pendingExtend = null;
+      syncToolbarLockedFromRef();
+    }, 15000);
+    syncToolbarLockedFromRef();
+  }, [clearBulkWatchdog, syncToolbarLockedFromRef]);
 
   // ── postMessage ハンドラ（usePortalMessage と信頼条件を共有） ───────────
   const handleCapturedMessage = useCallback((msg: PortalCapturedMessage) => {
@@ -243,8 +310,10 @@ export function useCalendarPanel({
       redrawFromClient,
       redraw,
       queueBulkYearFetch,
+      weekStart,
+      syncToolbarLocked: syncToolbarLockedFromRef,
     });
-  }, [queueBulkYearFetch, redraw, redrawFromClient]);
+  }, [queueBulkYearFetch, redraw, redrawFromClient, weekStart, syncToolbarLockedFromRef]);
 
   usePortalMessage(handleCapturedMessage, { msgTypes: [msgType] });
 
@@ -261,7 +330,9 @@ export function useCalendarPanel({
   // ── 直接フェッチ（月移動など） ────────────────────────────────────────
   const fetchRange = useCallback((params: CalParams, opts?: { lockBodyHeight?: boolean }) => {
     const m   = calRef.current;
-    if (m.loading || m.swipeAnimating) return;
+    // 年バルク取得中に直接フェッチを重ねると、[1] が先に来ても loading が残りツールバーが永久ロックし得る
+    // （週始まりを日曜にした直後の再整列 fetch がバルクと競合しやすい）
+    if (m.loading || m.swipeAnimating || m.bulkFetching) return;
     const uKbn = params.uKbn || m.storedUKbn || weekParamsRef.current?.uKbn;
     if (!uKbn) return;
     m.pendingKey = rangeKey(params.start, params.end);
@@ -281,7 +352,17 @@ export function useCalendarPanel({
     pendingEnterAnimRef.current = false;
     setGridHtml('<p class="p-empty p-cal-loading-msg">読み込み中…</p>');
     pageFetch(propsRef.current.calUrl({ uKbn, start: params.start, end: params.end }));
-  }, []);
+    clearLoadingWatchdog();
+    const pendingKey = m.pendingKey;
+    loadingWatchdogRef.current = window.setTimeout(() => {
+      const mm = calRef.current;
+      if (!mm.loading || mm.pendingKey !== pendingKey) return;
+      mm.loading = false;
+      mm.pendingKey = null;
+      syncToolbarLockedFromRef();
+    }, 15000);
+    syncToolbarLockedFromRef();
+  }, [clearLoadingWatchdog, syncToolbarLockedFromRef]);
 
   // ── クライアントサイドナビゲーション ─────────────────────────────────
   const navigateClientSide = useCallback((dir: 'prev' | 'next') => {
@@ -320,12 +401,14 @@ export function useCalendarPanel({
     skipDomSyncRef.current = true;
     setGridHtml(newHtml);
     m.swipeAnimating = true;
+    syncToolbarLockedFromRef();
     clearCalBodyLoadingAttrs(calBodyRef.current);
     applyCalSwipe(calBodyRef.current, dir, oldHtml, newHtml, () => {
       m.swipeAnimating         = false;
       skipDomSyncRef.current = false;
+      syncToolbarLockedFromRef();
     });
-  }, [viewMetaForRender, visibleParsed]);
+  }, [viewMetaForRender, visibleParsed, syncToolbarLockedFromRef]);
 
   // ── 公開: ナビゲーション ─────────────────────────────────────────────
   const navigate = useCallback((dir: 'prev' | 'next') => {
@@ -347,9 +430,9 @@ export function useCalendarPanel({
     } else if (viewModeRef.current === 'month' && monthRefRef.current && uK) {
       const nr    = shiftMonthRef(monthRefRef.current, dir === 'prev' ? -1 : 1);
       setMonthRef(nr); monthRefRef.current = nr;
-      fetchRange({ uKbn: uK, ...sixWeekRange(nr.y, nr.m) });
+      fetchRange({ uKbn: uK, ...sixWeekRange(nr.y, nr.m, weekStart) });
     }
-  }, [atNavBoundary, fetchRange, navigateClientSide, queueBulkExtend]);
+  }, [atNavBoundary, fetchRange, navigateClientSide, queueBulkExtend, weekStart]);
 
   // ── 公開: モード切替 ─────────────────────────────────────────────────
   const switchMode = useCallback((mode: 'week' | 'month') => {
@@ -375,13 +458,55 @@ export function useCalendarPanel({
     // フェッチ経由の場合、レスポンス受信後にフェードインが走るようフラグを立てる
     m.pendingEnterAnim = true;
     if (mode === 'month' && monthRefRef.current && uK) {
-      fetchRange({ uKbn: uK, ...sixWeekRange(monthRefRef.current.y, monthRefRef.current.m) }, { lockBodyHeight: true });
+      fetchRange({ uKbn: uK, ...sixWeekRange(monthRefRef.current.y, monthRefRef.current.m, weekStart) }, { lockBodyHeight: true });
     } else if (mode === 'week' && weekParamsRef.current) {
       fetchRange(weekParamsRef.current, { lockBodyHeight: true });
     }
-  }, [fetchRange, redrawFromClient]);
+  }, [fetchRange, redrawFromClient, weekStart]);
+
+  /** ストレージ読込前は in-memory 既定の月曜扱い。初回 ready で保存値が日曜なら必ず再整列する */
+  const prevCalendarWeekStartRef = useRef<CalendarWeekStart | null>(null);
+  useEffect(() => {
+    if (!settingsReady) return;
+    if (prevCalendarWeekStartRef.current === null) {
+      prevCalendarWeekStartRef.current = 'monday';
+    }
+    if (prevCalendarWeekStartRef.current === weekStart) return;
+    prevCalendarWeekStartRef.current = weekStart;
+
+    const m  = calRef.current;
+    const uK = m.storedUKbn || weekParamsRef.current?.uKbn;
+
+    if (viewModeRef.current === 'week' && weekParamsRef.current) {
+      const merged: CalParams = calParamsAfterWeekStartChange(
+        weekParamsRef.current,
+        weekStart,
+        toIsoLocal(new Date()),
+      );
+      weekParamsRef.current = merged;
+      setWeekParams(merged);
+      const mr = isoToMonthRef(merged.start);
+      monthRefRef.current = mr;
+      setMonthRef(mr);
+
+      if (m.clientDataMode && m.bulkParsed) redrawFromClient({ enterAnim: false });
+      else if (uK) void fetchRange({ uKbn: uK, ...merged });
+      return;
+    }
+
+    if (viewModeRef.current === 'month' && monthRefRef.current && uK) {
+      if (m.clientDataMode && m.bulkParsed) redrawFromClient({ enterAnim: false });
+      else void fetchRange({ uKbn: uK, ...sixWeekRange(monthRefRef.current.y, monthRefRef.current.m, weekStart) });
+    }
+  }, [weekStart, settingsReady, redrawFromClient, fetchRange]);
 
   // ── 授業カレンダー: King LMS コース一覧の更新 → 再描画 ────────────────
+  useEffect(() => {
+    const m = calRef.current;
+    if (!m.loading) clearLoadingWatchdog();
+    if (!m.bulkFetching) clearBulkWatchdog();
+  }, [gridHtml, clearBulkWatchdog, clearLoadingWatchdog]);
+
   useEffect(() => {
     if (kogiDisplayDeps === undefined) return;
     const m = calRef.current;
@@ -400,9 +525,25 @@ export function useCalendarPanel({
     else if (m.lastParsed) redraw(m.lastItems, m.lastParsed, { enterAnim: false });
   }, [forceVisibleDeps, redraw, redrawFromClient]);
 
+  useEffect(() => () => {
+    clearLoadingWatchdog();
+    clearBulkWatchdog();
+  }, [clearBulkWatchdog, clearLoadingWatchdog]);
+
   // ── 返却値 ───────────────────────────────────────────────────────────
   const modeTitle      = viewMode === 'week' ? titles.week : titles.month;
   const modeGroupLabel = `${titles.week.replace(/^今週の/, '')}カレンダー表示切替`;
 
-  return { calBodyRef, panelVisible, viewMode, calKind, modeTitle, modeGroupLabel, title, switchMode, navigate };
+  return {
+    calBodyRef,
+    panelVisible,
+    viewMode,
+    calKind,
+    modeTitle,
+    modeGroupLabel,
+    title,
+    switchMode,
+    navigate,
+    toolbarLocked,
+  };
 }

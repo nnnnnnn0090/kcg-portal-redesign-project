@@ -1,5 +1,5 @@
 /**
- * King LMS ブリッジ用 URL 判定とリダイレクト先組み立て。
+ * King LMS ページ種別の判定（ログイン誘導・コース・ストリーム等）と、同期後のポータル URL へのハッシュ付与です。
  */
 
 import { KING_LMS_HOSTNAME } from '../../shared/constants';

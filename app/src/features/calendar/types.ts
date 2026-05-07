@@ -1,6 +1,8 @@
 /**
- * カレンダー機能で使う共通型定義。
+ * カレンダー機能で共有する型定義です（API パラメータ・イベント・描画メタ情報）。
  */
+
+import type { CalendarWeekStart } from '../../lib/date';
 
 /** カレンダー API リクエストの uKbn + 半開区間 [start, end) */
 export interface CalParams {
@@ -18,6 +20,8 @@ export interface CalEvent {
   calTime?: string;
   /** ISO 8601 日時文字列。API によっては日時まで含む場合がある */
   start?:   string;
+  /** 課題カレンダー: streams の event_type から推定。未設定はストリーム情報なし（バッジ非表示） */
+  assignmentSubmitted?: boolean;
 }
 
 /** グリッド描画時の表示オプション */
@@ -27,4 +31,6 @@ export interface ViewMeta {
   /** 授業カレンダー（kogi）で King LMS コース URL の解決に使う */
   kingLmsCourses: Array<{ displayName?: string; externalAccessUrl?: string }>;
   calKind:        string;
+  /** 週列の左端。`range` の `start` 日の曜日と一致すること */
+  weekStart:      CalendarWeekStart;
 }

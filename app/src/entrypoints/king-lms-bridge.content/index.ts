@@ -1,4 +1,7 @@
-/** king-lms-bridge.content — King LMS 上の postMessage → storage とリダイレクト */
+/**
+ * King LMS オリジンで `document_start` に読み込まれる content script です。
+ * `king-lms-hooks` が同一ページの MAIN ワールドでフックした結果を `postMessage` 経由で受け、ストレージとリダイレクトを扱います。
+ */
 
 import { KING_LMS_ORIGIN } from '../../shared/constants';
 import { isLoginRedirectPage } from './bridge-urls';

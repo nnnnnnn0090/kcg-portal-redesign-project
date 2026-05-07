@@ -1,6 +1,6 @@
 /**
- * ポータル API の URL ビルダーと `pageFetch` ユーティリティ。
- * 各エンドポイントの URL を組み立て、fetch 橋渡しリクエストを postMessage で送出する。
+ * ポータル公式 API の URL 組み立てと、`pageFetch` による認証付き再取得のユーティリティです。
+ * 再取得は `postMessage` で `portal-hooks`（MAIN）側のブリッジへ依頼します。
  */
 
 import { FETCH_HOOK } from '../shared/constants';
@@ -91,7 +91,8 @@ export function pageFetch(url: string): void {
 /** カレンダー API のリクエスト URL から { uKbn, start, end } を取り出す */
 export function parseCalendarRequest(href: string): CalParams | null {
   try {
-    const u = new URL(href, location.origin);
+    const abs = /^https?:\/\//i.test(href);
+    const u = abs ? new URL(href) : new URL(href, location.origin);
     const start = u.searchParams.get('start');
     const end   = u.searchParams.get('end');
     const uKbn  = u.searchParams.get('uKbn') ?? '1';

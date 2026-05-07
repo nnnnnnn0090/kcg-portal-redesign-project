@@ -1,10 +1,10 @@
 /**
- * カレンダーイベントのツールチップとコンテキストメニューを管理するカスタムフック。
- * #portal-overlay への委譲イベントリスナーとして動作する。
- * tooltip / メニュー DOM は CalendarOverlayUiProvider の ref を使う。
+ * カレンダーイベントのツールチップとコンテキストメニューを担うフックです。
+ * `#portal-overlay` 上のキャプチャ段階のポインタ／コンテキストメニューイベントを処理し、表示 DOM は `CalendarOverlayUiProvider` の ref 経由で更新します。
  */
 
 import { useEffect, useRef, type RefObject } from 'react';
+import { afterLayout } from './anim';
 import { esc, setHtml } from '../../lib/dom';
 import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
 import { formatRemainingUntilDue } from './assignment';
@@ -12,6 +12,11 @@ import { syllabusUrl, findKingLmsUrl } from './kogi';
 import { useCourses, type CourseRow } from '../../context/courses';
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
 import { usePortalDom } from '../../context/portalDom';
+
+/** tooltip 先頭の「コード：」は左ラベルに寄せるため、値から除く */
+function stripLeadingCodeJaPrefix(raw: string): string {
+  return raw.replace(/^\s*コード\s*[：:]\s*/i, '').trim();
+}
 
 function attachCalendarTooltipAndContextMenu(
   overlayRoot: HTMLElement,
@@ -50,26 +55,134 @@ function attachCalendarTooltipAndContextMenu(
     const meta  = anchor.dataset.calMeta  || '';
     const tip   = (anchor.dataset.calTip  || '').trim();
     const time  = (anchor.dataset.calTime || '').trim();
+    const kind  = anchor.dataset.calKind || '';
+    const sub   = anchor.dataset.calAssignmentSubmitted;
+
     if (!title && !meta && !tip && !time) return;
 
-    const parts = [`<div class="p-cal-pop-title">${esc(title || '（無題）')}</div>`];
-    if (time) {
-      const dueIso = (anchor.dataset.calDueIso || '').trim();
-      const remain = dueIso ? formatRemainingUntilDue(dueIso) : null;
-      const remainHtml = remain
-        ? `<span class="p-cal-pop-remain">${esc(remain)}</span>`
-        : '';
-      parts.push(`<div class="p-cal-pop-time">${esc(time)}${remainHtml}</div>`);
+    // 課題: 左レール＋1行1項目
+    if (kind === 'assignment') {
+      const pending = sub === 'false';
+      const blocks: string[] = [];
+      blocks.push(`<div class="p-cal-pop-title">${esc(title || '（無題）')}</div>`);
+      blocks.push(
+        `<div class="p-cal-pop-rail-wrap"><div class="p-cal-pop-rail-body${pending ? ' p-cal-pop-rail-body--pending' : ''}">`,
+      );
+      if (pending) {
+        blocks.push('<p class="p-cal-pop-rail-pending" role="status">未提出</p>');
+      }
+      if (meta) {
+        blocks.push(
+          '<p class="p-cal-pop-rail-kv">'
+          + '<span class="p-cal-pop-rail-k">コース</span>'
+          + `<span class="p-cal-pop-rail-v">${esc(meta)}</span>`
+          + '</p>',
+        );
+      }
+      if (time) {
+        const dueIso = (anchor.dataset.calDueIso || '').trim();
+        const remain = dueIso ? formatRemainingUntilDue(dueIso) : null;
+        const remainHtml = remain
+          ? `<span class="p-cal-pop-remain">${esc(remain)}</span>`
+          : '';
+        blocks.push(
+          '<div class="p-cal-pop-rail-due">'
+          + '<p class="p-cal-pop-rail-kv p-cal-pop-rail-kv--due">'
+          + '<span class="p-cal-pop-rail-k">期限</span>'
+          + `<span class="p-cal-pop-rail-v p-cal-pop-rail-v--due">`
+          + `<span class="p-cal-pop-due-primary">${esc(time)}</span>${remainHtml}`
+          + '</span></p></div>',
+        );
+      }
+      blocks.push('</div></div>');
+      setHtml(hoverPopEl, blocks.join(''));
+      hoverPopEl.hidden = false;
+      afterLayout(() => positionHover(anchor));
+      return;
     }
-    if (meta) parts.push(`<div class="p-cal-pop-meta">${esc(meta)}</div>`);
+
+    const blocks: string[] = [];
+    blocks.push(`<div class="p-cal-pop-title">${esc(title || '（無題）')}</div>`);
+
+    let thirdLine = '';
     if (tip && tip !== title.trim()) {
       const lines = tip.split('\n').map((l) => l.trimEnd()).filter(Boolean);
-      const third = lines[2] || '';
-      if (third) parts.push(`<div class="p-cal-pop-detail"><div class="p-cal-pop-dline">${esc(third)}</div></div>`);
+      thirdLine = stripLeadingCodeJaPrefix(lines[2] || '');
     }
-    setHtml(hoverPopEl, parts.join(''));
+
+    const kogiPeriod = (anchor.dataset.calKogiPeriod || '').trim();
+    const kogiRoom   = (anchor.dataset.calKogiRoom || '').trim();
+    const useKogiSplit = kind === 'kogi' && (kogiPeriod !== '' || kogiRoom !== '');
+
+    const hasRailBody = Boolean(time || thirdLine || meta || useKogiSplit);
+
+    blocks.push('<div class="p-cal-pop-rail-wrap"><div class="p-cal-pop-rail-body">');
+
+    if (hasRailBody) {
+      if (time) {
+        const dueIso = (anchor.dataset.calDueIso || '').trim();
+        const remain = dueIso ? formatRemainingUntilDue(dueIso) : null;
+        const remainHtml = remain
+          ? `<span class="p-cal-pop-remain">${esc(remain)}</span>`
+          : '';
+        if (remainHtml) {
+          blocks.push(
+            '<div class="p-cal-pop-rail-due">'
+            + '<p class="p-cal-pop-rail-kv p-cal-pop-rail-kv--due">'
+            + '<span class="p-cal-pop-rail-k">時間</span>'
+            + '<span class="p-cal-pop-rail-v p-cal-pop-rail-v--due">'
+            + `<span class="p-cal-pop-due-primary">${esc(time)}</span>${remainHtml}`
+            + '</span></p></div>',
+          );
+        } else {
+          blocks.push(
+            '<p class="p-cal-pop-rail-kv">'
+            + '<span class="p-cal-pop-rail-k">時間</span>'
+            + `<span class="p-cal-pop-rail-v">${esc(time)}</span>`
+            + '</p>',
+          );
+        }
+      }
+      if (useKogiSplit) {
+        if (kogiPeriod !== '') {
+          blocks.push(
+            '<p class="p-cal-pop-rail-kv">'
+            + '<span class="p-cal-pop-rail-k">時限</span>'
+            + `<span class="p-cal-pop-rail-v">${esc(kogiPeriod)}</span>`
+            + '</p>',
+          );
+        }
+        if (kogiRoom !== '') {
+          blocks.push(
+            '<p class="p-cal-pop-rail-kv">'
+            + '<span class="p-cal-pop-rail-k">教室</span>'
+            + `<span class="p-cal-pop-rail-v">${esc(kogiRoom)}</span>`
+            + '</p>',
+          );
+        }
+      } else if (meta) {
+        blocks.push(
+          '<p class="p-cal-pop-rail-kv">'
+          + '<span class="p-cal-pop-rail-k">情報</span>'
+          + `<span class="p-cal-pop-rail-v">${esc(meta)}</span>`
+          + '</p>',
+        );
+      }
+      if (thirdLine) {
+        blocks.push(
+          '<p class="p-cal-pop-rail-kv p-cal-pop-rail-kv--note">'
+          + '<span class="p-cal-pop-rail-k">コード</span>'
+          + `<span class="p-cal-pop-rail-v">${esc(thirdLine)}</span>`
+          + '</p>',
+        );
+      }
+    }
+
+    blocks.push('</div></div>');
+
+    setHtml(hoverPopEl, blocks.join(''));
     hoverPopEl.hidden = false;
-    requestAnimationFrame(() => requestAnimationFrame(() => positionHover(anchor)));
+    afterLayout(() => positionHover(anchor));
   }
 
   function onMouseOver(e: MouseEvent) {
@@ -138,7 +251,7 @@ function attachCalendarTooltipAndContextMenu(
 
     menuEl.hidden = false;
     positionMenu(e.clientX, e.clientY);
-    requestAnimationFrame(() => requestAnimationFrame(() => positionMenu(e.clientX, e.clientY)));
+    afterLayout(() => positionMenu(e.clientX, e.clientY));
   }
 
   function onMenuClick(e: MouseEvent) {
@@ -183,7 +296,10 @@ function attachCalendarTooltipAndContextMenu(
   };
 }
 
-export function useCalendarInteractions(): void {
+/**
+ * @param calendarInteractionEpoch ルートやレイアウトが変わったときに変えると、DOM アンカー再マウント後にリスナーを張り直す
+ */
+export function useCalendarInteractions(calendarInteractionEpoch: string | number): void {
   const { courses } = useCourses();
   const coursesRef  = useRef(courses);
   coursesRef.current = courses;
@@ -207,5 +323,5 @@ export function useCalendarInteractions(): void {
       coursesRef,
       settingsPopRef,
     );
-  }, [hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef, overlayRoot, settingsPopRef]);
+  }, [hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef, overlayRoot, settingsPopRef, calendarInteractionEpoch]);
 }

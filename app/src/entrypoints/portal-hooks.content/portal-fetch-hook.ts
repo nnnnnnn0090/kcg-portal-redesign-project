@@ -1,4 +1,7 @@
-/** window.fetch のラップ、対象 API の JSON を dispatch へ渡す（リプレイ用リスナー含む） */
+/**
+ * `window.fetch` をラップし、フック対象のポータル API レスポンス JSON を `dispatch` へ渡します。
+ * 同一タブ向けのリプレイ用 `message` リスナーもここで登録します。
+ */
 
 import { devWarn } from '../../lib/debug';
 import { FETCH_HOOK } from '../../shared/constants';

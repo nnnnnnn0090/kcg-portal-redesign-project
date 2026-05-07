@@ -39,16 +39,84 @@ export function enumerateRange(startIso: string, endIso: string): string[] {
 
 // ─── 週・月範囲 ───────────────────────────────────────────────────────────────
 
-/** 指定日以前の最も近い月曜日 */
+/** カレンダーグリッド左端の曜日 */
+export type CalendarWeekStart = 'monday' | 'sunday';
+
+/** storage 等の生値を正規化（不正値は月曜扱い） */
+export function parseCalendarWeekStart(raw: unknown): CalendarWeekStart {
+  return raw === 'sunday' ? 'sunday' : 'monday';
+}
+
+/** 指定日以前の最も近い月曜日（ローカル日付の暦日境界） */
 function mondayOnOrBefore(d: Date): Date {
   const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   x.setDate(x.getDate() - (x.getDay() + 6) % 7);
   return x;
 }
 
-/** 指定年月の月カレンダーを 6 週分で表示する範囲（月曜始まり） */
-export function sixWeekRange(year: number, monthIndex: number): { start: string; end: string } {
-  const start = mondayOnOrBefore(new Date(year, monthIndex, 1));
+/** 指定日以前の最も近い日曜日 */
+function sundayOnOrBefore(d: Date): Date {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() - x.getDay());
+  return x;
+}
+
+/** 週の左端（カレンダー列の最初の日）が weekStart と一致するよう、その日以前で直近の日を返す */
+export function weekStartOnOrBefore(d: Date, weekStart: CalendarWeekStart): Date {
+  return weekStart === 'sunday' ? sundayOnOrBefore(d) : mondayOnOrBefore(d);
+}
+
+/**
+ * 指定ローカル日を含む週の [start, start+7)（半開区間）。
+ * start は常に weekStart に整合した暦日。
+ */
+export function weekRangeContaining(
+  iso: string,
+  weekStart: CalendarWeekStart = 'monday',
+): { uKbn: string; start: string; end: string } {
+  const d     = parseIsoLocal(iso);
+  const strip = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const left  = weekStartOnOrBefore(strip, weekStart);
+  const start = toIsoLocal(left);
+  return { uKbn: '0', start, end: addDaysIso(start, 7) };
+}
+
+/**
+ * 週始まり（設定）変更時に、表示中の週レンジを新しい週境界へ載せ替えるためのアンカー日付。
+ * 今日が表示週内なら今日、そうでなければ週の前半付近の代表日を使う。
+ */
+export function calendarRealignAnchorIso(
+  todayIso: string,
+  visibleRange: { start: string; end: string },
+): string {
+  if (todayIso >= visibleRange.start && todayIso < visibleRange.end) return todayIso;
+  return addDaysIso(visibleRange.start, 3);
+}
+
+/**
+ * 表示中の週パラメータと新しい週始まり設定から、API 用の週範囲を組み直す（uKbn は既存を優先）。
+ */
+export function calParamsAfterWeekStartChange(
+  current: { uKbn: string; start: string; end: string },
+  nextWeekStart: CalendarWeekStart,
+  todayIso: string,
+): { uKbn: string; start: string; end: string } {
+  const anchor = calendarRealignAnchorIso(todayIso, current);
+  const wr     = weekRangeContaining(anchor, nextWeekStart);
+  return {
+    uKbn: current.uKbn || wr.uKbn,
+    start: wr.start,
+    end:   wr.end,
+  };
+}
+
+/** 指定年月の月カレンダーを 6 週分で表示する範囲（週の左端は weekStart） */
+export function sixWeekRange(
+  year: number,
+  monthIndex: number,
+  weekStart: CalendarWeekStart = 'monday',
+): { start: string; end: string } {
+  const start = weekStartOnOrBefore(new Date(year, monthIndex, 1), weekStart);
   const end = new Date(start);
   end.setDate(end.getDate() + 42);
   return { start: toIsoLocal(start), end: toIsoLocal(end) };

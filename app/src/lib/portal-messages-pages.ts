@@ -1,4 +1,6 @@
-/** ホーム以外のページ向け portal postMessage の reducer */
+/**
+ * ホーム以外の各ページ向けに、`portal-hooks` から届く `postMessage` を解釈して状態を更新します。
+ */
 
 import { MSG } from '../shared/constants';
 import type { NewsListItem, PortalCapturedMessage } from '../shared/types';

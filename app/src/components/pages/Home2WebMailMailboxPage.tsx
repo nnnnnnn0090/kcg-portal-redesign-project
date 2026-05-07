@@ -1,4 +1,4 @@
-/** Home2 Web メール mailhead: 受信一覧オーバーレイ */
+/** Home2 Web メールの受信一覧（mailhead）オーバーレイです。 */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatHome2MailDateForDisplay, home2MailDateTimeIso, parseHome2MailDateMs } from '../../lib/format-home2-mail-date';

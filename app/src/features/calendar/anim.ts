@@ -1,6 +1,6 @@
 /**
- * カレンダーのアニメーション・DOM 操作ユーティリティ。
- * スワイプ・フェードイン・高さアニメーションと、それを支える transition 待機ヘルパーを提供する。
+ * カレンダー周りのアニメーションと、それに伴う軽い DOM 操作ユーティリティです。
+ * 週送りのスワイプやモード切替のフェード、`transitionend` の待機などを担います。
  */
 
 import { setHtml } from '../../lib/dom';
@@ -68,8 +68,8 @@ export function waitForAnimation(el: Element, callback: () => void, maxMs = 500)
 // ─── ローディング属性のクリア ─────────────────────────────────────────────
 
 /**
- * calBody の data-cal-loading / data-cal-mode / minHeight をクリアする。
- * ローディング中に仮設定した最低高さを解除するために呼ぶ。
+ * カレンダー本体要素の `data-cal-loading` / `data-cal-mode` と `minHeight` を消します。
+ * ローディング中に仮で入れた最低高さを外すために呼びます。
  */
 export function clearCalBodyLoadingAttrs(mount: HTMLElement | null | undefined): void {
   if (!mount) return;
@@ -81,8 +81,8 @@ export function clearCalBodyLoadingAttrs(mount: HTMLElement | null | undefined):
 // ─── スワイプアニメーション ───────────────────────────────────────────────
 
 /**
- * 前週/次週ナビゲーション時のスライドアニメーション。
- * oldHtml → newHtml をスライドトランジションで切り替える。
+ * 前週・次週へ移るときのスライド切り替えです。
+ * `oldHtml` から `newHtml` へトランジションで渡します。
  */
 export function applyCalSwipe(
   bodyEl: HTMLElement | null,
@@ -124,10 +124,10 @@ export function applyCalSwipe(
 // ─── モード切替アニメーション ─────────────────────────────────────────────
 
 /**
- * 週/月切替時のフェードインアニメーションを再生する。
- * setHtml の直後（ブラウザの初回ペイント前）に呼ぶこと。
- * animation-fill-mode: both により、クラス付与と同時に from キーフレーム（opacity:0）が適用されるため
- * グリッドが一瞬表示されてから消えるフリッカーが起きない。afterLayout は不要。
+ * 週表示と月表示を切り替えるときのフェードインを再生します。
+ * `setHtml` の直後（初回ペイント前）に呼ぶ想定です。
+ * `animation-fill-mode: both` により、クラス付与と同時に `opacity: 0` の開始フレームが効くため、
+ * グリッドが一瞬見えてから消えるチラつきを抑えます（`afterLayout` は不要）。
  */
 export function playCalModeEnterAnim(bodyEl: HTMLElement | null): void {
   if (!bodyEl || prefersReducedMotion()) return;
@@ -143,8 +143,8 @@ export function playCalModeEnterAnim(bodyEl: HTMLElement | null): void {
 // ─── 高さアニメーション ───────────────────────────────────────────────────
 
 /**
- * HTML をセットしながら高さをスムーズにアニメーションさせる。
- * 高さの差が 3px 未満のときはアニメーションをスキップする。
+ * HTML を差し替えつつ、高さの変化をスムーズに見せます。
+ * 高さ差が 3px 未満ならアニメーションは行いません。
  */
 export function setCalBodyHtmlSmooth(
   el: HTMLElement | null,

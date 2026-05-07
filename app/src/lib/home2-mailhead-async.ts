@@ -1,4 +1,6 @@
-/** mailhead.aspx 一覧のページャーを fetch で同期 */
+/**
+ * Home2 Web メールの `mailhead.aspx` 受信一覧で、ページャー操作を `fetch` により同期します。
+ */
 
 const FORM_ID = 'ctl01';
 

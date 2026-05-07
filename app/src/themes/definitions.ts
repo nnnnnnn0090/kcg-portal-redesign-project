@@ -1,7 +1,6 @@
 /**
- * カラーテーマのトークン定義。
- * 各テーマは CSS カスタムプロパティに展開される。
- * grape まではここに置き、それ以降は additional-themes.ts（旧 app/early/theme.js 由来）。
+ * カラーテーマのトークン定義です。
+ * 既定テーマおよび主要色はここに置き、追加パレットは `additional-themes.ts` に分離しています。
  */
 
 import type { ThemeTokens } from './theme-tokens';

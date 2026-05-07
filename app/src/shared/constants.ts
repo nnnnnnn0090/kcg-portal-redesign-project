@@ -1,6 +1,6 @@
 /**
- * 拡張機能全体で共有する定数。
- * ストレージキー（SK）・ページ識別子（PAGE）・メッセージ種別（MSG）などを一元管理する。
+ * 拡張機能全体で共有する定数です。
+ * `chrome.storage.local` のキー（`SK`）、ページ識別子（`PAGE`）、`postMessage` 種別（`MSG` など）をここに集約しています。
  */
 
 // ─── chrome.storage.local のキー ───────────────────────────────────────────
@@ -22,12 +22,18 @@ export const SK = {
   kingLmsAssignmentSyncPending:     'portalThemeKingLmsAssignmentSyncPending',
   kingLmsAssignmentSyncReturnUrl:   'portalThemeKingLmsAssignmentSyncReturnUrl',
   kingLmsAssignmentSyncAwaitStream: 'portalThemeKingLmsAssignmentSyncAwaitStream',
+  /** 課題同期でホームへ戻った直後、課題カレンダーへスクロールする（読み取り後に false に戻す） */
+  portalScrollToAssignmentOnce:   'portalThemeScrollToAssignmentOnce',
   shortcutConfig:                   'portalThemeShortcutConfig',
   /** 初回の案内チュートリアルを完了（またはスキップ）したら true */
   portalGuidedTourDone:             'portalThemePortalGuidedTourDone',
   home2WebMailOverlay:              'portalThemeHome2WebMailOverlay',
+  /** カレンダーグリッドの週の左端: `monday` | `sunday` */
+  calendarWeekStart:               'portalThemeCalendarWeekStart',
   /** 更新通知済みの拡張 manifest version（`readExtensionVersion()` と比較） */
   extensionVersionSeen:            'portalThemeExtensionVersionSeen',
+  /** 開発者お知らせパネルの表示言語（`ja` / `en` / `zh` / `zh_TW` / `ko` / `vi` / `ne` / `id` / `th`） */
+  developerNoticeLang:             'portalThemeDeveloperNoticeLang',
 } as const;
 
 // ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
@@ -132,6 +138,9 @@ export const FETCH_HOOK = {
   /** pageFetch 依頼 */
   pageFetch:     'portalThemePageFetchRequest',
 } as const;
+
+/** `window` で発火。`X-CPAuthorize` がキャプチャされたあと pageFetch ブリッジが待機解除する */
+export const PORTAL_CP_AUTHORIZE_READY = 'portalCpAuthorizeReady' as const;
 
 // ─── King LMS 同期ハッシュ（location.hash で結果を伝達する） ───────────────
 

@@ -1,4 +1,4 @@
-/** Home2 Web メール sendmail 送信 */
+/** Home2 Web メールの送信（sendmail）画面です。 */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 

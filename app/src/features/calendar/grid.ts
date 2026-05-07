@@ -1,18 +1,22 @@
 /**
- * カレンダーグリッドの HTML 文字列を構築するピュア関数群。
- * DOM 操作は行わず、`buildCalendarGridHtml` が返す文字列を `calBody.innerHTML` に設定する。
+ * カレンダーグリッドの HTML 文字列を組み立てる純関数群です。
+ * DOM には触れず、`buildCalendarGridHtml` の戻り値を `innerHTML` へ代入する想定です。
  */
 
-import { enumerateRange, parseIsoLocal, toIsoLocal, calEventDayIso } from '../../lib/date';
+import { enumerateRange, parseIsoLocal, toIsoLocal, calEventDayIso, type CalendarWeekStart } from '../../lib/date';
 import { esc, escAttr, plainFromHtml } from '../../lib/dom';
 import { parseKogiMeta, parseLeadingPeriodTitle, kogiPeriodNum, kogiPeriodTimeRange, findKingLmsUrl, syllabusUrl } from './kogi';
 import type { CalEvent, ViewMeta } from './types';
 
-const WEEKDAY_LABELS = ['月', '火', '水', '木', '金', '土', '日'];
+/** 列順は `enumerateRange` と一致するよう weekStart に応じて並べる */
+function weekdayLabels(weekStart: CalendarWeekStart): string[] {
+  const monFirst = ['月', '火', '水', '木', '金', '土', '日'];
+  return weekStart === 'sunday' ? ['日', '月', '火', '水', '木', '金', '土'] : monFirst;
+}
 
 // ─── 1 日分のイベント HTML ────────────────────────────────────────────────
 
-function buildDayEventsHtml(dayItems: CalEvent[], opts: ViewMeta): string {
+function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind' | 'mode' | 'kingLmsCourses'>): string {
   const { calKind, mode, kingLmsCourses } = opts;
   const parts: string[] = [];
   let prevPeriod: number | null = null;
@@ -50,15 +54,35 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: ViewMeta): string {
     const dueIsoAttr = calKind === 'assignment' && String(ev.start ?? '').trim()
       ? ` data-cal-due-iso="${escAttr(String(ev.start).trim())}"`
       : '';
+    const kogiPeriodAttr = calKind === 'kogi' && period
+      ? ` data-cal-kogi-period="${escAttr(String(period).trim())}"`
+      : '';
+    const kogiRoomAttr = calKind === 'kogi' && room
+      ? ` data-cal-kogi-room="${escAttr(String(room).trim())}"`
+      : '';
+    const sub = ev.assignmentSubmitted;
+    const subAttr = calKind === 'assignment' && sub !== undefined
+      ? ` data-cal-assignment-submitted="${sub ? 'true' : 'false'}"`
+      : '';
+    const pendingBadge = calKind === 'assignment' && sub === false
+      ? '<span class="p-cal-ev-pending-badge" aria-hidden="true">未提出</span>'
+      : '';
     const dataAttrs = `data-cal-title="${escAttr(ev.title ?? '')}" `
       + `data-cal-meta="${escAttr(meta)}" `
       + `data-cal-tip="${escAttr(tipPlain)}" `
-      + `data-cal-time="${escAttr(timeRange)}"${kindAttr}${dueIsoAttr}`;
-    const inner = `<span class="p-cal-ev-title">${esc(ev.title ?? '')}</span>${metaHtml}`;
+      + `data-cal-time="${escAttr(timeRange)}"${kindAttr}${dueIsoAttr}${subAttr}${kogiPeriodAttr}${kogiRoomAttr}`;
+    const titleSpan = `<span class="p-cal-ev-title">${esc(ev.title ?? '')}</span>`;
+    const inner = calKind === 'assignment' && sub === false
+      ? `<span class="p-cal-ev-head">${titleSpan}${pendingBadge}</span>${metaHtml}`
+      : `${titleSpan}${metaHtml}`;
+    const evClasses = ['p-cal-ev'];
+    if (calKind === 'assignment' && sub === true) evClasses.push('is-assignment-done');
+    if (calKind === 'assignment' && sub === false) evClasses.push('is-assignment-pending');
+    const evClass = evClasses.join(' ');
 
     parts.push(href
-      ? `<a class="p-cal-ev" href="${escAttr(href)}" target="_blank" rel="noopener noreferrer" ${dataAttrs}>${inner}</a>`
-      : `<div class="p-cal-ev" ${dataAttrs}>${inner}</div>`);
+      ? `<a class="${escAttr(evClass)}" href="${escAttr(href)}" target="_blank" rel="noopener noreferrer" ${dataAttrs}>${inner}</a>`
+      : `<div class="${escAttr(evClass)}" ${dataAttrs}>${inner}</div>`);
 
     if (pNum !== null) prevPeriod = pNum;
   }
@@ -87,6 +111,7 @@ export function buildCalendarGridHtml(
   const monthRef       = viewMeta?.monthRef ?? null;
   const kingLmsCourses = Array.isArray(viewMeta?.kingLmsCourses) ? viewMeta.kingLmsCourses : [];
   const calKind        = viewMeta?.calKind ?? '';
+  const weekStart      = viewMeta?.weekStart ?? 'monday';
   const todayIso       = toIsoLocal(new Date());
 
   // イベントを日付でグループ化
@@ -99,7 +124,7 @@ export function buildCalendarGridHtml(
     else byDay.set(day, [item]);
   }
 
-  const heads = WEEKDAY_LABELS.map((w) => `<div class="p-cal-wd">${w}</div>`).join('');
+  const heads = weekdayLabels(weekStart).map((w) => `<div class="p-cal-wd">${w}</div>`).join('');
 
   const cells = days.map((iso) => {
     const d       = parseIsoLocal(iso);
@@ -123,7 +148,7 @@ export function buildCalendarGridHtml(
       });
     }
 
-    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, kingLmsCourses, monthRef });
+    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, kingLmsCourses });
     const cls     = ['p-cal-cell', isMuted && 'is-muted', isToday && 'is-today'].filter(Boolean).join(' ');
     const ariaCur = isToday ? ' aria-current="date"' : '';
 

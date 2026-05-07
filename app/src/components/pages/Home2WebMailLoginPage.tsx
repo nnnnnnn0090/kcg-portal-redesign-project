@@ -1,4 +1,4 @@
-/** Home2 Web メール Default.aspx ログイン */
+/** Home2 Web メールのログイン（Default.aspx）です。 */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HOME2_MAIL_DEFAULT_URL, HOME2_ORIGIN } from '../../shared/constants';

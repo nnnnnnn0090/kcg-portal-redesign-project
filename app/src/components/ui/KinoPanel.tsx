@@ -1,6 +1,6 @@
 /**
- * キノメッセージ（ポータルお知らせ）パネル。
- * 旧 app/pages/home.js の #p-kino-panel 構造と renderers/kino.js の表示ロジックに合わせる。
+ * キノメッセージ（ポータルお知らせ）パネルです。
+ * 公式ポータルホームの該当パネルと同様の情報構造で表示します。
  */
 
 import { formatMessageBody } from '../../lib/dom';

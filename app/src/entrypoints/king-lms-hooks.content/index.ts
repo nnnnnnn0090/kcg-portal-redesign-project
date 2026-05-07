@@ -1,4 +1,7 @@
-/** king-lms-hooks.content — King LMS の fetch / XHR フック */
+/**
+ * King LMS オリジンで `document_start`・MAIN ワールドとして読み込まれます。
+ * `fetch` / XHR をフックし、コース一覧や streams/ultra の結果を同一タブの `king-lms-bridge` へ `postMessage` します。
+ */
 
 import { KING_LMS_HOOK, KING_LMS_HOSTNAME, KING_LMS_ORIGIN } from '../../shared/constants';
 
@@ -35,10 +38,14 @@ interface CourseEntry {
 }
 
 interface DueItem {
-  courseId:   unknown;
-  courseName: string;
-  title:      unknown;
-  dueDate:    string;
+  courseId:          unknown;
+  courseName:        string;
+  title:             unknown;
+  dueDate:           string;
+  /** notificationDetails.sourceId（同一課題の複数ストリーム行のマージに使用） */
+  sourceId?:         string;
+  /** extraAttribs.event_type（例 UA:DUE, UA:UA_AVAIL） */
+  streamEventType?: string;
 }
 
 // ─── ハンドラ ─────────────────────────────────────────────────────────────────
@@ -70,46 +77,76 @@ function courseIdToNameMap(json: unknown): Record<string, string> {
   return map;
 }
 
-function notifyStreamsFailure(): void {
+/**
+ * streams/ultra の結果を `king-lms-bridge` へ渡すための `postMessage` です。
+ * `bridge-message-listener` が受け取り、`saveAssignmentDue` でストレージに反映されます。
+ */
+function postStreamsUltraDue(
+  items: DueItem[],
+  capturedAt: number,
+  extra?: {
+    captureState?: 'error';
+    assignmentSyncNoOp?: boolean;
+  },
+): void {
   try {
-    window.postMessage({
-      type: KING_LMS_HOOK.streamsDuePostType,
-      source: KING_LMS_HOOK.source,
-      items: [],
-      capturedAt: Date.now(),
-      captureState: 'error',
-    }, '*');
+    window.postMessage(
+      {
+        type: KING_LMS_HOOK.streamsDuePostType,
+        source: KING_LMS_HOOK.source,
+        items,
+        capturedAt,
+        ...extra,
+      },
+      '*',
+    );
   } catch {}
 }
 
+function notifyStreamsFailure(): void {
+  postStreamsUltraDue([], Date.now(), { captureState: 'error' });
+}
 function handleStreamsUltra(json: unknown): void {
   try {
     if (!json || typeof json !== 'object') { notifyStreamsFailure(); return; }
     const se = (json as Record<string, unknown>).sv_streamEntries;
     if (!Array.isArray(se)) { notifyStreamsFailure(); return; }
+    // 空配列のときは未ロードのダミー応答のことがある。同レス内の締切など他フィールドも信用せず、bridge へは送らない。
     if (se.length === 0) return;
     const nameByCourseId = courseIdToNameMap(json);
     const slim: DueItem[] = [];
     for (const item of se) {
-      const isd = (item as Record<string, unknown>)?.itemSpecificData as Record<string, unknown>;
+      const row = item as Record<string, unknown>;
+      const isd = row?.itemSpecificData as Record<string, unknown>;
       const nd  = isd?.notificationDetails as Record<string, unknown>;
       const dd  = nd?.dueDate;
       if (dd == null || String(dd).trim() === '') continue;
       const cid    = nd?.courseId;
       const cidStr = cid != null ? String(cid) : '';
+      const extra  = row?.extraAttribs as Record<string, unknown> | undefined;
+      const evtRaw = extra?.event_type;
+      const sidRaw = nd?.sourceId;
+      const streamEventType = evtRaw != null && String(evtRaw).trim() !== ''
+        ? String(evtRaw).trim()
+        : undefined;
+      const sourceId = sidRaw != null && String(sidRaw).trim() !== ''
+        ? String(sidRaw).trim()
+        : undefined;
       slim.push({
         courseId:   cid,
         courseName: cidStr && nameByCourseId[cidStr] != null ? nameByCourseId[cidStr] : '',
         title:      isd?.title,
         dueDate:    String(dd),
+        sourceId,
+        streamEventType,
       });
     }
-    window.postMessage({
-      type: KING_LMS_HOOK.streamsDuePostType,
-      source: KING_LMS_HOOK.source,
-      items: slim,
-      capturedAt: Date.now(),
-    }, '*');
+    /** 行はあるが締切が取れないレスは空保存しない（別レスとのレースで一覧が消える）。同期完了だけ bridge へ委譲 */
+    if (slim.length === 0) {
+      postStreamsUltraDue([], Date.now(), { assignmentSyncNoOp: true });
+      return;
+    }
+    postStreamsUltraDue(slim, Date.now());
   } catch { notifyStreamsFailure(); }
 }
 
@@ -162,7 +199,7 @@ function installKingLmsHook(): void {
     return origSend.apply(this, arguments as unknown as Parameters<typeof origSend>);
   };
 
-  // ログインリダイレクト検知
+  /** ルート URL かつ `new_loc` クエリでログインへ飛ばされるとき、同期ペンディングを打ち切る `postMessage` を送ります。 */
   function notifyLoginRedirect(): void {
     try {
       if (location.hostname !== KING_LMS_HOSTNAME) return;

@@ -1,4 +1,6 @@
-/** King LMS 同期結果の location.hash 読み取り */
+/**
+ * King LMS からポータルへ戻った直後の `location.hash` を解釈し、トースト用メッセージを返します。
+ */
 
 import { SK, SYNC_HASH } from '../shared/constants';
 import storage from '../lib/storage';

@@ -1,6 +1,9 @@
+/**
+ * メイン定義以外の追加カラーテーマ（従来のブラウザ拡張テーマ群と同じ配色セット）です。
+ */
+
 import type { ThemeTokens } from './theme-tokens';
 
-/** 旧 app/early/theme.js の grape 以降（レガシーアプリと同一セット） */
 export const ADDITIONAL_THEMES: Record<string, ThemeTokens> = {
 indigo: {
   name: 'インディゴ',

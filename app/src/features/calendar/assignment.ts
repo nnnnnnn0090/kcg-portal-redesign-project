@@ -1,8 +1,8 @@
 /**
- * King LMS の課題データをカレンダーイベントに変換するアダプタ。
+ * King LMS の streams 由来データを、カレンダー描画用の `CalEvent` へ変換するアダプタです。
  */
 
-import { toIsoLocal, addDaysIso, parseIsoLocal, isoToMonthRef, calEventDayIso } from '../../lib/date';
+import { toIsoLocal, addDaysIso, isoToMonthRef, calEventDayIso } from '../../lib/date';
 import { KING_LMS_ORIGIN } from '../../shared/constants';
 import type { CalEvent } from './types';
 
@@ -14,12 +14,21 @@ export interface DueItem {
   courseName?: string;
   title?:      string;
   dueDate?:    string;
+  /** notificationDetails.sourceId（同一課題の複数ストリーム行のマージに使用） */
+  sourceId?:   string;
+  /** streams 行の extraAttribs.event_type（例 UA:DUE, UA:UA_AVAIL） */
+  streamEventType?: string;
 }
 
 export interface DuePayload {
   items:      DueItem[];
   capturedAt: number;
 }
+
+// ─── streams ultra 判定 ────────────────────────────────────────────────────
+
+/** 期日リマインダー行。同一課題にこれが含まれる間は未提出とみなす（King LMS / diff.json より） */
+const STREAM_UA_DUE = 'UA:DUE';
 
 // ─── 定数 ─────────────────────────────────────────────────────────────────
 
@@ -31,13 +40,81 @@ export const assignmentViewMeta = {
 
 // ─── ヘルパー ─────────────────────────────────────────────────────────────
 
-/** 今日を含む週の範囲を返す（月曜始まり） */
-export function weekRangeContaining(iso: string): { uKbn: string; start: string; end: string } {
-  const d   = parseIsoLocal(iso);
-  const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  mon.setDate(mon.getDate() - (mon.getDay() + 6) % 7);
-  const start = toIsoLocal(mon);
-  return { uKbn: '0', start, end: addDaysIso(start, 7) };
+/** courseId + sourceId + dueDate が揃うときのマージキー。揃わないときは null */
+function assignmentMergeKey(row: DueItem): string | null {
+  const cid = String(row.courseId ?? '').trim();
+  const sid = String(row.sourceId ?? '').trim();
+  const due = String(row.dueDate ?? '').trim();
+  if (!cid || !sid || !due) return null;
+  return `${cid}\0${sid}\0${due}`;
+}
+
+/** 表示・旧 dedup と同一のキー（日付キー + 締切 ISO + タイトル + コース） */
+function assignmentDisplayKey(row: DueItem): string {
+  const start = String(row.dueDate ?? '').trim();
+  const title = String(row.title ?? '').trim() || '（無題）';
+  const cid   = String(row.courseId ?? '').trim();
+  const dk    = calEventDayIso({ start });
+  return `${dk}\0${start}\0${title}\0${cid}`;
+}
+
+function groupHasStreamInfo(rows: DueItem[]): boolean {
+  return rows.some((r) => String(r.streamEventType ?? '').trim() !== '');
+}
+
+/** ストリーム種別が少なくとも1件あるとき、UA:DUE が無ければ提出済み */
+function submittedFromRows(rows: DueItem[]): boolean | undefined {
+  if (!groupHasStreamInfo(rows)) return undefined;
+  const hasDue = rows.some((r) => String(r.streamEventType ?? '').trim() === STREAM_UA_DUE);
+  return !hasDue;
+}
+
+function pickRepresentative(rows: DueItem[]): DueItem {
+  return [...rows].sort((a, b) =>
+    String(a.title ?? '').localeCompare(String(b.title ?? ''), 'ja'),
+  )[0]!;
+}
+
+export { weekRangeContaining } from '../../lib/date';
+export type { CalendarWeekStart } from '../../lib/date';
+
+/**
+ * 保存データの取得時刻（ミリ秒 epoch）から、注意書き用の相対表現を返す（秒まで表示）。
+ * 例: 「たった今」「12秒前に」「3分5秒前に」「1時間2分3秒前に」
+ */
+export function formatKingLmsCapturedAgoJa(capturedAtMs: number, nowMs = Date.now()): string {
+  const diff    = Math.max(0, nowMs - capturedAtMs);
+  const totalSec = Math.floor(diff / 1000);
+  if (totalSec < 1) return 'たった今';
+  if (totalSec < 60) return `${totalSec}秒前に`;
+
+  if (totalSec < 3600) {
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}分${s}秒前に`;
+  }
+
+  if (totalSec < 86400) {
+    const h = Math.floor(totalSec / 3600);
+    const r = totalSec % 3600;
+    const m = Math.floor(r / 60);
+    const s = r % 60;
+    return `${h}時間${m}分${s}秒前に`;
+  }
+
+  const days = Math.floor(totalSec / 86400);
+  if (days < 30) {
+    const r1 = totalSec % 86400;
+    const h  = Math.floor(r1 / 3600);
+    const r2 = r1 % 3600;
+    const m  = Math.floor(r2 / 60);
+    const s  = r2 % 60;
+    return `${days}日${h}時間${m}分${s}秒前に`;
+  }
+
+  const months = Math.floor(days / 30);
+  if (months < 12) return `約${months}か月前に`;
+  return `約${Math.floor(days / 365)}年前に`;
 }
 
 /** 期限日時を日本語形式にフォーマット */
@@ -82,24 +159,76 @@ export function formatRemainingUntilDue(iso: string, nowMs = Date.now()): string
   return `残り ${parts.join('')}`;
 }
 
+function buildAssignmentCalEvent(rep: DueItem, rows: DueItem[]): CalEvent {
+  const start      = String(rep.dueDate).trim();
+  const title      = String(rep.title ?? '').trim() || '（無題）';
+  const courseName = String(rep.courseName ?? '').trim();
+  const cid        = String(rep.courseId ?? '').trim();
+  const assignmentSubmitted = submittedFromRows(rows);
+  const tipLines: string[] = [
+    courseName && `コース: ${courseName}`,
+    `期限: ${formatDueLabel(start)}`,
+  ].filter(Boolean) as string[];
+  const tip = tipLines.join('\n');
+  const href = cid ? `${KING_LMS_ORIGIN}/ultra/courses/${encodeURIComponent(cid)}/outline` : '';
+  return {
+    start,
+    title,
+    tooltip: tip,
+    calMeta: courseName,
+    calTime: formatDueLabel(start),
+    href,
+    assignmentSubmitted,
+  };
+}
+
 /** 課題データ配列をカレンダーイベント配列に変換する */
 export function dueItemsToCalEvents(raw: DueItem[]): CalEvent[] {
-  const out: CalEvent[] = [];
-  const seen = new Set<string>();
-  for (const row of Array.isArray(raw) ? raw : []) {
-    if (!row || row.dueDate == null || String(row.dueDate).trim() === '') continue;
-    const start      = String(row.dueDate).trim();
-    const title      = String(row.title ?? '').trim() || '（無題）';
-    const courseName = String(row.courseName ?? '').trim();
-    const cid        = String(row.courseId ?? '').trim();
-    const dk         = calEventDayIso({ start });
-    const dedup      = `${dk}\0${start}\0${title}\0${cid}`;
-    if (seen.has(dedup)) continue;
-    seen.add(dedup);
-    const tip  = [courseName && `コース: ${courseName}`, `期限: ${formatDueLabel(start)}`].filter(Boolean).join('\n');
-    const href = cid ? `${KING_LMS_ORIGIN}/ultra/courses/${encodeURIComponent(cid)}/outline` : '';
-    out.push({ start, title, tooltip: tip, calMeta: courseName, calTime: formatDueLabel(start), href });
+  const rows = (Array.isArray(raw) ? raw : []).filter(
+    (r) => r && r.dueDate != null && String(r.dueDate).trim() !== '',
+  );
+
+  const mergeGroups = new Map<string, DueItem[]>();
+  const unmerged: DueItem[] = [];
+
+  for (const row of rows) {
+    const mk = assignmentMergeKey(row);
+    if (mk) {
+      const list = mergeGroups.get(mk);
+      if (list) list.push(row);
+      else mergeGroups.set(mk, [row]);
+    } else {
+      unmerged.push(row);
+    }
   }
+
+  const unmergedBundles = new Map<string, DueItem[]>();
+  for (const row of unmerged) {
+    const dk = assignmentDisplayKey(row);
+    const list = unmergedBundles.get(dk);
+    if (list) list.push(row);
+    else unmergedBundles.set(dk, [row]);
+  }
+
+  const out:    CalEvent[] = [];
+  const seenDisp = new Set<string>();
+
+  for (const [, group] of mergeGroups) {
+    const rep   = pickRepresentative(group);
+    const dedup = assignmentDisplayKey(rep);
+    if (seenDisp.has(dedup)) continue;
+    seenDisp.add(dedup);
+    out.push(buildAssignmentCalEvent(rep, group));
+  }
+
+  for (const [, bundle] of unmergedBundles) {
+    const rep   = pickRepresentative(bundle);
+    const dedup = assignmentDisplayKey(rep);
+    if (seenDisp.has(dedup)) continue;
+    seenDisp.add(dedup);
+    out.push(buildAssignmentCalEvent(rep, bundle));
+  }
+
   out.sort((a, b) => String(a.start).localeCompare(String(b.start)));
   return out;
 }

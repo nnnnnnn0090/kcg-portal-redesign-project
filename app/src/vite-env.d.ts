@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 
+/** Vite がビルド時に埋め込む環境変数（`.env` / `.env.local` など。リポジトリには秘密を含めない） */
 interface ImportMetaEnv {
   /** Discord 招待 URL（`app/.env.local` などで設定。リポジトリに含めない） */
   readonly VITE_PORTAL_DISCORD_INVITE_URL?: string;

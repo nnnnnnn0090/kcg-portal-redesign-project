@@ -1,4 +1,6 @@
-/** キャプチャ JSON を MSG 種別ごとに postMessage する */
+/**
+ * フックで得た JSON を、定数 `MSG` の種別ごとにオーバーレイへ `postMessage` します。
+ */
 
 import { FETCH_HOOK, MSG } from '../../shared/constants';
 import {

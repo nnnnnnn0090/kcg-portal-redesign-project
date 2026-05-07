@@ -1,4 +1,6 @@
-/** Home2 Web メール `/Mail` 配下のオーバーレイ表示モード（Default / mailhead / readmail / sendmail / その他） */
+/**
+ * Home2 Web メールの `/Mail` 配下で、オーバーレイの表示モード（一覧・本文・送信など）を URL から判定します。
+ */
 
 import { HOME2_HOSTNAME } from '../shared/constants';
 

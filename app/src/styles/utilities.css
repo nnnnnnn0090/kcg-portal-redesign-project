@@ -18,11 +18,6 @@
   background-clip:padding-box}
 #portal-overlay *::-webkit-scrollbar-thumb:active{background:var(--p-scroll-thumb-active);background-clip:padding-box;box-shadow:none}
 #portal-overlay *::-webkit-scrollbar-corner{background:var(--p-bg)}
-#portal-overlay .p-cal-ctx-menu{position:fixed;z-index:2147483646;min-width:12rem;padding:.35rem 0;border-radius:12px;border:1px solid var(--p-border);background:var(--p-bg2);box-shadow:0 16px 48px var(--p-shadow-strong);backdrop-filter:blur(10px)}
-#portal-overlay .p-cal-ctx-menu[hidden]{display:none!important}
-#portal-overlay .p-cal-ctx-item{display:block;width:100%;padding:.55rem 1rem;border:none;background:transparent;color:var(--p-text);font-size:.8125rem;font-weight:500;text-align:left;cursor:pointer;font-family:inherit;transition:background .12s}
-#portal-overlay .p-cal-ctx-item:hover:not(:disabled){background:var(--p-bg-hover)}
-#portal-overlay .p-cal-ctx-item:disabled{opacity:.4;cursor:not-allowed}
 #portal-overlay .p-fab-cluster{position:fixed;right:1.25rem;bottom:1.25rem;z-index:55;display:flex;flex-direction:row;align-items:center;gap:.5rem}
 #portal-overlay .p-share-ext-btn{min-height:3rem;padding:0 .85rem;border-radius:9999px;border:1px solid var(--p-border);background:color-mix(in srgb,var(--p-bg2) 92%,transparent);color:var(--p-text-muted);box-shadow:0 8px 28px var(--p-shadow-strong);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;font-size:.75rem;font-weight:600;white-space:nowrap;font-family:inherit;transition:background .2s,transform .2s,border-color .2s,color .2s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #portal-overlay .p-share-ext-btn:hover{background:var(--p-bg-hover);border-color:var(--p-accent-border);color:var(--p-accent-light);transform:translateY(-2px)}

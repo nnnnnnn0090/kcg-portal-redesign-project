@@ -1,10 +1,11 @@
 /**
- * ホーム初回マウント時に storage からショートカット・課題・コース一覧を読み込む。
+ * ホーム初回マウント時に KogiNews の先読みと、storage からのショートカット・課題・コース一覧読み込みをまとめる。
  */
 
 import { useEffect } from 'react';
 import { SK } from '../shared/constants';
 import storage from '../lib/storage';
+import { pageFetch, urls } from '../lib/api';
 import type { CourseRow } from '../context/courses';
 import type { CustomLink, LinkConfig } from '../shared/types';
 import type { DuePayload } from '../features/calendar';
@@ -54,6 +55,7 @@ export function useHomeStorageBootstrap({
   setCourses,
 }: HomeStorageBootstrapParams): void {
   useEffect(() => {
+    void pageFetch(urls.kogiNews());
     void storage.get([SK.shortcutConfig, SK.kingLmsStreamsUltraDue, SK.kingLmsCourses]).then((data) => {
       const cfg = data[SK.shortcutConfig];
       if (isLinkConfig(cfg)) setLinkConfig(cfg);

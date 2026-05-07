@@ -1,4 +1,6 @@
-/** ホーム用 portal postMessage の状態更新 */
+/**
+ * ホーム向けに、`portal-hooks` から届く `postMessage` を解釈して受信箱状態へ反映します。
+ */
 
 import { MSG } from '../shared/constants';
 import type { NewsListItem, PortalCapturedMessage } from '../shared/types';

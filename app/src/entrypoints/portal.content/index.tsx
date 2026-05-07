@@ -1,4 +1,7 @@
-/** portal.content — ポータル上で React オーバーレイをマウントする */
+/**
+ * 学ポータルで `document_end` に読み込まれ、ルートに応じて React オーバーレイをマウントします。
+ * `portal-hooks` が `postMessage` で流すデータを受け取る隔離ワールド側の UI です。
+ */
 
 import { createElement } from 'react';
 import overlayCss from '../../styles/overlay.css?inline';

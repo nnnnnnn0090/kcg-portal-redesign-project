@@ -1,4 +1,4 @@
-/* Home2 Mail: ホストのフォントを継承 */
+/* Home2 Web メールオーバーレイ: ホストページのフォントを継承する */
 #portal-overlay.p-surface-home2-mail {
   font-family: inherit;
   -webkit-font-smoothing: auto;
@@ -14,7 +14,7 @@
   text-transform: none;
 }
 
-/* Home2 .p-main の入場フェード */
+/* メイン領域（.p-main）の入場フェード */
 #portal-overlay.p-surface-home2-mail .p-main {
   animation: p-fade-in var(--p-enter-dur) var(--p-enter-ease) calc(var(--p-enter-delay-head) + 0.1s) both;
 }
@@ -30,7 +30,7 @@
     0 14px 44px -12px var(--p-shadow-strong);
 }
 
-/* header-only: 背後へクリック・スクロールを通す */
+/* ヘッダーのみ表示時: 背後のページへクリックとスクロールを通す */
 #portal-overlay.p-surface-home2-mail-header-only {
   position: fixed;
   inset: auto 0 auto 0;
@@ -53,7 +53,7 @@
   pointer-events: auto;
 }
 
-/* WebMail login */
+/* Web メール：ログイン画面 */
 #portal-overlay .p-main.p-home2-mail-login-screen {
   position: relative;
   display: flex;
@@ -235,7 +235,7 @@
   transform: scale(0.99);
 }
 
-/* mailhead list */
+/* 受信一覧（mailhead） */
 #portal-overlay .p-home2-send-note.p-home2-gm-caption {
   margin: 0;
   padding: 0;
@@ -479,7 +479,7 @@
   }
 }
 
-/* readmail: スクロールはオーバーレイ側 */
+/* 本文表示（readmail）：スクロールはオーバーレイ側で行う */
 #portal-overlay #p-home2-mail-read .p-home2-send-body.p-home2-mail-read-body {
   min-height: 0;
   max-height: none;
@@ -500,7 +500,7 @@
   color: var(--p-text-bright);
 }
 
-/* readmail メタ行（send と同系） */
+/* 本文表示のメタ情報行（送信画面と同系のトーン） */
 #portal-overlay #p-home2-mail-read .p-home2-send-fields > .p-home2-send-row {
   align-items: start;
 }
@@ -531,7 +531,7 @@
   min-width: 0;
 }
 
-/* sendmail form */
+/* 送信フォーム（sendmail） */
 #portal-overlay .p-main.p-home2-send {
   max-width: min(1100px, 100%);
   margin: 0 auto;

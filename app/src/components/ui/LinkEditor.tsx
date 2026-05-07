@@ -164,23 +164,24 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
       : (
         <div className="p-link-list">
           {visible.map((r) => (
-            <a
-              key={r.key}
-              className="p-link"
-              href={r.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              id={
-                r.midashi === '学生出欠登録'
-                  ? 'p-shortcut-attendance'
-                  : linkKey(r.url) === linkKey(HOME2_MAIL_DIRECTORY_URL)
-                    ? 'p-shortcut-webmail'
-                    : undefined
-              }
-            >
-              <span className="p-link-title">{r.midashi}</span>
-              {r.biko && <span className="p-link-meta">{r.biko}</span>}
-            </a>
+            <article key={r.key} className="p-shortcut">
+              <a
+                className="p-shortcut-link"
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                id={
+                  r.midashi === '学生出欠登録'
+                    ? 'p-shortcut-attendance'
+                    : linkKey(r.url) === linkKey(HOME2_MAIL_DIRECTORY_URL)
+                      ? 'p-shortcut-webmail'
+                      : undefined
+                }
+              >
+                <span className="p-shortcut-title">{r.midashi}</span>
+                {r.biko ? <span className="p-shortcut-meta">{r.biko}</span> : null}
+              </a>
+            </article>
           ))}
         </div>
       );

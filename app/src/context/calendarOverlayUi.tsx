@@ -1,6 +1,6 @@
 /**
- * カレンダー tooltip / コンテキストメニュー用 DOM の ref。
- * getElementById 依存を減らし、React のマウント順と一致させる。
+ * カレンダーのツールチップとコンテキストメニュー用 DOM への ref を React ツリーで共有します。
+ * `getElementById` の散在を避け、マウント順と表示先を一致させます。
  */
 
 import {

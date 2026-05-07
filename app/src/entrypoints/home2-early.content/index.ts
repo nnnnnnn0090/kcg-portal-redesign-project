@@ -1,4 +1,6 @@
-/** Home2 Mail: document_start でテーマ変数とブートカバー */
+/**
+ * Home2 Web メールで `document_start` に読み込まれ、オーバーレイ有効時のみテーマ変数とブートカバーを適用します。
+ */
 
 import { bootCoverBg, portalHeadThemeCssByName } from '../../themes';
 import {

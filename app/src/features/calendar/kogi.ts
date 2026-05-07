@@ -1,6 +1,6 @@
 /**
- * 講義カレンダー（KogiCalendar）のデータ解析・リンク生成ヘルパー。
- * シラバス URL（コンテキストメニュー用）と King LMS コース URL のマッチングを担当する。
+ * 講義（Kogi）カレンダー向けの、ツールチップ解析やリンク解決のヘルパーです。
+ * シラバス URL と King LMS コース URL の対応付けを行います。
  */
 
 import { PORTAL_ORIGIN } from '../../shared/constants';

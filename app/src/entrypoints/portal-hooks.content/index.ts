@@ -1,4 +1,7 @@
-/** portal-hooks.content — ポータル API の fetch / XHR フックと pageFetch ブリッジ */
+/**
+ * 学ポータル上で `document_start`・MAIN ワールドとして読み込まれます。
+ * ページ本体と同じ `fetch` / XHR をラップし、対象 API の JSON をオーバーレイ側へ `postMessage` するとともに、`pageFetch` ブリッジで認証付き再取得を行います。
+ */
 
 import { PORTAL_CONTENT_SCRIPT_MATCHES } from '../../shared/constants';
 import { installFetchHook } from './portal-fetch-hook';

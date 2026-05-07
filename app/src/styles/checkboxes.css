@@ -1,4 +1,4 @@
-/* #portal-overlay 内のチェックボックス共通（設定・お知らせフィルタ・アンケート・休講など） */
+/* #portal-overlay 内のチェックボックス・ラジオ共通（設定・各ページのフィルタなど） */
 #portal-overlay input[type=checkbox]{
   -webkit-appearance:none;appearance:none;width:1.1rem;height:1.1rem;flex-shrink:0;cursor:pointer;
   border:2px solid var(--p-border-hover);border-radius:5px;margin-top:.1rem;transition:background .15s ease,border-color .15s ease,opacity .15s ease;
@@ -9,5 +9,17 @@
   width:4px;height:8px;margin:0;border:solid #fff;border-width:0 2px 2px 0;
   transform:translate(-50%,-55%) rotate(45deg);transform-origin:center center}
 #portal-overlay input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
-#portal-overlay input[type=checkbox]:focus-visible{
+
+#portal-overlay input[type=radio]{
+  -webkit-appearance:none;appearance:none;width:1.1rem;height:1.1rem;flex-shrink:0;cursor:pointer;
+  border:2px solid var(--p-border-hover);border-radius:50%;margin-top:.1rem;transition:background .15s ease,border-color .15s ease,opacity .15s ease;
+  position:relative;background:transparent;vertical-align:top;box-sizing:border-box}
+#portal-overlay input[type=radio]:checked{background:var(--p-accent);border-color:var(--p-accent)}
+#portal-overlay input[type=radio]:checked::after{
+  content:'';display:block;position:absolute;left:50%;top:50%;box-sizing:border-box;pointer-events:none;
+  width:5px;height:5px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)}
+#portal-overlay input[type=radio]:disabled{opacity:.45;cursor:not-allowed}
+
+#portal-overlay input[type=checkbox]:focus-visible,
+#portal-overlay input[type=radio]:focus-visible{
   outline:2px solid var(--p-accent);outline-offset:2px}

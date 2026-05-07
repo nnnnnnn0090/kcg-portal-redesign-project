@@ -1,7 +1,6 @@
 /**
- * カレンダー共通 UI シェル。
- * 週/月切替ツールバーとカレンダー本体の DOM マウント先を提供する。
- * CalendarPanel と AssignmentCalendar の両方から使用する。
+ * 週／月切替ツールバーとカレンダー本体（`calBody`）の共通レイアウトです。
+ * `CalendarPanel` と `AssignmentCalendar` の双方から利用されます。
  */
 
 import type { RefObject } from 'react';

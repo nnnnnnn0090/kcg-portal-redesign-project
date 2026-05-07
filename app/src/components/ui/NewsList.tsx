@@ -26,14 +26,20 @@ export function NewsList({ items, emptyMsg = 'お知らせはありません' }:
         const isNew  = String(item.newFlg)  === '1';
         const id     = item.id;
         const key    = id != null ? String(id) : `${item.title}-${item.newsDate}`;
+        const href = id != null ? newsHref(String(id)) : '#';
+        const dateStr = String(item.newsDate ?? '').replace(/-/g, '/');
         return (
           <article key={key} className={`p-news${unread ? ' p-news-unread' : ''}`}>
-            <time>{String(item.newsDate ?? '').replace(/-/g, '/')}</time>
-            <a href={id != null ? newsHref(String(id)) : '#'}>
-              {item.title}
-              {isNew && <span className="p-news-new-badge" aria-hidden="true">NEW</span>}
+            <a className="p-news-link" href={href}>
+              <div className="p-news-meta-row">
+                <time dateTime={item.newsDate != null ? String(item.newsDate) : undefined}>{dateStr}</time>
+              </div>
+              <span className="p-news-title-line">
+                <span className="p-news-title">{item.title}</span>
+                {isNew && <span className="p-news-new-badge" aria-hidden="true">NEW</span>}
+              </span>
+              <span className="p-news-meta">{item.sender ?? ''} · {item.category ?? ''}</span>
             </a>
-            <span>{item.sender ?? ''} · {item.category ?? ''}</span>
           </article>
         );
       })}

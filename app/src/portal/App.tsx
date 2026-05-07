@@ -1,19 +1,18 @@
 /**
  * ポータルオーバーレイのアプリケーションルート。
- * ヘッダー・フッター・ページアウトレット・カレンダーインタラクションを統合する。
+ * ヘッダー・ページ末尾クローム（フッター／カレンダーアンカー／FAB）・ページアウトレット・トースト・案内を統合する。
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSettings } from '../context/settings';
 import { usePortalDom } from '../context/portalDom';
 import { useToast, Toast, copyToClipboard } from '../components/ui/Toast';
 import { Header } from '../components/layout/Header';
-import { Footer } from '../components/layout/Footer';
-import { SettingsPanel, type SettingsPanelHandle } from '../components/layout/SettingsPanel';
+import { PortalPageEndChrome } from '../components/layout/PortalPageEndChrome';
+import { SettingsPanel, type SettingsPanelHandle } from '../components/layout/settings';
 import { EXTENSION_PROMO_PAGE_URL, PAGE, PORTAL_ORIGIN, SK } from '../shared/constants';
 import storage from '../lib/storage';
 import { consumeExtensionUpdateToastMessage } from '../lib/extension-update-notice';
-import { useCalendarInteractions } from '../features/calendar';
 import type { PortalRoute } from './router';
 import type { PortalAppRoute, PortalSurface } from './app-types';
 import { isHome2MailRoute } from './app-types';
@@ -34,7 +33,7 @@ export interface PortalAppProps {
 
 // ─── エントリポイント（Provider ラッパー） ─────────────────────────────────
 
-/** entrypoint からマウントするルートコンポーネント */
+/** `portal.content` / `home2.content` のエントリからマウントされるルートコンポーネントです。 */
 export function PortalApp(props: PortalAppProps) {
   return (
     <AppProviders overlayRoot={props.overlayRoot}>
@@ -58,11 +57,21 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
   const showFullChrome = surface === 'portal'
     || (isHome2MailRoute(route) && (route.layout === 'full' || route.layout === 'mailHead' || route.layout === 'readMail' || route.layout === 'sendMail'));
 
-  const footerScrollTarget = surface === 'home2-mail'
+  const pageEndFabScrollTopScope = surface === 'home2-mail'
     && isHome2MailRoute(route)
     && route.layout === 'headerOnly'
     ? 'window' as const
     : 'overlay' as const;
+
+  const calendarInteractionEpoch = useMemo(() => {
+    if (isHome2MailRoute(route)) return `h2:${route.layout}`;
+    if (surface === 'portal' && portalRoute) {
+      return portalRoute.detailId != null
+        ? `p:${portalRoute.page}:${portalRoute.detailId}`
+        : `p:${portalRoute.page}`;
+    }
+    return String(surface);
+  }, [surface, route, portalRoute]);
 
   const handleReplayGuidedTour = useCallback(() => {
     if (!portalRoute) return;
@@ -105,9 +114,6 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
       showToast(msg, { placement: 'top', durationMs: 5200 });
     });
   }, [settingsReady, showToast]);
-
-  // カレンダーの tooltip / コンテキストメニューをオーバーレイに配線
-  useCalendarInteractions();
 
   // 拡張機能紹介 URL のコピー
   const handleShareClick = useCallback(async () => {
@@ -156,7 +162,11 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
       <PortalPageOutlet route={route} settings={settings} />
 
       {showFullChrome ? (
-        <Footer onShareClick={handleShareClick} scrollTarget={footerScrollTarget} />
+        <PortalPageEndChrome
+          onShareClick={handleShareClick}
+          scrollTopScope={pageEndFabScrollTopScope}
+          calendarInteractionEpoch={calendarInteractionEpoch}
+        />
       ) : null}
 
       {surface === 'portal' && portalRoute ? (

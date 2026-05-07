@@ -1,6 +1,6 @@
 /**
- * テーマ管理モジュール。
- * CSS カスタムプロパティの生成と、ポータル全体へのテーマ適用を担う。
+ * テーマ管理モジュールです。
+ * CSS カスタムプロパティ文字列の生成と、`#portal-overlay` への適用を担います。
  */
 
 import { PORTAL_DOM } from '../shared/constants';
@@ -11,7 +11,7 @@ export { THEMES, DEFAULT_THEME, type ThemeTokens };
 
 // ─── CSS 生成 ─────────────────────────────────────────────────────────────
 
-/** ThemeTokens → #portal-overlay スコープの CSS 変数文字列 */
+/** テーマトークンを `#portal-overlay` スコープ用の CSS カスタムプロパティ文字列へ変換します。 */
 export function getThemeCss(t: ThemeTokens): string {
   return `#${PORTAL_DOM.overlayRoot}{`
     + `--p-bg:${t.bg};--p-bg2:${t.bgSecondary};--p-bg3:${t.bgTertiary};--p-bg-hover:${t.bgHover};`
@@ -28,7 +28,7 @@ export function themeTokensForName(name: string): ThemeTokens {
   return THEMES[name] ?? THEMES[DEFAULT_THEME];
 }
 
-/** #portal-theme-vars 全文（#portal-overlay 変数 + 初期ビューポート背景） */
+/** オーバーレイ用変数に加え、`html` の初期背景色まで含めた先頭注入用 CSS 文字列です。 */
 export function portalHeadThemeCss(t: ThemeTokens): string {
   return `${getThemeCss(t)}html{background-color:${t.bg}!important}`;
 }
@@ -46,8 +46,8 @@ export function bootCoverBg(themeName?: string): string {
 // ─── テーマ適用 ────────────────────────────────────────────────────────────
 
 /**
- * #portal-overlay 要素の style に CSS 変数を直接書き込む。
- * <style> タグ経由よりも参照ズレが起きにくく、ライブ更新に強い。
+ * `#portal-overlay` の `style` に CSS 変数を直接書き込みます。
+ * `<style>` 注入より参照のズレが起きにくく、テーマのライブ切替にも向きます。
  */
 export function applyThemeToElement(el: HTMLElement, t: ThemeTokens): void {
   el.style.setProperty('--p-bg',           t.bg);
@@ -73,8 +73,8 @@ export function applyThemeToElement(el: HTMLElement, t: ThemeTokens): void {
 }
 
 /**
- * head の #portal-theme-vars と #portal-overlay の両方にテーマを反映する。
- * React マウント前後でも同じ関数で適用できる。
+ * `head` 内の `#portal-theme-vars` と `#portal-overlay` の両方へテーマを反映します。
+ * React のマウント前後を問わず同じ関数で呼べます。
  */
 export function syncPortalTheme(name: string): void {
   const t   = themeTokensForName(name);

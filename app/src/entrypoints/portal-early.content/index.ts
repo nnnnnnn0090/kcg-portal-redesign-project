@@ -1,4 +1,7 @@
-/** portal-early.content — 起動時のテーマ CSS とブートカバー */
+/**
+ * 学ポータルで `document_start` に読み込まれ、初期テーマ用の `<style>` とブートカバーを差し込みます。
+ * `storage` のテーマ値を読み、反映後にブートカバーの色を更新します。
+ */
 
 import { bootCoverBg, portalHeadThemeCssByName } from '../../themes';
 import { PORTAL_CONTENT_SCRIPT_MATCHES, PORTAL_DOM, SK } from '../../shared/constants';

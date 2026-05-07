@@ -1,6 +1,5 @@
 /**
- * カレンダーの週/月表示パラメータの計算ロジック。
- * API レスポンスから週パラメータ・月参照を確定する純粋関数を提供する。
+ * 週表示・月表示のパラメータを、API レスポンスから確定する純関数群です。
  */
 
 import { addDaysIso, parseIsoLocal, isoToMonthRef, type MonthRef } from '../../lib/date';

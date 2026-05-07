@@ -1,4 +1,4 @@
-/** Home2 Web メール readmail 本文 */
+/** Home2 Web メールの本文表示（readmail）です。 */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';

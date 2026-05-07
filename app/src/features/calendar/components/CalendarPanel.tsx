@@ -1,8 +1,6 @@
 /**
- * ポータルカレンダーパネル。
- * useCalendarPanel フックでデータ取得・描画ロジックを管理し、
- * CalendarShell で UI を描画する。
- * 授業/補修/キャンパスの 3 種類に使い回す汎用コンポーネント。
+ * 授業・補修・キャンパスなど、ポータル公式カレンダー API を表示する汎用パネルです。
+ * `useCalendarPanel` が `postMessage` とフェッチを束ね、`CalendarShell` がツールバーとグリッド領域を描画します。
  */
 
 import kogiWeekSleepMascotUrl from '../../../assets/mascot.png';
@@ -22,6 +20,7 @@ export function CalendarPanel(props: CalendarPanelConfig) {
     title,
     switchMode,
     navigate,
+    toolbarLocked,
   } = useCalendarPanel(props);
 
   const showSleepMascot = Boolean(props.sleepMascotSlot && settings.showKogiCalMascot);
@@ -43,6 +42,8 @@ export function CalendarPanel(props: CalendarPanelConfig) {
           switchMode={switchMode}
           navigate={navigate}
           calBodyRef={calBodyRef}
+          navDisabled={toolbarLocked}
+          controlsDisabled={toolbarLocked}
         />
       </section>
       {showSleepMascot ? (

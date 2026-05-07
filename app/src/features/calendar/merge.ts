@@ -1,6 +1,6 @@
 /**
- * カレンダーアイテムのマージ・重複除去ロジック。
- * バルクフェッチで取得した年単位データを連結・デデュープするために使用する。
+ * カレンダーイベント一覧のマージと重複除去です。
+ * 年単位のバルク取得結果をつなぐときに使います。
  */
 
 import { calEventDayIso } from '../../lib/date';
@@ -12,8 +12,8 @@ export function rangeKey(start: string, end: string): string {
 }
 
 /**
- * 2 つのカレンダーイベントリストをマージし、重複を除去する。
- * 同じ日・タイトル・tooltip の先頭 120 文字が一致する場合は重複とみなす。
+ * 2 つのイベント配列をマージし、重複を除きます。
+ * 同一日・同一タイトル・tooltip 先頭 120 文字が一致すれば重複とみなします。
  */
 export function mergeCalItemLists(a: CalEvent[], b: CalEvent[]): CalEvent[] {
   const seen = new Set<string>();

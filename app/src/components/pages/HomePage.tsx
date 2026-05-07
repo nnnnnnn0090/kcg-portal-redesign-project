@@ -1,19 +1,25 @@
 /**
- * ホームページ。
- * 授業カレンダー・課題カレンダー・お知らせ・ショートカットを統合表示する。
+ * ホーム（ダッシュボード）ページです。
+ * 授業カレンダー・課題カレンダー・お知らせ・ショートカットをまとめて表示します。
  */
 
-import { useState, useCallback, useMemo } from 'react';
-import { MSG } from '../../shared/constants';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { MSG, SK } from '../../shared/constants';
+import storage from '../../lib/storage';
 import { urls } from '../../lib/api';
 import type { Settings } from '../../context/settings';
 import { useCourses } from '../../context/courses';
+import { usePortalDom } from '../../context/portalDom';
 import type { LinkConfig } from '../../shared/types';
 import { useHomeStorageBootstrap } from '../../hooks/useHomeStorageBootstrap';
-import { useKogiNewsPrefetch } from '../../hooks/useKogiNewsPrefetch';
 import { useHomePortalInbox } from '../../hooks/useHomePortalInbox';
 import { useLastLogin } from '../../hooks/useLastLogin';
-import { useDeveloperNotice } from '../../hooks/useDeveloperNotice';
+import {
+  useDeveloperNotice,
+  DEVELOPER_NOTICE_SELECT_LABEL,
+  DEVELOPER_NOTICE_TITLE_FALLBACK,
+  isDeveloperNoticeLang,
+} from '../../hooks/useDeveloperNotice';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
@@ -26,10 +32,31 @@ interface HomePageProps {
   settings: Settings;
 }
 
+/** オーバーレイのスクロールルート内で、要素が縦方向ほぼ中央に来るよう scrollTop を計算する */
+function scrollElementToVerticalCenter(
+  scroller: HTMLElement,
+  target: HTMLElement,
+  behavior: ScrollBehavior,
+): void {
+  const cRect = scroller.getBoundingClientRect();
+  const tRect = target.getBoundingClientRect();
+  const visibleOffsetTop = tRect.top - cRect.top;
+  const nextTop = scroller.scrollTop + visibleOffsetTop - scroller.clientHeight / 2 + tRect.height / 2;
+  const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+  const clamped = Math.max(0, Math.min(nextTop, maxScroll));
+  // `smooth` は操作中のホイール等と合成されてずれることがある。瞬時合わせは scrollTop 直指定が確実。
+  if (behavior === 'auto') {
+    scroller.scrollTop = clamped;
+  } else {
+    scroller.scrollTo({ top: clamped, behavior });
+  }
+}
+
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export function HomePage({ settings }: HomePageProps) {
   const { courses, setCourses } = useCourses();
+  const { overlayRoot } = usePortalDom();
 
   const { kinoData, kogiNews, newTopicsItems, linkItems } = useHomePortalInbox();
 
@@ -38,7 +65,48 @@ export function HomePage({ settings }: HomePageProps) {
   const [linksEditing,      setLinksEditing]      = useState(false);
 
   useHomeStorageBootstrap({ setLinkConfig, setAssignmentPayload, setCourses });
-  useKogiNewsPrefetch();
+
+  // King LMS 課題同期でホームへ戻った直後、課題カレンダーへスクロール（bridge が立てたフラグ）
+  useEffect(() => {
+    let cancelled = false;
+    let settleTimer: number | null = null;
+
+    void storage.get(SK.portalScrollToAssignmentOnce).then((snap) => {
+      if (cancelled) return;
+      if (!snap[SK.portalScrollToAssignmentOnce]) return;
+      void storage.set({ [SK.portalScrollToAssignmentOnce]: false });
+
+      const run = () => {
+        const el = document.getElementById('p-assignment-calendar-panel');
+        if (!(el instanceof HTMLElement)) return;
+        scrollElementToVerticalCenter(overlayRoot, el, 'auto');
+      };
+
+      const motionReduce =
+        typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (cancelled) return;
+          run();
+          // パネル入場（base.css の --p-enter-dur）後に再計測。初回はアニメ中の矩形でズレやすい。
+          if (!motionReduce) {
+            settleTimer = window.setTimeout(() => {
+              settleTimer = null;
+              if (cancelled) return;
+              run();
+            }, 480);
+          }
+        });
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      if (settleTimer != null) window.clearTimeout(settleTimer);
+    };
+  }, [overlayRoot]);
 
   const kogiDisplayDeps = useMemo(
     () => courses.map((c) => `${String(c.displayName ?? '')}\t${String(c.externalAccessUrl ?? '')}`).join('\n'),
@@ -46,7 +114,11 @@ export function HomePage({ settings }: HomePageProps) {
   );
   const getKingLmsCourses = useCallback(() => courses, [courses]);
   const lastLogin         = useLastLogin();
-  const developerNotice   = useDeveloperNotice();
+  const { notice: developerNotice, lang: noticeLang, setLang: setNoticeLang } = useDeveloperNotice();
+
+  const developerNoticeTitle =
+    developerNotice?.byLang?.[noticeLang]?.title || DEVELOPER_NOTICE_TITLE_FALLBACK[noticeLang];
+  const developerNoticeMessage = developerNotice?.byLang?.[noticeLang]?.message ?? '';
 
   return (
     <PageShell
@@ -57,12 +129,31 @@ export function HomePage({ settings }: HomePageProps) {
 
         {developerNotice ? (
           <section className="p-panel">
-            <span className="p-panel-head">
-              {developerNotice.title || '開発者からのお知らせ'}
+            <span className="p-panel-head p-developer-notice-head">
+              <span className="p-developer-notice-head-title">{developerNoticeTitle}</span>
+              {developerNotice.canToggleLang ? (
+                <div className="p-developer-notice-lang-wrap">
+                  <select
+                    className="p-developer-notice-lang-select"
+                    value={noticeLang}
+                    aria-label="Language / 言語"
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (isDeveloperNoticeLang(v)) setNoticeLang(v);
+                    }}
+                  >
+                    {developerNotice.langOptions.map((id) => (
+                      <option key={id} value={id}>
+                        {DEVELOPER_NOTICE_SELECT_LABEL[id]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
             </span>
-            {developerNotice.message ? (
+            {developerNoticeMessage ? (
               <div className="p-panel-body" id="p-developer-notice">
-                <p className="p-developer-notice-text">{developerNotice.message}</p>
+                <p className="p-developer-notice-text">{developerNoticeMessage}</p>
               </div>
             ) : null}
           </section>

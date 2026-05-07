@@ -1,7 +1,7 @@
 /**
- * portal-hooks.content が送る postMessage を受信するカスタムフック。
- * マウント時にリプレイ要求を送ることで、コンテンツスクリプトロード前に
- * キャプチャされたデータも受け取れる。
+ * `portal-hooks.content` が送る `postMessage` を受信するカスタムフックです。
+ * マウント時にリプレイ要求を送るため、コンテンツスクリプト読み込み前に
+ * 捕捉済みのメッセージも取りこぼしにくくします。
  */
 
 import { useEffect, useRef } from 'react';
@@ -17,7 +17,7 @@ export interface UsePortalMessageOptions {
   msgTypes?: readonly string[];
 }
 
-/** fetch フック由来の信頼できる postMessage か判定する */
+/** 同一オリジンかつ `portal-hooks` が付与した `source` であることを確認します。 */
 function isTrusted(e: MessageEvent): boolean {
   if (e.origin !== location.origin) return false;
   if (!e.data?.type) return false;
