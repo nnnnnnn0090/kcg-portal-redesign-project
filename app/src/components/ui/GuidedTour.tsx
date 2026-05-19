@@ -9,6 +9,7 @@ import {
   useLayoutEffect,
   useCallback,
   useId,
+  useMemo,
   useRef,
   type CSSProperties,
   type ReactNode,
@@ -105,6 +106,9 @@ const STEPS: TourStep[] = [
   },
 ];
 
+/** 「課題を確認」スポットライトのインデックス（`hideAssignmentCalendar` でステップが外れるときに同期する） */
+const ASSIGNMENT_TOUR_STEP_INDEX = STEPS.findIndex((s) => s.id === 'assignment');
+
 const HOLE_PAD                      = 10;
 const MIN_SPOTLIGHT_EL_PX           = 2;
 const SCROLL_INTO_VIEW_SUPPLEMENT_MS = 420;
@@ -151,6 +155,7 @@ function querySpotlightElement(step: Extract<TourStep, { kind: 'spotlight' }>, r
 function tourCardBody(
   step: TourStep,
   stepIndex: number,
+  totalSteps: number,
   isLast: boolean,
   primaryLabel: string,
   goNext: () => void,
@@ -172,7 +177,7 @@ function tourCardBody(
         )}
       </div>
       <div className="p-tour-progress" aria-hidden>
-        {stepIndex + 1} / {STEPS.length}
+        {stepIndex + 1} / {totalSteps}
       </div>
     </div>
   );
@@ -181,12 +186,25 @@ function tourCardBody(
 export interface GuidedTourProps {
   route:                  PortalRoute;
   settingsReady:          boolean;
+  /** ホームで課題カレンダーを出していないとき、案内ステップから除外する */
+  hideAssignmentCalendar?: boolean;
   /** 増えるたびに案内を先頭から再開する（設定の「もう一度見る」） */
   guidedTourReplayToken?: number;
 }
 
-export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: GuidedTourProps) {
+export function GuidedTour({
+  route,
+  settingsReady,
+  hideAssignmentCalendar = false,
+  guidedTourReplayToken = 0,
+}: GuidedTourProps) {
   const { overlayRoot } = usePortalDom();
+  const steps = useMemo(
+    () => (hideAssignmentCalendar
+      ? STEPS.filter((s) => s.id !== 'assignment')
+      : STEPS),
+    [hideAssignmentCalendar],
+  );
   const [phase, setPhase] = useState<TourPhase>('loading');
   const [stepIndex, setStepIndex] = useState(0);
   const [viewport, setViewport] = useState({ w: 0, h: 0 });
@@ -217,18 +235,40 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
     setPhase('on');
   }, [guidedTourReplayToken, route.page, settingsReady]);
 
+  const prevHideAssignmentRef = useRef<boolean | null>(null);
+
+  useLayoutEffect(() => {
+    if (ASSIGNMENT_TOUR_STEP_INDEX < 0) return;
+    if (prevHideAssignmentRef.current === null) {
+      prevHideAssignmentRef.current = hideAssignmentCalendar;
+      return;
+    }
+    if (prevHideAssignmentRef.current === hideAssignmentCalendar) return;
+    prevHideAssignmentRef.current = hideAssignmentCalendar;
+
+    setStepIndex((i) => {
+      let n = i;
+      if (hideAssignmentCalendar) {
+        if (i > ASSIGNMENT_TOUR_STEP_INDEX) n = i - 1;
+      } else if (i >= ASSIGNMENT_TOUR_STEP_INDEX) {
+        n = i + 1;
+      }
+      return Math.max(0, Math.min(n, steps.length - 1));
+    });
+  }, [hideAssignmentCalendar, steps.length]);
+
   const updateViewport = useCallback(() => {
     setViewport({ w: window.innerWidth, h: window.innerHeight });
   }, []);
 
   const refreshHole = useCallback(() => {
-    const step = STEPS[stepIndex];
-    if (phase !== 'on' || step.kind !== 'spotlight') {
+    const step = steps[stepIndex];
+    if (!step || phase !== 'on' || step.kind !== 'spotlight') {
       setHole(null);
       return;
     }
     setHole(readSpotlightHole(step, overlayRoot));
-  }, [phase, stepIndex, overlayRoot]);
+  }, [phase, stepIndex, overlayRoot, steps]);
 
   useLayoutEffect(() => {
     updateViewport();
@@ -236,14 +276,15 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
 
   useLayoutEffect(() => {
     if (phase !== 'on') return;
-    const step = STEPS[stepIndex];
-    if (step.kind !== 'card' || step.id !== 'done') return;
+    const step = steps[stepIndex];
+    if (!step || step.kind !== 'card' || step.id !== 'done') return;
     overlayRoot.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [phase, stepIndex, overlayRoot]);
+  }, [phase, stepIndex, overlayRoot, steps]);
 
   useLayoutEffect(() => {
     if (phase !== 'on') return;
-    const step = STEPS[stepIndex];
+    const step = steps[stepIndex];
+    if (!step) return;
     retryRef.current = 0;
 
     if (step.kind !== 'spotlight') {
@@ -269,7 +310,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
       }, SCROLL_INTO_VIEW_SUPPLEMENT_MS);
       return () => window.clearTimeout(t);
     }
-  }, [refreshHole, viewport, stepIndex, phase, overlayRoot, updateViewport]);
+  }, [refreshHole, viewport, stepIndex, phase, overlayRoot, updateViewport, steps]);
 
   useEffect(() => {
     if (phase !== 'on') return;
@@ -287,8 +328,8 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
 
   useEffect(() => {
     if (phase !== 'on') return;
-    const step = STEPS[stepIndex];
-    if (step.kind !== 'spotlight') return;
+    const step = steps[stepIndex];
+    if (!step || step.kind !== 'spotlight') return;
     if (hole !== null) {
       retryRef.current = 0;
       return;
@@ -299,7 +340,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
       setHole(readSpotlightHole(step, overlayRoot));
     }, HOLE_RETRY_MS);
     return () => window.clearTimeout(t);
-  }, [phase, stepIndex, hole, overlayRoot]);
+  }, [phase, stepIndex, hole, overlayRoot, steps]);
 
   useLayoutEffect(() => {
     if (phase !== 'on') return;
@@ -313,19 +354,19 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
   }, []);
 
   const goNext = useCallback(() => {
-    if (stepIndex >= STEPS.length - 1) {
+    if (stepIndex >= steps.length - 1) {
       finishTour();
       return;
     }
     setStepIndex((s) => s + 1);
-  }, [stepIndex, finishTour]);
+  }, [stepIndex, finishTour, steps.length]);
 
   if (phase !== 'on') return null;
 
-  const step = STEPS[stepIndex];
+  const step = steps[stepIndex];
   if (!step) return null;
 
-  const isLast = stepIndex === STEPS.length - 1;
+  const isLast = stepIndex === steps.length - 1;
   const primaryLabel = isLast ? 'わかった' : '次へ';
 
   const vw = viewport.w || (typeof window !== 'undefined' ? window.innerWidth : 400);
@@ -414,7 +455,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
           aria-modal="true"
           aria-labelledby={`p-tour-h-${step.id}`}
         >
-          {tourCardBody(step, stepIndex, isLast, primaryLabel, goNext, finishTour)}
+          {tourCardBody(step, stepIndex, steps.length, isLast, primaryLabel, goNext, finishTour)}
         </div>
       )}
 
@@ -427,7 +468,7 @@ export function GuidedTour({ route, settingsReady, guidedTourReplayToken = 0 }: 
           aria-modal="true"
           aria-labelledby={`p-tour-h-${step.id}`}
         >
-          {tourCardBody(step, stepIndex, isLast, primaryLabel, goNext, finishTour)}
+          {tourCardBody(step, stepIndex, steps.length, isLast, primaryLabel, goNext, finishTour)}
         </div>
       )}
     </div>

@@ -173,10 +173,12 @@ export function HomePage({ settings }: HomePageProps) {
         />
 
         {/* 課題カレンダー */}
-        <AssignmentCalendar
-          payload={assignmentPayload}
-          titles={{ week: '今週の課題', month: '今月の課題' }}
-        />
+        {!settings.hideAssignmentCalendar ? (
+          <AssignmentCalendar
+            payload={assignmentPayload}
+            titles={{ week: '今週の課題', month: '今月の課題' }}
+          />
+        ) : null}
 
         {/* 補修カレンダー */}
         <CalendarPanel

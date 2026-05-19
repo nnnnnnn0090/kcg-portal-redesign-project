@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { SK } from '../shared/constants';
 import storage from '../lib/storage';
 import { pageFetch, urls } from '../lib/api';
-import type { CourseRow } from '../context/courses';
+import { isCourseRowArray, type CourseRow } from '../context/courses';
 import type { CustomLink, LinkConfig } from '../shared/types';
 import type { DuePayload } from '../features/calendar';
 
@@ -29,18 +29,6 @@ function isDuePayload(x: unknown): x is DuePayload {
   if (!x || typeof x !== 'object') return false;
   const o = x as Record<string, unknown>;
   return Array.isArray(o.items) && typeof o.capturedAt === 'number';
-}
-
-function isCourseRow(x: unknown): x is CourseRow {
-  if (!x || typeof x !== 'object') return false;
-  const o = x as Record<string, unknown>;
-  if (o.displayName != null && typeof o.displayName !== 'string') return false;
-  if (o.externalAccessUrl != null && typeof o.externalAccessUrl !== 'string') return false;
-  return true;
-}
-
-function isCourseRowArray(x: unknown): x is CourseRow[] {
-  return Array.isArray(x) && x.every(isCourseRow);
 }
 
 export interface HomeStorageBootstrapParams {

@@ -34,7 +34,6 @@ import {
   calendarYearRangeBeforeInclusiveStart,
   filterCalItemsByRange,
   toIsoLocal,
-  weekRangeContaining,
   calParamsAfterWeekStartChange,
   type CalendarWeekStart,
 } from '../../lib/date';

@@ -2,7 +2,7 @@
  * King LMS の streams 由来データを、カレンダー描画用の `CalEvent` へ変換するアダプタです。
  */
 
-import { toIsoLocal, addDaysIso, isoToMonthRef, calEventDayIso } from '../../lib/date';
+import { isoToMonthRef, calEventDayIso } from '../../lib/date';
 import { KING_LMS_ORIGIN } from '../../shared/constants';
 import type { CalEvent } from './types';
 

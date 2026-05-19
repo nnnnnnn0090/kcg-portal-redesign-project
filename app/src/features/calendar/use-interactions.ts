@@ -7,15 +7,30 @@ import { useEffect, useRef, type RefObject } from 'react';
 import { afterLayout } from './anim';
 import { esc, setHtml } from '../../lib/dom';
 import { beginKingLmsCourseListSync } from '../../lib/king-lms-course-sync';
+import { KING_LMS_COURSE_SYNC_URL } from '../../shared/constants';
 import { formatRemainingUntilDue } from './assignment';
 import { syllabusUrl, findKingLmsUrl } from './kogi';
-import { useCourses, type CourseRow } from '../../context/courses';
+import { readStoredCourses, useCourses, type CourseRow } from '../../context/courses';
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
 import { usePortalDom } from '../../context/portalDom';
 
 /** tooltip 先頭の「コード：」は左ラベルに寄せるため、値から除く */
 function stripLeadingCodeJaPrefix(raw: string): string {
   return raw.replace(/^\s*コード\s*[：:]\s*/i, '').trim();
+}
+
+function openKingLmsUrl(url: string): void {
+  const opened = window.open(url, '_blank');
+  if (opened) {
+    try { opened.opener = null; } catch { /* ignore */ }
+    return;
+  }
+  window.location.href = url;
+}
+
+function kingLmsUrlForEvent(ev: Element, courses: CourseRow[]): string {
+  const title = ev instanceof HTMLElement ? (ev.dataset.calTitle || '') : '';
+  return findKingLmsUrl(courses, title);
 }
 
 function attachCalendarTooltipAndContextMenu(
@@ -25,9 +40,11 @@ function attachCalendarTooltipAndContextMenu(
   btnSyl: HTMLButtonElement,
   btnKing: HTMLButtonElement,
   coursesRef: RefObject<CourseRow[]>,
+  setCourses: (rows: CourseRow[]) => void,
   settingsPopRef: RefObject<HTMLDivElement | null>,
 ): () => void {
   let hideTimer = 0;
+  let resolvingPrimaryCourseClick = false;
 
   function hide() {
     if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
@@ -210,7 +227,31 @@ function attachCalendarTooltipAndContextMenu(
     if (ev instanceof HTMLAnchorElement) return;
     e.preventDefault();
     e.stopPropagation();
-    void beginKingLmsCourseListSync();
+
+    if (resolvingPrimaryCourseClick) return;
+
+    const immediateUrl = kingLmsUrlForEvent(ev, coursesRef.current);
+    if (immediateUrl) {
+      openKingLmsUrl(immediateUrl);
+      return;
+    }
+
+    resolvingPrimaryCourseClick = true;
+    void (async () => {
+      try {
+        const storedCourses = await readStoredCourses();
+        if (storedCourses.length > 0) {
+          coursesRef.current = storedCourses;
+          setCourses(storedCourses);
+          const storedUrl = kingLmsUrlForEvent(ev, storedCourses);
+          openKingLmsUrl(storedUrl || KING_LMS_COURSE_SYNC_URL);
+          return;
+        }
+        await beginKingLmsCourseListSync();
+      } finally {
+        resolvingPrimaryCourseClick = false;
+      }
+    })();
   }
 
   overlayRoot.addEventListener('click', onKogiPrimaryClick);
@@ -300,7 +341,7 @@ function attachCalendarTooltipAndContextMenu(
  * @param calendarInteractionEpoch ルートやレイアウトが変わったときに変えると、DOM アンカー再マウント後にリスナーを張り直す
  */
 export function useCalendarInteractions(calendarInteractionEpoch: string | number): void {
-  const { courses } = useCourses();
+  const { courses, setCourses } = useCourses();
   const coursesRef  = useRef(courses);
   coursesRef.current = courses;
   const { hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef } = useCalendarOverlayUiRefs();
@@ -321,7 +362,8 @@ export function useCalendarInteractions(calendarInteractionEpoch: string | numbe
       btnSyl,
       btnKing,
       coursesRef,
+      setCourses,
       settingsPopRef,
     );
-  }, [hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef, overlayRoot, settingsPopRef, calendarInteractionEpoch]);
+  }, [hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef, overlayRoot, setCourses, settingsPopRef, calendarInteractionEpoch]);
 }

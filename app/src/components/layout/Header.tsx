@@ -35,6 +35,20 @@ function portalNavDisplayLabel(trimmedLabel: string): string {
   return trimmedLabel === 'Webサービス' ? 'キャンパスプラン' : trimmedLabel;
 }
 
+/**
+ * 学ポータル本体 DOM の `li.logoff` 内ログアウト用アンカー（拡張オーバーレイ外）。
+ * `href` が無い・`#`・`javascript:`・PostBack 専用など、遷移先 URL だけでは再現できないケースがある。
+ */
+function findHostLogoffAnchor(overlayRootId: string): HTMLAnchorElement | null {
+  for (const li of document.querySelectorAll('li.logoff')) {
+    if (!(li instanceof HTMLElement)) continue;
+    if (li.closest(`#${overlayRootId}`)) continue;
+    const a = li.querySelector('a');
+    if (a instanceof HTMLAnchorElement) return a;
+  }
+  return null;
+}
+
 function parseNavItems(ul: HTMLUListElement): NavItem[] {
   const out: NavItem[] = [];
   for (const li of ul.children) {
@@ -232,9 +246,7 @@ export function Header({
       setNavItems([]);
     }
 
-    const logoutLink = document.querySelector('li.logoff a[href]');
-    const nativePortalLogout = logoutLink instanceof HTMLAnchorElement
-      && !logoutLink.closest(`#${PORTAL_DOM.overlayRoot}`);
+    const nativePortalLogout = findHostLogoffAnchor(PORTAL_DOM.overlayRoot) != null;
 
     const webMailLo = document.getElementById('MainContent_butLogout');
     const hasWebMailLogout = webMailLo instanceof HTMLInputElement
@@ -242,6 +254,22 @@ export function Header({
 
     setShowLogout(nativePortalLogout || hasWebMailLogout);
   }, [navSource]);
+
+  /**
+   * `href` が実URLのときだけ location 遷移する。`#` / `javascript:` / PostBack 等は click に任せる。
+   */
+  function tryAssignLocationFromLogoutAnchor(a: HTMLAnchorElement): boolean {
+    const raw = a.getAttribute('href')?.trim() ?? '';
+    if (!raw || raw === '#' || raw.toLowerCase().startsWith('javascript:')) return false;
+    try {
+      const u = new URL(raw, location.href);
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+    } catch {
+      return false;
+    }
+    window.location.href = a.href;
+    return true;
+  }
 
   function handleLogout() {
     if (navSource === 'home2-mail') {
@@ -251,10 +279,13 @@ export function Header({
         return;
       }
     }
-    const logoutLink = [...document.querySelectorAll<HTMLAnchorElement>('a[href]')]
-      .find((a) => !a.closest(`#${PORTAL_DOM.overlayRoot}`) && a.closest('li.logoff'));
+    const logoutLink = findHostLogoffAnchor(PORTAL_DOM.overlayRoot);
     if (navSource === 'home2-mail' && !logoutLink) return;
-    window.location.href = logoutLink?.href ?? '/portal/Login';
+    if (logoutLink) {
+      if (!tryAssignLocationFromLogoutAnchor(logoutLink)) logoutLink.click();
+      return;
+    }
+    window.location.href = '/portal/Login';
   }
 
   const navLabel = navSource === 'home2-mail' ? 'Home2 メニュー' : 'ポータルメニュー';

@@ -66,12 +66,16 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
   const calendarInteractionEpoch = useMemo(() => {
     if (isHome2MailRoute(route)) return `h2:${route.layout}`;
     if (surface === 'portal' && portalRoute) {
-      return portalRoute.detailId != null
+      const base = portalRoute.detailId != null
         ? `p:${portalRoute.page}:${portalRoute.detailId}`
         : `p:${portalRoute.page}`;
+      if (portalRoute.page === PAGE.HOME) {
+        return `${base}:hideAsg${settings.hideAssignmentCalendar ? '1' : '0'}`;
+      }
+      return base;
     }
     return String(surface);
-  }, [surface, route, portalRoute]);
+  }, [surface, route, portalRoute, settings.hideAssignmentCalendar]);
 
   const handleReplayGuidedTour = useCallback(() => {
     if (!portalRoute) return;
@@ -173,6 +177,7 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
         <GuidedTour
           route={portalRoute}
           settingsReady={settingsReady}
+          hideAssignmentCalendar={settings.hideAssignmentCalendar}
           guidedTourReplayToken={guidedTourReplayToken}
         />
       ) : null}

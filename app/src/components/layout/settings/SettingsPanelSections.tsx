@@ -106,6 +106,15 @@ export function SettingsPortalOnlySections({
           <span>キャンパスカレンダーを、予定がなくても表示する</span>
         </label>
 
+        <label className="p-settings-row">
+          <input
+            type="checkbox"
+            checked={settings.hideAssignmentCalendar}
+            onChange={(e) => onSettingChange('hideAssignmentCalendar', e.target.checked)}
+          />
+          <span>課題カレンダーを表示しない</span>
+        </label>
+
         <fieldset className="p-settings-fieldset">
           <legend className="p-settings-row-label">カレンダーの週の始まり</legend>
           <label className="p-settings-row">

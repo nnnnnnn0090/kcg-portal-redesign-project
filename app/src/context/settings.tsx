@@ -27,6 +27,8 @@ export interface Settings {
   campusCalForce:     boolean;
   hideProfileName:    boolean;
   showKogiCalMascot:  boolean;
+  /** ホームの課題カレンダーを出さない */
+  hideAssignmentCalendar: boolean;
   home2WebMailOverlay: boolean;
   /** カレンダーの列を「月〜日」または「日〜土」で始める */
   calendarWeekStart: CalendarWeekStart;
@@ -49,6 +51,7 @@ const DEFAULTS: Settings = {
   campusCalForce:    false,
   hideProfileName:   false,
   showKogiCalMascot: false,
+  hideAssignmentCalendar: false,
   home2WebMailOverlay: true,
   calendarWeekStart: 'monday',
 };
@@ -62,6 +65,7 @@ const SETTINGS_TO_SK = {
   campusCalForce:  SK.campusCalForce,
   hideProfileName: SK.hideProfileName,
   showKogiCalMascot:  SK.showKogiCalMascot,
+  hideAssignmentCalendar: SK.hideAssignmentCalendar,
   home2WebMailOverlay: SK.home2WebMailOverlay,
   calendarWeekStart: SK.calendarWeekStart,
 } satisfies Record<keyof Settings, string>;
@@ -73,6 +77,7 @@ const STORAGE_KEYS = [
   SK.campusCalForce,
   SK.hideProfileName,
   SK.showKogiCalMascot,
+  SK.hideAssignmentCalendar,
   SK.home2WebMailOverlay,
   SK.calendarWeekStart,
 ] as const;
@@ -85,6 +90,8 @@ function parseSettings(data: Record<string, unknown>): Settings {
     campusCalForce:  Boolean(data[SK.campusCalForce]  ?? DEFAULTS.campusCalForce),
     hideProfileName: Boolean(data[SK.hideProfileName] ?? DEFAULTS.hideProfileName),
     showKogiCalMascot: Boolean(data[SK.showKogiCalMascot] ?? DEFAULTS.showKogiCalMascot),
+    hideAssignmentCalendar:
+      Boolean(data[SK.hideAssignmentCalendar] ?? DEFAULTS.hideAssignmentCalendar),
     home2WebMailOverlay: Boolean(data[SK.home2WebMailOverlay] ?? DEFAULTS.home2WebMailOverlay),
     calendarWeekStart: parseCalendarWeekStart(data[SK.calendarWeekStart]),
   };

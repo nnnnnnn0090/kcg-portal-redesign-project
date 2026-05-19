@@ -12,6 +12,8 @@ export const SK = {
   hideProfileName:                  'portalThemeHideProfileName',
   theme:                            'portalThemeColorTheme',
   showKogiCalMascot:                'portalThemeShowKogiCalMascot',
+  /** ホームの King LMS 連携「課題」カレンダーを表示しない */
+  hideAssignmentCalendar:          'portalThemeHideAssignmentCalendar',
   kingLmsCourses:                   'portalThemeKingLmsCourses',
   kingLmsStreamsUltraDue:           'portalThemeKingLmsStreamsUltraDue',
   kingLmsSyncPending:               'portalThemeKingLmsSyncPending',
