@@ -5,6 +5,7 @@
 
 import { PORTAL_CONTENT_SCRIPT_MATCHES } from '../../shared/constants';
 import { installFetchHook } from './portal-fetch-hook';
+import { installLogoffBridge } from './portal-logoff-bridge';
 import { installFetchBridge } from './portal-page-fetch-bridge';
 import { installXhrHook } from './portal-xhr-hook';
 
@@ -17,5 +18,6 @@ export default defineContentScript({
     installFetchHook();
     installXhrHook();
     installFetchBridge();
+    installLogoffBridge();
   },
 });

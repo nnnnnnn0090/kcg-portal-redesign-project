@@ -6,6 +6,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { Settings } from '../../context/settings';
 import { HOME2_MAIL_DEFAULT_URL, HOME2_ORIGIN, HOME2_TOP_PAGE_URL, PORTAL_DOM } from '../../shared/constants';
+import { findHostLogoffAnchor, requestHostPortalLogoff } from '../../shared/host-logoff';
 
 // ─── ナビゲーション型 ─────────────────────────────────────────────────────
 
@@ -33,20 +34,6 @@ function resolveHref(href: string): string {
 
 function portalNavDisplayLabel(trimmedLabel: string): string {
   return trimmedLabel === 'Webサービス' ? 'キャンパスプラン' : trimmedLabel;
-}
-
-/**
- * 学ポータル本体 DOM の `li.logoff` 内ログアウト用アンカー（拡張オーバーレイ外）。
- * `href` が無い・`#`・`javascript:`・PostBack 専用など、遷移先 URL だけでは再現できないケースがある。
- */
-function findHostLogoffAnchor(overlayRootId: string): HTMLAnchorElement | null {
-  for (const li of document.querySelectorAll('li.logoff')) {
-    if (!(li instanceof HTMLElement)) continue;
-    if (li.closest(`#${overlayRootId}`)) continue;
-    const a = li.querySelector('a');
-    if (a instanceof HTMLAnchorElement) return a;
-  }
-  return null;
 }
 
 function parseNavItems(ul: HTMLUListElement): NavItem[] {
@@ -282,7 +269,9 @@ export function Header({
     const logoutLink = findHostLogoffAnchor(PORTAL_DOM.overlayRoot);
     if (navSource === 'home2-mail' && !logoutLink) return;
     if (logoutLink) {
-      if (!tryAssignLocationFromLogoutAnchor(logoutLink)) logoutLink.click();
+      if (tryAssignLocationFromLogoutAnchor(logoutLink)) return;
+      // `javascript:__doPostBack` 等は隔離ワールドの click が Chrome CSP で拒否されるため MAIN へ委譲
+      requestHostPortalLogoff();
       return;
     }
     window.location.href = '/portal/Login';

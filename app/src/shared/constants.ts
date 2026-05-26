@@ -139,6 +139,8 @@ export const FETCH_HOOK = {
   replayRequest: 'portalThemeReplayIntercepted',
   /** pageFetch 依頼 */
   pageFetch:     'portalThemePageFetchRequest',
+  /** 学ポータル本体 `li.logoff` のログアウト（MAIN ワールドで実行） */
+  logoffTrigger: 'portalThemeLogoffTrigger',
 } as const;
 
 /** `window` で発火。`X-CPAuthorize` がキャプチャされたあと pageFetch ブリッジが待機解除する */
