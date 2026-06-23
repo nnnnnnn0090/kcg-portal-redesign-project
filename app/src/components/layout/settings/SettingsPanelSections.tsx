@@ -43,6 +43,7 @@ export function SettingsLanguageSection({
           ))}
         </select>
       </label>
+      <p className="p-settings-hint">{t.language.hint}</p>
     </div>
   );
 }
