@@ -1,5 +1,5 @@
 /**
- * King LMS ページ種別の判定（ログイン誘導・コース・ストリーム等）と、同期後のポータル URL へのハッシュ付与です。
+ * King LMS ページ種別の判定（ログイン誘導・コース・カレンダー等）と、同期後のポータル URL へのハッシュ付与です。
  */
 
 import { KING_LMS_HOSTNAME } from '../../shared/constants';
@@ -18,8 +18,8 @@ export function isCoursePage(): boolean {
   catch { return false; }
 }
 
-export function isStreamPage(): boolean {
-  try { return location.hostname === KING_LMS_HOSTNAME && /\/ultra\/stream/.test(location.pathname); }
+export function isAssignmentSyncPage(): boolean {
+  try { return location.hostname === KING_LMS_HOSTNAME && /\/ultra\/calendar/.test(location.pathname); }
   catch { return false; }
 }
 

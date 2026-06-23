@@ -22,7 +22,7 @@ export function installMessageListener(): void {
       return;
     }
 
-    if (e.data.type === KING_LMS_HOOK.streamsDuePostType && e.data.source === KING_LMS_HOOK.source) {
+    if (e.data.type === KING_LMS_HOOK.assignmentDuePostType && e.data.source === KING_LMS_HOOK.source) {
       if (e.data.captureState === 'error') {
         void saveAssignmentDue([], Date.now(), 'error');
         return;

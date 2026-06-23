@@ -44,11 +44,11 @@ export function useHomeStorageBootstrap({
 }: HomeStorageBootstrapParams): void {
   useEffect(() => {
     void pageFetch(urls.kogiNews());
-    void storage.get([SK.shortcutConfig, SK.kingLmsStreamsUltraDue, SK.kingLmsCourses]).then((data) => {
+    void storage.get([SK.shortcutConfig, SK.kingLmsAssignmentDue, SK.kingLmsCourses]).then((data) => {
       const cfg = data[SK.shortcutConfig];
       if (isLinkConfig(cfg)) setLinkConfig(cfg);
 
-      const due = data[SK.kingLmsStreamsUltraDue];
+      const due = data[SK.kingLmsAssignmentDue];
       if (isDuePayload(due)) setAssignmentPayload(due);
 
       const c = data[SK.kingLmsCourses];

@@ -5,7 +5,7 @@
 
 import { SK, SYNC_HASH } from '../../shared/constants';
 import storage from '../../lib/storage';
-import { isCoursePage, isLoginRedirectPage, isStreamPage } from './bridge-urls';
+import { isCoursePage, isLoginRedirectPage, isAssignmentSyncPage } from './bridge-urls';
 import { mountLoginHint, mountSyncOverlay, removeSyncOverlay } from './bridge-overlay-ui';
 import {
   clearAssignmentTimer,
@@ -20,14 +20,14 @@ export async function maybeShowOverlayFromStorage(): Promise<void> {
   const data = await storage.get([
     SK.kingLmsSyncPending,
     SK.kingLmsAssignmentSyncPending,
-    SK.kingLmsAssignmentSyncAwaitStream,
+    SK.kingLmsAssignmentSyncAwaitCalendar,
     SK.kingLmsAssignmentSyncReturnUrl,
   ]);
   const assignmentWaiting =
     !!data[SK.kingLmsAssignmentSyncPending]
-    || (!!data[SK.kingLmsAssignmentSyncAwaitStream]
+    || (!!data[SK.kingLmsAssignmentSyncAwaitCalendar]
       && !!data[SK.kingLmsAssignmentSyncReturnUrl]
-      && isStreamPage());
+      && isAssignmentSyncPage());
   if (assignmentWaiting) {
     mountSyncOverlay('課題を取得しています…');
     startAssignmentTimer();
@@ -48,7 +48,7 @@ export async function cancelPendingForLoginRedirect(): Promise<void> {
     [SK.kingLmsSyncPending]:               false,
     [SK.kingLmsSyncAwaitCourse]:           hadCourseReturn,
     [SK.kingLmsAssignmentSyncPending]:     false,
-    [SK.kingLmsAssignmentSyncAwaitStream]: hadAssignmentReturn,
+    [SK.kingLmsAssignmentSyncAwaitCalendar]: hadAssignmentReturn,
   });
   if (hadCourseReturn || hadAssignmentReturn) {
     mountLoginHint(hadAssignmentReturn && !hadCourseReturn);
@@ -70,23 +70,23 @@ export async function saveCourses(courses: unknown[]): Promise<void> {
 }
 
 export type SaveAssignmentDueOpts = {
-  /** 行はあるが締切行が 0 件: 既存の kingLmsStreamsUltraDue を壊さず、同期リダイレクトだけ行う */
+  /** 行はあるが締切行が 0 件: 既存の kingLmsAssignmentDue を壊さず、同期リダイレクトだけ行う */
   assignmentSyncNoOp?: boolean;
 };
 
 /**
- * ログイン直後の「ストリームページ待ち」→ 課題同期の通常ペンディングへ寄せる。
+ * ログイン直後の「カレンダーページ待ち」→ 課題同期の通常ペンディングへ寄せる。
  * saveAssignmentDue 成功・空スキップ・失敗の各経路で同じ形を使う。
  */
-function patchAssignmentAwaitStreamToPending(): Record<string, unknown> {
+function patchAssignmentAwaitCalendarToPending(): Record<string, unknown> {
   return {
-    [SK.kingLmsAssignmentSyncAwaitStream]: false,
+    [SK.kingLmsAssignmentSyncAwaitCalendar]: false,
     [SK.kingLmsAssignmentSyncPending]:     true,
   };
 }
 
 /**
- * kingLmsStreamsUltraDue を更新せず、ストレージ上の課題一覧を保ったまま同期フローだけ完了する
+ * kingLmsAssignmentDue を更新せず、ストレージ上の課題一覧を保ったまま同期フローだけ完了する
  *（noOp / 空上書きスキップ時のリダイレクト用）
  */
 async function completeAssignmentSyncKeepStoredDue(
@@ -94,7 +94,7 @@ async function completeAssignmentSyncKeepStoredDue(
   hadAwait: boolean,
 ): Promise<void> {
   if (syncPending && hadAwait) {
-    await storage.set(patchAssignmentAwaitStreamToPending());
+    await storage.set(patchAssignmentAwaitCalendarToPending());
   }
   if (syncPending) await redirectAfterAssignment(SYNC_HASH.assignmentDone);
 }
@@ -105,15 +105,15 @@ export async function saveAssignmentDue(
   captureState?: string,
   opts?: SaveAssignmentDueOpts,
 ): Promise<void> {
-  const data = await storage.get([SK.kingLmsAssignmentSyncPending, SK.kingLmsAssignmentSyncAwaitStream, SK.kingLmsAssignmentSyncReturnUrl]);
+  const data = await storage.get([SK.kingLmsAssignmentSyncPending, SK.kingLmsAssignmentSyncAwaitCalendar, SK.kingLmsAssignmentSyncReturnUrl]);
   let syncPending = !!data[SK.kingLmsAssignmentSyncPending];
-  const hadAwait  = !!data[SK.kingLmsAssignmentSyncAwaitStream];
-  if (!syncPending && hadAwait && data[SK.kingLmsAssignmentSyncReturnUrl] && isStreamPage()) syncPending = true;
+  const hadAwait  = !!data[SK.kingLmsAssignmentSyncAwaitCalendar];
+  if (!syncPending && hadAwait && data[SK.kingLmsAssignmentSyncReturnUrl] && isAssignmentSyncPage()) syncPending = true;
   if (syncPending) mountSyncOverlay('課題を取得しています…');
 
   if (captureState === 'error') {
     if (syncPending) {
-      if (hadAwait) await storage.set(patchAssignmentAwaitStreamToPending());
+      if (hadAwait) await storage.set(patchAssignmentAwaitCalendarToPending());
       await redirectAfterAssignment(SYNC_HASH.assignmentError);
     }
     return;
@@ -126,7 +126,7 @@ export async function saveAssignmentDue(
 
   // 空配列で既存有りを潰さない（hooks 以外のレースの保険）
   if (items.length === 0) {
-    const existing = await storage.get(SK.kingLmsStreamsUltraDue) as { items?: unknown[] } | undefined;
+    const existing = await storage.get(SK.kingLmsAssignmentDue) as { items?: unknown[] } | undefined;
     const prevItems = existing?.items;
     if (Array.isArray(prevItems) && prevItems.length > 0) {
       await completeAssignmentSyncKeepStoredDue(syncPending, hadAwait);
@@ -134,9 +134,9 @@ export async function saveAssignmentDue(
     }
   }
 
-  const toSet: Record<string, unknown> = { [SK.kingLmsStreamsUltraDue]: { items, capturedAt } };
+  const toSet: Record<string, unknown> = { [SK.kingLmsAssignmentDue]: { items, capturedAt } };
   if (syncPending && hadAwait) {
-    Object.assign(toSet, patchAssignmentAwaitStreamToPending());
+    Object.assign(toSet, patchAssignmentAwaitCalendarToPending());
   }
   await storage.set(toSet);
   if (syncPending) await redirectAfterAssignment(SYNC_HASH.assignmentDone);

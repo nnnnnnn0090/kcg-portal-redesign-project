@@ -1,9 +1,17 @@
 /**
  * King LMS オリジンで `document_start`・MAIN ワールドとして読み込まれます。
- * `fetch` / XHR をフックし、コース一覧や streams/ultra の結果を同一タブの `king-lms-bridge` へ `postMessage` します。
+ * `fetch` / XHR をフックし、コース一覧や calendarItems の結果を同一タブの `king-lms-bridge` へ `postMessage` します。
  */
 
-import { isStreamsUltraLoadingPlaceholder } from '../../lib/streams-ultra-response';
+import {
+  assignmentSyncCalendarRange,
+  calendarItemsToDueItems,
+  mergeDueItems,
+} from '../../lib/calendar-items-to-due-items';
+import { enrichDueItemsWithSubmissionStatus } from '../../lib/gradebook-submission-status';
+import { appendKingLmsApiCapture, isKingLmsApiUrl } from '../../lib/king-lms-api-capture';
+import { normalizeCalendarItemsResponse } from '../../lib/king-lms-calendar-response';
+import type { DueItem } from '../../features/calendar/assignment';
 import { KING_LMS_HOOK, KING_LMS_HOSTNAME, KING_LMS_ORIGIN } from '../../shared/constants';
 
 export default defineContentScript({
@@ -19,16 +27,21 @@ export default defineContentScript({
 // ─── URL 判定 ─────────────────────────────────────────────────────────────────
 
 const MEMBERSHIPS_RE = /^\/learn\/api\/v1\/users\/[^/]+\/memberships(?:\/|$)/;
+const CALENDAR_ITEMS_PATH = '/learn/api/v1/calendars/calendarItems';
 
 function isMembershipsUrl(url: string): boolean {
   try { return MEMBERSHIPS_RE.test(new URL(url, location.href).pathname); } catch { return false; }
 }
 
-function isStreamsUltraUrl(url: string): boolean {
+function isCalendarItemsUrl(url: string): boolean {
   try {
     const p = new URL(url, location.href).pathname;
-    return p === '/learn/api/v1/streams/ultra' || p.startsWith('/learn/api/v1/streams/ultra/');
+    return p === CALENDAR_ITEMS_PATH;
   } catch { return false; }
+}
+
+function isCalendarPage(): boolean {
+  try { return /\/ultra\/calendar/.test(location.pathname); } catch { return false; }
 }
 
 // ─── データ型 ─────────────────────────────────────────────────────────────────
@@ -38,15 +51,77 @@ interface CourseEntry {
   externalAccessUrl: string | null;
 }
 
-interface DueItem {
-  courseId:          unknown;
-  courseName:        string;
-  title:             unknown;
-  dueDate:           string;
-  /** notificationDetails.sourceId（同一課題の複数ストリーム行のマージに使用） */
-  sourceId?:         string;
-  /** extraAttribs.event_type（例 UA:DUE, UA:UA_AVAIL） */
-  streamEventType?: string;
+// ─── calendarItems 収集 ───────────────────────────────────────────────────────
+
+let collectedDueItems: DueItem[] = [];
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let wideFetchStarted = false;
+let wideFetchSettled = false;
+let wideFetchFailed = false;
+let assignmentFlushDone = false;
+let kingLmsOrigFetch: typeof fetch = (...args) => fetch(...args);
+
+function resetAssignmentCollection(): void {
+  collectedDueItems = [];
+  wideFetchStarted = false;
+  wideFetchSettled = false;
+  wideFetchFailed = false;
+  assignmentFlushDone = false;
+  if (flushTimer != null) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+}
+
+function ingestCalendarItems(json: unknown): void {
+  const rows = normalizeCalendarItemsResponse(json);
+  if (rows === null) {
+    if (collectedDueItems.length === 0 && wideFetchSettled) notifyAssignmentFailure();
+    return;
+  }
+  const due = calendarItemsToDueItems(rows);
+  if (due.length > 0) collectedDueItems.push(...due);
+  scheduleAssignmentFlush();
+}
+
+function scheduleAssignmentFlush(): void {
+  if (assignmentFlushDone) return;
+  if (flushTimer != null) clearTimeout(flushTimer);
+  flushTimer = setTimeout(() => { flushTimer = null; void flushAssignmentDue(); }, 700);
+}
+
+async function flushAssignmentDue(): Promise<void> {
+  if (assignmentFlushDone) return;
+  if (isCalendarPage() && wideFetchStarted && !wideFetchSettled) {
+    scheduleAssignmentFlush();
+    return;
+  }
+
+  const merged = mergeDueItems(collectedDueItems);
+  assignmentFlushDone = true;
+  if (merged.length === 0) {
+    if (wideFetchFailed) notifyAssignmentFailure();
+    else postAssignmentDue([], Date.now(), { assignmentSyncNoOp: true });
+    return;
+  }
+  await enrichAndPostAssignmentDue(merged);
+}
+
+function startWideCalendarFetch(origFetch: typeof fetch): void {
+  if (!isCalendarPage() || wideFetchStarted) return;
+  wideFetchStarted = true;
+  const { since, until } = assignmentSyncCalendarRange();
+  const url = `${KING_LMS_ORIGIN}${CALENDAR_ITEMS_PATH}?since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}`;
+  void origFetch(url)
+    .then(r => {
+      wideFetchSettled = true;
+      if (!r.ok) { wideFetchFailed = true; return; }
+      return r.json().then(ingestCalendarItems).catch(() => { wideFetchFailed = true; });
+    })
+    .catch(() => {
+      wideFetchSettled = true;
+      wideFetchFailed = true;
+    });
 }
 
 // ─── ハンドラ ─────────────────────────────────────────────────────────────────
@@ -66,23 +141,7 @@ function handleMemberships(json: unknown): void {
   } catch {}
 }
 
-function courseIdToNameMap(json: unknown): Record<string, string> {
-  const map: Record<string, string> = {};
-  const list = ((json as Record<string, unknown>)?.sv_extras as Record<string, unknown>)?.sx_courses;
-  if (!Array.isArray(list)) return map;
-  for (const row of list) {
-    const r = row as Record<string, unknown>;
-    if (r?.id == null) continue;
-    if (r.name != null && String(r.name).trim() !== '') map[String(r.id)] = String(r.name);
-  }
-  return map;
-}
-
-/**
- * streams/ultra の結果を `king-lms-bridge` へ渡すための `postMessage` です。
- * `bridge-message-listener` が受け取り、`saveAssignmentDue` でストレージに反映されます。
- */
-function postStreamsUltraDue(
+function postAssignmentDue(
   items: DueItem[],
   capturedAt: number,
   extra?: {
@@ -93,7 +152,7 @@ function postStreamsUltraDue(
   try {
     window.postMessage(
       {
-        type: KING_LMS_HOOK.streamsDuePostType,
+        type: KING_LMS_HOOK.assignmentDuePostType,
         source: KING_LMS_HOOK.source,
         items,
         capturedAt,
@@ -104,62 +163,25 @@ function postStreamsUltraDue(
   } catch {}
 }
 
-function notifyStreamsFailure(): void {
-  postStreamsUltraDue([], Date.now(), { captureState: 'error' });
+function notifyAssignmentFailure(): void {
+  postAssignmentDue([], Date.now(), { captureState: 'error' });
 }
 
-function handleStreamsUltra(json: unknown): void {
-  try {
-    if (!json || typeof json !== 'object') { notifyStreamsFailure(); return; }
-    const se = (json as Record<string, unknown>).sv_streamEntries;
-    if (!Array.isArray(se)) { notifyStreamsFailure(); return; }
-    // 未ロードのプレースホルダー（sv_moreData=true 等）は King LMS 本体レスが来るまで無視する
-    if (se.length === 0) {
-      if (isStreamsUltraLoadingPlaceholder(json)) return;
-      postStreamsUltraDue([], Date.now(), { assignmentSyncNoOp: true });
-      return;
-    }
-    const nameByCourseId = courseIdToNameMap(json);
-    const slim: DueItem[] = [];
-    for (const item of se) {
-      const row = item as Record<string, unknown>;
-      const isd = row?.itemSpecificData as Record<string, unknown>;
-      const nd  = isd?.notificationDetails as Record<string, unknown>;
-      const dd  = nd?.dueDate;
-      if (dd == null || String(dd).trim() === '') continue;
-      const cid    = nd?.courseId;
-      const cidStr = cid != null ? String(cid) : '';
-      const extra  = row?.extraAttribs as Record<string, unknown> | undefined;
-      const evtRaw = extra?.event_type;
-      const sidRaw = nd?.sourceId;
-      const streamEventType = evtRaw != null && String(evtRaw).trim() !== ''
-        ? String(evtRaw).trim()
-        : undefined;
-      const sourceId = sidRaw != null && String(sidRaw).trim() !== ''
-        ? String(sidRaw).trim()
-        : undefined;
-      slim.push({
-        courseId:   cid,
-        courseName: cidStr && nameByCourseId[cidStr] != null ? nameByCourseId[cidStr] : '',
-        title:      isd?.title,
-        dueDate:    String(dd),
-        sourceId,
-        streamEventType,
-      });
-    }
-    /** 行はあるが締切が取れないレスは空保存しない（別レスとのレースで一覧が消える）。同期完了だけ bridge へ委譲 */
-    if (slim.length === 0) {
-      postStreamsUltraDue([], Date.now(), { assignmentSyncNoOp: true });
-      return;
-    }
-    postStreamsUltraDue(slim, Date.now());
-  } catch { notifyStreamsFailure(); }
+async function enrichAndPostAssignmentDue(items: DueItem[]): Promise<void> {
+  const enriched = await enrichDueItemsWithSubmissionStatus(items, kingLmsOrigFetch);
+  postAssignmentDue(enriched, Date.now());
+}
+
+function maybeCaptureApiResponse(url: string, json: unknown): void {
+  if (!isKingLmsApiUrl(url)) return;
+  appendKingLmsApiCapture(url, json);
 }
 
 // ─── フック インストール ───────────────────────────────────────────────────────
 
 function installKingLmsHook(): void {
-  const origFetch = window.fetch;
+  const origFetch = window.fetch.bind(window);
+  kingLmsOrigFetch = origFetch;
   window.fetch = function (input, init) {
     const url = typeof input === 'string' ? input
       : input instanceof URL ? String(input)
@@ -167,14 +189,27 @@ function installKingLmsHook(): void {
 
     const p = origFetch.apply(this, [input, init] as Parameters<typeof fetch>);
 
+    if (isKingLmsApiUrl(url)) {
+      p.then(r => {
+        if (!r.ok) return;
+        r.clone().json().then(j => maybeCaptureApiResponse(url, j)).catch(() => {});
+      }).catch(() => {});
+    }
     if (isMembershipsUrl(url)) {
       p.then(r => r.clone().json().then(handleMemberships).catch(() => {})).catch(() => {});
     }
-    if (isStreamsUltraUrl(url)) {
+    if (isCalendarItemsUrl(url)) {
       p.then(r => {
-        if (!r.ok) { notifyStreamsFailure(); return; }
-        r.clone().json().then(handleStreamsUltra).catch(notifyStreamsFailure);
-      }).catch(notifyStreamsFailure);
+        if (!r.ok) {
+          if (collectedDueItems.length === 0 && wideFetchSettled) notifyAssignmentFailure();
+          return;
+        }
+        r.clone().json().then(ingestCalendarItems).catch(() => {
+          if (collectedDueItems.length === 0 && wideFetchSettled) notifyAssignmentFailure();
+        });
+      }).catch(() => {
+        if (collectedDueItems.length === 0 && wideFetchSettled) notifyAssignmentFailure();
+      });
     }
     return p;
   };
@@ -189,23 +224,40 @@ function installKingLmsHook(): void {
   XMLHttpRequest.prototype.send = function () {
     const self = this as XMLHttpRequest & { _kingLmsUrl?: string };
     const u = String(self._kingLmsUrl ?? '');
+    if (isKingLmsApiUrl(u)) {
+      this.addEventListener('load', function () {
+        try {
+          if (this.status < 200 || this.status >= 300) return;
+          maybeCaptureApiResponse(u, JSON.parse(this.responseText));
+        } catch {}
+      });
+    }
     if (isMembershipsUrl(u)) {
       this.addEventListener('load', function () {
         try { handleMemberships(JSON.parse(this.responseText)); } catch {}
       });
     }
-    if (isStreamsUltraUrl(u)) {
+    if (isCalendarItemsUrl(u)) {
       this.addEventListener('load', function () {
         try {
-          if (this.status < 200 || this.status >= 300) { notifyStreamsFailure(); return; }
-          handleStreamsUltra(JSON.parse(this.responseText));
-        } catch { notifyStreamsFailure(); }
+          if (this.status < 200 || this.status >= 300) {
+            if (collectedDueItems.length === 0 && wideFetchSettled) notifyAssignmentFailure();
+            return;
+          }
+          ingestCalendarItems(JSON.parse(this.responseText));
+        } catch {
+          if (collectedDueItems.length === 0 && wideFetchSettled) notifyAssignmentFailure();
+        }
       });
     }
     return origSend.apply(this, arguments as unknown as Parameters<typeof origSend>);
   };
 
-  /** ルート URL かつ `new_loc` クエリでログインへ飛ばされるとき、同期ペンディングを打ち切る `postMessage` を送ります。 */
+  if (isCalendarPage()) {
+    resetAssignmentCollection();
+    startWideCalendarFetch(origFetch);
+  }
+
   function notifyLoginRedirect(): void {
     try {
       if (location.hostname !== KING_LMS_HOSTNAME) return;
@@ -222,6 +274,7 @@ function installKingLmsHook(): void {
     history[methodName] = function () {
       const ret = orig.apply(this, arguments as unknown as Parameters<typeof orig>);
       notifyLoginRedirect();
+      if (isCalendarPage() && !wideFetchStarted) startWideCalendarFetch(origFetch);
       return ret;
     };
   }

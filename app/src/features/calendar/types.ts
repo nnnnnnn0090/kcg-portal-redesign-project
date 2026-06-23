@@ -20,7 +20,7 @@ export interface CalEvent {
   calTime?: string;
   /** ISO 8601 日時文字列。API によっては日時まで含む場合がある */
   start?:   string;
-  /** 課題カレンダー: streams の event_type から推定。未設定はストリーム情報なし（バッジ非表示） */
+  /** 課題カレンダー: gradebook user status から取得。未設定は判定不能（バッジ非表示） */
   assignmentSubmitted?: boolean;
 }
 

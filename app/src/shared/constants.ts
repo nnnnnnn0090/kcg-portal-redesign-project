@@ -15,7 +15,7 @@ export const SK = {
   /** ホームの King LMS 連携「課題」カレンダーを表示しない */
   hideAssignmentCalendar:          'portalThemeHideAssignmentCalendar',
   kingLmsCourses:                   'portalThemeKingLmsCourses',
-  kingLmsStreamsUltraDue:           'portalThemeKingLmsStreamsUltraDue',
+  kingLmsAssignmentDue:             'portalThemeKingLmsAssignmentDue',
   kingLmsSyncPending:               'portalThemeKingLmsSyncPending',
   kingLmsSyncReturnUrl:             'portalThemeKingLmsSyncReturnUrl',
   kingLmsSyncAwaitCourse:           'portalThemeKingLmsSyncAwaitCourse',
@@ -23,7 +23,7 @@ export const SK = {
   kingLmsCourseSyncToastQuiet:      'portalThemeKingLmsCourseSyncToastQuiet',
   kingLmsAssignmentSyncPending:     'portalThemeKingLmsAssignmentSyncPending',
   kingLmsAssignmentSyncReturnUrl:   'portalThemeKingLmsAssignmentSyncReturnUrl',
-  kingLmsAssignmentSyncAwaitStream: 'portalThemeKingLmsAssignmentSyncAwaitStream',
+  kingLmsAssignmentSyncAwaitCalendar: 'portalThemeKingLmsAssignmentSyncAwaitCalendar',
   /** 課題同期でホームへ戻った直後、課題カレンダーへスクロールする（読み取り後に false に戻す） */
   portalScrollToAssignmentOnce:   'portalThemeScrollToAssignmentOnce',
   shortcutConfig:                   'portalThemeShortcutConfig',
@@ -36,6 +36,14 @@ export const SK = {
   extensionVersionSeen:            'portalThemeExtensionVersionSeen',
   /** 開発者お知らせパネルの表示言語（`ja` / `en` / `zh` / `zh_TW` / `ko` / `vi` / `ne` / `id` / `th`） */
   developerNoticeLang:             'portalThemeDeveloperNoticeLang',
+  /** 拡張機能インストールごとに1つ発行する匿名ユーザー ID（notice.json 等の識別用） */
+  clientUserId:                    'portalThemeClientUserId',
+  /** 拡張の初回記録日時（ISO 8601） */
+  clientInstallAt:                 'portalThemeClientInstallAt',
+  /** 拡張の最終バージョン更新日時（ISO 8601） */
+  clientLastUpdatedAt:             'portalThemeClientLastUpdatedAt',
+  /** ライフサイクル追跡用の最後に記録した manifest version */
+  clientLastKnownVersion:          'portalThemeClientLastKnownVersion',
 } as const;
 
 // ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
@@ -44,7 +52,7 @@ export const KING_LMS_HOOK = {
   source:          'portalThemeKingLmsHook',
   syncAbortType:   'portalThemeKingLmsSyncAbort',
   coursesPostType:   SK.kingLmsCourses,
-  streamsDuePostType: SK.kingLmsStreamsUltraDue,
+  assignmentDuePostType: SK.kingLmsAssignmentDue,
 } as const;
 
 // ─── ポータルページ識別子 ────────────────────────────────────────────────────
@@ -168,7 +176,7 @@ export const KING_LMS_HOSTNAME = new URL(KING_LMS_ORIGIN).hostname;
 export const KING_LMS_COURSE_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/course` as const;
 
 /** King LMS 課題同期のエントリ URL */
-export const KING_LMS_ASSIGNMENT_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/stream` as const;
+export const KING_LMS_ASSIGNMENT_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/calendar` as const;
 /** 拡張紹介ページ・開発者お知らせ JSON のオリジン（host_permissions と URL 生成用） */
 export const EXTENSION_PROMO_ORIGIN = 'https://kcg-portal-redesign-project-web.vercel.app' as const;
 
@@ -177,6 +185,18 @@ export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;
 
 /** ホーム最上部「開発者からのお知らせ」用 JSON（`title` / `message`） */
 export const DEVELOPER_NOTICE_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/notice.json` as const;
+
+/** notice.json 等へ付与する匿名ユーザー識別子ヘッダー */
+export const CLIENT_USER_ID_HEADER = 'X-KCG-Portal-User-Id' as const;
+
+/** notice.json 等へ付与する拡張機能バージョンヘッダー（manifest version） */
+export const EXTENSION_VERSION_HEADER = 'X-KCG-Portal-Extension-Version' as const;
+
+/** notice.json 等へ付与するインストール日時ヘッダー（ISO 8601） */
+export const CLIENT_INSTALL_AT_HEADER = 'X-KCG-Portal-Install-At' as const;
+
+/** notice.json 等へ付与する最終更新日時ヘッダー（ISO 8601） */
+export const CLIENT_LAST_UPDATED_AT_HEADER = 'X-KCG-Portal-Last-Updated-At' as const;
 
 /** 設定の「チェンジログ」用・利用者向け更新履歴 JSON */
 export const CHANGELOG_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/changelog.json` as const;
