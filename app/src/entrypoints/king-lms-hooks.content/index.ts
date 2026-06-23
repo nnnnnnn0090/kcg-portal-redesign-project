@@ -3,6 +3,7 @@
  * `fetch` / XHR をフックし、コース一覧や streams/ultra の結果を同一タブの `king-lms-bridge` へ `postMessage` します。
  */
 
+import { isStreamsUltraLoadingPlaceholder } from '../../lib/streams-ultra-response';
 import { KING_LMS_HOOK, KING_LMS_HOSTNAME, KING_LMS_ORIGIN } from '../../shared/constants';
 
 export default defineContentScript({
@@ -106,13 +107,18 @@ function postStreamsUltraDue(
 function notifyStreamsFailure(): void {
   postStreamsUltraDue([], Date.now(), { captureState: 'error' });
 }
+
 function handleStreamsUltra(json: unknown): void {
   try {
     if (!json || typeof json !== 'object') { notifyStreamsFailure(); return; }
     const se = (json as Record<string, unknown>).sv_streamEntries;
     if (!Array.isArray(se)) { notifyStreamsFailure(); return; }
-    // 空配列のときは未ロードのダミー応答のことがある。同レス内の締切など他フィールドも信用せず、bridge へは送らない。
-    if (se.length === 0) return;
+    // 未ロードのプレースホルダー（sv_moreData=true 等）は King LMS 本体レスが来るまで無視する
+    if (se.length === 0) {
+      if (isStreamsUltraLoadingPlaceholder(json)) return;
+      postStreamsUltraDue([], Date.now(), { assignmentSyncNoOp: true });
+      return;
+    }
     const nameByCourseId = courseIdToNameMap(json);
     const slim: DueItem[] = [];
     for (const item of se) {
