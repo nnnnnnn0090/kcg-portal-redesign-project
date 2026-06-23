@@ -14,8 +14,9 @@ function isoToLabel(iso: string): string {
   return `${m[1]}/${+m[2]}/${+m[3]}`;
 }
 
-export function formatWeekTitle(start: string, end: string, _language: AppLanguage = 'ja'): string {
-  return `${isoToLabel(start)} 〜 ${isoToLabel(addDaysIso(end, -1))}`;
+export function formatWeekTitle(start: string, end: string, language: AppLanguage = 'ja'): string {
+  const t = messagesForLanguage(language).calendar;
+  return t.weekRange(isoToLabel(start), isoToLabel(addDaysIso(end, -1)));
 }
 
 export function formatMonthTitle(ref: MonthRef, language: AppLanguage = 'ja'): string {

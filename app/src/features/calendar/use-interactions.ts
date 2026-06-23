@@ -76,20 +76,28 @@ function attachCalendarTooltipAndContextMenu(
     const tip   = (anchor.dataset.calTip  || '').trim();
     const time  = (anchor.dataset.calTime || '').trim();
     const kind  = anchor.dataset.calKind || '';
-    const sub   = anchor.dataset.calAssignmentSubmitted;
+    const status = anchor.dataset.calAssignmentStatus || '';
 
     if (!title && !meta && !tip && !time) return;
 
     // 課題: 左レール＋1行1項目
     if (kind === 'assignment') {
-      const pending = sub === 'false';
+      const statusLabel = status === 'submitted'
+        ? t.calendar.submitted
+        : status === 'overdue'
+          ? t.calendar.overdue
+          : status === 'pending'
+            ? t.calendar.pending
+            : '';
       const blocks: string[] = [];
       blocks.push(`<div class="p-cal-pop-title">${esc(title || t.common.untitled)}</div>`);
       blocks.push(
-        `<div class="p-cal-pop-rail-wrap"><div class="p-cal-pop-rail-body${pending ? ' p-cal-pop-rail-body--pending' : ''}">`,
+        `<div class="p-cal-pop-rail-wrap"><div class="p-cal-pop-rail-body${status ? ` p-cal-pop-rail-body--${status}` : ''}">`,
       );
-      if (pending) {
-        blocks.push(`<p class="p-cal-pop-rail-pending" role="status">${esc(t.calendar.pending)}</p>`);
+      if (statusLabel) {
+        blocks.push(
+          `<p class="p-cal-pop-rail-status is-${esc(status)}" role="status">${esc(statusLabel)}</p>`,
+        );
       }
       if (meta) {
         blocks.push(

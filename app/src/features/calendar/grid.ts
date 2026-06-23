@@ -7,6 +7,7 @@ import { enumerateRange, parseIsoLocal, toIsoLocal, calEventDayIso, type Calenda
 import { esc, escAttr, plainFromHtml } from '../../lib/dom';
 import { parseKogiMeta, parseLeadingPeriodTitle, kogiPeriodNum, kogiPeriodTimeRange, findKingLmsUrl, syllabusUrl } from './kogi';
 import type { CalEvent, ViewMeta } from './types';
+import { assignmentStatusLabel, resolveAssignmentDisplayStatus } from './assignment';
 import { messagesForLanguage, normalizeLanguage, type AppLanguage } from '../../i18n/messages';
 
 /** 列順は `enumerateRange` と一致するよう weekStart に応じて並べる */
@@ -18,9 +19,10 @@ function weekdayLabels(weekStart: CalendarWeekStart, language: AppLanguage): str
 // ─── 1 日分のイベント HTML ────────────────────────────────────────────────
 
 function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind' | 'mode' | 'kingLmsCourses' | 'language'>): string {
-  const { calKind, mode, kingLmsCourses } = opts;
-  const t = messagesForLanguage(opts.language).calendar;
-  const common = messagesForLanguage(opts.language).common;
+  const { calKind, mode, kingLmsCourses, language: rawLanguage } = opts;
+  const language = normalizeLanguage(rawLanguage);
+  const t = messagesForLanguage(language).calendar;
+  const common = messagesForLanguage(language).common;
   const parts: string[] = [];
   let prevPeriod: number | null = null;
 
@@ -64,23 +66,31 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind'
       ? ` data-cal-kogi-room="${escAttr(String(room).trim())}"`
       : '';
     const sub = ev.assignmentSubmitted;
+    const dueIso = calKind === 'assignment' ? String(ev.start ?? '').trim() : '';
+    const assignmentStatus = calKind === 'assignment'
+      ? resolveAssignmentDisplayStatus(sub, dueIso || undefined)
+      : 'unknown';
     const subAttr = calKind === 'assignment' && sub !== undefined
       ? ` data-cal-assignment-submitted="${sub ? 'true' : 'false'}"`
       : '';
-    const pendingBadge = calKind === 'assignment' && sub === false
-      ? `<span class="p-cal-ev-pending-badge" aria-hidden="true">${esc(t.pending)}</span>`
+    const statusAttr = assignmentStatus !== 'unknown'
+      ? ` data-cal-assignment-status="${escAttr(assignmentStatus)}"`
+      : '';
+    const statusBadge = assignmentStatus !== 'unknown'
+      ? `<span class="p-cal-ev-assignment-badge is-${escAttr(assignmentStatus)}" aria-hidden="true">${esc(assignmentStatusLabel(assignmentStatus, language))}</span>`
       : '';
     const dataAttrs = `data-cal-title="${escAttr(ev.title ?? '')}" `
       + `data-cal-meta="${escAttr(meta)}" `
       + `data-cal-tip="${escAttr(tipPlain)}" `
-      + `data-cal-time="${escAttr(timeRange)}"${kindAttr}${dueIsoAttr}${subAttr}${kogiPeriodAttr}${kogiRoomAttr}`;
+      + `data-cal-time="${escAttr(timeRange)}"${kindAttr}${dueIsoAttr}${subAttr}${statusAttr}${kogiPeriodAttr}${kogiRoomAttr}`;
     const titleSpan = `<span class="p-cal-ev-title">${esc(ev.title || common.untitled)}</span>`;
-    const inner = calKind === 'assignment' && sub === false
-      ? `<span class="p-cal-ev-head">${titleSpan}${pendingBadge}</span>${metaHtml}`
+    const inner = assignmentStatus !== 'unknown'
+      ? `${statusBadge}${titleSpan}${metaHtml}`
       : `${titleSpan}${metaHtml}`;
     const evClasses = ['p-cal-ev'];
-    if (calKind === 'assignment' && sub === true) evClasses.push('is-assignment-done');
-    if (calKind === 'assignment' && sub === false) evClasses.push('is-assignment-pending');
+    if (assignmentStatus === 'submitted') evClasses.push('is-assignment-submitted');
+    if (assignmentStatus === 'pending') evClasses.push('is-assignment-pending');
+    if (assignmentStatus === 'overdue') evClasses.push('is-assignment-overdue');
     const evClass = evClasses.join(' ');
 
     parts.push(href

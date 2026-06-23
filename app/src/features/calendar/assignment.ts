@@ -54,12 +54,39 @@ function assignmentDisplayKey(row: DueItem): string {
   return `${dk}\0${start}\0${title}\0${cid}`;
 }
 
-function pickRepresentative(rows: DueItem[]): DueItem {
+function pickRepresentative(rows: DueItem[], locale: string): DueItem {
   const withStatus = rows.find((r) => typeof r.submitted === 'boolean');
   if (withStatus) return withStatus;
   return [...rows].sort((a, b) =>
-    String(a.title ?? '').localeCompare(String(b.title ?? ''), 'ja'),
+    String(a.title ?? '').localeCompare(String(b.title ?? ''), locale),
   )[0]!;
+}
+
+export type AssignmentDisplayStatus = 'submitted' | 'pending' | 'overdue' | 'unknown';
+
+/** 課題セルのバッジ用: 提出済み / 未提出 / 期限切れ（未提出かつ締切超過） */
+export function resolveAssignmentDisplayStatus(
+  submitted: boolean | undefined,
+  dueIso: string | undefined,
+  nowMs = Date.now(),
+): AssignmentDisplayStatus {
+  if (submitted === true) return 'submitted';
+  if (submitted === false) {
+    const dueMs = dueIso ? Date.parse(dueIso) : Number.NaN;
+    if (!Number.isNaN(dueMs) && dueMs < nowMs) return 'overdue';
+    return 'pending';
+  }
+  return 'unknown';
+}
+
+export function assignmentStatusLabel(status: AssignmentDisplayStatus, language: AppLanguage = 'ja'): string {
+  const t = messagesForLanguage(language).calendar;
+  switch (status) {
+    case 'submitted': return t.submitted;
+    case 'pending': return t.pending;
+    case 'overdue': return t.overdue;
+    default: return '';
+  }
 }
 
 export { weekRangeContaining } from '../../lib/date';
@@ -155,9 +182,10 @@ function buildAssignmentCalEvent(rep: DueItem, language: AppLanguage): CalEvent 
   const tipLines: string[] = [
     courseName && `${t.calendar.course}: ${courseName}`,
     `${t.calendar.due}: ${formatDueLabel(start, language)}`,
-    rep.submitted === true && `${t.calendar.status}: ${t.calendar.submitted}`,
-    rep.submitted === false && `${t.calendar.status}: ${t.calendar.pending}`,
   ].filter(Boolean) as string[];
+  const status = resolveAssignmentDisplayStatus(rep.submitted, start);
+  const statusLabel = assignmentStatusLabel(status, language);
+  if (statusLabel) tipLines.push(`${t.calendar.status}: ${statusLabel}`);
   const tip = tipLines.join('\n');
   const href = cid ? `${KING_LMS_ORIGIN}/ultra/courses/${encodeURIComponent(cid)}/outline` : '';
   return {
@@ -202,8 +230,10 @@ export function dueItemsToCalEvents(raw: DueItem[], language: AppLanguage = 'ja'
   const out:    CalEvent[] = [];
   const seenDisp = new Set<string>();
 
+  const locale = localeForLanguage(language);
+
   for (const [, group] of mergeGroups) {
-    const rep   = pickRepresentative(group);
+    const rep   = pickRepresentative(group, locale);
     const dedup = assignmentDisplayKey(rep);
     if (seenDisp.has(dedup)) continue;
     seenDisp.add(dedup);
@@ -211,7 +241,7 @@ export function dueItemsToCalEvents(raw: DueItem[], language: AppLanguage = 'ja'
   }
 
   for (const [, bundle] of unmergedBundles) {
-    const rep   = pickRepresentative(bundle);
+    const rep   = pickRepresentative(bundle, locale);
     const dedup = assignmentDisplayKey(rep);
     if (seenDisp.has(dedup)) continue;
     seenDisp.add(dedup);
