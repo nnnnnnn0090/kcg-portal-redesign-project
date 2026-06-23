@@ -29,6 +29,8 @@ export const SK = {
   shortcutConfig:                   'portalThemeShortcutConfig',
   /** 初回の案内チュートリアルを完了（またはスキップ）したら true */
   portalGuidedTourDone:             'portalThemePortalGuidedTourDone',
+  /** 初回の言語選択を完了したら true */
+  portalLanguagePickerDone:         'portalThemePortalLanguagePickerDone',
   home2WebMailOverlay:              'portalThemeHome2WebMailOverlay',
   /** カレンダーグリッドの週の左端: `monday` | `sunday` */
   calendarWeekStart:               'portalThemeCalendarWeekStart',

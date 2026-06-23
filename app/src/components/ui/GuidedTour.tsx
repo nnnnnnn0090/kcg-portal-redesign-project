@@ -18,9 +18,12 @@ import { PAGE, SK } from '../../shared/constants';
 import type { PortalRoute } from '../../portal/router';
 import storage from '../../lib/storage';
 import { usePortalDom } from '../../context/portalDom';
+import { useSettings } from '../../context/settings';
 import { useI18n } from '../../i18n';
+import { LanguagePicker } from './LanguagePicker';
+import type { AppLanguage } from '../../i18n/messages';
 
-type TourPhase = 'loading' | 'off' | 'on';
+type TourPhase = 'loading' | 'language' | 'tour' | 'off';
 
 type TourStep =
 {
@@ -153,6 +156,21 @@ function querySpotlightElement(step: Extract<TourStep, { kind: 'spotlight' }>, r
   return pick(step.selector) ?? (step.selectorFallback ? pick(step.selectorFallback) : null);
 }
 
+/** `#portal-overlay` 内でターゲットの中心が表示領域の中央に来るようスクロールする */
+function scrollSpotlightToOverlayCenter(
+  target: HTMLElement,
+  scrollRoot: HTMLElement,
+  behavior: ScrollBehavior,
+): void {
+  const rootRect = scrollRoot.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const deltaY = (targetRect.top + targetRect.height / 2)
+    - (rootRect.top + rootRect.height / 2);
+  const maxTop = Math.max(0, scrollRoot.scrollHeight - scrollRoot.clientHeight);
+  const nextTop = Math.min(maxTop, Math.max(0, scrollRoot.scrollTop + deltaY));
+  scrollRoot.scrollTo({ top: nextTop, behavior });
+}
+
 function tourCardBody(
   step: TourStep,
   stepIndex: number,
@@ -203,6 +221,7 @@ export function GuidedTour({
   guidedTourReplayToken = 0,
 }: GuidedTourProps) {
   const { t } = useI18n();
+  const { settings, updateSetting } = useSettings();
   const { overlayRoot } = usePortalDom();
   const steps = useMemo(
     () => (hideAssignmentCalendar
@@ -225,10 +244,14 @@ export function GuidedTour({
       return;
     }
     let cancelled = false;
-    void storage.get(SK.portalGuidedTourDone).then((d) => {
+    void storage.get([SK.portalGuidedTourDone, SK.portalLanguagePickerDone]).then((d) => {
       if (cancelled) return;
-      if (d[SK.portalGuidedTourDone]) setPhase('off');
-      else setPhase('on');
+      if (d[SK.portalGuidedTourDone]) {
+        setPhase('off');
+        return;
+      }
+      if (!d[SK.portalLanguagePickerDone]) setPhase('language');
+      else setPhase('tour');
     });
     return () => { cancelled = true; };
   }, [route.page, settingsReady]);
@@ -237,8 +260,20 @@ export function GuidedTour({
     if (guidedTourReplayToken === 0) return;
     if (route.page !== PAGE.HOME || !settingsReady) return;
     setStepIndex(0);
-    setPhase('on');
+    setPhase('tour');
   }, [guidedTourReplayToken, route.page, settingsReady]);
+
+  const handleLanguageChange = useCallback((language: AppLanguage) => {
+    updateSetting('language', language);
+  }, [updateSetting]);
+
+  const handleLanguageConfirm = useCallback((language: AppLanguage) => {
+    updateSetting('language', language);
+    void storage.set({ [SK.portalLanguagePickerDone]: true }).then(() => {
+      setStepIndex(0);
+      setPhase('tour');
+    });
+  }, [updateSetting]);
 
   const prevHideAssignmentRef = useRef<boolean | null>(null);
 
@@ -268,7 +303,7 @@ export function GuidedTour({
 
   const refreshHole = useCallback(() => {
     const step = steps[stepIndex];
-    if (!step || phase !== 'on' || step.kind !== 'spotlight') {
+    if (!step || phase !== 'tour' || step.kind !== 'spotlight') {
       setHole(null);
       return;
     }
@@ -280,14 +315,14 @@ export function GuidedTour({
   }, [updateViewport, phase, stepIndex]);
 
   useLayoutEffect(() => {
-    if (phase !== 'on') return;
+    if (phase !== 'tour') return;
     const step = steps[stepIndex];
     if (!step || step.kind !== 'card' || step.id !== 'done') return;
     overlayRoot.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [phase, stepIndex, overlayRoot, steps]);
 
   useLayoutEffect(() => {
-    if (phase !== 'on') return;
+    if (phase !== 'tour') return;
     const step = steps[stepIndex];
     if (!step) return;
     retryRef.current = 0;
@@ -300,11 +335,7 @@ export function GuidedTour({
     const target = querySpotlightElement(step, overlayRoot);
     if (target) {
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      target.scrollIntoView({
-        block:    'nearest',
-        inline:   'nearest',
-        behavior: reduceMotion ? 'auto' : 'smooth',
-      });
+      scrollSpotlightToOverlayCenter(target, overlayRoot, reduceMotion ? 'auto' : 'smooth');
     }
     refreshHole();
 
@@ -318,7 +349,7 @@ export function GuidedTour({
   }, [refreshHole, viewport, stepIndex, phase, overlayRoot, updateViewport, steps]);
 
   useEffect(() => {
-    if (phase !== 'on') return;
+    if (phase !== 'tour') return;
     const onResizeOrScroll = () => {
       updateViewport();
       refreshHole();
@@ -332,7 +363,7 @@ export function GuidedTour({
   }, [phase, overlayRoot, updateViewport, refreshHole]);
 
   useEffect(() => {
-    if (phase !== 'on') return;
+    if (phase !== 'tour') return;
     const step = steps[stepIndex];
     if (!step || step.kind !== 'spotlight') return;
     if (hole !== null) {
@@ -348,7 +379,7 @@ export function GuidedTour({
   }, [phase, stepIndex, hole, overlayRoot, steps]);
 
   useLayoutEffect(() => {
-    if (phase !== 'on') return;
+    if (phase !== 'tour') return;
     const btn = cardRef.current?.querySelector('button.p-tour-primary');
     if (btn instanceof HTMLElement) btn.focus();
   }, [phase, stepIndex]);
@@ -366,7 +397,17 @@ export function GuidedTour({
     setStepIndex((s) => s + 1);
   }, [stepIndex, finishTour, steps.length]);
 
-  if (phase !== 'on') return null;
+  if (phase === 'language') {
+    return (
+      <LanguagePicker
+        initialLanguage={settings.language}
+        onChange={handleLanguageChange}
+        onConfirm={handleLanguageConfirm}
+      />
+    );
+  }
+
+  if (phase !== 'tour') return null;
 
   const step = steps[stepIndex];
   if (!step) return null;
