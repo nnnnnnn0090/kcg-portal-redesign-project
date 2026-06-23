@@ -18,6 +18,7 @@ import {
 } from '../../shared/news-list-filters';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
+import { NewsList } from '../ui/NewsList';
 import { useI18n } from '../../i18n';
 
 type NewsItem = NewsListItem;
@@ -135,35 +136,6 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
     ? t.newsPage.nendoShowing(nendo)
     : raw !== null ? t.newsPage.nendoEmpty(nendo) : t.common.loading;
 
-  let tableBody: React.ReactNode;
-  if (raw === null) {
-    tableBody = <tr><td colSpan={4}><p className="p-news-empty">{t.common.loading}</p></td></tr>;
-  } else if (list.length === 0) {
-    tableBody = <tr><td colSpan={4}><p className="p-news-empty">{t.newsPage.emptyFiltered}</p></td></tr>;
-  } else {
-    tableBody = list.map((item, idx) => {
-      const unread      = String(item.readFlg) === '0';
-      const cls         = unread ? 'p-news-unread' : '';
-      const isImportant = item.importanceCd && String(item.importanceCd) !== '01' && item.importance;
-      const isNew       = String(item.newFlg) === '1';
-      const href        = item.id != null
-        ? new URL(`/portal/News/Detail/${encodeURIComponent(String(item.id))}`, location.origin).href
-        : '#';
-      return (
-        <tr key={idx}>
-          <td className={cls}>{String(item.newsDate ?? '')}</td>
-          <td className={cls}>
-            {isImportant && <span className="p-news-meta">{String(item.importance)}</span>}
-            <a href={href} className={cls}>{String(item.title ?? '')}</a>
-            {isNew && <span className="p-news-meta">NEW</span>}
-          </td>
-          <td className={cls}>{String(item.sender ?? '')}</td>
-          <td className={cls}>{String(item.category ?? '')}</td>
-        </tr>
-      );
-    });
-  }
-
   return (
     <PageShell variant="news" title={t.newsPage.title}>
       <KinoPanel data={kinoData} forceVisible={kinoForce} />
@@ -189,20 +161,14 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
 
           <p className="p-news-nendo-msg">{nendoMsg}</p>
 
-          <section className="p-panel p-news-table-wrap">
+          <section className="p-panel">
             <span className="p-panel-head">{t.newsPage.title}</span>
-            <div className="p-news-table-scroll">
-              <table className="p-news-table" aria-label={t.newsPage.title}>
-                <thead>
-                  <tr>
-                    <th scope="col">{t.newsPage.date}</th>
-                    <th scope="col">{t.newsPage.titleColumn}</th>
-                    <th scope="col">{t.newsPage.sender}</th>
-                    <th scope="col">{t.newsPage.category}</th>
-                  </tr>
-                </thead>
-                <tbody>{tableBody}</tbody>
-              </table>
+            <div className="p-panel-body" id="p-news-page-list">
+              {raw === null ? (
+                <p className="p-empty">{t.common.loading}</p>
+              ) : (
+                <NewsList items={list} emptyMsg={t.newsPage.emptyFiltered} />
+              )}
             </div>
           </section>
         </div>
