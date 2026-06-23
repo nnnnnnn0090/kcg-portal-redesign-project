@@ -3,6 +3,9 @@
 /app/.output
 /app/.wxt
 /app/node_modules
+/app/.chrome-dev-profile
+/app/.chrome-e2e-profile
+/app/.king-lms-api-capture
 
 # 非公開 URL（Discord 招待・フォーム等）用。`app/.env.example` を参照。
 /app/.env

@@ -15,7 +15,13 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "chrome": "bash ../scripts/chrome-dev.sh",
+    "chrome:stop": "bash ../scripts/chrome-dev.sh stop",
+    "chrome:status": "bash ../scripts/chrome-dev.sh status",
+    "chrome:verify": "bash ../scripts/chrome-dev.sh verify",
+    "fixloop": "bash ../scripts/chrome-dev.sh",
+    "fixloop:e2e": "bash ../scripts/chrome-dev.sh && EXTENSION_PATH=.output/chrome-mv3 npm run test:e2e"
   },
   "dependencies": {
     "react": "^19.1.0",
