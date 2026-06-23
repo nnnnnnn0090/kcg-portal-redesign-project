@@ -3,7 +3,8 @@
  */
 
 import { matchHome2MailRoute } from '../../portal/home2-mail-router';
-import { HOME2_MAIL_CONTENT_SCRIPT_MATCHES, PORTAL_DOM } from '../../shared/constants';
+import { HOME2_MAIL_CONTENT_SCRIPT_MATCHES } from '../../shared/constants';
+import { removePortalBackdrop } from '../../themes';
 import { mountHome2MailOverlay } from './mount-home2-mail-overlay';
 
 export default defineContentScript({
@@ -13,7 +14,7 @@ export default defineContentScript({
   main() {
     const route = matchHome2MailRoute();
     if (!route) {
-      document.getElementById(PORTAL_DOM.bootCover)?.remove();
+      removePortalBackdrop();
       return;
     }
 

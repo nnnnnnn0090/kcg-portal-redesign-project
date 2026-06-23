@@ -7,7 +7,7 @@ import { createElement } from 'react';
 import overlayCss from '../../styles/overlay.css?inline';
 import { matchPortalRoute } from '../../portal/router';
 import { resolveKingLmsMountToastMessage } from '../../portal/sync-hash';
-import { applyThemeToElement, portalHeadThemeCssByName, themeTokensForName } from '../../themes';
+import { appendPortalOverlayShell, ensurePortalBackdrop, portalHeadThemeCssByName, removePortalBackdrop, syncPortalTheme } from '../../themes';
 import storage from '../../lib/storage';
 import {
   PORTAL_BOOT_COVER_RAF_FRAMES,
@@ -16,12 +16,12 @@ import {
   SK,
 } from '../../shared/constants';
 
-function removeBootCoverAfterFrames(frameCount: number): void {
+function retainPortalBackdropAfterFrames(frameCount: number, themeName: string): void {
   if (frameCount <= 0) {
-    document.getElementById(PORTAL_DOM.bootCover)?.remove();
+    ensurePortalBackdrop(themeName);
     return;
   }
-  requestAnimationFrame(() => removeBootCoverAfterFrames(frameCount - 1));
+  requestAnimationFrame(() => retainPortalBackdropAfterFrames(frameCount - 1, themeName));
 }
 
 export default defineContentScript({
@@ -31,7 +31,7 @@ export default defineContentScript({
   main() {
     const route = matchPortalRoute();
     if (!route) {
-      document.getElementById(PORTAL_DOM.bootCover)?.remove();
+      removePortalBackdrop();
       return;
     }
 
@@ -58,11 +58,9 @@ export default defineContentScript({
         overlayStyle.textContent = overlayCss;
         document.head.appendChild(overlayStyle);
 
-        const overlay = document.createElement('div');
-        overlay.id = PORTAL_DOM.overlayRoot;
-        document.body.appendChild(overlay);
+        const { scroller } = appendPortalOverlayShell();
 
-        applyThemeToElement(overlay, themeTokensForName(themeName));
+        syncPortalTheme(themeName);
 
         document.documentElement.style.overflow = 'hidden';
         document.body.style.overflow = 'hidden';
@@ -71,22 +69,22 @@ export default defineContentScript({
           import('react-dom/client'),
           import('../../portal/App'),
         ]);
-        const root = createRoot(overlay);
+        const root = createRoot(scroller);
         root.render(
           createElement(PortalApp, {
             surface:      'portal',
             route,
             syncToastMsg,
-            overlayRoot: overlay,
+            overlayRoot: scroller,
           }),
         );
 
         const coverFrames = syncToastMsg
           ? PORTAL_BOOT_COVER_RAF_FRAMES.withToast
           : PORTAL_BOOT_COVER_RAF_FRAMES.default;
-        removeBootCoverAfterFrames(coverFrames);
+        retainPortalBackdropAfterFrames(coverFrames, themeName);
       } catch {
-        document.getElementById(PORTAL_DOM.bootCover)?.remove();
+        removePortalBackdrop();
       }
     })();
   },

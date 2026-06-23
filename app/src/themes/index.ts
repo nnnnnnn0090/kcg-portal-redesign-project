@@ -43,6 +43,60 @@ export function bootCoverBg(themeName?: string): string {
   return (THEMES[themeName ?? ''] ?? THEMES[DEFAULT_THEME]).bg;
 }
 
+const PORTAL_BACKDROP_Z = 2147483646;
+
+/**
+ * オーバーレイ直下の固定背景。オーバースクロールのバウンド時にホストページが見えないようにする。
+ * 起動時のブートカバー（`#kcg-portal-boot-cover`）をマウント後も残して使う。
+ */
+export function ensurePortalBackdrop(themeName?: string): void {
+  const bg = bootCoverBg(themeName);
+  const overlay = document.getElementById(PORTAL_DOM.overlayRoot);
+  let el = document.getElementById(PORTAL_DOM.bootCover) as HTMLElement | null;
+  if (!el) {
+    el = document.createElement('div');
+    el.id = PORTAL_DOM.bootCover;
+    el.setAttribute('aria-hidden', 'true');
+  }
+  el.style.position = 'fixed';
+  el.style.inset = '0';
+  el.style.zIndex = String(PORTAL_BACKDROP_Z);
+  el.style.pointerEvents = 'none';
+  el.style.margin = '0';
+  el.style.padding = '0';
+  el.style.border = '0';
+  el.style.width = '100%';
+  el.style.height = '100%';
+  el.style.background = bg;
+
+  const parent = document.body ?? document.documentElement;
+  if (overlay?.parentElement === parent) {
+    parent.insertBefore(el, overlay);
+  } else if (!el.parentElement) {
+    parent.appendChild(el);
+  }
+}
+
+export function removePortalBackdrop(): void {
+  document.getElementById(PORTAL_DOM.bootCover)?.remove();
+}
+
+/** 固定シェル `#portal-overlay` と、その内側スクロール容器を body に追加する */
+export function appendPortalOverlayShell(): { overlay: HTMLElement; scroller: HTMLElement } {
+  const overlay = document.createElement('div');
+  overlay.id = PORTAL_DOM.overlayRoot;
+  const scroller = document.createElement('div');
+  scroller.className = 'p-overlay-scroller';
+  overlay.appendChild(scroller);
+  document.body.appendChild(overlay);
+  return { overlay, scroller };
+}
+
+function syncDocumentSurfaceBg(bg: string): void {
+  document.documentElement.style.backgroundColor = bg;
+  document.body.style.backgroundColor = bg;
+}
+
 // ─── テーマ適用 ────────────────────────────────────────────────────────────
 
 /**
@@ -81,5 +135,10 @@ export function syncPortalTheme(name: string): void {
   const styleEl = document.getElementById(PORTAL_DOM.headThemeStyle);
   if (styleEl) styleEl.textContent = portalHeadThemeCss(t);
   const overlay = document.getElementById(PORTAL_DOM.overlayRoot) as HTMLElement | null;
-  if (overlay) applyThemeToElement(overlay, t);
+  if (overlay) {
+    applyThemeToElement(overlay, t);
+    overlay.style.background = t.bg;
+  }
+  syncDocumentSurfaceBg(t.bg);
+  ensurePortalBackdrop(name);
 }

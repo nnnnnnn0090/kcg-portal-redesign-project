@@ -4,7 +4,7 @@
 
 import { createElement } from 'react';
 import overlayCss from '../../styles/overlay.css?inline';
-import { applyThemeToElement, portalHeadThemeCssByName, themeTokensForName } from '../../themes';
+import { appendPortalOverlayShell, ensurePortalBackdrop, portalHeadThemeCssByName, removePortalBackdrop, syncPortalTheme } from '../../themes';
 import storage from '../../lib/storage';
 import type { Home2MailRoute } from '../../portal/home2-mail-router';
 import {
@@ -16,19 +16,19 @@ import {
 } from '../../shared/constants';
 import { hostTweakCssForHome2MailLayout } from './host-tweak-css';
 
-function removeBootCoverAfterFrames(frameCount: number): void {
+function retainPortalBackdropAfterFrames(frameCount: number, themeName: string): void {
   if (frameCount <= 0) {
-    document.getElementById(PORTAL_DOM.bootCover)?.remove();
+    ensurePortalBackdrop(themeName);
     return;
   }
-  requestAnimationFrame(() => removeBootCoverAfterFrames(frameCount - 1));
+  requestAnimationFrame(() => retainPortalBackdropAfterFrames(frameCount - 1, themeName));
 }
 
 export async function mountHome2MailOverlay(route: Home2MailRoute): Promise<void> {
   try {
     const themeSnap = await storage.get([SK.theme, SK.home2WebMailOverlay]);
     if (themeSnap[SK.home2WebMailOverlay] === false) {
-      document.getElementById(PORTAL_DOM.bootCover)?.remove();
+      removePortalBackdrop();
       return;
     }
     const themeName = String(themeSnap[SK.theme] ?? '').trim() || 'dark';
@@ -61,30 +61,28 @@ export async function mountHome2MailOverlay(route: Home2MailRoute): Promise<void
       document.body.style.overflow = 'hidden';
     }
 
-    const overlay = document.createElement('div');
-    overlay.id = PORTAL_DOM.overlayRoot;
+    const { overlay, scroller } = appendPortalOverlayShell();
     overlay.classList.add(HOME2_MAIL_OVERLAY_SURFACE_CLASS);
     if (route.layout === 'headerOnly') overlay.classList.add(HOME2_MAIL_OVERLAY_HEADER_ONLY_CLASS);
-    document.body.appendChild(overlay);
 
-    applyThemeToElement(overlay, themeTokensForName(themeName));
+    syncPortalTheme(themeName);
 
     const [{ createRoot }, { PortalApp }] = await Promise.all([
       import('react-dom/client'),
       import('../../portal/App'),
     ]);
-    const root = createRoot(overlay);
+    const root = createRoot(scroller);
     root.render(
       createElement(PortalApp, {
         surface:      'home2-mail',
         route,
         syncToastMsg: '',
-        overlayRoot:  overlay,
+        overlayRoot:  scroller,
       }),
     );
 
-    removeBootCoverAfterFrames(PORTAL_BOOT_COVER_RAF_FRAMES.default);
+    retainPortalBackdropAfterFrames(PORTAL_BOOT_COVER_RAF_FRAMES.default, themeName);
   } catch {
-    document.getElementById(PORTAL_DOM.bootCover)?.remove();
+    removePortalBackdrop();
   }
 }

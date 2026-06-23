@@ -74,7 +74,7 @@ export type PageType = (typeof PAGE)[keyof typeof PAGE];
 // ─── ポータル boot / オーバーレイの element id（early / content / themes で共有） ─
 
 export const PORTAL_DOM = {
-  bootCover:       'kcg-portal-boot-cover',
+  bootCover:       'kcg-portal-boot-cover', /* 起動フラッシュ防止＋オーバーレイ下の固定背景 */
   headThemeStyle: 'portal-theme-vars',
   overlayRoot:    'portal-overlay',
   overlayCss:     'portal-overlay-css',
