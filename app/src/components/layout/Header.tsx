@@ -3,11 +3,13 @@
  * ホスト DOM からナビ・プロフィール・ログアウトを取り込み、設定ポップオーバーを差し込む。
  */
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Settings } from '../../context/settings';
 import { HOME2_MAIL_DEFAULT_URL, HOME2_ORIGIN, HOME2_TOP_PAGE_URL, PORTAL_DOM } from '../../shared/constants';
 import { findHostLogoffAnchor, requestHostPortalLogoff } from '../../shared/host-logoff';
+import { resolvePortalNavLabel } from '../../lib/portal-nav-labels';
 import { useI18n } from '../../i18n';
+import type { AppLanguage, I18nMessages } from '../../i18n/messages';
 
 // ─── ナビゲーション型 ─────────────────────────────────────────────────────
 
@@ -33,10 +35,6 @@ function resolveHref(href: string): string {
   try { return new URL(href, location.origin).href; } catch { return href; }
 }
 
-function portalNavDisplayLabel(trimmedLabel: string): string {
-  return trimmedLabel === 'Webサービス' ? 'キャンパスプラン' : trimmedLabel;
-}
-
 function parseNavItems(ul: HTMLUListElement): NavItem[] {
   const out: NavItem[] = [];
   for (const li of ul.children) {
@@ -50,7 +48,7 @@ function parseNavItems(ul: HTMLUListElement): NavItem[] {
 
       const clone = toggle.cloneNode(true) as HTMLElement;
       clone.querySelectorAll('.caret').forEach((c) => c.remove());
-      const groupLabel = portalNavDisplayLabel(clone.textContent?.replace(/\s+/g, ' ').trim() ?? '');
+      const groupLabel = clone.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 
       const subs: NavLink[] = [];
       for (const a of menu.querySelectorAll<HTMLAnchorElement>('a[href]')) {
@@ -58,14 +56,13 @@ function parseNavItems(ul: HTMLUListElement): NavItem[] {
         if (!h || h === '#' || h.startsWith('javascript:')) continue;
         subs.push({
           type:   'link',
-          label:  portalNavDisplayLabel(a.textContent?.replace(/\s+/g, ' ').trim() ?? ''),
+          label:  a.textContent?.replace(/\s+/g, ' ').trim() ?? '',
           href:   h,
           target: a.getAttribute('target') ?? '',
           title:  a.getAttribute('title')  ?? '',
         });
       }
       if (subs.length === 0) continue;
-      // サブメニューが 1 件ならグループ不要
       out.push(subs.length === 1 ? subs[0] : { type: 'group', label: groupLabel, items: subs });
     } else {
       const a = li.querySelector<HTMLAnchorElement>(':scope > a[href]');
@@ -74,7 +71,7 @@ function parseNavItems(ul: HTMLUListElement): NavItem[] {
       if (!h || h === '#' || h.startsWith('javascript:')) continue;
       out.push({
         type:   'link',
-        label:  portalNavDisplayLabel(a.textContent?.replace(/\s+/g, ' ').trim() ?? ''),
+        label:  a.textContent?.replace(/\s+/g, ' ').trim() ?? '',
         href:   h,
         target: a.getAttribute('target') ?? '',
         title:  a.getAttribute('title')  ?? '',
@@ -82,6 +79,26 @@ function parseNavItems(ul: HTMLUListElement): NavItem[] {
     }
   }
   return out;
+}
+
+function localizePortalNavItems(
+  items: NavItem[],
+  t: I18nMessages,
+  language: AppLanguage,
+): NavItem[] {
+  return items.map((item) => {
+    if (item.type === 'link') {
+      return { ...item, label: resolvePortalNavLabel(item.href, item.label, t, language) };
+    }
+    return {
+      ...item,
+      label: resolvePortalNavLabel(item.items[0]?.href ?? '', item.label, t, language),
+      items: item.items.map((sub) => ({
+        ...sub,
+        label: resolvePortalNavLabel(sub.href, sub.label, t, language),
+      })),
+    };
+  });
 }
 
 /** Home2 `#NavigationMenu` → `NavItem[]` */
@@ -130,38 +147,53 @@ function parseHome2NavItems(menuRoot: HTMLElement): NavItem[] {
 }
 
 const HIDDEN_HOME2_NAV_LABELS = new Set(['実験中', 'KCG WebMail']);
+const HOST_HOME_LABEL = 'ホーム';
+const HOST_PORTAL_LABEL = 'キャンパスプランポータル';
+
+function localizeHome2NavItems(items: NavItem[], t: I18nMessages): NavItem[] {
+  const labels = { home: t.common.home, portal: t.header.portal };
+  return finalizeHome2NavItems(items, labels);
+}
 
 /** Home2 メニュー項目のリンク・ラベル調整 */
-function mapHome2Link(link: NavLink): NavLink | null {
+interface Home2NavLabels {
+  home:   string;
+  portal: string;
+}
+
+function mapHome2Link(link: NavLink, labels: Home2NavLabels): NavLink | null {
   const t = link.label.trim();
   if (HIDDEN_HOME2_NAV_LABELS.has(t)) return null;
-  const href = t === 'ホーム' ? HOME2_TOP_PAGE_URL : link.href;
-  const label = t === 'キャンパスプランポータル' ? 'ポータル' : link.label;
+  const href = t === HOST_HOME_LABEL ? HOME2_TOP_PAGE_URL : link.href;
+  const label =
+    t === HOST_PORTAL_LABEL ? labels.portal
+    : t === HOST_HOME_LABEL ? labels.home
+    : link.label;
   return { ...link, href, label };
 }
 
-function finalizeHome2NavItems(items: NavItem[]): NavItem[] {
+function finalizeHome2NavItems(items: NavItem[], labels: Home2NavLabels): NavItem[] {
   const out: NavItem[] = [];
   for (const item of items) {
     if (item.type === 'link') {
-      const mapped = mapHome2Link(item);
+      const mapped = mapHome2Link(item, labels);
       if (mapped) out.push(mapped);
       continue;
     }
     if (HIDDEN_HOME2_NAV_LABELS.has(item.label.trim())) continue;
     const groupLabel =
-      item.label.trim() === 'キャンパスプランポータル' ? 'ポータル' : item.label;
-    const subs = item.items.map(mapHome2Link).filter((s): s is NavLink => s != null);
+      item.label.trim() === HOST_PORTAL_LABEL ? labels.portal : item.label;
+    const subs = item.items.map((sub) => mapHome2Link(sub, labels)).filter((s): s is NavLink => s != null);
     if (subs.length === 0) continue;
 
     const homeSplit =
-      item.label.trim() === 'ホーム'
+      item.label.trim() === HOST_HOME_LABEL
       && subs.length >= 2
-      && subs[0]!.label.trim() === 'ホーム';
+      && subs[0]!.label.trim() === labels.home;
     if (homeSplit) {
       out.push({
         type:   'link',
-        label:  'ホーム',
+        label:  labels.home,
         href:   HOME2_TOP_PAGE_URL,
         target: '',
         title:  '',
@@ -214,25 +246,30 @@ export function Header({
   settingsPopover,
   navSource = 'portal',
 }: HeaderProps) {
-  const { t } = useI18n();
-  const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const { t, language } = useI18n();
+  const [rawNavItems, setRawNavItems] = useState<NavItem[]>([]);
   const [showLogout, setShowLogout] = useState(navSource === 'portal');
   const profile = usePortalProfile(t.header.profileTitle);
+
+  const navItems = useMemo(() => {
+    if (navSource === 'portal') return localizePortalNavItems(rawNavItems, t, language);
+    return localizeHome2NavItems(rawNavItems, t);
+  }, [rawNavItems, navSource, t, language]);
 
   useEffect(() => {
     if (navSource === 'portal') {
       const ul = [...document.querySelectorAll<HTMLUListElement>('ul.nav.navbar-nav')]
         .find((el) => !el.closest(`#${PORTAL_DOM.overlayRoot}`));
-      setNavItems(ul ? parseNavItems(ul) : []);
+      setRawNavItems(ul ? parseNavItems(ul) : []);
       setShowLogout(true);
       return;
     }
 
     const menu = document.getElementById('NavigationMenu');
     if (menu && !menu.closest(`#${PORTAL_DOM.overlayRoot}`)) {
-      setNavItems(finalizeHome2NavItems(parseHome2NavItems(menu)));
+      setRawNavItems(parseHome2NavItems(menu));
     } else {
-      setNavItems([]);
+      setRawNavItems([]);
     }
 
     const nativePortalLogout = findHostLogoffAnchor(PORTAL_DOM.overlayRoot) != null;
