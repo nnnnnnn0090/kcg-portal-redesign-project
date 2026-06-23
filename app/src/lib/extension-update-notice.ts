@@ -4,6 +4,7 @@
  */
 
 import { readExtensionVersion } from './extension-version';
+import { notifyExtensionUpdateToWeb } from './notify-extension-update';
 import storage from './storage';
 import { SK } from '../shared/constants';
 import { messagesForLanguage, type AppLanguage } from '../i18n/messages';
@@ -51,6 +52,7 @@ async function runConsume(language: AppLanguage): Promise<string> {
   }
 
   await storage.set({ [SK.extensionVersionSeen]: current });
+  void notifyExtensionUpdateToWeb(seen, current);
   return messagesForLanguage(language).sync.updated(current);
 }
 

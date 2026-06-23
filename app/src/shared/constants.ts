@@ -202,6 +202,12 @@ export const CLIENT_INSTALL_AT_HEADER = 'X-KCG-Portal-Install-At' as const;
 /** notice.json 等へ付与する最終更新日時ヘッダー（ISO 8601） */
 export const CLIENT_LAST_UPDATED_AT_HEADER = 'X-KCG-Portal-Last-Updated-At' as const;
 
+/** extension-update 通知へ付与する更新前バージョンヘッダー */
+export const CLIENT_PREVIOUS_VERSION_HEADER = 'X-KCG-Portal-Previous-Version' as const;
+
+/** 拡張バージョン更新時に Web へ通知するエンドポイント（Web 側で Discord 通知） */
+export const EXTENSION_UPDATE_NOTIFY_URL = `${EXTENSION_PROMO_ORIGIN}/extension-update` as const;
+
 /** 設定の「チェンジログ」用・利用者向け更新履歴 JSON */
 export const CHANGELOG_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/changelog.json` as const;
 
