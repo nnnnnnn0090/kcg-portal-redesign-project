@@ -72,6 +72,11 @@ export const koMessages: typeof jaMessages = {
     discordHint: 'Discord에서도 버그 신고와 기능 요청을 받습니다.',
     discordServer: 'Discord 서버 열기',
     version: (version: string) => `버전 ${version}`,
+    updateAvailableTitle: '새 버전이 있습니다',
+    updateAvailableBody: (current: string, latest: string) =>
+      `현재 v${current}입니다. 최신은 v${latest}입니다.`,
+    updateAvailableHint:
+      '수동으로 업데이트할 필요는 없습니다. 브라우저가 자동으로 확인하고 반영합니다. Google Chrome / Microsoft Edge는 시작 시와 약 5시간마다, Mozilla Firefox는 약 24시간마다입니다. 반영까지 시간이 걸릴 수 있으니, 잠시 기다려도 버전이 바뀌지 않을 때만 브라우저를 재시작해 보세요.',
     changelogFormatError: '변경 기록 형식을 읽을 수 없습니다.',
     changelogFetchError: '변경 기록을 가져올 수 없습니다. 네트워크 연결이나 사이트 상태를 확인하세요.',
     changelogTitle: '변경 기록',

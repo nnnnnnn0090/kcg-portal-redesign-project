@@ -72,6 +72,11 @@ export const zhTWMessages: typeof jaMessages = {
     discordHint: '也可在 Discord 上提交錯誤回報與功能請求。',
     discordServer: '開啟 Discord 伺服器',
     version: (version: string) => `版本 ${version}`,
+    updateAvailableTitle: '有新版本',
+    updateAvailableBody: (current: string, latest: string) =>
+      `目前為 v${current}，最新為 v${latest}。`,
+    updateAvailableHint:
+      '無需手動更新。瀏覽器會自動檢查並套用更新。Google Chrome / Microsoft Edge 在啟動時以及約每 5 小時檢查一次，Mozilla Firefox 約每 24 小時一次。生效可能需要一些時間，若等待後版本仍未變化，再重新啟動瀏覽器即可。',
     changelogFormatError: '無法讀取更新紀錄格式。',
     changelogFetchError: '無法取得更新紀錄。請檢查網路連線或網站狀態。',
     changelogTitle: '更新紀錄',

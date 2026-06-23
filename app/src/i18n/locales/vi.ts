@@ -72,6 +72,11 @@ export const viMessages: typeof jaMessages = {
     discordHint: 'Cũng chấp nhận báo lỗi và yêu cầu tính năng trên Discord.',
     discordServer: 'Mở máy chủ Discord',
     version: (version: string) => `Phiên bản ${version}`,
+    updateAvailableTitle: 'Có phiên bản mới',
+    updateAvailableBody: (current: string, latest: string) =>
+      `Bạn đang dùng v${current}. Phiên bản mới nhất là v${latest}.`,
+    updateAvailableHint:
+      'Không cần cập nhật thủ công. Trình duyệt tự kiểm tra và áp dụng. Google Chrome / Microsoft Edge khi khởi động và khoảng 5 giờ một lần; Mozilla Firefox khoảng 24 giờ một lần. Việc áp dụng có thể mất thời gian, nên chỉ khởi động lại trình duyệt nếu đợi một lúc mà phiên bản vẫn chưa đổi.',
     changelogFormatError: 'Không đọc được định dạng nhật ký thay đổi.',
     changelogFetchError: 'Không tải được nhật ký thay đổi. Kiểm tra kết nối mạng hoặc trạng thái trang web.',
     changelogTitle: 'Nhật ký thay đổi',

@@ -12,7 +12,13 @@
   max-height:min(46rem,calc(100vh - 4rem));max-height:min(46rem,calc(100dvh - 4rem));
   overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 #portal-overlay .p-settings-dialog h2{margin:0 0 .95rem;font-size:.95rem;color:var(--p-text-bright);font-weight:600;letter-spacing:-.01em}
-#portal-overlay .p-settings-version{margin:.65rem 0 0;padding-top:.75rem;border-top:1px solid var(--p-border-light);font-size:.68rem;color:var(--p-text-dimmer);line-height:1.45;text-align:right;letter-spacing:.02em}
+#portal-overlay .p-settings-version-block{margin:.65rem 0 0;padding-top:.75rem;border-top:1px solid var(--p-border-light)}
+#portal-overlay .p-settings-version{margin:0;font-size:.68rem;color:var(--p-text-dimmer);line-height:1.45;text-align:right;letter-spacing:.02em}
+#portal-overlay .p-settings-update-callout{margin:0 0 1rem;padding:.85rem .9rem;border-radius:12px;
+  border:1px solid var(--p-accent-border);background:var(--p-accent-bg)}
+#portal-overlay .p-settings-update-callout-title{margin:0 0 .35rem;font-size:.8125rem;font-weight:650;color:var(--p-accent-light);line-height:1.35}
+#portal-overlay .p-settings-update-callout-body{margin:0;font-size:.75rem;line-height:1.55;color:var(--p-text-muted)}
+#portal-overlay .p-settings-update-callout-hint{margin:.45rem 0 0;font-size:.68rem;line-height:1.5;color:var(--p-text-dimmer)}
 #portal-overlay .p-settings-section{margin:0 0 1.1rem;padding:0 0 .85rem;border-bottom:1px solid var(--p-border-light)}
 #portal-overlay .p-settings-section:last-of-type{margin-bottom:.55rem;padding-bottom:0;border-bottom:none}
 #portal-overlay .p-settings-section-title{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;

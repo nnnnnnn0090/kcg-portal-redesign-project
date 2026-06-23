@@ -72,6 +72,11 @@ export const neMessages: typeof jaMessages = {
     discordHint: 'Discord मा पनि बग रिपोर्ट र सुविधा अनुरोध स्वीकार गरिन्छ।',
     discordServer: 'Discord सर्भर खोल्नुहोस्',
     version: (version: string) => `संस्करण ${version}`,
+    updateAvailableTitle: 'नयाँ संस्करण उपलब्ध छ',
+    updateAvailableBody: (current: string, latest: string) =>
+      `हाल v${current} हो। नवीनतम v${latest} हो।`,
+    updateAvailableHint:
+      'हातले अपडेट गर्नु पर्दैन। ब्राउजरले स्वतः जाँचेर लागू गर्छ। Google Chrome / Microsoft Edge सुरु हुँदा र लगभग ५ घण्टामा, Mozilla Firefox लगभग २४ घण्टामा। लागू हुन समय लाग्न सक्छ, केही पर्खेर पनि संस्करण नबदले मात्र ब्राउजर पुनः सुरु गर्नुहोस्।',
     changelogFormatError: 'परिवर्तन लग ढाँचा पढ्न सकिएन।',
     changelogFetchError: 'परिवर्तन लग ल्याउन सकिएन। नेटवर्क वा साइट स्थिति जाँच गर्नुहोस्।',
     changelogTitle: 'परिवर्तन लग',

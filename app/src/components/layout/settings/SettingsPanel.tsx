@@ -19,6 +19,7 @@ import {
 import type { Settings } from '../../../context/settings';
 import { readExtensionVersion } from '../../../lib/extension-version';
 import { CHANGELOG_JSON_URL, PORTAL_DOM } from '../../../shared/constants';
+import { useExtensionUpdateAvailable } from '../../../hooks/useExtensionUpdateAvailable';
 import { useI18n } from '../../../i18n';
 import { parseChangelogJson, type ParsedChangelogRelease } from './settings-changelog';
 import { SettingsChangelogModal } from './SettingsChangelogModal';
@@ -68,6 +69,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     variant = 'portal',
   }, ref) {
     const { t } = useI18n();
+    const { latestVersion, updateAvailable } = useExtensionUpdateAvailable();
     const popRef  = useRef<HTMLDivElement>(null);
     const changelogCloseRef = useRef<HTMLButtonElement>(null);
     const changelogModalRootRef = useRef<HTMLDivElement>(null);
@@ -309,6 +311,16 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
         >
           <h2 id="p-settings-heading">{t.settings.title}</h2>
 
+          {updateAvailable && latestVersion && extensionVersion ? (
+            <div className="p-settings-update-callout" role="status" aria-live="polite">
+              <p className="p-settings-update-callout-title">{t.settings.updateAvailableTitle}</p>
+              <p className="p-settings-update-callout-body">
+                {t.settings.updateAvailableBody(extensionVersion, latestVersion)}
+              </p>
+              <p className="p-settings-update-callout-hint">{t.settings.updateAvailableHint}</p>
+            </div>
+          ) : null}
+
           <SettingsLanguageSection settings={settings} onSettingChange={onSettingChange} />
 
           <SettingsThemeSection settings={settings} onThemeChange={onThemeChange} />
@@ -335,9 +347,11 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
           ) : null}
 
           {extensionVersion ? (
-            <p className="p-settings-version" role="note">
-              {t.settings.version(extensionVersion)}
-            </p>
+            <div className="p-settings-version-block">
+              <p className="p-settings-version" role="note">
+                {t.settings.version(extensionVersion)}
+              </p>
+            </div>
           ) : null}
         </div>
       </div>

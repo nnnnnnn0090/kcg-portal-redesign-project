@@ -72,6 +72,11 @@ export const enMessages: typeof jaMessages = {
     discordHint: 'Bug reports and feature requests are also accepted on Discord.',
     discordServer: 'Open Discord server',
     version: (version: string) => `Version ${version}`,
+    updateAvailableTitle: 'Update available',
+    updateAvailableBody: (current: string, latest: string) =>
+      `You are on v${current}. The latest is v${latest}.`,
+    updateAvailableHint:
+      'No manual update is required. Your browser checks and applies updates automatically. Google Chrome and Microsoft Edge check on startup and about every 5 hours; Mozilla Firefox about every 24 hours. It can take time to apply, so only restart the browser if the version still has not changed after waiting a while.',
     changelogFormatError: 'Could not read the changelog format.',
     changelogFetchError: 'Could not fetch the changelog. Check your network connection or the site status.',
     changelogTitle: 'Changelog',

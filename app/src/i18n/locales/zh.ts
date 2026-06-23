@@ -72,6 +72,11 @@ export const zhMessages: typeof jaMessages = {
     discordHint: '也可在 Discord 上提交错误报告和功能请求。',
     discordServer: '打开 Discord 服务器',
     version: (version: string) => `版本 ${version}`,
+    updateAvailableTitle: '有新版本',
+    updateAvailableBody: (current: string, latest: string) =>
+      `当前为 v${current}，最新为 v${latest}。`,
+    updateAvailableHint:
+      '无需手动更新。浏览器会自动检查并应用更新。Google Chrome / Microsoft Edge 在启动时以及约每 5 小时检查一次，Mozilla Firefox 约每 24 小时一次。生效可能需要一些时间，若等待后版本仍未变化，再重启浏览器即可。',
     changelogFormatError: '无法读取更新日志格式。',
     changelogFetchError: '无法获取更新日志。请检查网络连接或网站状态。',
     changelogTitle: '更新日志',

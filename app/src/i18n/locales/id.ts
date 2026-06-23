@@ -72,6 +72,11 @@ export const idMessages: typeof jaMessages = {
     discordHint: 'Laporan bug dan permintaan fitur juga diterima di Discord.',
     discordServer: 'Buka server Discord',
     version: (version: string) => `Versi ${version}`,
+    updateAvailableTitle: 'Versi baru tersedia',
+    updateAvailableBody: (current: string, latest: string) =>
+      `Anda memakai v${current}. Terbaru v${latest}.`,
+    updateAvailableHint:
+      'Tidak perlu memperbarui secara manual. Browser memeriksa dan menerapkan pembaruan otomatis. Google Chrome / Microsoft Edge saat startup dan sekitar setiap 5 jam; Mozilla Firefox sekitar setiap 24 jam. Penerapan bisa membutuhkan waktu, jadi mulai ulang browser hanya jika versi belum berubah setelah menunggu.',
     changelogFormatError: 'Tidak dapat membaca format catatan perubahan.',
     changelogFetchError: 'Tidak dapat mengambil catatan perubahan. Periksa koneksi jaringan atau status situs.',
     changelogTitle: 'Catatan perubahan',

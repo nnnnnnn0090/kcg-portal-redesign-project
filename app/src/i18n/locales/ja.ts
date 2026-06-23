@@ -69,6 +69,11 @@ export const jaMessages = {
     discordHint: 'Discord からもバグ報告・機能リクエストを受け付けています。',
     discordServer: 'Discord サーバーへ',
     version: (version: string) => `バージョン ${version}`,
+    updateAvailableTitle: '新しいバージョンがあります',
+    updateAvailableBody: (current: string, latest: string) =>
+      `現在 v${current} です。最新は v${latest} です。`,
+    updateAvailableHint:
+      '手動で更新する操作は不要です。ブラウザが自動で確認・反映します。Google Chrome / Microsoft Edge は起動時とおおよそ5時間ごと、Mozilla Firefox は約24時間ごとです。反映まで時間がかかることもあるため、しばらく待ってもバージョンが変わらない場合のみブラウザを再起動してください。',
     changelogFormatError: '更新履歴の形式を読み取れませんでした。',
     changelogFetchError: '更新履歴を取得できませんでした。ネットワークやサイト側の状態をご確認ください。',
     changelogTitle: '更新履歴',

@@ -72,6 +72,11 @@ export const thMessages: typeof jaMessages = {
     discordHint: 'รับรายงานบั๊กและขอฟีเจอร์ทาง Discord ด้วย',
     discordServer: 'เปิดเซิร์ฟเวอร์ Discord',
     version: (version: string) => `เวอร์ชัน ${version}`,
+    updateAvailableTitle: 'มีเวอร์ชันใหม่',
+    updateAvailableBody: (current: string, latest: string) =>
+      `คุณใช้ v${current} อยู่ เวอร์ชันล่าสุดคือ v${latest}`,
+    updateAvailableHint:
+      'ไม่ต้องอัปเดตด้วยตนเอง เบราว์เซอร์ตรวจและติดตั้งให้อัตโนมัติ Google Chrome / Microsoft Edge เมื่อเปิดและประมาณทุก 5 ชั่วโมง Mozilla Firefox ประมาณทุก 24 ชั่วโมง การอัปเดตอาจใช้เวลา หากรอแล้วเวอร์ชันยังไม่เปลี่ยนค่อยรีสตาร์ทเบราว์เซอร์',
     changelogFormatError: 'อ่านรูปแบบบันทึกการเปลี่ยนแปลงไม่ได้',
     changelogFetchError: 'ดึงบันทึกการเปลี่ยนแปลงไม่ได้ ตรวจสอบเครือข่ายหรือสถานะไซต์',
     changelogTitle: 'บันทึกการเปลี่ยนแปลง',
