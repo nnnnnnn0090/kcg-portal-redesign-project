@@ -27,11 +27,12 @@ import {
 import {
   assignmentViewMeta,
   dueItemsToCalEvents,
-  formatKingLmsCapturedAgoJa,
+  formatKingLmsCapturedAgo,
   weekRangeContaining,
   type DuePayload,
 } from '../assignment';
 import { CalendarShell } from './CalendarShell';
+import { useI18n } from '../../../i18n';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -45,8 +46,9 @@ interface AssignmentCalendarProps {
 export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps) {
   const todayIso = toIsoLocal(new Date());
   const { settings, settingsReady } = useSettings();
+  const { language, t } = useI18n();
   const weekStart = settings.calendarWeekStart;
-  const events   = useMemo(() => dueItemsToCalEvents(payload?.items ?? []), [payload?.items]);
+  const events   = useMemo(() => dueItemsToCalEvents(payload?.items ?? [], language), [payload?.items, language]);
   const hasData  = events.length > 0;
 
   const [viewMode,       setViewMode]       = useState<'week' | 'month'>('week');
@@ -98,9 +100,9 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     return buildCalendarGridHtml(
       filterCalItemsByRange(events, r.start, r.end),
       r,
-      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart },
+      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart, language },
     );
-  }, [hasData, events, viewMode, monthRef, weekParams, weekStart]);
+  }, [hasData, events, viewMode, monthRef, weekParams, weekStart, language]);
 
   // ── グリッド HTML を DOM に反映（スワイプ中は skip） ──────────────────
   useLayoutEffect(() => {
@@ -150,7 +152,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     const oldHtml = buildCalendarGridHtml(
       filterCalItemsByRange(events, r0.start, r0.end),
       r0,
-      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart },
+      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart, language },
     );
 
     // 次の表示範囲を計算してステートを更新
@@ -173,7 +175,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     const newHtml = buildCalendarGridHtml(
       filterCalItemsByRange(events, r1.start, r1.end),
       r1,
-      { mode: viewMode, monthRef: viewMode === 'month' ? nextMr : null, ...assignmentViewMeta, weekStart },
+      { mode: viewMode, monthRef: viewMode === 'month' ? nextMr : null, ...assignmentViewMeta, weekStart, language },
     );
 
     if (prefersReducedMotion()) {
@@ -188,7 +190,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
       setSwipeAnimating(false);
       skipDomSyncRef.current = false;
     });
-  }, [swipeAnimating, hasData, viewMode, weekParams, monthRef, events, weekStart]);
+  }, [swipeAnimating, hasData, viewMode, weekParams, monthRef, events, weekStart, language]);
 
   // ── 週/月 モード切替 ─────────────────────────────────────────────────
   function switchMode(mode: 'week' | 'month') {
@@ -208,12 +210,12 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
   // ── ラベル ────────────────────────────────────────────────────────────
   const rangeLabel = viewMode === 'week'
     ? `${weekParams.start.replace(/-/g, '/')} 〜 ${weekParams.end.replace(/-/g, '/')}`
-    : `${monthRef.y}年${monthRef.m + 1}月`;
+    : t.calendar.monthTitle(monthRef.y, monthRef.m + 1);
 
   const capturedAgo = useMemo(() => {
     if (payload?.capturedAt == null || !Number.isFinite(payload.capturedAt)) return null;
-    return formatKingLmsCapturedAgoJa(payload.capturedAt, capturedNowMs);
-  }, [payload?.capturedAt, capturedNowMs]);
+    return formatKingLmsCapturedAgo(payload.capturedAt, language, capturedNowMs);
+  }, [payload?.capturedAt, capturedNowMs, language]);
 
   return (
     <section
@@ -223,7 +225,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     >
       {/* ヘッダー行：タイトル + 再取得ボタン */}
       <div className="p-assignment-head-row">
-        <span className="p-panel-head">課題カレンダー</span>
+        <span className="p-panel-head">{t.home.assignmentCalendar}</span>
         <button
           type="button"
           id="p-assignment-refresh-btn"
@@ -232,18 +234,18 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
           aria-busy={refreshNavigating}
           aria-label={
             refreshNavigating
-              ? '課題データを取り込むため King LMS のページへ移動する準備中'
-              : '課題の最新データを King LMS から取り込み（別ページへ移動）'
+              ? t.calendar.assignmentRefreshBusyAria
+              : t.calendar.assignmentRefreshAria
           }
           onClick={() => void handleRefresh()}
         >
           {refreshNavigating ? (
             <>
               <span className="p-assignment-refresh-spinner" aria-hidden />
-              <span className="p-assignment-refresh-label">準備中…</span>
+              <span className="p-assignment-refresh-label">{t.calendar.assignmentPreparing}</span>
             </>
           ) : (
-            <span className="p-assignment-refresh-label">最新の状態に更新</span>
+            <span className="p-assignment-refresh-label">{t.calendar.assignmentRefresh}</span>
           )}
         </button>
       </div>
@@ -253,10 +255,12 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
           <span className="p-assignment-refresh-status__spinner" aria-hidden />
           <div className="p-assignment-refresh-status__copy">
             <p className="p-assignment-refresh-status__lead">
-              課題の最新データを取りに、<strong>King LMS</strong> の画面へ移動します。
+              {t.calendar.assignmentRefreshLead.split('King LMS')[0]}
+              <strong>King LMS</strong>
+              {t.calendar.assignmentRefreshLead.split('King LMS')[1] ?? ''}
             </p>
             <p className="p-assignment-refresh-status__hint">
-              このままお待ちください。まもなくページが切り替わります（数秒かかることがあります）。
+              {t.calendar.assignmentRefreshHint}
             </p>
           </div>
         </div>
@@ -265,24 +269,24 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
       {/* データ未取得メッセージ */}
       <div className="p-panel-body p-assignment-fetch-wrap" hidden={hasData}>
         <p className="p-empty">
-          保存された課題はまだありません。「最新の状態に更新」で King LMS から取り込めます。
+          {t.calendar.assignmentNoData}
         </p>
       </div>
 
       {/* キャッシュ注意＋提出状況（Beta）の注記 */}
       <div className="p-assignment-cache-note" hidden={!hasData} role="note">
         <p>
-          表示は{capturedAgo != null ? ` ${capturedAgo} ` : ' '}King LMS から取得した内容の保存データです。最新の状態でない可能性があります。「最新の状態に更新」で更新できます。
+          {t.calendar.assignmentCacheNote(capturedAgo)}
         </p>
         <p className="p-assignment-cache-note__beta">
-          提出済み・未提出の表示はベータ版の推定です。取得データや判定の都合で実際と異なる場合があります。確実な確認は King LMS で行ってください。
+          {t.calendar.assignmentBetaNote}
         </p>
       </div>
 
       <CalendarShell
         viewMode={viewMode}
         modeTitle={viewMode === 'week' ? titles.week : titles.month}
-        modeGroupLabel="課題カレンダー表示切替"
+        modeGroupLabel={t.calendar.modeGroup(t.home.assignmentCalendar)}
         rangeLabel={rangeLabel}
         switchMode={switchMode}
         navigate={navigate}

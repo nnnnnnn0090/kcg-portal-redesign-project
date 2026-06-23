@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { formatHome2MailDateForDisplay, home2MailDateTimeIso } from '../../lib/format-home2-mail-date';
+import { useI18n } from '../../i18n';
 
 interface Home2ReadSnap {
   subject: string;
@@ -102,6 +103,7 @@ function IconBack() {
 }
 
 export function Home2WebMailReadPage() {
+  const { language, t } = useI18n();
   const [snap, setSnap] = useState<Home2ReadSnap>(() => parseReadmailFromDom());
 
   const bodyContent = useMemo(() => renderReadmailBodyWithBracketLinks(snap.body), [snap.body]);
@@ -124,48 +126,48 @@ export function Home2WebMailReadPage() {
 
   return (
     <main className="p-main p-home2-send" id="p-home2-mail-read">
-      <div className="p-home2-send-toolbar" role="toolbar" aria-label="メール表示の操作">
-        <button type="button" className="p-home2-send-back" onClick={onBack} title="前の画面へ戻る">
+      <div className="p-home2-send-toolbar" role="toolbar" aria-label={t.home2.readToolbar}>
+        <button type="button" className="p-home2-send-back" onClick={onBack} title={t.home2.backTitle}>
           <IconBack />
-          <span>戻る</span>
+          <span>{t.common.back}</span>
         </button>
         <div className="p-home2-send-tools">
           <button type="button" className="p-home2-send-act p-home2-send-act--primary" disabled={snap.nav.reply} onClick={() => nativeSubmitClick('MainContent_butRetMail1')}>
-            返信
+            {t.home2.reply}
           </button>
           <button type="button" className="p-home2-send-act" disabled={snap.nav.replyQuote} onClick={() => nativeSubmitClick('MainContent_butRetMail2')}>
-            引用返信
+            {t.home2.replyQuote}
           </button>
           <button type="button" className="p-home2-send-act" disabled={snap.nav.forward} onClick={() => nativeSubmitClick('MainContent_butFow')}>
-            転送
+            {t.home2.forward}
           </button>
           <button type="button" className="p-home2-send-act p-home2-send-act--muted" disabled={snap.nav.binSave} onClick={() => nativeSubmitClick('MainContent_butBinFileSave')}>
-            添付を保存
+            {t.home2.saveAttachments}
           </button>
         </div>
       </div>
 
       <article className="p-home2-send-card">
         <header className="p-home2-send-head">
-          <h1 className="p-home2-send-title">{snap.subject || '（無題）'}</h1>
+          <h1 className="p-home2-send-title">{snap.subject || t.common.untitled}</h1>
         </header>
 
         <div className="p-home2-send-fields">
           <div className="p-home2-send-row">
-            <span className="p-home2-send-rowk">差出人</span>
+            <span className="p-home2-send-rowk">{t.home2.sender}</span>
             <div className="p-home2-mail-read-field" title={snap.from || undefined}>
               {snap.from || '—'}
             </div>
           </div>
           {snap.date ? (
             <div className="p-home2-send-row">
-              <span className="p-home2-send-rowk">日時</span>
+              <span className="p-home2-send-rowk">{t.home2.date}</span>
               <time
                 className="p-home2-mail-read-field"
                 dateTime={home2MailDateTimeIso(snap.date)}
                 title={snap.date}
               >
-                {formatHome2MailDateForDisplay(snap.date)}
+                {formatHome2MailDateForDisplay(snap.date, language)}
               </time>
             </div>
           ) : null}

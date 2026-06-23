@@ -18,6 +18,7 @@ import { PAGE, SK } from '../../shared/constants';
 import type { PortalRoute } from '../../portal/router';
 import storage from '../../lib/storage';
 import { usePortalDom } from '../../context/portalDom';
+import { useI18n } from '../../i18n';
 
 type TourPhase = 'loading' | 'off' | 'on';
 
@@ -42,67 +43,67 @@ const STEPS: TourStep[] = [
   {
     kind:   'card',
     id:     'welcome',
-    title:  'ようこそ',
-    body:   '「KCG Portal Redesign Project」をインストールしていただき、ありがとうございます。\n\nここでは、よく使う機能を中心に、短くご案内します。',
+    title:  '',
+    body:   '',
   },
   {
     kind:     'spotlight',
     id:       'settings',
-    title:    'まずはここ：設定',
-    body:     '右上のこのボタンから開けます。\n\nテーマカラーの変更や、コース一覧の再取得（King LMSとの連携）などが行えます。',
+    title:    '',
+    body:     '',
     selector: '#p-open-settings',
   },
   {
     kind:     'spotlight',
     id:       'assignment',
-    title:    '課題を確認するには',
-    body:     'このボタンから King LMS の課題を取り込めます。\n\n初回は一度押しておくのがおすすめです。',
+    title:    '',
+    body:     '',
     selector: '#p-assignment-refresh-btn',
   },
   {
     kind:               'spotlight',
     id:                 'kogi',
-    title:              '授業カレンダー',
-    body:               '各講義をクリックすると、King LMS のコースページへ直接移動できます。\n\n初回はコース一覧の取得が必要な場合があります（その際は案内が表示されます）。',
+    title:              '',
+    body:               '',
     selector:           'section.p-panel-cal[data-cal-kind="kogi"] .p-cal-ev[data-cal-kind="kogi"]',
     selectorFallback:   'section.p-panel-cal[data-cal-kind="kogi"]',
   },
   {
     kind:               'spotlight',
     id:                 'kogi-context',
-    title:              '講義を右クリック',
-    body:               '授業カレンダー上の講義を右クリックすると、シラバスや King LMS のコースを別タブで開くメニューが表示されます。\n\n左クリックはコースページへの直行、右クリックはメニューから選ぶ動きです。',
+    title:              '',
+    body:               '',
     selector:           'section.p-panel-cal[data-cal-kind="kogi"] .p-cal-ev[data-cal-kind="kogi"]',
     selectorFallback:   'section.p-panel-cal[data-cal-kind="kogi"]',
   },
   {
     kind:     'spotlight',
     id:       'shortcuts',
-    title:    'ショートカット',
-    body:     'よく使うページへのリンクをまとめられます。「編集」から、並べ替え・非表示・独自リンクの追加ができます。',
+    title:    '',
+    body:     '',
     selector: 'section.p-panel.p-panel-links',
   },
   {
     kind:               'spotlight',
     id:                 'attendance',
-    title:              '出欠登録',
-    body:               '「学生出欠登録」から出欠の申請画面へ進めます。表示されないときは「編集」で一覧を開き、非表示になっていないか確認してください。',
+    title:              '',
+    body:               '',
     selector:           '#p-shortcut-attendance',
     selectorFallback:   '#p-links',
   },
   {
     kind:               'spotlight',
     id:                 'webmail',
-    title:              'Web メール（KCG WebMail）',
-    body:               'ここから Home2 の Web メールを別タブで開けます。\n\n画面は拡張のオーバーレイで見やすく表示されます。オフにしたいときは「設定」の「Web メール」から切り替えられます。',
+    title:              '',
+    body:               '',
     selector:           '#p-shortcut-webmail',
     selectorFallback:   '#p-links',
   },
   {
     kind:   'card',
     id:     'done',
-    title:  '以上です',
-    body:   '困ったときは「設定」からいつでもこの案内を確認できます。\n\n気に入ったら、ぜひ友だちにも教えてあげてください❤️',
+    title:  '',
+    body:   '',
   },
 ];
 
@@ -157,22 +158,25 @@ function tourCardBody(
   stepIndex: number,
   totalSteps: number,
   isLast: boolean,
+  title: string,
+  body: string,
   primaryLabel: string,
+  skipLabel: string,
   goNext: () => void,
   finishTour: () => void,
 ): ReactNode {
   const showSkip = step.kind === 'spotlight' || !isLast;
   return (
     <div className="p-tour-card-inner" key={stepIndex}>
-      <h2 id={`p-tour-h-${step.id}`}>{step.title}</h2>
-      <p>{step.body}</p>
+      <h2 id={`p-tour-h-${step.id}`}>{title}</h2>
+      <p>{body}</p>
       <div className="p-tour-card-actions">
         <button type="button" className="p-tour-primary" onClick={goNext}>
           {primaryLabel}
         </button>
         {showSkip && (
           <button type="button" className="p-tour-skip" onClick={finishTour}>
-            チュートリアルを終了
+            {skipLabel}
           </button>
         )}
       </div>
@@ -198,6 +202,7 @@ export function GuidedTour({
   hideAssignmentCalendar = false,
   guidedTourReplayToken = 0,
 }: GuidedTourProps) {
+  const { t } = useI18n();
   const { overlayRoot } = usePortalDom();
   const steps = useMemo(
     () => (hideAssignmentCalendar
@@ -367,7 +372,10 @@ export function GuidedTour({
   if (!step) return null;
 
   const isLast = stepIndex === steps.length - 1;
-  const primaryLabel = isLast ? 'わかった' : '次へ';
+  const primaryLabel = isLast ? t.guidedTour.primaryDone : t.common.next;
+  const copy = t.guidedTour.steps.find((s) => s.id === step.id);
+  const stepTitle = copy?.title ?? step.title;
+  const stepBody = copy?.body ?? step.body;
 
   const vw = viewport.w || (typeof window !== 'undefined' ? window.innerWidth : 400);
   const vh = viewport.h || (typeof window !== 'undefined' ? window.innerHeight : 600);
@@ -455,7 +463,18 @@ export function GuidedTour({
           aria-modal="true"
           aria-labelledby={`p-tour-h-${step.id}`}
         >
-          {tourCardBody(step, stepIndex, steps.length, isLast, primaryLabel, goNext, finishTour)}
+          {tourCardBody(
+            step,
+            stepIndex,
+            steps.length,
+            isLast,
+            stepTitle,
+            stepBody,
+            primaryLabel,
+            t.guidedTour.end,
+            goNext,
+            finishTour,
+          )}
         </div>
       )}
 
@@ -468,7 +487,18 @@ export function GuidedTour({
           aria-modal="true"
           aria-labelledby={`p-tour-h-${step.id}`}
         >
-          {tourCardBody(step, stepIndex, steps.length, isLast, primaryLabel, goNext, finishTour)}
+          {tourCardBody(
+            step,
+            stepIndex,
+            steps.length,
+            isLast,
+            stepTitle,
+            stepBody,
+            primaryLabel,
+            t.guidedTour.end,
+            goNext,
+            finishTour,
+          )}
         </div>
       )}
     </div>

@@ -19,11 +19,13 @@ import {
 import type { Settings } from '../../../context/settings';
 import { readExtensionVersion } from '../../../lib/extension-version';
 import { CHANGELOG_JSON_URL, PORTAL_DOM } from '../../../shared/constants';
+import { useI18n } from '../../../i18n';
 import { parseChangelogJson, type ParsedChangelogRelease } from './settings-changelog';
 import { SettingsChangelogModal } from './SettingsChangelogModal';
 import {
   SettingsFeedbackSection,
   SettingsHome2ChangelogSection,
+  SettingsLanguageSection,
   SettingsPortalOnlySections,
   SettingsThemeSection,
   SettingsWebMailSection,
@@ -65,6 +67,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     onReplayGuidedTour,
     variant = 'portal',
   }, ref) {
+    const { t } = useI18n();
     const popRef  = useRef<HTMLDivElement>(null);
     const changelogCloseRef = useRef<HTMLButtonElement>(null);
     const changelogModalRootRef = useRef<HTMLDivElement>(null);
@@ -98,7 +101,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
           if (changelogFetchGenRef.current !== gen) return;
           const parsed = parseChangelogJson(raw);
           if (!parsed) {
-            setChangelogErr('更新履歴の形式を読み取れませんでした。');
+            setChangelogErr(t.settings.changelogFormatError);
             setChangelogList(null);
             return;
           }
@@ -106,14 +109,14 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
         })
         .catch(() => {
           if (changelogFetchGenRef.current !== gen) return;
-          setChangelogErr('更新履歴を取得できませんでした。ネットワークやサイト側の状態をご確認ください。');
+          setChangelogErr(t.settings.changelogFetchError);
           setChangelogList(null);
         })
         .finally(() => {
           if (changelogFetchGenRef.current !== gen) return;
           setChangelogLoading(false);
         });
-    }, []);
+    }, [t]);
 
     const openChangelogModal = useCallback(() => {
       setChangelogModalClosing(false);
@@ -304,7 +307,9 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
           aria-labelledby="p-settings-heading"
           tabIndex={-1}
         >
-          <h2 id="p-settings-heading">設定</h2>
+          <h2 id="p-settings-heading">{t.settings.title}</h2>
+
+          <SettingsLanguageSection settings={settings} onSettingChange={onSettingChange} />
 
           <SettingsThemeSection settings={settings} onThemeChange={onThemeChange} />
 
@@ -331,7 +336,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
 
           {extensionVersion ? (
             <p className="p-settings-version" role="note">
-              バージョン {extensionVersion}
+              {t.settings.version(extensionVersion)}
             </p>
           ) : null}
         </div>

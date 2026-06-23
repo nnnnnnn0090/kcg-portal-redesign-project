@@ -4,6 +4,7 @@
 
 import { addDaysIso, parseIsoLocal, isoToMonthRef, type MonthRef } from '../../lib/date';
 import type { CalParams } from './types';
+import { messagesForLanguage, type AppLanguage } from '../../i18n/messages';
 
 // ─── ラベル生成 ───────────────────────────────────────────────────────────
 
@@ -13,12 +14,12 @@ function isoToLabel(iso: string): string {
   return `${m[1]}/${+m[2]}/${+m[3]}`;
 }
 
-export function formatWeekTitle(start: string, end: string): string {
+export function formatWeekTitle(start: string, end: string, _language: AppLanguage = 'ja'): string {
   return `${isoToLabel(start)} 〜 ${isoToLabel(addDaysIso(end, -1))}`;
 }
 
-export function formatMonthTitle(ref: MonthRef): string {
-  return `${ref.y}年${ref.m + 1}月`;
+export function formatMonthTitle(ref: MonthRef, language: AppLanguage = 'ja'): string {
+  return messagesForLanguage(language).calendar.monthTitle(ref.y, ref.m + 1);
 }
 
 // ─── 表示パラメータの確定 ─────────────────────────────────────────────────

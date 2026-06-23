@@ -6,6 +6,7 @@
 import { readExtensionVersion } from './extension-version';
 import storage from './storage';
 import { SK } from '../shared/constants';
+import { messagesForLanguage, type AppLanguage } from '../i18n/messages';
 
 function semverSegments(v: string): number[] {
   return v.split('.').map((part) => {
@@ -30,7 +31,7 @@ function semverGreater(a: string, b: string): boolean {
 
 let inFlight: Promise<string> | null = null;
 
-async function runConsume(): Promise<string> {
+async function runConsume(language: AppLanguage): Promise<string> {
   const current = readExtensionVersion();
   if (!current) return '';
 
@@ -50,13 +51,13 @@ async function runConsume(): Promise<string> {
   }
 
   await storage.set({ [SK.extensionVersionSeen]: current });
-  return `アップデートされました（v${current}）`;
+  return messagesForLanguage(language).sync.updated(current);
 }
 
 /** 同時呼び出しは 1 本にまとめる（Strict Mode 等での二重取得を避ける） */
-export function consumeExtensionUpdateToastMessage(): Promise<string> {
+export function consumeExtensionUpdateToastMessage(language: AppLanguage): Promise<string> {
   if (!inFlight) {
-    inFlight = runConsume().finally(() => {
+    inFlight = runConsume(language).finally(() => {
       inFlight = null;
     });
   }

@@ -4,6 +4,7 @@
  */
 
 import type { RefObject } from 'react';
+import { useI18n } from '../../../i18n';
 
 export interface CalendarShellProps {
   viewMode:       'week' | 'month';
@@ -33,6 +34,7 @@ export function CalendarShell({
   navDisabled       = false,
   controlsDisabled  = false,
 }: CalendarShellProps) {
+  const { t } = useI18n();
   const navLocked = navDisabled || controlsDisabled;
   return (
     <>
@@ -47,7 +49,7 @@ export function CalendarShell({
             disabled={controlsDisabled}
             onClick={() => switchMode('week')}
           >
-            週
+            {t.calendar.week}
           </button>
           <button
             type="button"
@@ -55,7 +57,7 @@ export function CalendarShell({
             disabled={controlsDisabled}
             onClick={() => switchMode('month')}
           >
-            月
+            {t.calendar.month}
           </button>
         </div>
 
@@ -64,21 +66,21 @@ export function CalendarShell({
           <button
             type="button"
             className="p-cal-btn"
-            aria-label="前へ"
+            aria-label={t.calendar.previous}
             disabled={navLocked}
             onClick={() => navigate('prev')}
           >
-            戻る
+            {t.calendar.previousButton}
           </button>
           <span className="p-cal-range">{rangeLabel}</span>
           <button
             type="button"
             className="p-cal-btn"
-            aria-label="次へ"
+            aria-label={t.calendar.next}
             disabled={navLocked}
             onClick={() => navigate('next')}
           >
-            次へ
+            {t.calendar.next}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 /** Home2 Web メールの送信（sendmail）画面です。 */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useI18n } from '../../i18n';
 
 interface Home2SendAttachment {
   value: string;
@@ -136,23 +137,24 @@ function IconAttach() {
   );
 }
 
-function formatFileSizeBytes(raw: string): string {
+function formatFileSizeBytes(raw: string, locale: string): string {
   const m = String(raw).match(/(-?\d[\d,_\s]*)/);
   if (!m) return raw.replace(/\s+/g, ' ').trim();
   const n = Number.parseInt(m[1].replace(/[,_\s]/g, ''), 10);
   if (!Number.isFinite(n) || n < 0) return raw.replace(/\s+/g, ' ').trim();
-  if (n < 1024) return `${n.toLocaleString('ja-JP')} B`;
+  if (n < 1024) return `${n.toLocaleString(locale)} B`;
   const kb = n / 1024;
   if (kb < 1024) {
     const d = kb >= 100 ? 0 : kb >= 10 ? 1 : 2;
-    return `${Number(kb.toFixed(d)).toLocaleString('ja-JP', { maximumFractionDigits: d })} KB`;
+    return `${Number(kb.toFixed(d)).toLocaleString(locale, { maximumFractionDigits: d })} KB`;
   }
   const mb = n / (1024 * 1024);
   const d = mb >= 10 ? 1 : 2;
-  return `${Number(mb.toFixed(d)).toLocaleString('ja-JP', { maximumFractionDigits: d })} MB`;
+  return `${Number(mb.toFixed(d)).toLocaleString(locale, { maximumFractionDigits: d })} MB`;
 }
 
 export function Home2WebMailSendPage() {
+  const { locale, t } = useI18n();
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [cc, setCc] = useState('');
@@ -271,35 +273,35 @@ export function Home2WebMailSendPage() {
     nativeSubmitClick('MainContent_butSend');
   }, [to, subject, cc, body, copyMe]);
 
-  const sizeLabel = useMemo(() => (snap.byteInfo ? formatFileSizeBytes(snap.byteInfo) : ''), [snap.byteInfo]);
+  const sizeLabel = useMemo(() => (snap.byteInfo ? formatFileSizeBytes(snap.byteInfo, locale) : ''), [snap.byteInfo, locale]);
 
   return (
     <main className="p-main p-home2-send" id="p-home2-mail-send">
-      <div className="p-home2-send-toolbar" role="toolbar" aria-label="送信画面の操作">
+      <div className="p-home2-send-toolbar" role="toolbar" aria-label={t.home2.sendToolbar}>
         <button type="button" className="p-home2-send-back" onClick={onBack}>
           <IconBack />
-          <span>戻る</span>
+          <span>{t.common.back}</span>
         </button>
         <div className="p-home2-send-tools">
           <button type="button" className="p-home2-send-act p-home2-send-act--muted" onClick={onToggleCc} disabled={snap.nav.showCc}>
-            {snap.ccVisible ? 'CC を隠す' : 'CC を表示'}
+            {snap.ccVisible ? t.home2.hideCc : t.home2.showCc}
           </button>
           <button type="submit" form="p-home2-send-form" className="p-home2-send-act p-home2-send-act--primary" disabled={snap.nav.send}>
             <IconSend />
-            <span>送信</span>
+            <span>{t.home2.send}</span>
           </button>
         </div>
       </div>
 
       <form id="p-home2-send-form" className="p-home2-send-card" onSubmit={onSend}>
         <header className="p-home2-send-head">
-          <h1 className="p-home2-send-title">新規メッセージ</h1>
-          <p className="p-home2-send-from">差出人 <span>{snap.from || '—'}</span></p>
+          <h1 className="p-home2-send-title">{t.home2.newMessage}</h1>
+          <p className="p-home2-send-from">{t.home2.from} <span>{snap.from || t.common.none}</span></p>
         </header>
 
         <div className="p-home2-send-fields">
           <label className="p-home2-send-row">
-            <span className="p-home2-send-rowk">宛先</span>
+            <span className="p-home2-send-rowk">{t.home2.to}</span>
             <input
               className="p-home2-send-rowv p-home2-send-rowv--tone"
               type="email"
@@ -325,13 +327,13 @@ export function Home2WebMailSendPage() {
           ) : null}
 
           <label className="p-home2-send-row">
-            <span className="p-home2-send-rowk">件名</span>
+            <span className="p-home2-send-rowk">{t.home2.subject}</span>
             <input
               className="p-home2-send-rowv p-home2-send-rowv--tone"
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              placeholder="件名を入力"
+              placeholder={t.home2.subjectPlaceholder}
             />
           </label>
         </div>
@@ -340,15 +342,15 @@ export function Home2WebMailSendPage() {
           className="p-home2-send-body"
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="本文を入力してください"
+          placeholder={t.home2.bodyPlaceholder}
           rows={14}
         />
 
-        <section className="p-home2-send-attach" aria-label="添付ファイル">
+        <section className="p-home2-send-attach" aria-label={t.home2.attachments}>
           <div className="p-home2-send-attach-row">
-            <button type="button" className="p-home2-send-act" onClick={onPickFile} title="選択したファイルはすぐに添付されます">
+            <button type="button" className="p-home2-send-act" onClick={onPickFile} title={t.home2.pickFileTitle}>
               <IconAttach />
-              <span>ファイルを選択</span>
+              <span>{t.home2.chooseFile}</span>
             </button>
             {snap.fileName ? (
               <span className="p-home2-send-file-name" title={snap.fileName}>
@@ -358,7 +360,7 @@ export function Home2WebMailSendPage() {
           </div>
 
           {snap.attachments.length > 0 ? (
-            <ul className="p-home2-send-attach-list" role="listbox" aria-label="添付済みファイル">
+            <ul className="p-home2-send-attach-list" role="listbox" aria-label={t.home2.attachedFiles}>
               {snap.attachments.map((a) => {
                 const isSel = (selectedAttachment || snap.attachments[0]?.value) === a.value;
                 return (
@@ -375,7 +377,7 @@ export function Home2WebMailSendPage() {
                     <button
                       type="button"
                       className="p-home2-send-chip-x"
-                      aria-label={`${a.label} を削除`}
+                      aria-label={t.home2.removeAttachment(a.label)}
                       onClick={() => { onPickAttachment(a.value); onFileDel(); }}
                       disabled={snap.nav.fileDel && !isSel}
                     >
@@ -386,16 +388,16 @@ export function Home2WebMailSendPage() {
               })}
             </ul>
           ) : (
-            <p className="p-home2-send-empty">添付ファイルはまだありません</p>
+            <p className="p-home2-send-empty">{t.home2.noAttachments}</p>
           )}
 
-          {sizeLabel ? <p className="p-home2-send-note">合計サイズ: {sizeLabel}</p> : null}
+          {sizeLabel ? <p className="p-home2-send-note">{t.home2.totalSize(sizeLabel)}</p> : null}
           {snap.fileInfo ? <p className="p-home2-send-note">{snap.fileInfo}</p> : null}
         </section>
 
         <label className="p-home2-send-copyme">
           <input type="checkbox" checked={copyMe} onChange={(e) => setCopyMe(e.target.checked)} />
-          <span>確認として From アドレスへ同報する</span>
+          <span>{t.home2.copyMe}</span>
         </label>
 
         {snap.ccError ? <p className="p-home2-send-error">{snap.ccError}</p> : null}

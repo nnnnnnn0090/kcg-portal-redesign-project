@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSettings } from '../context/settings';
 import { usePortalDom } from '../context/portalDom';
+import { useI18n } from '../i18n';
 import { useToast, Toast, copyToClipboard } from '../components/ui/Toast';
 import { Header } from '../components/layout/Header';
 import { PortalPageEndChrome } from '../components/layout/PortalPageEndChrome';
@@ -46,6 +47,7 @@ export function PortalApp(props: PortalAppProps) {
 
 function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
   const { settings, settingsReady, updateSetting, updateTheme } = useSettings();
+  const { language, t } = useI18n();
   const { settingsPopRef, overlayRoot } = usePortalDom();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [guidedTourReplayToken, setGuidedTourReplayToken] = useState(0);
@@ -106,7 +108,7 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
   // 拡張機能の manifest バージョンが上がったときのトースト（同一タブ・同一メッセージは一度だけ）
   useEffect(() => {
     if (!settingsReady) return;
-    void consumeExtensionUpdateToastMessage().then((msg) => {
+    void consumeExtensionUpdateToastMessage(language).then((msg) => {
       if (!msg) return;
       const mark = `kcg-portal-ext-up-toast:${msg}`;
       try {
@@ -117,13 +119,13 @@ function PortalAppShell({ surface, route, syncToastMsg }: PortalAppProps) {
       }
       showToast(msg, { placement: 'top', durationMs: 5200 });
     });
-  }, [settingsReady, showToast]);
+  }, [settingsReady, showToast, language]);
 
   // 拡張機能紹介 URL のコピー
   const handleShareClick = useCallback(async () => {
     const ok = await copyToClipboard(EXTENSION_PROMO_PAGE_URL);
-    showToast(ok ? 'URLをコピーしました' : 'コピーに失敗しました（手動でコピーしてください）');
-  }, [showToast]);
+    showToast(ok ? t.sync.urlCopied : t.sync.copyFailed);
+  }, [showToast, t]);
 
   // 設定パネルのトグル（開いている場合は閉じるアニメを先に実行）
   const toggleSettings = useCallback(() => {

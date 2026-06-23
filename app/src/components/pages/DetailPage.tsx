@@ -14,6 +14,7 @@ import {
 } from '../../lib/portal-messages-pages';
 import { formatMessageBody } from '../../lib/dom';
 import { PageShell } from '../layout/PageShell';
+import { useI18n } from '../../i18n';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -39,6 +40,7 @@ function findPortalAttachmentLink(filename: string): HTMLAnchorElement | null {
 }
 
 function AttachmentList({ files }: { files: unknown[] }) {
+  const { t } = useI18n();
   const listRef = useRef<HTMLUListElement>(null);
 
   // 委譲クリックで元 DOM のリンクを呼び出す
@@ -62,9 +64,9 @@ function AttachmentList({ files }: { files: unknown[] }) {
       name = String(f).trim();
     } else if (f && typeof f === 'object') {
       const fo = f as Record<string, unknown>;
-      name = String(fo.filename ?? fo.fileName ?? fo.name ?? 'ファイル').trim();
+      name = String(fo.filename ?? fo.fileName ?? fo.name ?? t.common.file).trim();
     } else {
-      name = 'ファイル';
+      name = t.common.file;
     }
     if (!name) return [];
     return [
@@ -81,6 +83,7 @@ function AttachmentList({ files }: { files: unknown[] }) {
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export function DetailPage({ newsDetailId }: DetailPageProps) {
+  const { t } = useI18n();
   const [detail,   setDetail]   = useState<NewsDetail | null>(null);
 
   // 詳細データをフェッチ
@@ -94,14 +97,14 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
 
   usePortalMessage(handleMessage);
 
-  const title    = detail ? String(detail.title ?? '').trim() || 'お知らせ' : '読み込み中…';
+  const title    = detail ? String(detail.title ?? '').trim() || t.detailPage.fallbackTitle : t.common.loading;
   const bodyHtml = detail ? formatMessageBody(String(detail.naiyo ?? '')) : '';
   const files    = detail && Array.isArray(detail.attachmentFiles) ? detail.attachmentFiles : [];
 
   const metaRows = detail ? [
-    { key: '掲載日時', val: String(detail.newsDate ?? '').trim() },
-    { key: '配信元',   val: String(detail.sender   ?? '').trim() },
-    { key: 'カテゴリ', val: String(detail.category ?? '').trim() },
+    { key: t.detailPage.postedAt, val: String(detail.newsDate ?? '').trim() },
+    { key: t.detailPage.sender,   val: String(detail.sender   ?? '').trim() },
+    { key: t.detailPage.category, val: String(detail.category ?? '').trim() },
   ].filter((r) => r.val) : [];
 
   return (
@@ -110,7 +113,7 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
       head={(
         <div className="p-main-head">
           <div className="p-news-detail-head-block">
-            <a className="p-news-detail-back" href="/portal/News">お知らせ一覧</a>
+            <a className="p-news-detail-back" href="/portal/News">{t.detailPage.backToList}</a>
             <h1 className="p-news-detail-title">{title}</h1>
           </div>
         </div>
@@ -119,7 +122,7 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
       <div className="p-stack">
         {/* 掲載情報 */}
         <section className="p-panel">
-          <span className="p-panel-head">掲載情報</span>
+          <span className="p-panel-head">{t.detailPage.postedInfo}</span>
           <div className="p-panel-body">
             {detail ? (
               metaRows.length > 0 ? (
@@ -131,20 +134,20 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
                     </div>
                   ))}
                 </div>
-              ) : <p className="p-empty">情報はありません</p>
+              ) : <p className="p-empty">{t.common.noInfo}</p>
             ) : (
-              <p className="p-empty">読み込み中…</p>
+              <p className="p-empty">{t.common.loading}</p>
             )}
           </div>
         </section>
 
         {/* 本文 */}
         <section className="p-panel p-panel-kino">
-          <span className="p-panel-head">本文</span>
+          <span className="p-panel-head">{t.detailPage.body}</span>
           <div id="p-news-detail-body" className="p-panel-body p-kino-message">
             {detail
               ? <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
-              : <p className="p-empty">読み込み中…</p>
+              : <p className="p-empty">{t.common.loading}</p>
             }
           </div>
         </section>
@@ -152,7 +155,7 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
         {/* 添付ファイル */}
         {files.length > 0 && (
           <section className="p-panel" id="p-news-detail-attachments">
-            <span className="p-panel-head">添付ファイル</span>
+            <span className="p-panel-head">{t.detailPage.attachments}</span>
             <div className="p-panel-body">
               <AttachmentList files={files} />
             </div>
@@ -160,8 +163,8 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
         )}
 
         <div className="p-news-detail-foot">
-          <a className="p-nav-btn" href="/portal/">ホーム</a>
-          <a className="p-nav-btn" href="/portal/News">お知らせ一覧</a>
+          <a className="p-nav-btn" href="/portal/">{t.common.home}</a>
+          <a className="p-nav-btn" href="/portal/News">{t.detailPage.backToList}</a>
         </div>
       </div>
     </PageShell>

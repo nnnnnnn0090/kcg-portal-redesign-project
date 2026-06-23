@@ -5,6 +5,7 @@
 
 import { EXTENSION_PROMO_PAGE_URL } from '../../shared/constants';
 import { usePortalDom } from '../../context/portalDom';
+import { useI18n } from '../../i18n';
 
 export interface OverlayPageEndFabClusterProps {
   onShareClick: () => void;
@@ -16,6 +17,7 @@ export function OverlayPageEndFabCluster({
   onShareClick,
   scrollTopScope = 'overlay',
 }: OverlayPageEndFabClusterProps) {
+  const { t } = useI18n();
   const { overlayRoot } = usePortalDom();
 
   function scrollTop() {
@@ -27,13 +29,13 @@ export function OverlayPageEndFabCluster({
   }
 
   return (
-    <div className="p-fab-cluster" role="group" aria-label="ページ末尾の操作">
+    <div className="p-fab-cluster" role="group" aria-label={t.fab.group}>
       <button
         type="button"
         className="p-share-ext-btn"
         id="p-share-extension"
-        aria-label="拡張機能の紹介ページのURLをコピー"
-        title={`拡張機能の紹介ページ (${EXTENSION_PROMO_PAGE_URL}) の URL をコピー`}
+        aria-label={t.fab.shareAria}
+        title={t.fab.shareTitle(EXTENSION_PROMO_PAGE_URL)}
         onClick={onShareClick}
       >
         <svg
@@ -50,13 +52,13 @@ export function OverlayPageEndFabCluster({
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
           <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
         </svg>
-        <span>拡張機能を紹介</span>
+        <span>{t.fab.share}</span>
       </button>
       <button
         type="button"
         className="p-scroll-top-btn"
-        aria-label="ページ先頭へ"
-        title="ページ先頭へ"
+        aria-label={t.fab.pageTop}
+        title={t.fab.pageTop}
         onClick={scrollTop}
       >
         <svg

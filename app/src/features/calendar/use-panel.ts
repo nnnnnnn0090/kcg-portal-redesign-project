@@ -46,6 +46,7 @@ import { formatWeekTitle, formatMonthTitle } from './view-params';
 import { clearCalBodyLoadingAttrs, applyCalSwipe, setCalBodyHtmlSmooth } from './anim';
 import { runCalendarPanelInboundMessage } from './calendar-panel-process-inbound';
 import type { CalParams, CalEvent } from './types';
+import { useI18n } from '../../i18n';
 
 // ─── 設定インターフェース ──────────────────────────────────────────────────
 
@@ -56,6 +57,8 @@ export interface CalendarPanelConfig {
   calKind: string;
   /** 週/月それぞれのパネルタイトル */
   titles: { week: string; month: string };
+  /** 週/月切替ボタングループの aria-label */
+  modeGroupLabel?: string;
   /** 受信する postMessage の type */
   msgType: string;
   /** true のとき、データがない場合パネルを隠す */
@@ -78,6 +81,7 @@ export function useCalendarPanel({
   calUrl,
   calKind,
   titles,
+  modeGroupLabel,
   msgType,
   hideWhenEmpty = false,
   getForceVisible   = () => false,
@@ -87,6 +91,7 @@ export function useCalendarPanel({
 }: CalendarPanelConfig) {
 
   const { settings, settingsReady } = useSettings();
+  const { language, t } = useI18n();
   const weekStart = settings.calendarWeekStart;
 
   // ── 表示状態 ──────────────────────────────────────────────────────────
@@ -158,7 +163,8 @@ export function useCalendarPanel({
     kingLmsCourses: propsRef.current.getKingLmsCourses(),
     calKind:        propsRef.current.calKind,
     weekStart,
-  }), [weekStart]);
+    language,
+  }), [weekStart, language]);
 
   // ── 現在表示している範囲の CalParams ─────────────────────────────────
   const visibleParsed = useCallback((): CalParams | null => {
@@ -193,22 +199,22 @@ export function useCalendarPanel({
     m.lastItems  = filtered;
     m.lastParsed = vp;
 
-    if (viewModeRef.current === 'week') setTitle(formatWeekTitle(vp.start, vp.end));
-    else if (monthRefRef.current) setTitle(formatMonthTitle(monthRefRef.current));
+    if (viewModeRef.current === 'week') setTitle(formatWeekTitle(vp.start, vp.end, language));
+    else if (monthRefRef.current) setTitle(formatMonthTitle(monthRefRef.current, language));
 
     applyPanelVisibility(buildCalendarGridHtml(filtered, vp, viewMetaForRender()), filtered.length > 0, opts);
-  }, [applyPanelVisibility, viewMetaForRender, visibleParsed]);
+  }, [applyPanelVisibility, viewMetaForRender, visibleParsed, language]);
 
   // ── 通常の再描画（fetch レスポンス後） ───────────────────────────────
   const redraw = useCallback((items: CalEvent[], parsed: CalParams, opts?: { enterAnim?: boolean }) => {
     const m = calRef.current;
     if (m.clientDataMode && m.bulkParsed) { redrawFromClient(opts); return; }
 
-    if (viewModeRef.current === 'week') setTitle(formatWeekTitle(parsed.start, parsed.end));
-    else if (monthRefRef.current) setTitle(formatMonthTitle(monthRefRef.current));
+    if (viewModeRef.current === 'week') setTitle(formatWeekTitle(parsed.start, parsed.end, language));
+    else if (monthRefRef.current) setTitle(formatMonthTitle(monthRefRef.current, language));
 
     applyPanelVisibility(buildCalendarGridHtml(items, parsed, viewMetaForRender()), items.length > 0, opts);
-  }, [applyPanelVisibility, redrawFromClient, viewMetaForRender]);
+  }, [applyPanelVisibility, redrawFromClient, viewMetaForRender, language]);
 
   // ── バルク年取得の開始 ────────────────────────────────────────────────
   const queueBulkYearFetch = useCallback(() => {
@@ -349,7 +355,7 @@ export function useCalendarPanel({
       }
     }
     pendingEnterAnimRef.current = false;
-    setGridHtml('<p class="p-empty p-cal-loading-msg">読み込み中…</p>');
+    setGridHtml(`<p class="p-empty p-cal-loading-msg">${t.calendar.loading}</p>`);
     pageFetch(propsRef.current.calUrl({ uKbn, start: params.start, end: params.end }));
     clearLoadingWatchdog();
     const pendingKey = m.pendingKey;
@@ -361,7 +367,7 @@ export function useCalendarPanel({
       syncToolbarLockedFromRef();
     }, 15000);
     syncToolbarLockedFromRef();
-  }, [clearLoadingWatchdog, syncToolbarLockedFromRef]);
+  }, [clearLoadingWatchdog, syncToolbarLockedFromRef, t]);
 
   // ── クライアントサイドナビゲーション ─────────────────────────────────
   const navigateClientSide = useCallback((dir: 'prev' | 'next') => {
@@ -390,8 +396,8 @@ export function useCalendarPanel({
     m.lastItems  = newItems;
     m.lastParsed = vp1;
 
-    if (viewModeRef.current === 'week') setTitle(formatWeekTitle(vp1.start, vp1.end));
-    else if (monthRefRef.current) setTitle(formatMonthTitle(monthRefRef.current));
+    if (viewModeRef.current === 'week') setTitle(formatWeekTitle(vp1.start, vp1.end, language));
+    else if (monthRefRef.current) setTitle(formatMonthTitle(monthRefRef.current, language));
 
     const { hideWhenEmpty: he, getForceVisible: gf } = propsRef.current;
     if (he && newItems.length === 0 && !gf()) { setPanelVisible(false); return; }
@@ -407,7 +413,7 @@ export function useCalendarPanel({
       skipDomSyncRef.current = false;
       syncToolbarLockedFromRef();
     });
-  }, [viewMetaForRender, visibleParsed, syncToolbarLockedFromRef]);
+  }, [viewMetaForRender, visibleParsed, syncToolbarLockedFromRef, language]);
 
   // ── 公開: ナビゲーション ─────────────────────────────────────────────
   const navigate = useCallback((dir: 'prev' | 'next') => {
@@ -514,6 +520,13 @@ export function useCalendarPanel({
     else redraw(m.lastItems, m.lastParsed, { enterAnim: false });
   }, [kogiDisplayDeps, redraw, redrawFromClient]);
 
+  // ── 言語変更 → 固定文言を含むグリッドを再描画 ───────────────────────
+  useEffect(() => {
+    const m = calRef.current;
+    if (m.clientDataMode && m.bulkParsed) redrawFromClient({ enterAnim: false });
+    else if (m.lastParsed) redraw(m.lastItems, m.lastParsed, { enterAnim: false });
+  }, [language, redraw, redrawFromClient]);
+
   // ── 強制表示設定変更 → 可視性更新 ────────────────────────────────────
   useEffect(() => {
     if (forceVisibleDeps === undefined) return;
@@ -531,7 +544,7 @@ export function useCalendarPanel({
 
   // ── 返却値 ───────────────────────────────────────────────────────────
   const modeTitle      = viewMode === 'week' ? titles.week : titles.month;
-  const modeGroupLabel = `${titles.week.replace(/^今週の/, '')}カレンダー表示切替`;
+  const resolvedModeGroupLabel = modeGroupLabel ?? t.calendar.modeGroup(modeTitle);
 
   return {
     calBodyRef,
@@ -539,7 +552,7 @@ export function useCalendarPanel({
     viewMode,
     calKind,
     modeTitle,
-    modeGroupLabel,
+    modeGroupLabel: resolvedModeGroupLabel,
     title,
     switchMode,
     navigate,

@@ -3,6 +3,7 @@
  */
 
 import { isLoginRedirectPage } from './bridge-urls';
+import { messagesForLanguage, type AppLanguage } from '../../i18n/messages';
 
 const OVERLAY_ID    = 'kcg-portal-ext-sync-overlay';
 const LOGIN_HINT_ID = 'kcg-portal-ext-login-hint';
@@ -64,11 +65,12 @@ function ensureUiStyles(): void {
   (document.head ?? document.documentElement).appendChild(style);
 }
 
-export function mountSyncOverlay(message = 'コース一覧を保存しています…'): void {
+export function mountSyncOverlay(language: AppLanguage, message?: string): void {
   if (document.getElementById(OVERLAY_ID)) return;
   removeLoginHint();
   lockScroll();
   ensureUiStyles();
+  const text = message ?? messagesForLanguage(language).sync.coursesSaving;
   const root = document.createElement('div');
   root.id = OVERLAY_ID;
   root.setAttribute('role', 'status');
@@ -76,7 +78,7 @@ export function mountSyncOverlay(message = 'コース一覧を保存していま
   root.innerHTML =
     '<div class="kcg-portal-ext-sync-inner">' +
       '<div class="kcg-portal-ext-sync-spinner" aria-hidden="true"></div>' +
-      `<p class="kcg-portal-ext-sync-msg">${message}</p>` +
+      `<p class="kcg-portal-ext-sync-msg">${text}</p>` +
     '</div>';
   (document.body ?? document.documentElement).appendChild(root);
 }
@@ -90,19 +92,18 @@ function removeLoginHint(): void {
   document.getElementById(LOGIN_HINT_ID)?.remove();
 }
 
-export function mountLoginHint(isAssignment: boolean): void {
+export function mountLoginHint(isAssignment: boolean, language: AppLanguage): void {
   if (!isLoginRedirectPage()) return;
   ensureUiStyles();
   if (document.getElementById(LOGIN_HINT_ID)) return;
-  const sub = isAssignment
-    ? 'ログイン後、課題を取得してポータルに戻ります。'
-    : 'ログイン後、コース一覧を保存してポータルに戻ります。';
+  const text = messagesForLanguage(language).sync;
+  const sub = isAssignment ? text.loginAfterAssignment : text.loginAfterCourses;
   const bar = document.createElement('div');
   bar.id = LOGIN_HINT_ID;
   bar.setAttribute('role', 'status');
   bar.setAttribute('aria-live', 'polite');
   bar.innerHTML =
-    '<p class="kcg-portal-ext-login-hint-msg">ログインしてください</p>' +
+    `<p class="kcg-portal-ext-login-hint-msg">${text.loginPlease}</p>` +
     `<p class="kcg-portal-ext-login-hint-sub">${sub}</p>`;
   (document.body ?? document.documentElement).appendChild(bar);
 }

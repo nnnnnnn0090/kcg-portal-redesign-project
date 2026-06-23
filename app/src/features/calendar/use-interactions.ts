@@ -13,6 +13,7 @@ import { syllabusUrl, findKingLmsUrl } from './kogi';
 import { readStoredCourses, useCourses, type CourseRow } from '../../context/courses';
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
 import { usePortalDom } from '../../context/portalDom';
+import { useI18n, type AppLanguage, type I18nMessages } from '../../i18n';
 
 /** tooltip 先頭の「コード：」は左ラベルに寄せるため、値から除く */
 function stripLeadingCodeJaPrefix(raw: string): string {
@@ -42,6 +43,8 @@ function attachCalendarTooltipAndContextMenu(
   coursesRef: RefObject<CourseRow[]>,
   setCourses: (rows: CourseRow[]) => void,
   settingsPopRef: RefObject<HTMLDivElement | null>,
+  language: AppLanguage,
+  t: I18nMessages,
 ): () => void {
   let hideTimer = 0;
   let resolvingPrimaryCourseClick = false;
@@ -81,31 +84,31 @@ function attachCalendarTooltipAndContextMenu(
     if (kind === 'assignment') {
       const pending = sub === 'false';
       const blocks: string[] = [];
-      blocks.push(`<div class="p-cal-pop-title">${esc(title || '（無題）')}</div>`);
+      blocks.push(`<div class="p-cal-pop-title">${esc(title || t.common.untitled)}</div>`);
       blocks.push(
         `<div class="p-cal-pop-rail-wrap"><div class="p-cal-pop-rail-body${pending ? ' p-cal-pop-rail-body--pending' : ''}">`,
       );
       if (pending) {
-        blocks.push('<p class="p-cal-pop-rail-pending" role="status">未提出</p>');
+        blocks.push(`<p class="p-cal-pop-rail-pending" role="status">${esc(t.calendar.pending)}</p>`);
       }
       if (meta) {
         blocks.push(
           '<p class="p-cal-pop-rail-kv">'
-          + '<span class="p-cal-pop-rail-k">コース</span>'
+          + `<span class="p-cal-pop-rail-k">${esc(t.calendar.course)}</span>`
           + `<span class="p-cal-pop-rail-v">${esc(meta)}</span>`
           + '</p>',
         );
       }
       if (time) {
         const dueIso = (anchor.dataset.calDueIso || '').trim();
-        const remain = dueIso ? formatRemainingUntilDue(dueIso) : null;
+        const remain = dueIso ? formatRemainingUntilDue(dueIso, language) : null;
         const remainHtml = remain
           ? `<span class="p-cal-pop-remain">${esc(remain)}</span>`
           : '';
         blocks.push(
           '<div class="p-cal-pop-rail-due">'
           + '<p class="p-cal-pop-rail-kv p-cal-pop-rail-kv--due">'
-          + '<span class="p-cal-pop-rail-k">期限</span>'
+          + `<span class="p-cal-pop-rail-k">${esc(t.calendar.due)}</span>`
           + `<span class="p-cal-pop-rail-v p-cal-pop-rail-v--due">`
           + `<span class="p-cal-pop-due-primary">${esc(time)}</span>${remainHtml}`
           + '</span></p></div>',
@@ -119,7 +122,7 @@ function attachCalendarTooltipAndContextMenu(
     }
 
     const blocks: string[] = [];
-    blocks.push(`<div class="p-cal-pop-title">${esc(title || '（無題）')}</div>`);
+    blocks.push(`<div class="p-cal-pop-title">${esc(title || t.common.untitled)}</div>`);
 
     let thirdLine = '';
     if (tip && tip !== title.trim()) {
@@ -138,7 +141,7 @@ function attachCalendarTooltipAndContextMenu(
     if (hasRailBody) {
       if (time) {
         const dueIso = (anchor.dataset.calDueIso || '').trim();
-        const remain = dueIso ? formatRemainingUntilDue(dueIso) : null;
+        const remain = dueIso ? formatRemainingUntilDue(dueIso, language) : null;
         const remainHtml = remain
           ? `<span class="p-cal-pop-remain">${esc(remain)}</span>`
           : '';
@@ -146,7 +149,7 @@ function attachCalendarTooltipAndContextMenu(
           blocks.push(
             '<div class="p-cal-pop-rail-due">'
             + '<p class="p-cal-pop-rail-kv p-cal-pop-rail-kv--due">'
-            + '<span class="p-cal-pop-rail-k">時間</span>'
+            + `<span class="p-cal-pop-rail-k">${esc(t.calendar.time)}</span>`
             + '<span class="p-cal-pop-rail-v p-cal-pop-rail-v--due">'
             + `<span class="p-cal-pop-due-primary">${esc(time)}</span>${remainHtml}`
             + '</span></p></div>',
@@ -154,7 +157,7 @@ function attachCalendarTooltipAndContextMenu(
         } else {
           blocks.push(
             '<p class="p-cal-pop-rail-kv">'
-            + '<span class="p-cal-pop-rail-k">時間</span>'
+            + `<span class="p-cal-pop-rail-k">${esc(t.calendar.time)}</span>`
             + `<span class="p-cal-pop-rail-v">${esc(time)}</span>`
             + '</p>',
           );
@@ -164,7 +167,7 @@ function attachCalendarTooltipAndContextMenu(
         if (kogiPeriod !== '') {
           blocks.push(
             '<p class="p-cal-pop-rail-kv">'
-            + '<span class="p-cal-pop-rail-k">時限</span>'
+            + `<span class="p-cal-pop-rail-k">${esc(t.calendar.period)}</span>`
             + `<span class="p-cal-pop-rail-v">${esc(kogiPeriod)}</span>`
             + '</p>',
           );
@@ -172,7 +175,7 @@ function attachCalendarTooltipAndContextMenu(
         if (kogiRoom !== '') {
           blocks.push(
             '<p class="p-cal-pop-rail-kv">'
-            + '<span class="p-cal-pop-rail-k">教室</span>'
+            + `<span class="p-cal-pop-rail-k">${esc(t.calendar.room)}</span>`
             + `<span class="p-cal-pop-rail-v">${esc(kogiRoom)}</span>`
             + '</p>',
           );
@@ -180,7 +183,7 @@ function attachCalendarTooltipAndContextMenu(
       } else if (meta) {
         blocks.push(
           '<p class="p-cal-pop-rail-kv">'
-          + '<span class="p-cal-pop-rail-k">情報</span>'
+          + `<span class="p-cal-pop-rail-k">${esc(t.calendar.info)}</span>`
           + `<span class="p-cal-pop-rail-v">${esc(meta)}</span>`
           + '</p>',
         );
@@ -188,7 +191,7 @@ function attachCalendarTooltipAndContextMenu(
       if (thirdLine) {
         blocks.push(
           '<p class="p-cal-pop-rail-kv p-cal-pop-rail-kv--note">'
-          + '<span class="p-cal-pop-rail-k">コード</span>'
+          + `<span class="p-cal-pop-rail-k">${esc(t.calendar.code)}</span>`
           + `<span class="p-cal-pop-rail-v">${esc(thirdLine)}</span>`
           + '</p>',
         );
@@ -341,6 +344,7 @@ function attachCalendarTooltipAndContextMenu(
  * @param calendarInteractionEpoch ルートやレイアウトが変わったときに変えると、DOM アンカー再マウント後にリスナーを張り直す
  */
 export function useCalendarInteractions(calendarInteractionEpoch: string | number): void {
+  const { language, t } = useI18n();
   const { courses, setCourses } = useCourses();
   const coursesRef  = useRef(courses);
   coursesRef.current = courses;
@@ -364,6 +368,8 @@ export function useCalendarInteractions(calendarInteractionEpoch: string | numbe
       coursesRef,
       setCourses,
       settingsPopRef,
+      language,
+      t,
     );
-  }, [hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef, overlayRoot, setCourses, settingsPopRef, calendarInteractionEpoch]);
+  }, [hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef, overlayRoot, setCourses, settingsPopRef, calendarInteractionEpoch, language, t]);
 }

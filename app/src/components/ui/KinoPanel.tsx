@@ -4,6 +4,7 @@
  */
 
 import { formatMessageBody } from '../../lib/dom';
+import { useI18n } from '../../i18n';
 
 interface KinoPanelProps {
   data:         { title?: string; message?: string } | null;
@@ -11,6 +12,7 @@ interface KinoPanelProps {
 }
 
 export function KinoPanel({ data, forceVisible }: KinoPanelProps) {
+  const { t } = useI18n();
   const title   = data ? String(data.title ?? '').trim() : '';
   const message = data ? String(data.message ?? '').trim() : '';
   const hasContent = !!(title && message);
@@ -19,7 +21,7 @@ export function KinoPanel({ data, forceVisible }: KinoPanelProps) {
   return (
     <section className="p-panel p-panel-kino" id="p-kino-panel" hidden={hidden}>
       <span className="p-panel-head" id="p-kino-title">
-        {hidden ? '' : hasContent ? title : 'お知らせ'}
+        {hidden ? '' : hasContent ? title : t.kino.defaultTitle}
       </span>
       <div className="p-panel-body">
         {hasContent ? (
@@ -30,7 +32,7 @@ export function KinoPanel({ data, forceVisible }: KinoPanelProps) {
           />
         ) : (
           <div className="p-kino-message" id="p-kino-body">
-            {!hidden ? <p className="p-empty">お知らせはありません</p> : null}
+            {!hidden ? <p className="p-empty">{t.kino.empty}</p> : null}
           </div>
         )}
       </div>

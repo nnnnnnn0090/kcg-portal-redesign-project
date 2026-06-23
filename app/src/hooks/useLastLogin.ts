@@ -5,12 +5,11 @@
 
 import { useState } from 'react';
 import { portalLastLoginCollapsed } from '../lib/api';
+import { useI18n } from '../i18n';
 
 /** 素 HTML の #lastLoginDt に基づく「前回ログイン …」表示用テキスト（無ければ空） */
 export function useLastLogin(): string {
-  const [text] = useState(() => {
-    const raw = portalLastLoginCollapsed();
-    return raw ? `前回ログイン ${raw}` : '';
-  });
-  return text;
+  const { t } = useI18n();
+  const [raw] = useState(() => portalLastLoginCollapsed());
+  return raw ? t.home.lastLogin(raw) : '';
 }

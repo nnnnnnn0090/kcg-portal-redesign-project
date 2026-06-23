@@ -7,6 +7,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import type { Settings } from '../../context/settings';
 import { HOME2_MAIL_DEFAULT_URL, HOME2_ORIGIN, HOME2_TOP_PAGE_URL, PORTAL_DOM } from '../../shared/constants';
 import { findHostLogoffAnchor, requestHostPortalLogoff } from '../../shared/host-logoff';
+import { useI18n } from '../../i18n';
 
 // ─── ナビゲーション型 ─────────────────────────────────────────────────────
 
@@ -177,7 +178,7 @@ function finalizeHome2NavItems(items: NavItem[]): NavItem[] {
 
 // ─── カスタムフック ───────────────────────────────────────────────────────
 
-function usePortalProfile() {
+function usePortalProfile(fallbackTitle: string) {
   const [profile, setProfile] = useState<{ name: string; href: string; title: string } | null>(null);
 
   // マウント時に一度だけ DOM から取得。表示/非表示は呼び出し側で CSS クラスで制御する。
@@ -188,8 +189,8 @@ function usePortalProfile() {
     if (!name) { setProfile(null); return; }
     let href = '/portal/Profile';
     try { href = new URL(src!.getAttribute('href') ?? '/portal/Profile', location.origin).href; } catch {}
-    setProfile({ name, href, title: src!.getAttribute('title') ?? 'プロフィール' });
-  }, []);
+    setProfile({ name, href, title: src!.getAttribute('title') ?? fallbackTitle });
+  }, [fallbackTitle]);
 
   return profile;
 }
@@ -213,9 +214,10 @@ export function Header({
   settingsPopover,
   navSource = 'portal',
 }: HeaderProps) {
+  const { t } = useI18n();
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [showLogout, setShowLogout] = useState(navSource === 'portal');
-  const profile = usePortalProfile();
+  const profile = usePortalProfile(t.header.profileTitle);
 
   useEffect(() => {
     if (navSource === 'portal') {
@@ -277,7 +279,7 @@ export function Header({
     window.location.href = '/portal/Login';
   }
 
-  const navLabel = navSource === 'home2-mail' ? 'Home2 メニュー' : 'ポータルメニュー';
+  const navLabel = navSource === 'home2-mail' ? t.header.home2Menu : t.header.portalMenu;
 
   return (
     <header className="p-header">
@@ -285,12 +287,12 @@ export function Header({
         {navSource === 'home2-mail' ? (
           <a className="p-brand" href={HOME2_MAIL_DEFAULT_URL}>
             <img src={`${HOME2_ORIGIN}/ic.bmp`} width={28} height={28} alt="" />
-            <span>Web メール</span>
+            <span>{t.header.webMail}</span>
           </a>
         ) : (
           <a className="p-brand" href="/portal/">
             <img src="/portal/favicon.ico" width={28} height={28} alt="" />
-            <span>ポータル</span>
+            <span>{t.header.portal}</span>
           </a>
         )}
 
@@ -315,7 +317,7 @@ export function Header({
               aria-controls="p-settings-dialog"
               onClick={(e) => { e.stopPropagation(); onSettingsToggle(); }}
             >
-              設定
+              {t.header.settings}
             </button>
             {settingsPopover}
           </div>
@@ -339,7 +341,7 @@ export function Header({
                 <polyline points="16 17 21 12 16 7"/>
                 <line x1="21" y1="12" x2="9" y2="12"/>
               </svg>
-              ログアウト
+              {t.header.logout}
             </button>
           ) : null}
         </div>

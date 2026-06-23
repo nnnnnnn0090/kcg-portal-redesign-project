@@ -4,6 +4,7 @@
 
 import { createPortal } from 'react-dom';
 import type { RefObject } from 'react';
+import { useI18n } from '../../../i18n';
 import type { ParsedChangelogRelease } from './settings-changelog';
 
 export interface SettingsChangelogModalProps {
@@ -29,6 +30,7 @@ export function SettingsChangelogModal({
   closeButtonRef,
   onRequestClose,
 }: SettingsChangelogModalProps) {
+  const { t } = useI18n();
   if (!mounted || !overlayEl) return null;
   return createPortal(
     <div
@@ -40,7 +42,7 @@ export function SettingsChangelogModal({
       <button
         type="button"
         className="p-changelog-modal-backdrop"
-        aria-label="閉じる"
+        aria-label={t.common.close}
         onClick={onRequestClose}
       />
       <div
@@ -50,19 +52,19 @@ export function SettingsChangelogModal({
         aria-labelledby="p-changelog-modal-title"
       >
         <div className="p-changelog-modal-head">
-          <h2 id="p-changelog-modal-title">更新履歴</h2>
+          <h2 id="p-changelog-modal-title">{t.settings.changelogTitle}</h2>
           <button
             ref={closeButtonRef}
             type="button"
             className="p-changelog-modal-close"
-            aria-label="閉じる"
+            aria-label={t.common.close}
             onClick={onRequestClose}
           >
             ×
           </button>
         </div>
         <div className="p-changelog-modal-body">
-          {loading ? <p className="p-changelog-modal-status">読み込み中…</p> : null}
+          {loading ? <p className="p-changelog-modal-status">{t.common.loading}</p> : null}
           {err ? (
             <p className="p-changelog-modal-status p-changelog-modal-status--error" role="alert">
               {err}

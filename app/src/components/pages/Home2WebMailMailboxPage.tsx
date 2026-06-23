@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatHome2MailDateForDisplay, home2MailDateTimeIso, parseHome2MailDateMs } from '../../lib/format-home2-mail-date';
 import { runMailheadPagerAsync } from '../../lib/home2-mailhead-async';
+import { useI18n, type I18nMessages } from '../../i18n';
 
 interface Home2MailboxRow {
   readBtnId:    string;
@@ -62,24 +63,24 @@ function parseInboxTotalFromCaption(raw: string): number | null {
   return Number.isFinite(n) && n >= 1 ? n : null;
 }
 
-function formatInboxSizeLabel(raw: string): string {
+function formatInboxSizeLabel(raw: string, locale: string, t: I18nMessages): string {
   const n = Number.parseInt(String(raw).replace(/[,_\s]/g, ''), 10);
   if (!Number.isFinite(n) || n < 0) return raw.replace(/\s+/g, ' ').trim();
-  if (n < 1024) return `${n.toLocaleString('ja-JP')} バイト`;
+  if (n < 1024) return `${n.toLocaleString(locale)} ${t.home2.byteUnit}`;
   const kb = n / 1024;
   if (kb < 1024) {
     const digits = kb >= 100 ? 0 : kb >= 10 ? 1 : 2;
     const v = Number(kb.toFixed(digits));
-    return `${v.toLocaleString('ja-JP', { maximumFractionDigits: digits })} KB`;
+    return `${v.toLocaleString(locale, { maximumFractionDigits: digits })} KB`;
   }
   const mb = n / (1024 * 1024);
   const md = mb >= 10 ? 1 : 2;
   const v = Number(mb.toFixed(md));
-  return `${v.toLocaleString('ja-JP', { maximumFractionDigits: md })} MB`;
+  return `${v.toLocaleString(locale, { maximumFractionDigits: md })} MB`;
 }
 
 /** 新着先頭表示向けに caption の通番レンジを書き換える */
-function rewriteMailboxCaptionNewestFirstRank(raw: string, rows: Home2MailboxRow[]): string {
+function rewriteMailboxCaptionNewestFirstRank(raw: string, rows: Home2MailboxRow[], t: I18nMessages): string {
   const compact = raw.replace(/\s+/g, ' ').trim();
   const total = parseInboxTotalFromCaption(compact);
   if (total == null) return raw;
@@ -90,7 +91,7 @@ function rewriteMailboxCaptionNewestFirstRank(raw: string, rows: Home2MailboxRow
   const maxM = Math.max(...nums);
   const userLo = total - maxM;
   const userHi = userLo + rows.length - 1;
-  return `受信メールの${userLo}～${userHi}を表示しています。(総数=${total})`;
+  return t.home2.mailboxCaption(userLo, userHi, total);
 }
 
 function sortMailboxRowsNewestFirst(rows: Home2MailboxRow[]): void {
@@ -110,7 +111,7 @@ function sortMailboxRowsNewestFirst(rows: Home2MailboxRow[]): void {
   });
 }
 
-function parseMailboxFromDom(): Home2MailboxSnap {
+function parseMailboxFromDom(t: I18nMessages): Home2MailboxSnap {
   const address = document.getElementById('MainContent_Label2')?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
   const table = document.getElementById('MainContent_Table1');
 
@@ -163,7 +164,7 @@ function parseMailboxFromDom(): Home2MailboxSnap {
 
   sortMailboxRowsNewestFirst(rows);
 
-  const caption = rewriteMailboxCaptionNewestFirstRank(captionRaw, rows);
+  const caption = rewriteMailboxCaptionNewestFirstRank(captionRaw, rows, t);
   const inboxTotal = parseInboxTotalFromCaption(captionRaw);
 
   const nums = rows.map((r) => parseInt(r.mailNum, 10)).filter((n) => Number.isFinite(n) && n >= 1);
@@ -240,7 +241,8 @@ function IconPen() {
 }
 
 export function Home2WebMailMailboxPage() {
-  const [snap, setSnap] = useState<Home2MailboxSnap>(() => parseMailboxFromDom());
+  const { language, locale, t } = useI18n();
+  const [snap, setSnap] = useState<Home2MailboxSnap>(() => parseMailboxFromDom(t));
   /** 削除チェック・削除実行はこのモード中のみ表示 */
   const [deleteEditMode, setDeleteEditMode] = useState(false);
   const [listLoading, setListLoading] = useState(false);
@@ -248,8 +250,8 @@ export function Home2WebMailMailboxPage() {
   const pagerReqRef = useRef(0);
 
   const refresh = useCallback(() => {
-    setSnap(parseMailboxFromDom());
-  }, []);
+    setSnap(parseMailboxFromDom(t));
+  }, [t]);
 
   const onPager = useCallback(async (submitterId: string) => {
     const el = document.getElementById(submitterId);
@@ -263,11 +265,15 @@ export function Home2WebMailMailboxPage() {
       refresh();
     } catch {
       if (pagerReqRef.current !== seq) return;
-      setListErr('一覧の更新に失敗しました。通信状況を確認するか、ページを再読み込みしてください。');
+      setListErr(t.home2.updateListFailed);
     } finally {
       if (pagerReqRef.current === seq) setListLoading(false);
     }
-  }, [refresh]);
+  }, [refresh, t]);
+
+  useEffect(() => {
+    refresh();
+  }, [language, refresh]);
 
   useEffect(() => {
     refresh();
@@ -298,10 +304,10 @@ export function Home2WebMailMailboxPage() {
     >
       <article className={`p-home2-send-card${listLoading ? ' p-home2-gm--list-loading' : ''}`}>
         <header className="p-home2-send-head">
-          <h1 className="p-home2-send-title">受信トレイ</h1>
+          <h1 className="p-home2-send-title">{t.home2.inbox}</h1>
           {snap.address ? (
             <p className="p-home2-send-from">
-              受信箱 <span title={snap.address}>{snap.address}</span>
+              {t.home2.inboxAddress} <span title={snap.address}>{snap.address}</span>
             </p>
           ) : null}
         </header>
@@ -313,19 +319,19 @@ export function Home2WebMailMailboxPage() {
           <p className="p-home2-send-error" role="alert">{listErr}</p>
         ) : null}
 
-        <div className="p-home2-send-toolbar" role="toolbar" aria-label="メール一覧の操作">
+        <div className="p-home2-send-toolbar" role="toolbar" aria-label={t.home2.mailListToolbar}>
           <div className="p-home2-gm-toolbar-start">
-            <div className="p-home2-gm-seg" role="group" aria-label="一覧の位置">
-              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.last1} title="先頭へ（新着のページへ）" onClick={() => void onPager('MainContent_butLast1')}>
+            <div className="p-home2-gm-seg" role="group" aria-label={t.home2.listPosition}>
+              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.last1} title={t.home2.firstNewerPage} onClick={() => void onPager('MainContent_butLast1')}>
                 <IconChevronsLeft />
               </button>
-              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.next1} title="戻る（より新しいメールへ）" onClick={() => void onPager('MainContent_butNext1')}>
+              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.next1} title={t.home2.newerPage} onClick={() => void onPager('MainContent_butNext1')}>
                 <IconChevronLeft />
               </button>
-              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.prev1} title="進む（より古いメールへ）" onClick={() => void onPager('MainContent_butPrev1')}>
+              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.prev1} title={t.home2.olderPage} onClick={() => void onPager('MainContent_butPrev1')}>
                 <IconChevronRight />
               </button>
-              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.first1} title="終端へ（古いメールのページへ）" onClick={() => void onPager('MainContent_butFirst1')}>
+              <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.first1} title={t.home2.oldestPage} onClick={() => void onPager('MainContent_butFirst1')}>
                 <IconChevronsRight />
               </button>
             </div>
@@ -336,13 +342,13 @@ export function Home2WebMailMailboxPage() {
               onClick={() => nativeSubmitClick('MainContent_butNewMail1')}
             >
               <IconPen />
-              <span>作成</span>
+              <span>{t.home2.compose}</span>
             </button>
           </div>
           <div className="p-home2-send-tools">
             {deleteEditMode ? (
               <button type="button" className="p-home2-send-act p-home2-send-act--muted" disabled={snap.nav.selAll} onClick={() => nativeSubmitClick('MainContent_butSelAll')}>
-                すべて選択
+                {t.home2.selectAll}
               </button>
             ) : null}
             <button
@@ -351,14 +357,14 @@ export function Home2WebMailMailboxPage() {
               aria-pressed={deleteEditMode}
               onClick={() => setDeleteEditMode((v) => !v)}
             >
-              {deleteEditMode ? '完了' : '選択'}
+              {deleteEditMode ? t.common.done : t.home2.select}
             </button>
           </div>
         </div>
 
         <div className="p-home2-gm-list-shell">
           {snap.rows.length === 0 ? (
-            <div className="p-home2-gm-empty">一覧を読み取れませんでした。読み込み後にもう一度開いてください。</div>
+            <div className="p-home2-gm-empty">{t.home2.emptyMailbox}</div>
           ) : (
             <div className="p-home2-gm-list" role="list">
               {snap.rows.map((row) => {
@@ -384,7 +390,7 @@ export function Home2WebMailMailboxPage() {
                           type="checkbox"
                           checked={row.checked}
                           onChange={(e) => onChk(row.chkId, e.target.checked)}
-                          aria-label="削除対象にする"
+                          aria-label={t.home2.markForDelete}
                         />
                       ) : null}
                     </div>
@@ -397,23 +403,23 @@ export function Home2WebMailMailboxPage() {
                         dateTime={home2MailDateTimeIso(row.date)}
                         title={row.date}
                       >
-                        {formatHome2MailDateForDisplay(row.date)}
+                      {formatHome2MailDateForDisplay(row.date, language)}
                       </time>
                     </div>
                     <span
                       className="p-home2-gm-subject"
                       aria-disabled={row.readDisabled || !row.mailNum}
                     >
-                      {row.subject || '（無題）'}
+                      {row.subject || t.common.untitled}
                     </span>
                     <div className="p-home2-gm-row-bottom">
                       {row.mailNum ? (
-                        <span className="p-home2-gm-meta-num" title={row.displayRank != null ? `サーバー通番 ${row.mailNum}` : undefined}>
+                        <span className="p-home2-gm-meta-num" title={row.displayRank != null ? t.home2.serverNumber(row.mailNum) : undefined}>
                           #{row.displayRank != null ? String(row.displayRank) : row.mailNum}
                         </span>
                       ) : null}
-                      <span className="p-home2-gm-meta-size" title={row.size ? `${row.size.replace(/\s+/g, '')} バイト` : undefined}>
-                        {row.size ? formatInboxSizeLabel(row.size) : ''}
+                      <span className="p-home2-gm-meta-size" title={row.size ? t.home2.bytesTitle(row.size.replace(/\s+/g, '')) : undefined}>
+                        {row.size ? formatInboxSizeLabel(row.size, locale, t) : ''}
                       </span>
                     </div>
                   </div>
@@ -425,17 +431,17 @@ export function Home2WebMailMailboxPage() {
         </div>
 
         <footer className="p-home2-gm-footer">
-          <div className="p-home2-gm-seg" role="group" aria-label="ページ送り">
-            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.last2} title="先頭へ（新着のページへ）" onClick={() => void onPager('MainContent_butLast2')}>
+          <div className="p-home2-gm-seg" role="group" aria-label={t.home2.pager}>
+            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.last2} title={t.home2.firstNewerPage} onClick={() => void onPager('MainContent_butLast2')}>
               <IconChevronsLeft />
             </button>
-            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.next2} title="戻る（より新しいメールへ）" onClick={() => void onPager('MainContent_butNext2')}>
+            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.next2} title={t.home2.newerPage} onClick={() => void onPager('MainContent_butNext2')}>
               <IconChevronLeft />
             </button>
-            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.prev2} title="進む（より古いメールへ）" onClick={() => void onPager('MainContent_butPrev2')}>
+            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.prev2} title={t.home2.olderPage} onClick={() => void onPager('MainContent_butPrev2')}>
               <IconChevronRight />
             </button>
-            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.first2} title="終端へ（古いメールのページへ）" onClick={() => void onPager('MainContent_butFirst2')}>
+            <button type="button" className="p-home2-gm-seg-btn" disabled={listLoading || snap.nav.first2} title={t.home2.oldestPage} onClick={() => void onPager('MainContent_butFirst2')}>
               <IconChevronsRight />
             </button>
           </div>
@@ -443,7 +449,7 @@ export function Home2WebMailMailboxPage() {
             <>
               <span className="p-home2-gm-footer-spacer" aria-hidden />
               <button type="button" className="p-home2-send-act p-home2-gm-delete" disabled={snap.nav.del} onClick={() => nativeSubmitClick('MainContent_butDel')}>
-                ゴミ箱へ移動
+                {t.home2.moveToTrash}
               </button>
             </>
           ) : null}

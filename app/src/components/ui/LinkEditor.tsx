@@ -7,6 +7,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { SK, HOME_SHORTCUT_EXTRAS, HOME2_MAIL_DIRECTORY_URL } from '../../shared/constants';
 import type { LinkConfig } from '../../shared/types';
 import storage from '../../lib/storage';
+import { useI18n } from '../../i18n';
 
 export type { LinkConfig, CustomLink } from '../../shared/types';
 
@@ -64,6 +65,7 @@ interface LinkEditorProps {
 }
 
 export function LinkEditor({ items, config, onConfigChange, editing }: LinkEditorProps) {
+  const { t } = useI18n();
   const [localCfg, setLocalCfg] = useState<LinkConfig>(config);
   const [addName,  setAddName]  = useState('');
   const [addUrl,   setAddUrl]   = useState('');
@@ -160,7 +162,7 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
   // ── 表示モード ──────────────────────────────────────────────────────────
   if (!editing) {
     return visible.length === 0
-      ? <p className="p-empty">ショートカットがありません</p>
+      ? <p className="p-empty">{t.linkEditor.empty}</p>
       : (
         <div className="p-link-list">
           {visible.map((r) => (
@@ -203,21 +205,21 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
             onDragEnd={onDragEnd}
             onDrop={(e) => onDrop(e, i)}
           >
-            <span className="p-link-edit-grip" aria-hidden="true" title="ドラッグで並べ替え">⋮⋮</span>
+            <span className="p-link-edit-grip" aria-hidden="true" title={t.linkEditor.dragToReorder}>⋮⋮</span>
             <span className="p-link-edit-name">{r.midashi}</span>
             <button
               type="button"
               className="p-link-edit-vis"
-              title={isHidden(r.key) ? 'ホームに表示する' : 'ホームで非表示にする'}
+              title={isHidden(r.key) ? t.linkEditor.showOnHome : t.linkEditor.hideOnHome}
               onClick={() => toggleHidden(r.key)}
             >
-              {isHidden(r.key) ? '表示' : '隠す'}
+              {isHidden(r.key) ? t.common.show : t.common.hide}
             </button>
             {r.isCustom && (
               <button
                 type="button"
                 className="p-link-edit-del"
-                title="削除"
+                title={t.common.delete}
                 onClick={() => deleteCustom(r.customId!)}
               >
                 ×
@@ -227,9 +229,9 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
         ))}
       </div>
       <div className="p-link-add-form">
-        <input type="text"  className="p-link-add-input" placeholder="リンク名"        autoComplete="off" value={addName} onChange={(e) => setAddName(e.target.value)} />
-        <input type="url"   className="p-link-add-input" placeholder="URL (https://…)" autoComplete="off" value={addUrl}  onChange={(e) => setAddUrl(e.target.value)} />
-        <button type="button" className="p-link-add-btn" onClick={addCustomLink}>追加</button>
+        <input type="text"  className="p-link-add-input" placeholder={t.linkEditor.linkNamePlaceholder} autoComplete="off" value={addName} onChange={(e) => setAddName(e.target.value)} />
+        <input type="url"   className="p-link-add-input" placeholder={t.linkEditor.urlPlaceholder} autoComplete="off" value={addUrl}  onChange={(e) => setAddUrl(e.target.value)} />
+        <button type="button" className="p-link-add-btn" onClick={addCustomLink}>{t.common.add}</button>
       </div>
     </>
   );

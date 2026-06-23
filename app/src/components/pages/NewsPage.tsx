@@ -18,6 +18,7 @@ import {
 } from '../../shared/news-list-filters';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
+import { useI18n } from '../../i18n';
 
 type NewsItem = NewsListItem;
 
@@ -28,6 +29,7 @@ interface NewsPageProps {
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export function NewsPage({ kinoForce }: NewsPageProps) {
+  const { t } = useI18n();
   const y0           = new Date().getFullYear();
   const initialNendo = String(currentNendo());
 
@@ -130,14 +132,14 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
 
   const list     = filteredList();
   const nendoMsg = raw && raw.length > 0
-    ? `${nendo}年度のお知らせ一覧を表示しています。`
-    : raw !== null ? `${nendo}年度のお知らせはありません。` : '読み込み中…';
+    ? t.newsPage.nendoShowing(nendo)
+    : raw !== null ? t.newsPage.nendoEmpty(nendo) : t.common.loading;
 
   let tableBody: React.ReactNode;
   if (raw === null) {
-    tableBody = <tr><td colSpan={4}><p className="p-news-empty">読み込み中…</p></td></tr>;
+    tableBody = <tr><td colSpan={4}><p className="p-news-empty">{t.common.loading}</p></td></tr>;
   } else if (list.length === 0) {
-    tableBody = <tr><td colSpan={4}><p className="p-news-empty">該当するお知らせはありません。</p></td></tr>;
+    tableBody = <tr><td colSpan={4}><p className="p-news-empty">{t.newsPage.emptyFiltered}</p></td></tr>;
   } else {
     tableBody = list.map((item, idx) => {
       const unread      = String(item.readFlg) === '0';
@@ -163,13 +165,13 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
   }
 
   return (
-    <PageShell variant="news" title="お知らせ一覧">
+    <PageShell variant="news" title={t.newsPage.title}>
       <KinoPanel data={kinoData} forceVisible={kinoForce} />
 
       <div className="p-news-page">
         <div className="p-news-primary">
           {/* 年度選択 */}
-          <nav className="p-news-nendo-nav" aria-label="表示年度">
+          <nav className="p-news-nendo-nav" aria-label={t.newsPage.nendoAria}>
             {Array.from({ length: 5 }, (_, k) => {
               const n = String(y0 - k);
               return (
@@ -179,7 +181,7 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
                   className={`p-news-nendo-btn${n === nendo ? ' is-active' : ''}`}
                   onClick={() => requestNendo(n)}
                 >
-                  {n} 年度
+                  {t.newsPage.nendoButton(n)}
                 </button>
               );
             })}
@@ -188,15 +190,15 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
           <p className="p-news-nendo-msg">{nendoMsg}</p>
 
           <section className="p-panel p-news-table-wrap">
-            <span className="p-panel-head">お知らせ一覧</span>
+            <span className="p-panel-head">{t.newsPage.title}</span>
             <div className="p-news-table-scroll">
-              <table className="p-news-table" aria-label="お知らせ一覧">
+              <table className="p-news-table" aria-label={t.newsPage.title}>
                 <thead>
                   <tr>
-                    <th scope="col">日時</th>
-                    <th scope="col">タイトル</th>
-                    <th scope="col">配信元</th>
-                    <th scope="col">カテゴリ</th>
+                    <th scope="col">{t.newsPage.date}</th>
+                    <th scope="col">{t.newsPage.titleColumn}</th>
+                    <th scope="col">{t.newsPage.sender}</th>
+                    <th scope="col">{t.newsPage.category}</th>
                   </tr>
                 </thead>
                 <tbody>{tableBody}</tbody>
@@ -206,11 +208,11 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
         </div>
 
         {/* 絞り込みサイドバー */}
-        <aside className="p-news-aside" aria-label="絞り込み条件">
-          <h2 className="p-news-filter-page-title">絞り込み条件</h2>
+        <aside className="p-news-aside" aria-label={t.newsPage.filterAria}>
+          <h2 className="p-news-filter-page-title">{t.newsPage.filterTitle}</h2>
 
           <div className="p-news-mat">
-            <h3>配信元で選択</h3>
+            <h3>{t.newsPage.senderFilter}</h3>
             <ul className="p-news-checklist">
               {filterOptions.senders.map((s, i) => (
                 <li key={`${s.value}\t${i}`}>
@@ -224,11 +226,11 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
                 </li>
               ))}
             </ul>
-            <p className="p-news-mat-hint">※教員名で絞りたい場合はキーワードへ入力してください</p>
+            <p className="p-news-mat-hint">{t.newsPage.senderHint}</p>
           </div>
 
           <div className="p-news-mat">
-            <h3>カテゴリで選択</h3>
+            <h3>{t.newsPage.categoryFilter}</h3>
             <ul className="p-news-checklist">
               {filterOptions.categories.map((c) => (
                 <li key={c.value}>
@@ -245,11 +247,11 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
           </div>
 
           <div className="p-news-mat">
-            <h3>キーワード</h3>
+            <h3>{t.newsPage.keyword}</h3>
             <input
               type="search"
               className="p-news-kw"
-              placeholder="条件を入れてください"
+              placeholder={t.newsPage.keywordPlaceholder}
               autoComplete="off"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
@@ -258,7 +260,7 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
 
           <div className="p-news-clear">
             <button type="button" className="p-news-clear-btn" onClick={clearFilters}>
-              条件クリア
+              {t.newsPage.clear}
             </button>
           </div>
         </aside>

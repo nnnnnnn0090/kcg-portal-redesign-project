@@ -4,8 +4,10 @@
  */
 
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
+import { useI18n } from '../../i18n';
 
 export function CalendarOverlayAnchors() {
+  const { t } = useI18n();
   const { hoverPopRef, ctxMenuRef, btnSylRef, btnKingRef } = useCalendarOverlayUiRefs();
 
   return (
@@ -24,7 +26,7 @@ export function CalendarOverlayAnchors() {
         className="p-cal-ctx-menu"
         hidden
         role="menu"
-        aria-label="講義リンク先"
+        aria-label={t.calendar.contextMenuAria}
       >
         <button
           type="button"
@@ -33,7 +35,7 @@ export function CalendarOverlayAnchors() {
           className="p-cal-ctx-item"
           role="menuitem"
         >
-          シラバスを開く
+          {t.calendar.openSyllabus}
         </button>
         <button
           type="button"
@@ -42,7 +44,7 @@ export function CalendarOverlayAnchors() {
           className="p-cal-ctx-item"
           role="menuitem"
         >
-          King LMS を開く
+          {t.calendar.openKingLms}
         </button>
       </div>
     </>

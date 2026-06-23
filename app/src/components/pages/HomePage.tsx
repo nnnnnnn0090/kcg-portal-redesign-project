@@ -16,15 +16,13 @@ import { useHomePortalInbox } from '../../hooks/useHomePortalInbox';
 import { useLastLogin } from '../../hooks/useLastLogin';
 import {
   useDeveloperNotice,
-  DEVELOPER_NOTICE_SELECT_LABEL,
-  DEVELOPER_NOTICE_TITLE_FALLBACK,
-  isDeveloperNoticeLang,
 } from '../../hooks/useDeveloperNotice';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
 import { LinkEditor } from '../ui/LinkEditor';
 import { CalendarPanel, AssignmentCalendar, type DuePayload } from '../../features/calendar';
+import { useI18n } from '../../i18n';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -55,6 +53,7 @@ function scrollElementToVerticalCenter(
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export function HomePage({ settings }: HomePageProps) {
+  const { language, t } = useI18n();
   const { courses, setCourses } = useCourses();
   const { overlayRoot } = usePortalDom();
 
@@ -114,15 +113,15 @@ export function HomePage({ settings }: HomePageProps) {
   );
   const getKingLmsCourses = useCallback(() => courses, [courses]);
   const lastLogin         = useLastLogin();
-  const { notice: developerNotice, lang: noticeLang, setLang: setNoticeLang } = useDeveloperNotice();
+  const { notice: developerNotice, lang: noticeLang } = useDeveloperNotice(language);
 
   const developerNoticeTitle =
-    developerNotice?.byLang?.[noticeLang]?.title || DEVELOPER_NOTICE_TITLE_FALLBACK[noticeLang];
+    developerNotice?.byLang?.[noticeLang]?.title || t.developerNotice.fallbackTitle;
   const developerNoticeMessage = developerNotice?.byLang?.[noticeLang]?.message ?? '';
 
   return (
     <PageShell
-      title="ホーム"
+      title={t.home.title}
       headExtra={lastLogin ? <span className="p-last-login">{lastLogin}</span> : undefined}
     >
       <div className="p-stack">
@@ -131,25 +130,6 @@ export function HomePage({ settings }: HomePageProps) {
           <section className="p-panel">
             <span className="p-panel-head p-developer-notice-head">
               <span className="p-developer-notice-head-title">{developerNoticeTitle}</span>
-              {developerNotice.canToggleLang ? (
-                <div className="p-developer-notice-lang-wrap">
-                  <select
-                    className="p-developer-notice-lang-select"
-                    value={noticeLang}
-                    aria-label="Language / 言語"
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      if (isDeveloperNoticeLang(v)) setNoticeLang(v);
-                    }}
-                  >
-                    {developerNotice.langOptions.map((id) => (
-                      <option key={id} value={id}>
-                        {DEVELOPER_NOTICE_SELECT_LABEL[id]}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ) : null}
             </span>
             {developerNoticeMessage ? (
               <div className="p-panel-body" id="p-developer-notice">
@@ -165,7 +145,8 @@ export function HomePage({ settings }: HomePageProps) {
         <CalendarPanel
           calUrl={urls.kogiCalendar}
           calKind="kogi"
-          titles={{ week: '今週の授業', month: '今月の授業' }}
+          titles={{ week: t.home.kogiWeek, month: t.home.kogiMonth }}
+          modeGroupLabel={t.calendar.modeGroup(t.home.kogiCalendar)}
           msgType={MSG.kogiCalendar}
           getKingLmsCourses={getKingLmsCourses}
           kogiDisplayDeps={kogiDisplayDeps}
@@ -176,7 +157,7 @@ export function HomePage({ settings }: HomePageProps) {
         {!settings.hideAssignmentCalendar ? (
           <AssignmentCalendar
             payload={assignmentPayload}
-            titles={{ week: '今週の課題', month: '今月の課題' }}
+            titles={{ week: t.home.assignmentWeek, month: t.home.assignmentMonth }}
           />
         ) : null}
 
@@ -184,7 +165,8 @@ export function HomePage({ settings }: HomePageProps) {
         <CalendarPanel
           calUrl={urls.hoshuCalendar}
           calKind="hoshu"
-          titles={{ week: '今週の補修', month: '今月の補修' }}
+          titles={{ week: t.home.hoshuWeek, month: t.home.hoshuMonth }}
+          modeGroupLabel={t.calendar.modeGroup(t.home.hoshuCalendar)}
           msgType={MSG.hoshuCalendar}
           hideWhenEmpty
           getForceVisible={() => settings.hoshuCalForce}
@@ -195,7 +177,8 @@ export function HomePage({ settings }: HomePageProps) {
         <CalendarPanel
           calUrl={urls.campusCalendar}
           calKind="campus"
-          titles={{ week: '今週のキャンパス', month: '今月のキャンパス' }}
+          titles={{ week: t.home.campusWeek, month: t.home.campusMonth }}
+          modeGroupLabel={t.calendar.modeGroup(t.home.campusCalendar)}
           msgType={MSG.campusCalendar}
           hideWhenEmpty
           getForceVisible={() => settings.campusCalForce}
@@ -204,7 +187,7 @@ export function HomePage({ settings }: HomePageProps) {
 
         {/* 授業に関するお知らせ */}
         <section className="p-panel">
-          <span className="p-panel-head">授業に関するお知らせ</span>
+          <span className="p-panel-head">{t.home.kogiNews}</span>
           <div className="p-panel-body" id="p-kogi-news">
             <NewsList items={kogiNews} />
           </div>
@@ -213,21 +196,21 @@ export function HomePage({ settings }: HomePageProps) {
         {/* お知らせ & ショートカット */}
         <div className="p-grid">
           <section className="p-panel">
-            <span className="p-panel-head">お知らせ</span>
+            <span className="p-panel-head">{t.home.news}</span>
             <div className="p-panel-body" id="p-news">
               <NewsList items={newTopicsItems} />
             </div>
           </section>
           <section className="p-panel p-panel-links">
             <span className="p-panel-head">
-              <span>ショートカット</span>
+              <span>{t.home.shortcuts}</span>
               <button
                 type="button"
                 className={`p-link-edit-btn${linksEditing ? ' is-active' : ''}`}
                 id="p-link-edit-btn"
                 onClick={() => setLinksEditing((v) => !v)}
               >
-                {linksEditing ? '完了' : '編集'}
+                {linksEditing ? t.common.done : t.common.edit}
               </button>
             </span>
             <div className={`p-panel-body${linksEditing ? ' is-editing' : ''}`} id="p-links">

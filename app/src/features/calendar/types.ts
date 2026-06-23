@@ -3,6 +3,7 @@
  */
 
 import type { CalendarWeekStart } from '../../lib/date';
+import type { AppLanguage } from '../../i18n/messages';
 
 /** カレンダー API リクエストの uKbn + 半開区間 [start, end) */
 export interface CalParams {
@@ -33,4 +34,6 @@ export interface ViewMeta {
   calKind:        string;
   /** 週列の左端。`range` の `start` 日の曜日と一致すること */
   weekStart:      CalendarWeekStart;
+  /** グリッド内固定文言の表示言語 */
+  language?:      AppLanguage;
 }

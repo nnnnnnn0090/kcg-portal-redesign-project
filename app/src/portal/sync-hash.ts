@@ -4,21 +4,26 @@
 
 import { SK, SYNC_HASH } from '../shared/constants';
 import storage from '../lib/storage';
+import { messagesForLanguage, normalizeLanguage, type AppLanguage } from '../i18n/messages';
 
-export const KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST =
-  '初回セットアップは完了しました。King LMS を開くには、該当の講義をもう一度クリックしてください。';
+export function kingLmsCourseListSyncSuccessGuideToast(language: AppLanguage): string {
+  return messagesForLanguage(language).sync.courseGuideToast;
+}
 
-const HASH_MESSAGES: Record<string, string> = {
-  [SYNC_HASH.courseDone]: KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST,
-  [SYNC_HASH.courseTimeout]:     'コース一覧の取得が時間内に完了しませんでした',
-  [SYNC_HASH.assignmentDone]:    '課題を取得しました',
-  [SYNC_HASH.assignmentTimeout]: '課題の取得が時間内に完了しませんでした',
-  [SYNC_HASH.assignmentError]:   '課題データを読み取れませんでした（King LMS の変更の可能性があります）',
-};
+function hashMessages(language: AppLanguage): Record<string, string> {
+  const t = messagesForLanguage(language).sync;
+  return {
+    [SYNC_HASH.courseDone]:       t.courseGuideToast,
+    [SYNC_HASH.courseTimeout]:    t.courseTimeout,
+    [SYNC_HASH.assignmentDone]:   t.assignmentDone,
+    [SYNC_HASH.assignmentTimeout]: t.assignmentTimeout,
+    [SYNC_HASH.assignmentError]:  t.assignmentError,
+  };
+}
 
-export function consumeKingLmsSyncReturnHash(): string {
+export function consumeKingLmsSyncReturnHash(language: AppLanguage): string {
   const hash = location.hash.replace(/^#/, '');
-  const msg  = HASH_MESSAGES[hash] ?? '';
+  const msg  = hashMessages(language)[hash] ?? '';
 
   if (msg) {
     try {
@@ -32,12 +37,13 @@ export function consumeKingLmsSyncReturnHash(): string {
 
 /** 起動時トースト: location.hash と storage の quiet フラグを解決する */
 export async function resolveKingLmsMountToastMessage(): Promise<string> {
-  let syncToastMsg = consumeKingLmsSyncReturnHash();
-  const bootSnap = await storage.get([SK.kingLmsCourseSyncToastQuiet]);
+  const bootSnap = await storage.get([SK.kingLmsCourseSyncToastQuiet, SK.language]);
+  const language = normalizeLanguage(bootSnap[SK.language]);
+  let syncToastMsg = consumeKingLmsSyncReturnHash(language);
   if (bootSnap[SK.kingLmsCourseSyncToastQuiet]) {
     await storage.set({ [SK.kingLmsCourseSyncToastQuiet]: false });
-    if (syncToastMsg === KING_LMS_COURSE_LIST_SYNC_SUCCESS_GUIDE_TOAST) {
-      syncToastMsg = 'コース一覧を保存しました';
+    if (syncToastMsg === kingLmsCourseListSyncSuccessGuideToast(language)) {
+      syncToastMsg = messagesForLanguage(language).sync.courseSaved;
     }
   }
   return syncToastMsg;

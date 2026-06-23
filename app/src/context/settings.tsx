@@ -17,6 +17,11 @@ import storage from '../lib/storage';
 import { syncPortalTheme } from '../themes';
 import type { CalendarWeekStart } from '../lib/date';
 import { parseCalendarWeekStart } from '../lib/date';
+import {
+  DEFAULT_LANGUAGE,
+  normalizeLanguage,
+  type AppLanguage,
+} from '../i18n/messages';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -32,6 +37,8 @@ export interface Settings {
   home2WebMailOverlay: boolean;
   /** カレンダーの列を「月〜日」または「日〜土」で始める */
   calendarWeekStart: CalendarWeekStart;
+  /** 拡張 UI の表示言語 */
+  language: AppLanguage;
 }
 
 export interface SettingsContextValue {
@@ -54,6 +61,7 @@ const DEFAULTS: Settings = {
   hideAssignmentCalendar: false,
   home2WebMailOverlay: true,
   calendarWeekStart: 'monday',
+  language: DEFAULT_LANGUAGE,
 };
 
 // Settings キーから storage キーへの明示的マッピング。
@@ -68,6 +76,7 @@ const SETTINGS_TO_SK = {
   hideAssignmentCalendar: SK.hideAssignmentCalendar,
   home2WebMailOverlay: SK.home2WebMailOverlay,
   calendarWeekStart: SK.calendarWeekStart,
+  language: SK.language,
 } satisfies Record<keyof Settings, string>;
 
 const STORAGE_KEYS = [
@@ -80,6 +89,7 @@ const STORAGE_KEYS = [
   SK.hideAssignmentCalendar,
   SK.home2WebMailOverlay,
   SK.calendarWeekStart,
+  SK.language,
 ] as const;
 
 function parseSettings(data: Record<string, unknown>): Settings {
@@ -94,6 +104,7 @@ function parseSettings(data: Record<string, unknown>): Settings {
       Boolean(data[SK.hideAssignmentCalendar] ?? DEFAULTS.hideAssignmentCalendar),
     home2WebMailOverlay: Boolean(data[SK.home2WebMailOverlay] ?? DEFAULTS.home2WebMailOverlay),
     calendarWeekStart: parseCalendarWeekStart(data[SK.calendarWeekStart]),
+    language: normalizeLanguage(data[SK.language] ?? DEFAULTS.language),
   };
 }
 

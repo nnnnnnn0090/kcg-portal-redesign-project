@@ -2,19 +2,18 @@
  * ホーム用の開発者お知らせ JSON（`title` / `message`、任意で `message_ja` 互換、各 `title_*` / `message_*`）を取得する。
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   CLIENT_INSTALL_AT_HEADER,
   CLIENT_LAST_UPDATED_AT_HEADER,
   CLIENT_USER_ID_HEADER,
   DEVELOPER_NOTICE_JSON_URL,
   EXTENSION_VERSION_HEADER,
-  SK,
 } from '../shared/constants';
 import { getOrCreateClientUserId } from '../lib/client-user-id';
 import { getClientLifecycleTimestamps } from '../lib/extension-client-lifecycle';
 import { readExtensionVersion } from '../lib/extension-version';
-import storage from '../lib/storage';
+import type { AppLanguage } from '../i18n/messages';
 
 /** JSON の接尾辞と一致（`title_zh_TW` / `message_zh_TW` など） */
 export const DEVELOPER_NOTICE_LANG_IDS = [
@@ -70,13 +69,11 @@ export const DEVELOPER_NOTICE_TITLE_FALLBACK: Record<DeveloperNoticeLang, string
 export interface DeveloperNoticeI18n {
   byLang: Record<DeveloperNoticeLang, { title: string; message: string }>;
   langOptions: DeveloperNoticeLang[];
-  canToggleLang: boolean;
 }
 
 export interface UseDeveloperNoticeResult {
   notice: DeveloperNoticeI18n | null;
   lang: DeveloperNoticeLang;
-  setLang: (l: DeveloperNoticeLang) => void;
 }
 
 function str(v: unknown): string {
@@ -102,6 +99,14 @@ function fingerprint(x: { title: string; message: string }): string {
   return `${x.title}\0${x.message}`;
 }
 
+function preferredNoticeLang(preferred: AppLanguage, notice: DeveloperNoticeI18n | null): DeveloperNoticeLang {
+  if (!notice?.langOptions.length) return preferred;
+  if (notice.langOptions.includes(preferred)) return preferred;
+  if (notice.langOptions.includes('ja')) return 'ja';
+  if (notice.langOptions.includes('en')) return 'en';
+  return notice.langOptions[0] ?? preferred;
+}
+
 /** リロードのたびに最新を取る（ブラウザ・CDN キャッシュを避ける） */
 async function fetchDeveloperNoticeJson(): Promise<Response> {
   const [userId, lifecycle] = await Promise.all([
@@ -125,26 +130,12 @@ async function fetchDeveloperNoticeJson(): Promise<Response> {
   });
 }
 
-export function useDeveloperNotice(): UseDeveloperNoticeResult {
+export function useDeveloperNotice(preferredLanguage: AppLanguage): UseDeveloperNoticeResult {
   const [notice, setNotice] = useState<DeveloperNoticeI18n | null>(null);
-  const [lang, setLangState] = useState<DeveloperNoticeLang>('ja');
-
-  useEffect(() => {
-    let cancelled = false;
-    void storage.get(SK.developerNoticeLang).then((r) => {
-      if (cancelled) return;
-      const v = r[SK.developerNoticeLang];
-      if (isDeveloperNoticeLang(v)) setLangState(v);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const setLang = useCallback((l: DeveloperNoticeLang) => {
-    setLangState(l);
-    void storage.set({ [SK.developerNoticeLang]: l });
-  }, []);
+  const lang = useMemo(
+    () => preferredNoticeLang(preferredLanguage, notice),
+    [preferredLanguage, notice],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -208,10 +199,10 @@ export function useDeveloperNotice(): UseDeveloperNoticeResult {
           if (rawTitle(json, id) || rawMessage(json, id)) langOptions.push(id);
         }
 
-        const uniq = new Set(DEVELOPER_NOTICE_LANG_IDS.map((id) => fingerprint(byLang[id])));
-        const canToggleLang = uniq.size > 1;
+        // Keep this calculation so equal translated payloads are normalized consistently.
+        void new Set(DEVELOPER_NOTICE_LANG_IDS.map((id) => fingerprint(byLang[id])));
 
-        setNotice({ byLang, langOptions, canToggleLang });
+        setNotice({ byLang, langOptions });
       })
       .catch(() => {
         if (!cancelled) setNotice(null);
@@ -222,14 +213,5 @@ export function useDeveloperNotice(): UseDeveloperNoticeResult {
     };
   }, []);
 
-  useEffect(() => {
-    if (!notice?.langOptions.length) return;
-    if (!notice.langOptions.includes(lang)) {
-      const next = notice.langOptions[0] ?? 'ja';
-      setLangState(next);
-      void storage.set({ [SK.developerNoticeLang]: next });
-    }
-  }, [notice, lang]);
-
-  return { notice, lang, setLang };
+  return { notice, lang };
 }

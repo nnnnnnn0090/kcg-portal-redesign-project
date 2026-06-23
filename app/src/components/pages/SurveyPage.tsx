@@ -14,6 +14,7 @@ import {
 } from '../../lib/portal-messages-pages';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
+import { useI18n } from '../../i18n';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -34,10 +35,16 @@ function pickRaw(obj: Row | null, keys: string[]): string {
   return '';
 }
 
-function formatDeadline(raw: string): string {
+function formatDeadline(raw: string, locale: string): string {
   const s = String(raw).trim();
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::\d{2})?/);
-  return m ? `${m[1]}年${m[2]}月${m[3]}日 ${m[4]}:${m[5]}` : s;
+  if (!m) return s;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4]), Number(m[5]));
+  if (Number.isNaN(d.getTime())) return s;
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(d);
 }
 
 /** アンケート一覧行を一度だけ pick して束ねる（API 確定キー） */
@@ -115,9 +122,10 @@ function applyFilters(raw: Row[], onlyUnanswered: boolean, kogiKw: string, kyoin
 // ─── 行コンポーネント ─────────────────────────────────────────────────────
 
 function SurveyRow({ row }: { row: Row }) {
+  const { locale } = useI18n();
   const s        = parseSurveyRow(row);
   const href     = buildDetailHrefParsed(s);
-  const deadline = formatDeadline(s.dispEndDateTime);
+  const deadline = formatDeadline(s.dispEndDateTime, locale);
   const { kogi, yobiRNm: yobi, jigenRNm: jigen, kyoinFullNm: kyoin } = s;
   return (
     <tr>
@@ -133,6 +141,7 @@ function SurveyRow({ row }: { row: Row }) {
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export function SurveyPage({ kinoForce }: SurveyPageProps) {
+  const { t } = useI18n();
   const nendo = String(currentNendo());
 
   const [portal, setPortal] = useState<SurveyPortalState>({ kinoData: null, raw: null });
@@ -153,39 +162,39 @@ export function SurveyPage({ kinoForce }: SurveyPageProps) {
   const noData   = raw !== null && raw.length === 0;
 
   const listTitle = raw === null || filtered.length > 0
-    ? `${nendo}年度の回答期間中の授業評価アンケート一覧を表示しています。`
-    : `${nendo}年度の条件に一致する回答期間中の授業評価アンケートはありません。`;
+    ? t.surveyPage.listShowing(nendo)
+    : t.surveyPage.listEmpty(nendo);
 
   let tableBody: React.ReactNode;
   if (raw === null) {
-    tableBody = <tr><td colSpan={5}><p className="p-news-empty">読み込み中…</p></td></tr>;
+    tableBody = <tr><td colSpan={5}><p className="p-news-empty">{t.common.loading}</p></td></tr>;
   } else if (filtered.length === 0) {
-    tableBody = <tr><td colSpan={5}><p className="p-news-empty">条件に一致するアンケートはありません。</p></td></tr>;
+    tableBody = <tr><td colSpan={5}><p className="p-news-empty">{t.surveyPage.emptyFiltered}</p></td></tr>;
   } else {
     tableBody = filtered.map((row) => <SurveyRow key={surveyRowKey(row)} row={row} />);
   }
 
   return (
-    <PageShell variant="news" title="授業評価アンケート回答">
+    <PageShell variant="news" title={t.surveyPage.title}>
       <KinoPanel data={kinoData} forceVisible={kinoForce} />
 
       <div className="p-news-page p-questionnaire-layout">
         <div className="p-news-primary">
           <section className="p-panel p-news-table-wrap" id="p-questionnaire-section">
-            <span className="p-panel-head">アンケート一覧</span>
+            <span className="p-panel-head">{t.surveyPage.list}</span>
             <div className="p-questionnaire-subbar">
               <p className="p-questionnaire-list-title">{raw !== null ? listTitle : ''}</p>
             </div>
             {!noData && (
               <div className="p-news-table-scroll">
-                <table className="p-news-table" aria-label="授業評価アンケート一覧">
+                <table className="p-news-table" aria-label={t.surveyPage.ariaList}>
                   <thead>
                     <tr>
-                      <th scope="col">講義</th>
-                      <th scope="col">曜日</th>
-                      <th scope="col">時限</th>
-                      <th scope="col">担当教員</th>
-                      <th scope="col">締切</th>
+                      <th scope="col">{t.surveyPage.lecture}</th>
+                      <th scope="col">{t.surveyPage.weekday}</th>
+                      <th scope="col">{t.surveyPage.period}</th>
+                      <th scope="col">{t.surveyPage.teacher}</th>
+                      <th scope="col">{t.surveyPage.deadline}</th>
                     </tr>
                   </thead>
                   <tbody>{tableBody}</tbody>
@@ -196,11 +205,11 @@ export function SurveyPage({ kinoForce }: SurveyPageProps) {
         </div>
 
         {/* 絞り込みサイドバー */}
-        <aside className="p-news-aside" aria-label="絞り込み">
-          <h2 className="p-news-filter-page-title">絞り込み条件</h2>
+        <aside className="p-news-aside" aria-label={t.kyukoPage.filterAria}>
+          <h2 className="p-news-filter-page-title">{t.newsPage.filterTitle}</h2>
 
           <div className="p-news-mat">
-            <h3>表示</h3>
+            <h3>{t.surveyPage.display}</h3>
             <ul className="p-news-checklist">
               <li>
                 <input
@@ -209,17 +218,17 @@ export function SurveyPage({ kinoForce }: SurveyPageProps) {
                   checked={onlyUnanswered}
                   onChange={(e) => setOnlyUnanswered(e.target.checked)}
                 />
-                <label htmlFor="p-questionnaire-only-unanswer">未回答のみ</label>
+                <label htmlFor="p-questionnaire-only-unanswer">{t.surveyPage.onlyUnanswered}</label>
               </li>
             </ul>
           </div>
 
           <div className="p-news-mat">
-            <h3>講義名</h3>
+            <h3>{t.surveyPage.lectureName}</h3>
             <input
               type="search"
               className="p-news-kw"
-              placeholder="キーワード"
+              placeholder={t.surveyPage.keywordPlaceholder}
               maxLength={40}
               autoComplete="off"
               value={kogiKw}
@@ -228,11 +237,11 @@ export function SurveyPage({ kinoForce }: SurveyPageProps) {
           </div>
 
           <div className="p-news-mat">
-            <h3>担当教員</h3>
+            <h3>{t.surveyPage.teacher}</h3>
             <input
               type="search"
               className="p-news-kw"
-              placeholder="キーワード"
+              placeholder={t.surveyPage.keywordPlaceholder}
               maxLength={40}
               autoComplete="off"
               value={kyoinKw}
@@ -246,7 +255,7 @@ export function SurveyPage({ kinoForce }: SurveyPageProps) {
               className="p-news-clear-btn"
               onClick={() => { setOnlyUnanswered(true); setKogiKw(''); setKyoinKw(''); }}
             >
-              条件クリア
+              {t.newsPage.clear}
             </button>
           </div>
         </aside>

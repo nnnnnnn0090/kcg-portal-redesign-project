@@ -7,17 +7,20 @@ import { enumerateRange, parseIsoLocal, toIsoLocal, calEventDayIso, type Calenda
 import { esc, escAttr, plainFromHtml } from '../../lib/dom';
 import { parseKogiMeta, parseLeadingPeriodTitle, kogiPeriodNum, kogiPeriodTimeRange, findKingLmsUrl, syllabusUrl } from './kogi';
 import type { CalEvent, ViewMeta } from './types';
+import { messagesForLanguage, normalizeLanguage, type AppLanguage } from '../../i18n/messages';
 
 /** 列順は `enumerateRange` と一致するよう weekStart に応じて並べる */
-function weekdayLabels(weekStart: CalendarWeekStart): string[] {
-  const monFirst = ['月', '火', '水', '木', '金', '土', '日'];
-  return weekStart === 'sunday' ? ['日', '月', '火', '水', '木', '金', '土'] : monFirst;
+function weekdayLabels(weekStart: CalendarWeekStart, language: AppLanguage): string[] {
+  const t = messagesForLanguage(language).calendar;
+  return weekStart === 'sunday' ? t.weekdaysSunday : t.weekdaysMonday;
 }
 
 // ─── 1 日分のイベント HTML ────────────────────────────────────────────────
 
-function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind' | 'mode' | 'kingLmsCourses'>): string {
+function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind' | 'mode' | 'kingLmsCourses' | 'language'>): string {
   const { calKind, mode, kingLmsCourses } = opts;
+  const t = messagesForLanguage(opts.language).calendar;
+  const common = messagesForLanguage(opts.language).common;
   const parts: string[] = [];
   let prevPeriod: number | null = null;
 
@@ -26,7 +29,7 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind'
     const { firstNum }                   = parseLeadingPeriodTitle(ev.title ?? '');
     const period                         = periodFromTip || firstNum;
     const pNum                           = calKind === 'kogi' ? kogiPeriodNum(ev) : null;
-    const kogiMeta = [period && `時限 ${period}`, room].filter(Boolean).join(' · ');
+    const kogiMeta = [period && t.periodValue(String(period)), room].filter(Boolean).join(' · ');
     const meta = String(ev.calMeta ?? '').trim() || kogiMeta;
 
     // kogi カレンダーでは時限の空きを視覚的に表すギャップ要素を挿入する
@@ -65,13 +68,13 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind'
       ? ` data-cal-assignment-submitted="${sub ? 'true' : 'false'}"`
       : '';
     const pendingBadge = calKind === 'assignment' && sub === false
-      ? '<span class="p-cal-ev-pending-badge" aria-hidden="true">未提出</span>'
+      ? `<span class="p-cal-ev-pending-badge" aria-hidden="true">${esc(t.pending)}</span>`
       : '';
     const dataAttrs = `data-cal-title="${escAttr(ev.title ?? '')}" `
       + `data-cal-meta="${escAttr(meta)}" `
       + `data-cal-tip="${escAttr(tipPlain)}" `
       + `data-cal-time="${escAttr(timeRange)}"${kindAttr}${dueIsoAttr}${subAttr}${kogiPeriodAttr}${kogiRoomAttr}`;
-    const titleSpan = `<span class="p-cal-ev-title">${esc(ev.title ?? '')}</span>`;
+    const titleSpan = `<span class="p-cal-ev-title">${esc(ev.title || common.untitled)}</span>`;
     const inner = calKind === 'assignment' && sub === false
       ? `<span class="p-cal-ev-head">${titleSpan}${pendingBadge}</span>${metaHtml}`
       : `${titleSpan}${metaHtml}`;
@@ -101,17 +104,18 @@ export function buildCalendarGridHtml(
   viewMeta: ViewMeta,
 ): string {
   if (!range?.start || !range?.end) {
-    return '<p class="p-empty">カレンダー範囲を取得できませんでした</p>';
+    return `<p class="p-empty">${esc(messagesForLanguage(viewMeta?.language).calendar.rangeUnavailable)}</p>`;
   }
 
   const days = enumerateRange(range.start, range.end);
-  if (days.length === 0) return '<p class="p-empty">表示できる日付がありません</p>';
+  if (days.length === 0) return `<p class="p-empty">${esc(messagesForLanguage(viewMeta?.language).calendar.noDates)}</p>`;
 
   const mode           = viewMeta?.mode === 'month' ? 'month' : 'week';
   const monthRef       = viewMeta?.monthRef ?? null;
   const kingLmsCourses = Array.isArray(viewMeta?.kingLmsCourses) ? viewMeta.kingLmsCourses : [];
   const calKind        = viewMeta?.calKind ?? '';
   const weekStart      = viewMeta?.weekStart ?? 'monday';
+  const language       = normalizeLanguage(viewMeta?.language);
   const todayIso       = toIsoLocal(new Date());
 
   // イベントを日付でグループ化
@@ -124,7 +128,7 @@ export function buildCalendarGridHtml(
     else byDay.set(day, [item]);
   }
 
-  const heads = weekdayLabels(weekStart).map((w) => `<div class="p-cal-wd">${w}</div>`).join('');
+  const heads = weekdayLabels(weekStart, language).map((w) => `<div class="p-cal-wd">${esc(w)}</div>`).join('');
 
   const cells = days.map((iso) => {
     const d       = parseIsoLocal(iso);
@@ -148,7 +152,7 @@ export function buildCalendarGridHtml(
       });
     }
 
-    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, kingLmsCourses });
+    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, kingLmsCourses, language });
     const cls     = ['p-cal-cell', isMuted && 'is-muted', isToday && 'is-today'].filter(Boolean).join(' ');
     const ariaCur = isToday ? ' aria-current="date"' : '';
 

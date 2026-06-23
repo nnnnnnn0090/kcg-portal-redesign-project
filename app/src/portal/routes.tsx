@@ -14,6 +14,7 @@ import { Home2WebMailLoginPage } from '../components/pages/Home2WebMailLoginPage
 import { Home2WebMailMailboxPage } from '../components/pages/Home2WebMailMailboxPage';
 import { Home2WebMailReadPage } from '../components/pages/Home2WebMailReadPage';
 import { Home2WebMailSendPage } from '../components/pages/Home2WebMailSendPage';
+import { useI18n } from '../i18n';
 
 // 遅延ロード（ホームページ以外）
 const NewsPage = lazy(() =>
@@ -29,11 +30,14 @@ const SurveyPage = lazy(() =>
   import('../components/pages/SurveyPage').then((m) => ({ default: m.SurveyPage })),
 );
 
-const PageFallback = (
-  <PageShell hideHead>
-    <p className="p-empty">読み込み中…</p>
-  </PageShell>
-);
+function PageFallback() {
+  const { t } = useI18n();
+  return (
+    <PageShell hideHead>
+      <p className="p-empty">{t.common.loading}</p>
+    </PageShell>
+  );
+}
 
 /** ルートに応じたページコンポーネント。レイアウトは App が担当する。 */
 export function PortalPageOutlet({ route, settings }: { route: PortalAppRoute; settings: Settings }) {
@@ -49,13 +53,13 @@ export function PortalPageOutlet({ route, settings }: { route: PortalAppRoute; s
     case PAGE.HOME:
       return <HomePage settings={settings} />;
     case PAGE.NEWS:
-      return <Suspense fallback={PageFallback}><NewsPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
+      return <Suspense fallback={<PageFallback />}><NewsPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
     case PAGE.DETAIL:
-      return <Suspense fallback={PageFallback}><DetailPage newsDetailId={route.detailId ?? ''} /></Suspense>;
+      return <Suspense fallback={<PageFallback />}><DetailPage newsDetailId={route.detailId ?? ''} /></Suspense>;
     case PAGE.KYUKO:
-      return <Suspense fallback={PageFallback}><KyukoPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
+      return <Suspense fallback={<PageFallback />}><KyukoPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
     case PAGE.SURVEY:
-      return <Suspense fallback={PageFallback}><SurveyPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
+      return <Suspense fallback={<PageFallback />}><SurveyPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
     default:
       return null;
   }

@@ -7,6 +7,7 @@ import { SK, SYNC_HASH } from '../../shared/constants';
 import storage from '../../lib/storage';
 import { isCoursePage, isLoginRedirectPage, isAssignmentSyncPage } from './bridge-urls';
 import { mountLoginHint, mountSyncOverlay, removeSyncOverlay } from './bridge-overlay-ui';
+import { messagesForLanguage, normalizeLanguage } from '../../i18n/messages';
 import {
   clearAssignmentTimer,
   clearCourseTimer,
@@ -22,17 +23,20 @@ export async function maybeShowOverlayFromStorage(): Promise<void> {
     SK.kingLmsAssignmentSyncPending,
     SK.kingLmsAssignmentSyncAwaitCalendar,
     SK.kingLmsAssignmentSyncReturnUrl,
+    SK.language,
   ]);
+  const language = normalizeLanguage(data[SK.language]);
+  const text = messagesForLanguage(language).sync;
   const assignmentWaiting =
     !!data[SK.kingLmsAssignmentSyncPending]
     || (!!data[SK.kingLmsAssignmentSyncAwaitCalendar]
       && !!data[SK.kingLmsAssignmentSyncReturnUrl]
       && isAssignmentSyncPage());
   if (assignmentWaiting) {
-    mountSyncOverlay('課題を取得しています…');
+    mountSyncOverlay(language, text.assignmentFetching);
     startAssignmentTimer();
   } else if (data[SK.kingLmsSyncPending]) {
-    mountSyncOverlay();
+    mountSyncOverlay(language);
     startCourseTimer();
   }
 }
@@ -41,7 +45,8 @@ export async function cancelPendingForLoginRedirect(): Promise<void> {
   clearAssignmentTimer();
   clearCourseTimer();
   removeSyncOverlay();
-  const data = await storage.get([SK.kingLmsSyncReturnUrl, SK.kingLmsAssignmentSyncReturnUrl]);
+  const data = await storage.get([SK.kingLmsSyncReturnUrl, SK.kingLmsAssignmentSyncReturnUrl, SK.language]);
+  const language = normalizeLanguage(data[SK.language]);
   const hadCourseReturn     = typeof data[SK.kingLmsSyncReturnUrl]           === 'string' && !!data[SK.kingLmsSyncReturnUrl];
   const hadAssignmentReturn = typeof data[SK.kingLmsAssignmentSyncReturnUrl] === 'string' && !!data[SK.kingLmsAssignmentSyncReturnUrl];
   await storage.set({
@@ -51,18 +56,19 @@ export async function cancelPendingForLoginRedirect(): Promise<void> {
     [SK.kingLmsAssignmentSyncAwaitCalendar]: hadAssignmentReturn,
   });
   if (hadCourseReturn || hadAssignmentReturn) {
-    mountLoginHint(hadAssignmentReturn && !hadCourseReturn);
+    mountLoginHint(hadAssignmentReturn && !hadCourseReturn, language);
   }
 }
 
 export async function saveCourses(courses: unknown[]): Promise<void> {
   if (isLoginRedirectPage()) { await cancelPendingForLoginRedirect(); return; }
-  const data = await storage.get([SK.kingLmsSyncPending, SK.kingLmsSyncAwaitCourse, SK.kingLmsSyncReturnUrl]);
+  const data = await storage.get([SK.kingLmsSyncPending, SK.kingLmsSyncAwaitCourse, SK.kingLmsSyncReturnUrl, SK.language]);
+  const language = normalizeLanguage(data[SK.language]);
   let syncPending = !!data[SK.kingLmsSyncPending];
   const hadAwait  = !!data[SK.kingLmsSyncAwaitCourse];
   // AwaitCourse フラグ（ログイン後に戻ったケース）でも同期を継続する
   if (!syncPending && hadAwait && data[SK.kingLmsSyncReturnUrl] && isCoursePage()) syncPending = true;
-  if (syncPending) mountSyncOverlay();
+  if (syncPending) mountSyncOverlay(language);
   const toSet: Record<string, unknown> = { [SK.kingLmsCourses]: courses };
   if (syncPending && hadAwait) { toSet[SK.kingLmsSyncAwaitCourse] = false; toSet[SK.kingLmsSyncPending] = true; }
   await storage.set(toSet);
@@ -105,11 +111,12 @@ export async function saveAssignmentDue(
   captureState?: string,
   opts?: SaveAssignmentDueOpts,
 ): Promise<void> {
-  const data = await storage.get([SK.kingLmsAssignmentSyncPending, SK.kingLmsAssignmentSyncAwaitCalendar, SK.kingLmsAssignmentSyncReturnUrl]);
+  const data = await storage.get([SK.kingLmsAssignmentSyncPending, SK.kingLmsAssignmentSyncAwaitCalendar, SK.kingLmsAssignmentSyncReturnUrl, SK.language]);
+  const language = normalizeLanguage(data[SK.language]);
   let syncPending = !!data[SK.kingLmsAssignmentSyncPending];
   const hadAwait  = !!data[SK.kingLmsAssignmentSyncAwaitCalendar];
   if (!syncPending && hadAwait && data[SK.kingLmsAssignmentSyncReturnUrl] && isAssignmentSyncPage()) syncPending = true;
-  if (syncPending) mountSyncOverlay('課題を取得しています…');
+  if (syncPending) mountSyncOverlay(language, messagesForLanguage(language).sync.assignmentFetching);
 
   if (captureState === 'error') {
     if (syncPending) {

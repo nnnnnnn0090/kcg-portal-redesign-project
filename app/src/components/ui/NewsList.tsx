@@ -4,6 +4,7 @@
 
 import type { NewsListItem } from '../../shared/types';
 import { newsHref } from '../../lib/dom';
+import { useI18n } from '../../i18n';
 
 export type { NewsListItem } from '../../shared/types';
 
@@ -12,11 +13,12 @@ interface NewsListProps {
   emptyMsg?: string;
 }
 
-export function NewsList({ items, emptyMsg = 'お知らせはありません' }: NewsListProps) {
+export function NewsList({ items, emptyMsg }: NewsListProps) {
+  const { t } = useI18n();
   const filtered = items.filter((i) => i.title);
 
   if (filtered.length === 0) {
-    return <p className="p-empty">{emptyMsg}</p>;
+    return <p className="p-empty">{emptyMsg ?? t.newsList.empty}</p>;
   }
 
   return (

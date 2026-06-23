@@ -8,6 +8,7 @@ import {
   EXTENSION_AUTHOR_PROFILE_URL,
   PORTAL_DOM,
 } from '../../shared/constants';
+import { useI18n } from '../../i18n';
 
 /** ポータル用フッターが無いとき、ホストの `.footer` 文言を載せる */
 function appendHostPlainFooterLine(mount: HTMLElement): void {
@@ -50,6 +51,7 @@ function appendRedesignedCredit(mount: HTMLElement): void {
 }
 
 export function Footer() {
+  const { t } = useI18n();
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,7 +88,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="p-site-footer" id="p-site-footer" aria-label="フッター">
+    <footer className="p-site-footer" id="p-site-footer" aria-label={t.footer.aria}>
       <div className="container" ref={mountRef} />
     </footer>
   );

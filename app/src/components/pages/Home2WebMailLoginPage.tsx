@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HOME2_MAIL_DEFAULT_URL, HOME2_ORIGIN } from '../../shared/constants';
+import { useI18n } from '../../i18n';
 
 const ID_USER = 'MainContent_txtUserID';
 const ID_PASS = 'MainContent_txtPasswd';
@@ -37,6 +38,7 @@ function forceNativeShowLastPageOn(): void {
 }
 
 export function Home2WebMailLoginPage() {
+  const { t } = useI18n();
   const [userId, setUserId]   = useState('');
   const [passwd, setPasswd]   = useState('');
   const nativeReadyRef = useRef(false);
@@ -105,18 +107,18 @@ export function Home2WebMailLoginPage() {
       <div className="p-home2-mail-login-backdrop" aria-hidden />
       <div className="p-home2-mail-login-card">
         <header className="p-home2-mail-login-card-head">
-          <a className="p-home2-mail-login-mark" href={HOME2_MAIL_DEFAULT_URL} title="Web メールのトップへ">
+          <a className="p-home2-mail-login-mark" href={HOME2_MAIL_DEFAULT_URL} title={t.home2.loginTopTitle}>
             <img src={`${HOME2_ORIGIN}/ic.bmp`} width={44} height={44} alt="" />
           </a>
           <div className="p-home2-mail-login-brand-text">
             <h1 className="p-home2-mail-login-title">KCG WebMail</h1>
-            <p className="p-home2-mail-login-lead">ユーザー ID とパスワードでサインインしてください</p>
+            <p className="p-home2-mail-login-lead">{t.home2.loginLead}</p>
           </div>
         </header>
 
         <form className="p-home2-mail-form" onSubmit={onSubmit}>
           <label className="p-home2-mail-field">
-            <span className="p-home2-mail-label">ユーザー ID</span>
+            <span className="p-home2-mail-label">{t.home2.userId}</span>
             <input
               className="p-home2-mail-input"
               type="text"
@@ -129,7 +131,7 @@ export function Home2WebMailLoginPage() {
             />
           </label>
           <label className="p-home2-mail-field">
-            <span className="p-home2-mail-label">パスワード</span>
+            <span className="p-home2-mail-label">{t.home2.password}</span>
             <input
               className="p-home2-mail-input"
               type="password"
@@ -141,7 +143,7 @@ export function Home2WebMailLoginPage() {
           </label>
           <div className="p-home2-mail-actions">
             <button type="submit" className="p-home2-mail-submit">
-              ログイン
+              {t.home2.login}
             </button>
           </div>
         </form>

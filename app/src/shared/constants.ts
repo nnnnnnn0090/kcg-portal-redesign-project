@@ -32,6 +32,8 @@ export const SK = {
   home2WebMailOverlay:              'portalThemeHome2WebMailOverlay',
   /** カレンダーグリッドの週の左端: `monday` | `sunday` */
   calendarWeekStart:               'portalThemeCalendarWeekStart',
+  /** 拡張 UI の表示言語 */
+  language:                        'portalThemeLanguage',
   /** 更新通知済みの拡張 manifest version（`readExtensionVersion()` と比較） */
   extensionVersionSeen:            'portalThemeExtensionVersionSeen',
   /** 開発者お知らせパネルの表示言語（`ja` / `en` / `zh` / `zh_TW` / `ko` / `vi` / `ne` / `id` / `th`） */
