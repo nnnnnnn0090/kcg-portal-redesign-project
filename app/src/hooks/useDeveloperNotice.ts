@@ -3,7 +3,17 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { DEVELOPER_NOTICE_JSON_URL, SK } from '../shared/constants';
+import {
+  CLIENT_INSTALL_AT_HEADER,
+  CLIENT_LAST_UPDATED_AT_HEADER,
+  CLIENT_USER_ID_HEADER,
+  DEVELOPER_NOTICE_JSON_URL,
+  EXTENSION_VERSION_HEADER,
+  SK,
+} from '../shared/constants';
+import { getOrCreateClientUserId } from '../lib/client-user-id';
+import { getClientLifecycleTimestamps } from '../lib/extension-client-lifecycle';
+import { readExtensionVersion } from '../lib/extension-version';
 import storage from '../lib/storage';
 
 /** JSON の接尾辞と一致（`title_zh_TW` / `message_zh_TW` など） */
@@ -92,6 +102,29 @@ function fingerprint(x: { title: string; message: string }): string {
   return `${x.title}\0${x.message}`;
 }
 
+/** リロードのたびに最新を取る（ブラウザ・CDN キャッシュを避ける） */
+async function fetchDeveloperNoticeJson(): Promise<Response> {
+  const [userId, lifecycle] = await Promise.all([
+    getOrCreateClientUserId(),
+    getClientLifecycleTimestamps(),
+  ]);
+  const url = `${DEVELOPER_NOTICE_JSON_URL}?_=${Date.now()}`;
+  const headers: Record<string, string> = {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    [CLIENT_USER_ID_HEADER]: userId,
+    [CLIENT_INSTALL_AT_HEADER]: lifecycle.installAt,
+    [CLIENT_LAST_UPDATED_AT_HEADER]: lifecycle.lastUpdatedAt,
+  };
+  const version = readExtensionVersion();
+  if (version) headers[EXTENSION_VERSION_HEADER] = version;
+  return fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+    headers,
+  });
+}
+
 export function useDeveloperNotice(): UseDeveloperNoticeResult {
   const [notice, setNotice] = useState<DeveloperNoticeI18n | null>(null);
   const [lang, setLangState] = useState<DeveloperNoticeLang>('ja');
@@ -115,7 +148,7 @@ export function useDeveloperNotice(): UseDeveloperNoticeResult {
 
   useEffect(() => {
     let cancelled = false;
-    void fetch(DEVELOPER_NOTICE_JSON_URL, { method: 'GET', cache: 'no-store' })
+    void fetchDeveloperNoticeJson()
       .then((r) => {
         if (!r.ok) throw new Error(String(r.status));
         return r.json() as Promise<Record<string, unknown>>;
