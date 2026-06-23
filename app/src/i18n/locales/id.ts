@@ -82,7 +82,7 @@ export const idMessages: typeof jaMessages = {
     changelogTitle: 'Catatan perubahan',
   },
   header: {
-    portal: 'Portal',
+    portal: 'RE:Portal',
     webMail: 'Web Mail',
     settings: 'Pengaturan',
     logout: 'Keluar',

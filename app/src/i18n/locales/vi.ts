@@ -82,7 +82,7 @@ export const viMessages: typeof jaMessages = {
     changelogTitle: 'Nhật ký thay đổi',
   },
   header: {
-    portal: 'Cổng thông tin',
+    portal: 'RE:Portal',
     webMail: 'Web Mail',
     settings: 'Cài đặt',
     logout: 'Đăng xuất',

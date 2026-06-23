@@ -79,7 +79,7 @@ export const jaMessages = {
     changelogTitle: '更新履歴',
   },
   header: {
-    portal: 'ポータル',
+    portal: 'RE:Portal',
     webMail: 'Web メール',
     settings: '設定',
     logout: 'ログアウト',

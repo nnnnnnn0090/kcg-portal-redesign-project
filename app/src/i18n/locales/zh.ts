@@ -82,7 +82,7 @@ export const zhMessages: typeof jaMessages = {
     changelogTitle: '更新日志',
   },
   header: {
-    portal: '门户',
+    portal: 'RE:Portal',
     webMail: 'Web 邮件',
     settings: '设置',
     logout: '退出登录',

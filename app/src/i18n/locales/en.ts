@@ -82,7 +82,7 @@ export const enMessages: typeof jaMessages = {
     changelogTitle: 'Changelog',
   },
   header: {
-    portal: 'Portal',
+    portal: 'RE:Portal',
     webMail: 'Web Mail',
     settings: 'Settings',
     logout: 'Log out',

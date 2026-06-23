@@ -82,7 +82,7 @@ export const thMessages: typeof jaMessages = {
     changelogTitle: 'บันทึกการเปลี่ยนแปลง',
   },
   header: {
-    portal: 'พอร์ทัล',
+    portal: 'RE:Portal',
     webMail: 'Web Mail',
     settings: 'การตั้งค่า',
     logout: 'ออกจากระบบ',

@@ -82,7 +82,7 @@ export const neMessages: typeof jaMessages = {
     changelogTitle: 'परिवर्तन लग',
   },
   header: {
-    portal: 'पोर्टल',
+    portal: 'RE:Portal',
     webMail: 'Web मेल',
     settings: 'सेटिङ',
     logout: 'लगआउट',

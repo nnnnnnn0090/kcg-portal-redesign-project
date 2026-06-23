@@ -82,7 +82,7 @@ export const koMessages: typeof jaMessages = {
     changelogTitle: '변경 기록',
   },
   header: {
-    portal: '포털',
+    portal: 'RE:Portal',
     webMail: 'Web 메일',
     settings: '설정',
     logout: '로그아웃',

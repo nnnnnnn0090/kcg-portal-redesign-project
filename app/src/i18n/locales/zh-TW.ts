@@ -82,7 +82,7 @@ export const zhTWMessages: typeof jaMessages = {
     changelogTitle: '更新紀錄',
   },
   header: {
-    portal: '入口網站',
+    portal: 'RE:Portal',
     webMail: 'Web 郵件',
     settings: '設定',
     logout: '登出',
