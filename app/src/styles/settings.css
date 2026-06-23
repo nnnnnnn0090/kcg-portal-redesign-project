@@ -1,7 +1,11 @@
 #portal-overlay .p-settings-wrap{position:relative;z-index:60}
-#portal-overlay .p-settings-open{padding:.45rem .75rem;border-radius:8px;border:1px solid var(--p-border);background:transparent;
+#portal-overlay .p-settings-open{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .75rem;border-radius:8px;border:1px solid var(--p-border);background:transparent;
   color:var(--p-text-muted);font-size:.75rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s ease}
 #portal-overlay .p-settings-open:hover{border-color:var(--p-border-hover);background:var(--p-bg-hover);color:var(--p-text-bright)}
+#portal-overlay .p-settings-update-pulse{width:6px;height:6px;border-radius:50%;background-color:var(--p-danger);position:relative;flex-shrink:0}
+#portal-overlay .p-settings-update-pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background-color:var(--p-danger);
+  animation:p-pulse-anim 1.8s infinite ease-in-out}
+@keyframes p-pulse-anim{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.5);opacity:0}}
 #portal-overlay .p-settings-pop{position:absolute;top:calc(100% + .35rem);left:0;right:auto;z-index:70;width:min(22rem,calc(100vw - 2rem));
   animation:p-scale-in var(--p-pop-dur) var(--p-enter-ease) both;user-select:none;-webkit-user-select:none}
 #portal-overlay .p-settings-pop.is-closing{animation:p-scale-out var(--p-pop-dur) var(--p-enter-ease) forwards}

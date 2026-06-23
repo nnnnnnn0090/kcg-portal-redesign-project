@@ -10,6 +10,7 @@ import { findHostLogoffAnchor, requestHostPortalLogoff } from '../../shared/host
 import { resolvePortalNavLabel } from '../../lib/portal-nav-labels';
 import { useI18n } from '../../i18n';
 import type { AppLanguage, I18nMessages } from '../../i18n/messages';
+import { useExtensionUpdateAvailable } from '../../hooks/useExtensionUpdateAvailable';
 
 // ─── ナビゲーション型 ─────────────────────────────────────────────────────
 
@@ -247,6 +248,7 @@ export function Header({
   navSource = 'portal',
 }: HeaderProps) {
   const { t, language } = useI18n();
+  const { updateAvailable } = useExtensionUpdateAvailable();
   const [rawNavItems, setRawNavItems] = useState<NavItem[]>([]);
   const [showLogout, setShowLogout] = useState(navSource === 'portal');
   const profile = usePortalProfile(t.header.profileTitle);
@@ -347,13 +349,17 @@ export function Header({
           <div className="p-settings-wrap" id="p-settings-wrap">
             <button
               type="button"
-              className="p-settings-open"
+              className={`p-settings-open${updateAvailable ? ' has-update' : ''}`}
               id="p-open-settings"
               aria-expanded={settingsOpen}
               aria-haspopup="dialog"
               aria-controls="p-settings-dialog"
               onClick={(e) => { e.stopPropagation(); onSettingsToggle(); }}
+              title={updateAvailable ? t.settings.updateAvailableTitle : undefined}
             >
+              {updateAvailable && (
+                <span className="p-settings-update-pulse" aria-hidden="true" />
+              )}
               {t.header.settings}
             </button>
             {settingsPopover}
