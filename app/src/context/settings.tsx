@@ -19,6 +19,7 @@ import type { CalendarWeekStart } from '../lib/date';
 import { parseCalendarWeekStart } from '../lib/date';
 import {
   DEFAULT_LANGUAGE,
+  detectDefaultLanguage,
   normalizeLanguage,
   type AppLanguage,
 } from '../i18n/messages';
@@ -104,7 +105,7 @@ function parseSettings(data: Record<string, unknown>): Settings {
       Boolean(data[SK.hideAssignmentCalendar] ?? DEFAULTS.hideAssignmentCalendar),
     home2WebMailOverlay: Boolean(data[SK.home2WebMailOverlay] ?? DEFAULTS.home2WebMailOverlay),
     calendarWeekStart: parseCalendarWeekStart(data[SK.calendarWeekStart]),
-    language: normalizeLanguage(data[SK.language] ?? DEFAULTS.language),
+    language: normalizeLanguage(data[SK.language] ?? detectDefaultLanguage()),
   };
 }
 

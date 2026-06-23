@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   type ReactNode,
 } from 'react';
@@ -18,6 +19,7 @@ export {
   APP_LANGUAGES,
   APP_LANGUAGE_LABELS,
   DEFAULT_LANGUAGE,
+  detectDefaultLanguage,
   localeForLanguage,
   messagesForLanguage,
   normalizeLanguage,
@@ -40,6 +42,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     locale: localeForLanguage(language),
     t:      messagesForLanguage(language),
   }), [language]);
+
+  useEffect(() => {
+    const tag = language === 'zh_TW' ? 'zh-Hant' : language.replace('_', '-');
+    try { document.documentElement.lang = tag; } catch { /* ignore */ }
+  }, [language]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
