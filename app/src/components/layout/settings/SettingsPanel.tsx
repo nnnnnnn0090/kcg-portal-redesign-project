@@ -347,7 +347,8 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
           ) : null}
 
           {extensionVersion ? (
-            <div className="p-settings-version-block">
+            <div className="p-settings-footer">
+              <p className="p-settings-credit" role="note">nnnnnnn0090</p>
               <p className="p-settings-version" role="note">
                 {t.settings.version(extensionVersion)}
               </p>
