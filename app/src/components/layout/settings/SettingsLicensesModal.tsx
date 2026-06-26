@@ -15,6 +15,12 @@ interface ThirdPartyLicense {
 
 const THIRD_PARTY_LICENSES: ThirdPartyLicense[] = [
   {
+    name: 'KCG Portal Redesign Project',
+    license: 'MIT',
+    copyright: 'Copyright (c) 2026 nnnnnnn0090',
+    url: 'https://github.com/nnnnnnn0090/kcg-portal-redesign-project',
+  },
+  {
     name: 'DOMPurify',
     license: 'MPL-2.0 OR Apache-2.0',
     copyright: 'Copyright 2015 Mario Heiderich',
