@@ -24,6 +24,8 @@
     "fixloop:e2e": "bash ../scripts/chrome-dev.sh && EXTENSION_PATH=.output/chrome-mv3 npm run test:e2e"
   },
   "dependencies": {
+    "dompurify": "^3.4.11",
+    "marked": "^18.0.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

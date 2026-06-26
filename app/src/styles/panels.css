@@ -36,7 +36,26 @@
 #portal-overlay #p-kogi-news.p-panel-body{padding-top:.55rem;padding-bottom:.55rem}
 #portal-overlay #p-news-page-list.p-panel-body{padding-top:.55rem;padding-bottom:.55rem;max-height:none;overflow:visible}
 #portal-overlay #p-developer-notice.p-panel-body{padding-top:.75rem;padding-bottom:.75rem}
-#portal-overlay .p-developer-notice-text{margin:0;font-size:.875rem;line-height:1.55;color:var(--p-text);word-break:break-word;white-space:pre-wrap}
+#portal-overlay .p-developer-notice-markdown{font-size:.875rem;line-height:1.6;color:var(--p-text);word-break:break-word}
+#portal-overlay .p-developer-notice-markdown > :first-child{margin-top:0}
+#portal-overlay .p-developer-notice-markdown > :last-child{margin-bottom:0}
+#portal-overlay .p-developer-notice-markdown p{margin:.65rem 0}
+#portal-overlay .p-developer-notice-markdown h1,#portal-overlay .p-developer-notice-markdown h2,#portal-overlay .p-developer-notice-markdown h3,#portal-overlay .p-developer-notice-markdown h4,#portal-overlay .p-developer-notice-markdown h5,#portal-overlay .p-developer-notice-markdown h6{margin:.9rem 0 .45rem;color:var(--p-text-bright);font-weight:650;line-height:1.35;letter-spacing:0}
+#portal-overlay .p-developer-notice-markdown h1{font-size:1.05rem}
+#portal-overlay .p-developer-notice-markdown h2{font-size:1rem}
+#portal-overlay .p-developer-notice-markdown h3,#portal-overlay .p-developer-notice-markdown h4,#portal-overlay .p-developer-notice-markdown h5,#portal-overlay .p-developer-notice-markdown h6{font-size:.92rem}
+#portal-overlay .p-developer-notice-markdown ul,#portal-overlay .p-developer-notice-markdown ol{margin:.65rem 0;padding-left:1.25rem}
+#portal-overlay .p-developer-notice-markdown li{margin:.25rem 0}
+#portal-overlay .p-developer-notice-markdown a{color:var(--p-accent-light);font-weight:500;text-decoration:underline;text-underline-offset:.12em}
+#portal-overlay .p-developer-notice-markdown a:hover{color:var(--p-accent)}
+#portal-overlay .p-developer-notice-markdown img{display:block;max-width:100%;max-height:min(22rem,52vh);width:auto;height:auto;margin:.75rem 0;border-radius:8px;border:1px solid var(--p-border-light);object-fit:contain;background:var(--p-bg3)}
+#portal-overlay .p-developer-notice-markdown blockquote{margin:.75rem 0;padding:.05rem 0 .05rem .85rem;border-left:3px solid var(--p-border-hover);color:var(--p-text-muted)}
+#portal-overlay .p-developer-notice-markdown code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85em;background:var(--p-bg3);border:1px solid var(--p-border-light);border-radius:4px;padding:.08rem .28rem}
+#portal-overlay .p-developer-notice-markdown pre{margin:.75rem 0;padding:.75rem;overflow:auto;background:var(--p-bg3);border:1px solid var(--p-border-light);border-radius:8px}
+#portal-overlay .p-developer-notice-markdown pre code{display:block;padding:0;background:transparent;border:0;border-radius:0}
+#portal-overlay .p-developer-notice-markdown table{width:100%;border-collapse:collapse;margin:.75rem 0;font-size:.8125rem}
+#portal-overlay .p-developer-notice-markdown th,#portal-overlay .p-developer-notice-markdown td{padding:.45rem .55rem;border:1px solid var(--p-border-light);text-align:left;vertical-align:top}
+#portal-overlay .p-developer-notice-markdown th{color:var(--p-text-bright);background:var(--p-bg3);font-weight:650}
 #portal-overlay .p-panel-head.p-developer-notice-head{flex-wrap:wrap;justify-content:space-between;gap:.5rem .75rem}
 #portal-overlay .p-developer-notice-head-title{min-width:0;flex:1 1 8rem}
 #portal-overlay .p-developer-notice-lang-wrap{display:flex;flex-shrink:0;align-items:center}
