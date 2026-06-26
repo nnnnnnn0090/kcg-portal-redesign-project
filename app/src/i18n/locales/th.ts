@@ -80,6 +80,11 @@ export const thMessages: typeof jaMessages = {
     changelogFormatError: 'อ่านรูปแบบบันทึกการเปลี่ยนแปลงไม่ได้',
     changelogFetchError: 'ดึงบันทึกการเปลี่ยนแปลงไม่ได้ ตรวจสอบเครือข่ายหรือสถานะไซต์',
     changelogTitle: 'บันทึกการเปลี่ยนแปลง',
+    openLicenses: 'ข้อมูลไลเซนส์',
+    licensesTitle: 'ข้อมูลไลเซนส์',
+    licensesIntro: 'ไลบรารีบุคคลที่สามหลักที่ส่วนขยายนี้ใช้',
+    licenseType: 'ไลเซนส์',
+    licenseCopyright: 'ประกาศลิขสิทธิ์',
   },
   header: {
     portal: 'RE:Portal',

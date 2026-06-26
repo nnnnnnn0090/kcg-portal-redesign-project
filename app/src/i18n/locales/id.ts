@@ -80,6 +80,11 @@ export const idMessages: typeof jaMessages = {
     changelogFormatError: 'Tidak dapat membaca format catatan perubahan.',
     changelogFetchError: 'Tidak dapat mengambil catatan perubahan. Periksa koneksi jaringan atau status situs.',
     changelogTitle: 'Catatan perubahan',
+    openLicenses: 'Informasi lisensi',
+    licensesTitle: 'Informasi lisensi',
+    licensesIntro: 'Pustaka pihak ketiga utama yang digunakan oleh ekstensi ini.',
+    licenseType: 'Lisensi',
+    licenseCopyright: 'Pemberitahuan hak cipta',
   },
   header: {
     portal: 'RE:Portal',

@@ -80,6 +80,11 @@ export const enMessages: typeof jaMessages = {
     changelogFormatError: 'Could not read the changelog format.',
     changelogFetchError: 'Could not fetch the changelog. Check your network connection or the site status.',
     changelogTitle: 'Changelog',
+    openLicenses: 'License information',
+    licensesTitle: 'License information',
+    licensesIntro: 'Major third-party libraries used by this extension.',
+    licenseType: 'License',
+    licenseCopyright: 'Copyright notice',
   },
   header: {
     portal: 'RE:Portal',

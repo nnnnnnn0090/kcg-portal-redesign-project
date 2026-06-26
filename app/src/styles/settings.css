@@ -78,6 +78,7 @@
 #portal-overlay .p-settings-section-changelog-only{margin-bottom:.5rem;padding-bottom:0;border-bottom:none}
 #portal-overlay .p-settings-section-changelog-only .p-settings-row{margin-bottom:0}
 #portal-overlay .p-settings-changelog-after-tour{margin-top:.4rem;padding-top:0}
+#portal-overlay .p-settings-section-licenses{margin-bottom:.55rem;padding-bottom:.65rem}
 @keyframes p-changelog-modal-root-in{from{opacity:0}to{opacity:1}}
 @keyframes p-changelog-modal-root-out{from{opacity:1}to{opacity:0}}
 #portal-overlay .p-changelog-modal-root{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:max(.75rem,env(safe-area-inset-top)) max(.75rem,env(safe-area-inset-right)) max(.75rem,env(safe-area-inset-bottom)) max(.75rem,env(safe-area-inset-left));box-sizing:border-box;pointer-events:auto;
@@ -96,6 +97,17 @@
 #portal-overlay .p-changelog-modal-status{margin:0 0 .65rem;font-size:.8125rem;line-height:1.5;color:var(--p-text-muted)}
 #portal-overlay .p-changelog-modal-status--error{color:var(--p-danger)}
 #portal-overlay .p-changelog-modal-body .p-settings-changelog-list{margin-top:0}
+#portal-overlay .p-licenses-intro{margin:0 0 .75rem;font-size:.8125rem;line-height:1.55;color:var(--p-text-muted)}
+#portal-overlay .p-licenses-list{display:flex;flex-direction:column;gap:.65rem}
+#portal-overlay .p-license-item{margin:0;padding:.7rem .75rem;border:1px solid var(--p-border-light);border-radius:10px;background:var(--p-bg3)}
+#portal-overlay .p-license-name{margin:0 0 .55rem;font-size:.86rem;font-weight:650;line-height:1.35;letter-spacing:0}
+#portal-overlay .p-license-name a{color:var(--p-text-bright);text-decoration:underline;text-underline-offset:.14em}
+#portal-overlay .p-license-name a:hover{color:var(--p-accent-light)}
+#portal-overlay .p-license-meta{display:flex;flex-direction:column;gap:.42rem;margin:0}
+#portal-overlay .p-license-meta div{display:grid;grid-template-columns:6.5rem minmax(0,1fr);gap:.65rem;align-items:start}
+#portal-overlay .p-license-meta dt{margin:0;font-size:.68rem;line-height:1.45;color:var(--p-text-dimmer);font-weight:650;text-transform:uppercase;letter-spacing:.04em}
+#portal-overlay .p-license-meta dd{margin:0;min-width:0;font-size:.75rem;line-height:1.5;color:var(--p-text-muted);overflow-wrap:anywhere}
+@media (max-width:420px){#portal-overlay .p-license-meta div{grid-template-columns:1fr;gap:.12rem}}
 @media (prefers-reduced-motion:reduce){
   #portal-overlay .p-changelog-modal-root,#portal-overlay .p-changelog-modal-root.is-closing,#portal-overlay .p-changelog-modal-panel{animation-duration:.01ms!important}
 }

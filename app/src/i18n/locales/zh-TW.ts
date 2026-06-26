@@ -80,6 +80,11 @@ export const zhTWMessages: typeof jaMessages = {
     changelogFormatError: '無法讀取更新紀錄格式。',
     changelogFetchError: '無法取得更新紀錄。請檢查網路連線或網站狀態。',
     changelogTitle: '更新紀錄',
+    openLicenses: '授權資訊',
+    licensesTitle: '授權資訊',
+    licensesIntro: '此擴充功能使用的主要第三方函式庫。',
+    licenseType: '授權',
+    licenseCopyright: '著作權聲明',
   },
   header: {
     portal: 'RE:Portal',

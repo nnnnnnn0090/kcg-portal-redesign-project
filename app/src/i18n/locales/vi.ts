@@ -80,6 +80,11 @@ export const viMessages: typeof jaMessages = {
     changelogFormatError: 'Không đọc được định dạng nhật ký thay đổi.',
     changelogFetchError: 'Không tải được nhật ký thay đổi. Kiểm tra kết nối mạng hoặc trạng thái trang web.',
     changelogTitle: 'Nhật ký thay đổi',
+    openLicenses: 'Thông tin giấy phép',
+    licensesTitle: 'Thông tin giấy phép',
+    licensesIntro: 'Các thư viện bên thứ ba chính được dùng trong tiện ích này.',
+    licenseType: 'Giấy phép',
+    licenseCopyright: 'Thông báo bản quyền',
   },
   header: {
     portal: 'RE:Portal',

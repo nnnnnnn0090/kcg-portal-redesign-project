@@ -23,6 +23,7 @@ import { useExtensionUpdateAvailable } from '../../../hooks/useExtensionUpdateAv
 import { useI18n } from '../../../i18n';
 import { parseChangelogJson, type ParsedChangelogRelease } from './settings-changelog';
 import { SettingsChangelogModal } from './SettingsChangelogModal';
+import { SettingsLicensesModal } from './SettingsLicensesModal';
 import {
   SettingsFeedbackSection,
   SettingsHome2ChangelogSection,
@@ -73,10 +74,14 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     const popRef  = useRef<HTMLDivElement>(null);
     const changelogCloseRef = useRef<HTMLButtonElement>(null);
     const changelogModalRootRef = useRef<HTMLDivElement>(null);
+    const licensesCloseRef = useRef<HTMLButtonElement>(null);
+    const licensesModalRootRef = useRef<HTMLDivElement>(null);
     const changelogFetchGenRef = useRef(0);
     const [closing, setClosing] = useState(false);
     const [changelogModalOpen, setChangelogModalOpen] = useState(false);
     const [changelogModalClosing, setChangelogModalClosing] = useState(false);
+    const [licensesModalOpen, setLicensesModalOpen] = useState(false);
+    const [licensesModalClosing, setLicensesModalClosing] = useState(false);
     const [changelogLoading, setChangelogLoading] = useState(false);
     const [changelogErr, setChangelogErr] = useState<string | null>(null);
     const [changelogList, setChangelogList] = useState<ParsedChangelogRelease[] | null>(null);
@@ -88,6 +93,11 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       setChangelogLoading(false);
       setChangelogErr(null);
       setChangelogList(null);
+    }, []);
+
+    const resetLicensesModal = useCallback(() => {
+      setLicensesModalOpen(false);
+      setLicensesModalClosing(false);
     }, []);
 
     const fetchChangelog = useCallback(() => {
@@ -134,6 +144,16 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       setChangelogModalClosing(true);
     }, [changelogModalOpen, changelogModalClosing]);
 
+    const openLicensesModal = useCallback(() => {
+      setLicensesModalClosing(false);
+      setLicensesModalOpen(true);
+    }, []);
+
+    const requestCloseLicensesModal = useCallback(() => {
+      if (!licensesModalOpen || licensesModalClosing) return;
+      setLicensesModalClosing(true);
+    }, [licensesModalOpen, licensesModalClosing]);
+
     useEffect(() => {
       if (!changelogModalClosing) return;
       const el = changelogModalRootRef.current;
@@ -160,8 +180,34 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     }, [changelogModalClosing, resetChangelogModal]);
 
     useEffect(() => {
+      if (!licensesModalClosing) return;
+      const el = licensesModalRootRef.current;
+      const finish = () => {
+        resetLicensesModal();
+      };
+      if (!el) {
+        finish();
+        return;
+      }
+      const ms = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 30 : 220;
+      const timer = window.setTimeout(finish, ms);
+      const onAnimEnd = (e: AnimationEvent) => {
+        if (e.target !== el) return;
+        window.clearTimeout(timer);
+        el.removeEventListener('animationend', onAnimEnd);
+        finish();
+      };
+      el.addEventListener('animationend', onAnimEnd);
+      return () => {
+        window.clearTimeout(timer);
+        el.removeEventListener('animationend', onAnimEnd);
+      };
+    }, [licensesModalClosing, resetLicensesModal]);
+
+    useEffect(() => {
       if (!isOpen) resetChangelogModal();
-    }, [isOpen, resetChangelogModal]);
+      if (!isOpen) resetLicensesModal();
+    }, [isOpen, resetChangelogModal, resetLicensesModal]);
 
     useLayoutEffect(() => {
       if (!changelogModalOpen || changelogModalClosing) return;
@@ -169,12 +215,19 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       if (btn) btn.focus();
     }, [changelogModalOpen, changelogModalClosing]);
 
+    useLayoutEffect(() => {
+      if (!licensesModalOpen || licensesModalClosing) return;
+      const btn = licensesCloseRef.current;
+      if (btn) btn.focus();
+    }, [licensesModalOpen, licensesModalClosing]);
+
     // 閉じるアニメーションを開始する（外部からも呼べるように ref 経由で公開）
     const requestClose = useCallback(() => {
       resetChangelogModal();
+      resetLicensesModal();
       if (!isOpen || closing) return;
       setClosing(true);
-    }, [isOpen, closing, resetChangelogModal]);
+    }, [isOpen, closing, resetChangelogModal, resetLicensesModal]);
 
     useImperativeHandle(ref, () => ({ requestClose }), [requestClose]);
 
@@ -241,6 +294,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
         const t = e.target as Node;
         if (popRef.current?.contains(t)) return;
         if (document.getElementById('p-changelog-modal-root')?.contains(t)) return;
+        if (document.getElementById('p-licenses-modal-root')?.contains(t)) return;
         if (document.getElementById('p-open-settings')?.contains(t)) return;
         requestClose();
       }
@@ -256,12 +310,18 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       else (r as RefObject<HTMLDivElement | null>).current = node;
     }
 
-    // Escape キー：チェンジログモーダル優先で閉じる → 設定パネル
+    // Escape キー：モーダル優先で閉じる → 設定パネル
     useEffect(() => {
       if (!isOpen) return;
       function onKeyDown(e: KeyboardEvent) {
         if (e.key !== 'Escape') return;
         if (changelogModalClosing) return;
+        if (licensesModalClosing) return;
+        if (licensesModalOpen) {
+          e.preventDefault();
+          requestCloseLicensesModal();
+          return;
+        }
         if (changelogModalOpen) {
           e.preventDefault();
           requestCloseChangelogModal();
@@ -271,13 +331,23 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       }
       document.addEventListener('keydown', onKeyDown);
       return () => document.removeEventListener('keydown', onKeyDown);
-    }, [isOpen, changelogModalOpen, changelogModalClosing, requestCloseChangelogModal, requestClose]);
+    }, [
+      isOpen,
+      changelogModalOpen,
+      changelogModalClosing,
+      licensesModalOpen,
+      licensesModalClosing,
+      requestCloseChangelogModal,
+      requestCloseLicensesModal,
+      requestClose,
+    ]);
 
     const overlayEl = typeof document !== 'undefined'
       ? document.getElementById(PORTAL_DOM.overlayRoot)
       : null;
 
     const changelogModalMounted = changelogModalOpen || changelogModalClosing;
+    const licensesModalMounted = licensesModalOpen || licensesModalClosing;
     const changelogModal = (
       <SettingsChangelogModal
         overlayEl={overlayEl}
@@ -289,6 +359,16 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
         modalRootRef={changelogModalRootRef}
         closeButtonRef={changelogCloseRef}
         onRequestClose={requestCloseChangelogModal}
+      />
+    );
+    const licensesModal = (
+      <SettingsLicensesModal
+        overlayEl={overlayEl}
+        mounted={licensesModalMounted}
+        closing={licensesModalClosing}
+        modalRootRef={licensesModalRootRef}
+        closeButtonRef={licensesCloseRef}
+        onRequestClose={requestCloseLicensesModal}
       />
     );
 
@@ -346,6 +426,14 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
             <SettingsHome2ChangelogSection onOpenChangelog={openChangelogModal} />
           ) : null}
 
+          <div className="p-settings-section p-settings-section-licenses">
+            <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+              <button type="button" className="p-settings-tour-replay-btn" onClick={openLicensesModal}>
+                {t.settings.openLicenses}
+              </button>
+            </div>
+          </div>
+
           {extensionVersion ? (
             <div className="p-settings-footer">
               <p className="p-settings-credit" role="note">
@@ -367,6 +455,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
         </div>
       </div>
       {changelogModal}
+      {licensesModal}
       </>
     );
   },

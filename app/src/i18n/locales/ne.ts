@@ -80,6 +80,11 @@ export const neMessages: typeof jaMessages = {
     changelogFormatError: 'परिवर्तन लग ढाँचा पढ्न सकिएन।',
     changelogFetchError: 'परिवर्तन लग ल्याउन सकिएन। नेटवर्क वा साइट स्थिति जाँच गर्नुहोस्।',
     changelogTitle: 'परिवर्तन लग',
+    openLicenses: 'लाइसेन्स जानकारी',
+    licensesTitle: 'लाइसेन्स जानकारी',
+    licensesIntro: 'यो एक्सटेन्सनमा प्रयोग भएका मुख्य तेस्रो-पक्ष लाइब्रेरीहरू।',
+    licenseType: 'लाइसेन्स',
+    licenseCopyright: 'प्रतिलिपि अधिकार सूचना',
   },
   header: {
     portal: 'RE:Portal',

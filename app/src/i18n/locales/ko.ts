@@ -80,6 +80,11 @@ export const koMessages: typeof jaMessages = {
     changelogFormatError: '변경 기록 형식을 읽을 수 없습니다.',
     changelogFetchError: '변경 기록을 가져올 수 없습니다. 네트워크 연결이나 사이트 상태를 확인하세요.',
     changelogTitle: '변경 기록',
+    openLicenses: '라이선스 정보',
+    licensesTitle: '라이선스 정보',
+    licensesIntro: '이 확장 기능에서 사용하는 주요 서드파티 라이브러리입니다.',
+    licenseType: '라이선스',
+    licenseCopyright: '저작권 표시',
   },
   header: {
     portal: 'RE:Portal',
