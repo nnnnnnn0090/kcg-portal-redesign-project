@@ -348,7 +348,17 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
 
           {extensionVersion ? (
             <div className="p-settings-footer">
-              <p className="p-settings-credit" role="note">nnnnnnn0090</p>
+              <p className="p-settings-credit" role="note">
+                Created by{' '}
+                <a
+                  className="p-settings-credit-link"
+                  href="https://x.com/nnnnnnn0090"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  nnnnnnn0090
+                </a>
+              </p>
               <p className="p-settings-version" role="note">
                 {t.settings.version(extensionVersion)}
               </p>

@@ -18,6 +18,9 @@
 #portal-overlay .p-settings-dialog h2{margin:0 0 .95rem;font-size:.95rem;color:var(--p-text-bright);font-weight:600;letter-spacing:-.01em}
 #portal-overlay .p-settings-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:.75rem;margin:.65rem 0 0;padding-top:.75rem;border-top:1px solid var(--p-border-light)}
 #portal-overlay .p-settings-credit{margin:0;font-size:.68rem;color:var(--p-text-dimmer);line-height:1.45;text-align:left;letter-spacing:.02em;white-space:nowrap}
+#portal-overlay .p-settings-credit-link{color:inherit;text-decoration:underline;text-underline-offset:2px}
+#portal-overlay .p-settings-credit-link:visited{color:inherit}
+#portal-overlay .p-settings-credit-link:hover{color:var(--p-text-muted)}
 #portal-overlay .p-settings-version{margin:0;font-size:.68rem;color:var(--p-text-dimmer);line-height:1.45;text-align:right;letter-spacing:.02em;white-space:nowrap}
 #portal-overlay .p-settings-update-callout{margin:0 0 1rem;padding:.85rem .9rem;border-radius:12px;
   border:1px solid var(--p-accent-border);background:var(--p-accent-bg)}
