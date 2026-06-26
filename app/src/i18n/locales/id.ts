@@ -82,7 +82,7 @@ export const idMessages: typeof jaMessages = {
     changelogTitle: 'Catatan perubahan',
     openLicenses: 'Informasi lisensi',
     licensesTitle: 'Informasi lisensi',
-    licensesIntro: 'Pustaka pihak ketiga utama yang digunakan oleh ekstensi ini.',
+    licensesIntro: 'Ekstensi ini dan pustaka pihak ketiga utama yang digunakannya.',
     licenseType: 'Lisensi',
     licenseCopyright: 'Pemberitahuan hak cipta',
   },

@@ -82,7 +82,7 @@ export const zhTWMessages: typeof jaMessages = {
     changelogTitle: '更新紀錄',
     openLicenses: '授權資訊',
     licensesTitle: '授權資訊',
-    licensesIntro: '此擴充功能使用的主要第三方函式庫。',
+    licensesIntro: '此擴充功能及其使用的主要第三方函式庫。',
     licenseType: '授權',
     licenseCopyright: '著作權聲明',
   },

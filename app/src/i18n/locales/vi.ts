@@ -82,7 +82,7 @@ export const viMessages: typeof jaMessages = {
     changelogTitle: 'Nhật ký thay đổi',
     openLicenses: 'Thông tin giấy phép',
     licensesTitle: 'Thông tin giấy phép',
-    licensesIntro: 'Các thư viện bên thứ ba chính được dùng trong tiện ích này.',
+    licensesIntro: 'Tiện ích này và các thư viện bên thứ ba chính mà tiện ích sử dụng.',
     licenseType: 'Giấy phép',
     licenseCopyright: 'Thông báo bản quyền',
   },

@@ -82,7 +82,7 @@ export const zhMessages: typeof jaMessages = {
     changelogTitle: '更新日志',
     openLicenses: '许可证信息',
     licensesTitle: '许可证信息',
-    licensesIntro: '此扩展使用的主要第三方库。',
+    licensesIntro: '此扩展及其使用的主要第三方库。',
     licenseType: '许可证',
     licenseCopyright: '版权声明',
   },

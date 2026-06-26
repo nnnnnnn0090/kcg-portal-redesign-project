@@ -82,7 +82,7 @@ export const thMessages: typeof jaMessages = {
     changelogTitle: 'บันทึกการเปลี่ยนแปลง',
     openLicenses: 'ข้อมูลไลเซนส์',
     licensesTitle: 'ข้อมูลไลเซนส์',
-    licensesIntro: 'ไลบรารีบุคคลที่สามหลักที่ส่วนขยายนี้ใช้',
+    licensesIntro: 'ส่วนขยายนี้และไลบรารีบุคคลที่สามหลักที่ใช้งาน',
     licenseType: 'ไลเซนส์',
     licenseCopyright: 'ประกาศลิขสิทธิ์',
   },

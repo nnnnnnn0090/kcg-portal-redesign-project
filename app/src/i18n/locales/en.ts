@@ -82,7 +82,7 @@ export const enMessages: typeof jaMessages = {
     changelogTitle: 'Changelog',
     openLicenses: 'License information',
     licensesTitle: 'License information',
-    licensesIntro: 'Major third-party libraries used by this extension.',
+    licensesIntro: 'This extension and the major third-party libraries it uses.',
     licenseType: 'License',
     licenseCopyright: 'Copyright notice',
   },

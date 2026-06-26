@@ -79,7 +79,7 @@ export const jaMessages = {
     changelogTitle: '更新履歴',
     openLicenses: 'ライセンス情報',
     licensesTitle: 'ライセンス情報',
-    licensesIntro: 'この拡張機能で使用している主なサードパーティライブラリです。',
+    licensesIntro: 'この拡張機能と、使用している主なサードパーティライブラリです。',
     licenseType: 'ライセンス',
     licenseCopyright: '著作権表示',
   },

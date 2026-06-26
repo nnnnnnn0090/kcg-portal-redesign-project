@@ -82,7 +82,7 @@ export const neMessages: typeof jaMessages = {
     changelogTitle: 'परिवर्तन लग',
     openLicenses: 'लाइसेन्स जानकारी',
     licensesTitle: 'लाइसेन्स जानकारी',
-    licensesIntro: 'यो एक्सटेन्सनमा प्रयोग भएका मुख्य तेस्रो-पक्ष लाइब्रेरीहरू।',
+    licensesIntro: 'यो एक्सटेन्सन र यसले प्रयोग गर्ने मुख्य तेस्रो-पक्ष लाइब्रेरीहरू।',
     licenseType: 'लाइसेन्स',
     licenseCopyright: 'प्रतिलिपि अधिकार सूचना',
   },

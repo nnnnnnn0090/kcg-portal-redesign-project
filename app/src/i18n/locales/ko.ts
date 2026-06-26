@@ -82,7 +82,7 @@ export const koMessages: typeof jaMessages = {
     changelogTitle: '변경 기록',
     openLicenses: '라이선스 정보',
     licensesTitle: '라이선스 정보',
-    licensesIntro: '이 확장 기능에서 사용하는 주요 서드파티 라이브러리입니다.',
+    licensesIntro: '이 확장 기능과 여기에서 사용하는 주요 서드파티 라이브러리입니다.',
     licenseType: '라이선스',
     licenseCopyright: '저작권 표시',
   },
