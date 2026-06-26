@@ -37,7 +37,7 @@ const DEVELOPER_NOTICE_MARKDOWN_DEMO_TITLE = 'Markdown notice demo';
 
 const DEVELOPER_NOTICE_MARKDOWN_DEMO_MESSAGE = String.raw`# Markdown display test
 
-This notice is rendered from **Markdown**. It supports *emphasis*, ~~strikethrough~~, inline code like \`notice.json\`, and normal line breaks.
+This notice is rendered from **Markdown**. It supports *emphasis*, ~~strikethrough~~, inline code like \`notice_md.json\`, and normal line breaks.
 
 ## Links
 

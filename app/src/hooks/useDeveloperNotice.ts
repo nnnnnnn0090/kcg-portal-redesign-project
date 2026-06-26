@@ -1,5 +1,5 @@
 /**
- * ホーム用の開発者お知らせ JSON（`title` / `message`、任意で `message_ja` 互換、各 `title_*` / `message_*`）を取得する。
+ * ホーム用の開発者お知らせ Markdown JSON（`title` / `message`、任意で `message_ja` 互換、各 `title_*` / `message_*`）を取得する。
  */
 
 import { useMemo, useState, useEffect } from 'react';
