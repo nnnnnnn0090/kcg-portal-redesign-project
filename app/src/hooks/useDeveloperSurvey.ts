@@ -169,7 +169,7 @@ async function surveyHeaders(): Promise<Record<string, string>> {
 }
 
 export function useDeveloperSurvey(language: AppLanguage): UseDeveloperSurveyResult {
-  const [survey, setSurvey] = useState<DeveloperSurvey | null>(null);
+  const [rawSurvey, setRawSurvey] = useState<unknown>(null);
   const [answeredKeys, setAnsweredKeys] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -196,11 +196,11 @@ export function useDeveloperSurvey(language: AppLanguage): UseDeveloperSurveyRes
         const json = await response.json();
         if (cancelled) return;
         setAnsweredKeys(answeredList(stored[SK.developerSurveyAnswered]));
-        setSurvey(normalizeSurvey(json, language));
+        setRawSurvey(json);
       })
       .catch(() => {
         if (!cancelled) {
-          setSurvey(null);
+          setRawSurvey(null);
           setError('');
         }
       })
@@ -211,7 +211,12 @@ export function useDeveloperSurvey(language: AppLanguage): UseDeveloperSurveyRes
     return () => {
       cancelled = true;
     };
-  }, [language]);
+  }, []);
+
+  const survey = useMemo(
+    () => normalizeSurvey(rawSurvey, language),
+    [rawSurvey, language],
+  );
 
   const answered = useMemo(
     () => Boolean(survey && answeredKeys.includes(surveyKey(survey))),
