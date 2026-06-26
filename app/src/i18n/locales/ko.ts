@@ -122,6 +122,18 @@ export const koMessages: typeof jaMessages = {
   developerNotice: {
     fallbackTitle: '개발자 공지',
   },
+  developerSurvey: {
+    submit: '응답 보내기',
+    submitting: '보내는 중…',
+    thanks: '응답해 주셔서 감사합니다.',
+    answered: '응답 완료',
+    required: '필수',
+    requiredError: '이 항목은 필수입니다.',
+    invalidOptionError: '선택 내용을 확인해 주세요.',
+    maxLengthError: (max: number) => `${max}자 이내로 입력해 주세요.`,
+    submitError: '보낼 수 없습니다. 잠시 후 다시 시도해 주세요.',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: '공지',
     empty: '공지 없음',

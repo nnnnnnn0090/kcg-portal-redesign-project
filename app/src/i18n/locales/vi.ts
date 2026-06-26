@@ -122,6 +122,18 @@ export const viMessages: typeof jaMessages = {
   developerNotice: {
     fallbackTitle: 'Thông báo từ nhà phát triển',
   },
+  developerSurvey: {
+    submit: 'Gửi câu trả lời',
+    submitting: 'Đang gửi…',
+    thanks: 'Cảm ơn bạn đã trả lời.',
+    answered: 'Đã trả lời',
+    required: 'Bắt buộc',
+    requiredError: 'Mục này là bắt buộc.',
+    invalidOptionError: 'Vui lòng kiểm tra lựa chọn.',
+    maxLengthError: (max: number) => `Vui lòng nhập tối đa ${max} ký tự.`,
+    submitError: 'Không thể gửi. Vui lòng thử lại sau.',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: 'Thông báo',
     empty: 'Không có thông báo',

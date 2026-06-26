@@ -40,6 +40,8 @@ export const SK = {
   extensionVersionSeen:            'portalThemeExtensionVersionSeen',
   /** 開発者お知らせパネルの表示言語（`ja` / `en` / `zh` / `zh_TW` / `ko` / `vi` / `ne` / `id` / `th`） */
   developerNoticeLang:             'portalThemeDeveloperNoticeLang',
+  /** 開発者アンケートの回答済み状態（`surveyId:revision` の配列） */
+  developerSurveyAnswered:         'portalThemeDeveloperSurveyAnswered',
   /** 拡張機能インストールごとに1つ発行する匿名ユーザー ID（notice.json 等の識別用） */
   clientUserId:                    'portalThemeClientUserId',
   /** 拡張の初回記録日時（ISO 8601） */
@@ -189,6 +191,12 @@ export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;
 
 /** ホーム最上部「開発者からのお知らせ」用 Markdown JSON（`title` / `message`） */
 export const DEVELOPER_NOTICE_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/notice_md.json` as const;
+
+/** ホーム最上部「開発者アンケート」用 JSON */
+export const DEVELOPER_SURVEY_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/survey.json` as const;
+
+/** 開発者アンケート回答送信用エンドポイント */
+export const DEVELOPER_SURVEY_RESPONSE_URL = `${EXTENSION_PROMO_ORIGIN}/survey-response` as const;
 
 /** notice.json 等へ付与する匿名ユーザー識別子ヘッダー */
 export const CLIENT_USER_ID_HEADER = 'X-KCG-Portal-User-Id' as const;

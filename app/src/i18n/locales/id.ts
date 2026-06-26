@@ -122,6 +122,18 @@ export const idMessages: typeof jaMessages = {
   developerNotice: {
     fallbackTitle: 'Pemberitahuan pengembang',
   },
+  developerSurvey: {
+    submit: 'Kirim jawaban',
+    submitting: 'Mengirim…',
+    thanks: 'Terima kasih atas jawaban Anda.',
+    answered: 'Sudah dijawab',
+    required: 'Wajib',
+    requiredError: 'Kolom ini wajib diisi.',
+    invalidOptionError: 'Periksa pilihan Anda.',
+    maxLengthError: (max: number) => `Masukkan maksimal ${max} karakter.`,
+    submitError: 'Tidak dapat mengirim. Coba lagi nanti.',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: 'Pengumuman',
     empty: 'Tidak ada pengumuman',

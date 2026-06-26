@@ -122,6 +122,18 @@ export const neMessages: typeof jaMessages = {
   developerNotice: {
     fallbackTitle: 'विकासकर्ता सूचना',
   },
+  developerSurvey: {
+    submit: 'उत्तर पठाउनुहोस्',
+    submitting: 'पठाउँदै…',
+    thanks: 'उत्तरका लागि धन्यवाद।',
+    answered: 'उत्तर दिइयो',
+    required: 'अनिवार्य',
+    requiredError: 'यो फिल्ड अनिवार्य छ।',
+    invalidOptionError: 'कृपया आफ्नो चयन जाँच गर्नुहोस्।',
+    maxLengthError: (max: number) => `${max} अक्षरभित्र लेख्नुहोस्।`,
+    submitError: 'पठाउन सकिएन। केही समयपछि फेरि प्रयास गर्नुहोस्।',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: 'सूचना',
     empty: 'सूचना छैन',

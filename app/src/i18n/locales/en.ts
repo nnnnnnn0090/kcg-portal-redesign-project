@@ -122,6 +122,18 @@ export const enMessages: typeof jaMessages = {
   developerNotice: {
     fallbackTitle: 'Developer notice',
   },
+  developerSurvey: {
+    submit: 'Submit response',
+    submitting: 'Submitting…',
+    thanks: 'Thank you for your response.',
+    answered: 'Answered',
+    required: 'Required',
+    requiredError: 'This field is required.',
+    invalidOptionError: 'Please check your selection.',
+    maxLengthError: (max: number) => `Please enter ${max} characters or fewer.`,
+    submitError: 'Could not submit. Please try again later.',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: 'Notice',
     empty: 'No notices',

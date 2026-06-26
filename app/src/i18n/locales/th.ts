@@ -122,6 +122,18 @@ export const thMessages: typeof jaMessages = {
   developerNotice: {
     fallbackTitle: 'ประกาศจากนักพัฒนา',
   },
+  developerSurvey: {
+    submit: 'ส่งคำตอบ',
+    submitting: 'กำลังส่ง…',
+    thanks: 'ขอบคุณสำหรับคำตอบของคุณ',
+    answered: 'ตอบแล้ว',
+    required: 'จำเป็น',
+    requiredError: 'จำเป็นต้องกรอกช่องนี้',
+    invalidOptionError: 'โปรดตรวจสอบตัวเลือกของคุณ',
+    maxLengthError: (max: number) => `โปรดกรอกไม่เกิน ${max} ตัวอักษร`,
+    submitError: 'ส่งไม่ได้ โปรดลองอีกครั้งภายหลัง',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: 'ประกาศ',
     empty: 'ไม่มีประกาศ',

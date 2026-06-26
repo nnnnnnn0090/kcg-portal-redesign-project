@@ -17,9 +17,11 @@ import { useLastLogin } from '../../hooks/useLastLogin';
 import {
   useDeveloperNotice,
 } from '../../hooks/useDeveloperNotice';
+import { useDeveloperSurvey } from '../../hooks/useDeveloperSurvey';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
+import { DeveloperSurveyPanel } from '../ui/DeveloperSurveyPanel';
 import { LinkEditor } from '../ui/LinkEditor';
 import { CalendarPanel, AssignmentCalendar, type DuePayload } from '../../features/calendar';
 import { useI18n } from '../../i18n';
@@ -169,6 +171,7 @@ export function HomePage({ settings }: HomePageProps) {
   const getKingLmsCourses = useCallback(() => courses, [courses]);
   const lastLogin         = useLastLogin();
   const { notice: developerNotice, lang: noticeLang } = useDeveloperNotice(language);
+  const developerSurvey = useDeveloperSurvey(language);
 
   const developerNoticeTitle =
     DEVELOPER_NOTICE_MARKDOWN_DEMO
@@ -203,6 +206,18 @@ export function HomePage({ settings }: HomePageProps) {
               </div>
             ) : null}
           </section>
+        ) : null}
+
+        {developerSurvey.ready && developerSurvey.survey ? (
+          <DeveloperSurveyPanel
+            survey={developerSurvey.survey}
+            answered={developerSurvey.answered}
+            submitting={developerSurvey.submitting}
+            submitted={developerSurvey.submitted}
+            submitError={developerSurvey.error}
+            labels={t.developerSurvey}
+            onSubmit={developerSurvey.submit}
+          />
         ) : null}
 
         <KinoPanel data={kinoData} forceVisible={settings.kinoEmptyForce} />

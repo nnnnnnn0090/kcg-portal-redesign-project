@@ -122,6 +122,18 @@ export const zhMessages: typeof jaMessages = {
   developerNotice: {
     fallbackTitle: '开发者通知',
   },
+  developerSurvey: {
+    submit: '发送回答',
+    submitting: '发送中…',
+    thanks: '感谢您的回答。',
+    answered: '已回答',
+    required: '必填',
+    requiredError: '此项目为必填。',
+    invalidOptionError: '请确认选择内容。',
+    maxLengthError: (max: number) => `请输入 ${max} 个字符以内。`,
+    submitError: '无法发送。请稍后再试。',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: '公告',
     empty: '暂无公告',

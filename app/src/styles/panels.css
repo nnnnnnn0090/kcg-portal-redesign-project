@@ -61,6 +61,26 @@
 #portal-overlay .p-developer-notice-lang-wrap{display:flex;flex-shrink:0;align-items:center}
 #portal-overlay .p-developer-notice-lang-select{margin:0;padding:.28rem .5rem;font-size:.62rem;font-weight:600;letter-spacing:.02em;border:1px solid var(--p-border-light);border-radius:8px;background:var(--p-bg);color:var(--p-text);cursor:pointer;max-width:min(12rem,100%)}
 #portal-overlay .p-developer-notice-lang-select:focus{outline:2px solid var(--p-accent);outline-offset:1px}
+#portal-overlay .p-developer-survey-head{justify-content:space-between;flex-wrap:wrap;gap:.5rem .75rem}
+#portal-overlay .p-developer-survey-status{display:inline-flex;align-items:center;padding:.16rem .45rem;border-radius:999px;background:var(--p-accent-bg);color:var(--p-accent-light);border:1px solid var(--p-accent-border);font-size:.62rem;font-weight:700;letter-spacing:.02em;text-transform:none}
+#portal-overlay .p-developer-survey-body{padding-top:.85rem;padding-bottom:.95rem}
+#portal-overlay .p-developer-survey-description{margin:0 0 .85rem;font-size:.875rem;line-height:1.65;color:var(--p-text-muted)}
+#portal-overlay .p-developer-survey-form{display:flex;flex-direction:column;gap:.85rem;margin:0 0 .9rem}
+#portal-overlay .p-developer-survey-question{min-width:0;margin:0;padding:.75rem .85rem;border:1px solid var(--p-border-light);border-radius:8px;background:color-mix(in srgb,var(--p-bg3) 72%,transparent)}
+#portal-overlay .p-developer-survey-question legend{display:flex;align-items:center;gap:.45rem;max-width:100%;padding:0 .2rem;font-size:.84rem;font-weight:650;line-height:1.45;color:var(--p-text-bright)}
+#portal-overlay .p-developer-survey-required{display:inline-flex;align-items:center;flex-shrink:0;padding:.08rem .32rem;border-radius:4px;color:var(--p-danger);background:color-mix(in srgb,var(--p-danger) 10%,transparent);border:1px solid color-mix(in srgb,var(--p-danger) 22%,transparent);font-size:.62rem;font-weight:700}
+#portal-overlay .p-developer-survey-options{display:flex;flex-direction:column;gap:.45rem;margin:.55rem 0 0}
+#portal-overlay .p-developer-survey-option{display:flex;align-items:flex-start;gap:.5rem;font-size:.84rem;line-height:1.5;color:var(--p-text);cursor:pointer}
+#portal-overlay .p-developer-survey-option input{flex-shrink:0;margin:.22rem 0 0;accent-color:var(--p-accent)}
+#portal-overlay .p-developer-survey-text,#portal-overlay .p-developer-survey-textarea{width:100%;box-sizing:border-box;margin:.55rem 0 0;padding:.55rem .65rem;border:1px solid var(--p-border);border-radius:8px;background:var(--p-bg);color:var(--p-text);font:inherit;font-size:.85rem;line-height:1.5}
+#portal-overlay .p-developer-survey-textarea{resize:vertical;min-height:6rem;max-height:14rem}
+#portal-overlay .p-developer-survey-text:focus,#portal-overlay .p-developer-survey-textarea:focus{outline:2px solid var(--p-accent);outline-offset:1px;border-color:var(--p-accent)}
+#portal-overlay .p-developer-survey-count{margin:.35rem 0 0;text-align:right;font-size:.68rem;line-height:1.4;color:var(--p-text-dimmer)}
+#portal-overlay .p-developer-survey-error{margin:.45rem 0 0;font-size:.76rem;line-height:1.5;color:var(--p-danger)}
+#portal-overlay .p-developer-survey-success{margin:0;font-size:.875rem;line-height:1.6;color:var(--p-accent-light)}
+#portal-overlay .p-developer-survey-submit{display:inline-flex;align-items:center;justify-content:center;min-height:2.25rem;min-width:7.5rem;padding:.5rem 1rem;border-radius:8px;border:1px solid var(--p-accent-border);background:var(--p-accent-bg);color:var(--p-accent-light);font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+#portal-overlay .p-developer-survey-submit:hover:not(:disabled){background:color-mix(in srgb,var(--p-accent) 22%,transparent);border-color:var(--p-accent);color:var(--p-text-bright)}
+#portal-overlay .p-developer-survey-submit:disabled{opacity:.6;cursor:not-allowed}
 #portal-overlay #p-news > .p-empty,#portal-overlay #p-kogi-news > .p-empty,#portal-overlay #p-news-page-list > .p-empty{padding:.5rem 0;margin:0}
 #portal-overlay .p-empty{font-size:.875rem;color:var(--p-text-dimmer);padding:.75rem 0;margin:0}
 #portal-overlay .p-news{position:relative;padding:.85rem 0 .85rem .7rem;border-bottom:1px solid var(--p-border-light);margin:0;transition:background .15s ease,opacity .15s ease}

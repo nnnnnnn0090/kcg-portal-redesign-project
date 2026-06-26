@@ -119,6 +119,18 @@ export const jaMessages = {
   developerNotice: {
     fallbackTitle: '開発者からのお知らせ',
   },
+  developerSurvey: {
+    submit: '回答を送信',
+    submitting: '送信中…',
+    thanks: '回答ありがとうございました。',
+    answered: '回答済み',
+    required: '必須',
+    requiredError: 'この項目は必須です。',
+    invalidOptionError: '選択内容を確認してください。',
+    maxLengthError: (max: number) => `${max}文字以内で入力してください。`,
+    submitError: '送信できませんでした。しばらくしてからもう一度お試しください。',
+    characterCount: (current: number, max: number) => `${current} / ${max}`,
+  },
   kino: {
     defaultTitle: 'お知らせ',
     empty: 'お知らせはありません',
