@@ -128,6 +128,7 @@ export const viMessages: typeof jaMessages = {
   },
   newsList: {
     empty: 'Không có thông báo',
+    urgent: 'Khẩn',
   },
   linkEditor: {
     empty: 'Không có lối tắt',

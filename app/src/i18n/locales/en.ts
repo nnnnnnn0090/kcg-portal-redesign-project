@@ -128,6 +128,7 @@ export const enMessages: typeof jaMessages = {
   },
   newsList: {
     empty: 'No notices',
+    urgent: 'Urgent',
   },
   linkEditor: {
     empty: 'No shortcuts',

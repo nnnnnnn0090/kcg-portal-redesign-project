@@ -49,6 +49,7 @@
 #portal-overlay .p-news:hover{background:var(--p-bg-hover);border-radius:8px}
 #portal-overlay .p-news::before{content:'';position:absolute;left:0;top:.78rem;bottom:.78rem;width:3px;border-radius:999px;background:transparent;transition:background .15s ease}
 #portal-overlay .p-news-meta-row{display:flex;align-items:center;justify-content:space-between;gap:.45rem;margin:0 0 .35rem}
+#portal-overlay .p-news-date-line{display:inline-flex;align-items:center;gap:.35rem;flex-wrap:wrap}
 #portal-overlay .p-news-link{display:flex;flex-direction:column;text-decoration:none;color:inherit;outline:none;min-width:0}
 #portal-overlay .p-news-link:focus-visible{outline:2px solid var(--p-accent);outline-offset:2px;border-radius:6px}
 #portal-overlay .p-news time{display:inline-flex;align-items:center;font-size:.65rem;color:var(--p-accent);margin:0;padding:.15rem .45rem;
@@ -60,6 +61,7 @@
 #portal-overlay article.p-news.p-news-unread::before{background:var(--p-accent)}
 #portal-overlay article.p-news.p-news-unread time{color:var(--p-text-bright);font-weight:700}
 #portal-overlay article.p-news.p-news-unread .p-news-title{color:var(--p-text-bright);font-weight:650}
+#portal-overlay .p-news-urgent-badge{display:inline-flex;align-items:center;gap:.2rem;padding:.12rem .38rem;border-radius:4px;font-size:.62rem;font-weight:700;line-height:1.2;letter-spacing:.03em;color:var(--p-danger);background:color-mix(in srgb,var(--p-danger) 12%,transparent);border:1px solid color-mix(in srgb,var(--p-danger) 25%,transparent);margin-left:.35rem;vertical-align:.08em;white-space:nowrap}
 #portal-overlay article.p-news .p-news-new-badge{display:inline;font-size:.62rem;font-weight:600;color:var(--p-accent);margin-left:.35rem;vertical-align:.05em;letter-spacing:.02em}
 #portal-overlay article.p-news .p-news-link .p-news-meta{display:block;font-size:.7rem;color:var(--p-text-dimmer);margin:.4rem 0 0;padding:0}
 /* ショートカット一覧（表示モード）— お知らせ一覧と同系の行レイアウト */

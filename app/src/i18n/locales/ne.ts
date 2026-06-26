@@ -128,6 +128,7 @@ export const neMessages: typeof jaMessages = {
   },
   newsList: {
     empty: 'सूचना छैन',
+    urgent: 'आपतकालीन',
   },
   linkEditor: {
     empty: 'सर्टकट छैन',

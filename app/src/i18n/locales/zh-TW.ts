@@ -128,6 +128,7 @@ export const zhTWMessages: typeof jaMessages = {
   },
   newsList: {
     empty: '暫無公告',
+    urgent: '緊急',
   },
   linkEditor: {
     empty: '暫無捷徑',

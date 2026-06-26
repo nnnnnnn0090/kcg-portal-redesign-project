@@ -128,6 +128,7 @@ export const thMessages: typeof jaMessages = {
   },
   newsList: {
     empty: 'ไม่มีประกาศ',
+    urgent: 'เร่งด่วน',
   },
   linkEditor: {
     empty: 'ไม่มีทางลัด',

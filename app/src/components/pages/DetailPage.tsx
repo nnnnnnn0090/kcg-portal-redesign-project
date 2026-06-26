@@ -100,9 +100,18 @@ export function DetailPage({ newsDetailId }: DetailPageProps) {
   const title    = detail ? String(detail.title ?? '').trim() || t.detailPage.fallbackTitle : t.common.loading;
   const bodyHtml = detail ? formatMessageBody(String(detail.naiyo ?? '')) : '';
   const files    = detail && Array.isArray(detail.attachmentFiles) ? detail.attachmentFiles : [];
+  const isUrgent = detail != null && String(detail.importanceCd) === '02';
 
   const metaRows = detail ? [
-    { key: t.detailPage.postedAt, val: String(detail.newsDate ?? '').trim() },
+    {
+      key: t.detailPage.postedAt,
+      val: (
+        <span className="p-news-detail-date-line">
+          <span>{String(detail.newsDate ?? '').trim()}</span>
+          {isUrgent && <span className="p-news-urgent-badge" aria-hidden="true">{t.newsList.urgent}</span>}
+        </span>
+      ),
+    },
     { key: t.detailPage.sender,   val: String(detail.sender   ?? '').trim() },
     { key: t.detailPage.category, val: String(detail.category ?? '').trim() },
   ].filter((r) => r.val) : [];

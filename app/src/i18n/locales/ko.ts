@@ -128,6 +128,7 @@ export const koMessages: typeof jaMessages = {
   },
   newsList: {
     empty: '공지 없음',
+    urgent: '긴급',
   },
   linkEditor: {
     empty: '바로가기 없음',

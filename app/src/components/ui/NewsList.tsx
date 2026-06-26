@@ -26,6 +26,7 @@ export function NewsList({ items, emptyMsg }: NewsListProps) {
       {filtered.map((item) => {
         const unread = String(item.readFlg) === '0';
         const isNew  = String(item.newFlg)  === '1';
+        const isUrgent = String(item.importanceCd) === '02';
         const id     = item.id;
         const key    = id != null ? String(id) : `${item.title}-${item.newsDate}`;
         const href = id != null ? newsHref(String(id)) : '#';
@@ -34,7 +35,10 @@ export function NewsList({ items, emptyMsg }: NewsListProps) {
           <article key={key} className={`p-news${unread ? ' p-news-unread' : ''}`}>
             <a className="p-news-link" href={href}>
               <div className="p-news-meta-row">
-                <time dateTime={item.newsDate != null ? String(item.newsDate) : undefined}>{dateStr}</time>
+                <div className="p-news-date-line">
+                  <time dateTime={item.newsDate != null ? String(item.newsDate) : undefined}>{dateStr}</time>
+                  {isUrgent && <span className="p-news-urgent-badge" aria-hidden="true">{t.newsList.urgent}</span>}
+                </div>
               </div>
               <span className="p-news-title-line">
                 <span className="p-news-title">{item.title}</span>

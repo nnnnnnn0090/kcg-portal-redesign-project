@@ -125,6 +125,7 @@ export const jaMessages = {
   },
   newsList: {
     empty: 'お知らせはありません',
+    urgent: '緊急',
   },
   linkEditor: {
     empty: 'ショートカットがありません',

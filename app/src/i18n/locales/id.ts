@@ -128,6 +128,7 @@ export const idMessages: typeof jaMessages = {
   },
   newsList: {
     empty: 'Tidak ada pengumuman',
+    urgent: 'Penting',
   },
   linkEditor: {
     empty: 'Tidak ada pintasan',
