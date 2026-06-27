@@ -26,6 +26,7 @@ import { SettingsChangelogModal } from './SettingsChangelogModal';
 import { SettingsLicensesModal } from './SettingsLicensesModal';
 import {
   SettingsFeedbackSection,
+  SettingsCplanSection,
   SettingsHome2ChangelogSection,
   SettingsLanguageSection,
   SettingsPortalOnlySections,
@@ -419,6 +420,10 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
             variant={variant}
             onSettingChange={onSettingChange}
           />
+
+          {variant === 'portal' ? (
+            <SettingsCplanSection settings={settings} onSettingChange={onSettingChange} />
+          ) : null}
 
           <SettingsFeedbackSection />
 

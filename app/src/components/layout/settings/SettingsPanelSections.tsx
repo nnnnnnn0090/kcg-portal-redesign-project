@@ -240,6 +240,27 @@ export function SettingsWebMailSection({
   );
 }
 
+export function SettingsCplanSection({
+  settings,
+  onSettingChange,
+}: SettingsLanguageSectionProps) {
+  const { t } = useI18n();
+  return (
+    <div className="p-settings-section">
+      <div className="p-settings-section-title">{t.settings.campusPlan}</div>
+      <label className="p-settings-row">
+        <input
+          type="checkbox"
+          checked={settings.cplanOverlay}
+          onChange={(e) => onSettingChange('cplanOverlay', e.target.checked)}
+        />
+        <span>{t.settings.campusPlanOverlay}</span>
+      </label>
+      <p className="p-settings-hint">{t.settings.campusPlanReloadHint}</p>
+    </div>
+  );
+}
+
 export function SettingsFeedbackSection() {
   const { t } = useI18n();
   const feedbackFormUrl = EXTENSION_FEEDBACK_FORM_URL;

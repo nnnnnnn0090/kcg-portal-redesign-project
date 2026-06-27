@@ -36,6 +36,7 @@ export interface Settings {
   /** ホームの課題カレンダーを出さない */
   hideAssignmentCalendar: boolean;
   home2WebMailOverlay: boolean;
+  cplanOverlay:        boolean;
   /** カレンダーの列を「月〜日」または「日〜土」で始める */
   calendarWeekStart: CalendarWeekStart;
   /** 拡張 UI の表示言語 */
@@ -61,6 +62,7 @@ const DEFAULTS: Settings = {
   showKogiCalMascot: false,
   hideAssignmentCalendar: false,
   home2WebMailOverlay: true,
+  cplanOverlay:        true,
   calendarWeekStart: 'monday',
   language: DEFAULT_LANGUAGE,
 };
@@ -76,6 +78,7 @@ const SETTINGS_TO_SK = {
   showKogiCalMascot:  SK.showKogiCalMascot,
   hideAssignmentCalendar: SK.hideAssignmentCalendar,
   home2WebMailOverlay: SK.home2WebMailOverlay,
+  cplanOverlay:        SK.cplanOverlay,
   calendarWeekStart: SK.calendarWeekStart,
   language: SK.language,
 } satisfies Record<keyof Settings, string>;
@@ -89,6 +92,7 @@ const STORAGE_KEYS = [
   SK.showKogiCalMascot,
   SK.hideAssignmentCalendar,
   SK.home2WebMailOverlay,
+  SK.cplanOverlay,
   SK.calendarWeekStart,
   SK.language,
 ] as const;
@@ -104,6 +108,7 @@ function parseSettings(data: Record<string, unknown>): Settings {
     hideAssignmentCalendar:
       Boolean(data[SK.hideAssignmentCalendar] ?? DEFAULTS.hideAssignmentCalendar),
     home2WebMailOverlay: Boolean(data[SK.home2WebMailOverlay] ?? DEFAULTS.home2WebMailOverlay),
+    cplanOverlay: Boolean(data[SK.cplanOverlay] ?? DEFAULTS.cplanOverlay),
     calendarWeekStart: parseCalendarWeekStart(data[SK.calendarWeekStart]),
     language: normalizeLanguage(data[SK.language] ?? detectDefaultLanguage()),
   };
