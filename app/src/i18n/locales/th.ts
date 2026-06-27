@@ -81,6 +81,7 @@ export const thMessages: typeof jaMessages = {
     changelogFetchError: 'ดึงบันทึกการเปลี่ยนแปลงไม่ได้ ตรวจสอบเครือข่ายหรือสถานะไซต์',
     changelogTitle: 'บันทึกการเปลี่ยนแปลง',
     openLicenses: 'ข้อมูลไลเซนส์',
+    openPrivacyPolicy: 'นโยบายความเป็นส่วนตัว',
     licensesTitle: 'ข้อมูลไลเซนส์',
     licensesIntro: 'ส่วนขยายนี้และไลบรารีบุคคลที่สามหลักที่ใช้งาน',
     licenseType: 'ไลเซนส์',

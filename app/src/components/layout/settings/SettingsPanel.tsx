@@ -432,6 +432,16 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
                 {t.settings.openLicenses}
               </button>
             </div>
+            <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+              <a
+                className="p-settings-tour-replay-btn"
+                href="https://kcg-portal-redesign-project-web.vercel.app/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t.settings.openPrivacyPolicy}
+              </a>
+            </div>
           </div>
 
           {extensionVersion ? (

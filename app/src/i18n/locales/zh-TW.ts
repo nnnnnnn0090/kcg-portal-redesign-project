@@ -81,6 +81,7 @@ export const zhTWMessages: typeof jaMessages = {
     changelogFetchError: '無法取得更新紀錄。請檢查網路連線或網站狀態。',
     changelogTitle: '更新紀錄',
     openLicenses: '授權資訊',
+    openPrivacyPolicy: '隱私權政策',
     licensesTitle: '授權資訊',
     licensesIntro: '此擴充功能及其使用的主要第三方函式庫。',
     licenseType: '授權',

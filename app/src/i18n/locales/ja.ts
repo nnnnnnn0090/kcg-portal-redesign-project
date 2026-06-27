@@ -78,6 +78,7 @@ export const jaMessages = {
     changelogFetchError: '更新履歴を取得できませんでした。ネットワークやサイト側の状態をご確認ください。',
     changelogTitle: '更新履歴',
     openLicenses: 'ライセンス情報',
+    openPrivacyPolicy: 'プライバシーポリシー',
     licensesTitle: 'ライセンス情報',
     licensesIntro: 'この拡張機能と、使用している主なサードパーティライブラリです。',
     licenseType: 'ライセンス',

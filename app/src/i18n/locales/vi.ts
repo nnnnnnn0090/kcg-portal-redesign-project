@@ -81,6 +81,7 @@ export const viMessages: typeof jaMessages = {
     changelogFetchError: 'Không tải được nhật ký thay đổi. Kiểm tra kết nối mạng hoặc trạng thái trang web.',
     changelogTitle: 'Nhật ký thay đổi',
     openLicenses: 'Thông tin giấy phép',
+    openPrivacyPolicy: 'Chính sách quyền riêng tư',
     licensesTitle: 'Thông tin giấy phép',
     licensesIntro: 'Tiện ích này và các thư viện bên thứ ba chính mà tiện ích sử dụng.',
     licenseType: 'Giấy phép',

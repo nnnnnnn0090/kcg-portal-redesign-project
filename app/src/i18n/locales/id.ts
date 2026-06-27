@@ -81,6 +81,7 @@ export const idMessages: typeof jaMessages = {
     changelogFetchError: 'Tidak dapat mengambil catatan perubahan. Periksa koneksi jaringan atau status situs.',
     changelogTitle: 'Catatan perubahan',
     openLicenses: 'Informasi lisensi',
+    openPrivacyPolicy: 'Kebijakan privasi',
     licensesTitle: 'Informasi lisensi',
     licensesIntro: 'Ekstensi ini dan pustaka pihak ketiga utama yang digunakannya.',
     licenseType: 'Lisensi',

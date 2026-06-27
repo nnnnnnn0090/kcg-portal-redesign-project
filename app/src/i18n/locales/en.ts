@@ -81,6 +81,7 @@ export const enMessages: typeof jaMessages = {
     changelogFetchError: 'Could not fetch the changelog. Check your network connection or the site status.',
     changelogTitle: 'Changelog',
     openLicenses: 'License information',
+    openPrivacyPolicy: 'Privacy policy',
     licensesTitle: 'License information',
     licensesIntro: 'This extension and the major third-party libraries it uses.',
     licenseType: 'License',

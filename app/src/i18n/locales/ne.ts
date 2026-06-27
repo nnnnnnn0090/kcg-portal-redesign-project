@@ -81,6 +81,7 @@ export const neMessages: typeof jaMessages = {
     changelogFetchError: 'परिवर्तन लग ल्याउन सकिएन। नेटवर्क वा साइट स्थिति जाँच गर्नुहोस्।',
     changelogTitle: 'परिवर्तन लग',
     openLicenses: 'लाइसेन्स जानकारी',
+    openPrivacyPolicy: 'गोपनीयता नीति',
     licensesTitle: 'लाइसेन्स जानकारी',
     licensesIntro: 'यो एक्सटेन्सन र यसले प्रयोग गर्ने मुख्य तेस्रो-पक्ष लाइब्रेरीहरू।',
     licenseType: 'लाइसेन्स',

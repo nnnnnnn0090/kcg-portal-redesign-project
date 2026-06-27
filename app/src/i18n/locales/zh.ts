@@ -81,6 +81,7 @@ export const zhMessages: typeof jaMessages = {
     changelogFetchError: '无法获取更新日志。请检查网络连接或网站状态。',
     changelogTitle: '更新日志',
     openLicenses: '许可证信息',
+    openPrivacyPolicy: '隐私政策',
     licensesTitle: '许可证信息',
     licensesIntro: '此扩展及其使用的主要第三方库。',
     licenseType: '许可证',
