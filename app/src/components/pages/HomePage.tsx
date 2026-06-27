@@ -33,60 +33,6 @@ interface HomePageProps {
   settings: Settings;
 }
 
-const DEVELOPER_NOTICE_MARKDOWN_DEMO = false;
-
-const DEVELOPER_NOTICE_MARKDOWN_DEMO_TITLE = 'Markdown notice demo';
-
-const DEVELOPER_NOTICE_MARKDOWN_DEMO_MESSAGE = String.raw`# Markdown display test
-
-This notice is rendered from **Markdown**. It supports *emphasis*, ~~strikethrough~~, inline code like \`notice_md.json\`, and normal line breaks.
-
-## Links
-
-- [X profile](https://x.com/nnnnnnn0090)
-- <https://kcg-portal-redesign-project-web.vercel.app/>
-
-## Lists
-
-- Bullet item
-- Nested-looking text is kept readable
-- Long text wraps inside the panel without breaking the layout
-
-1. Ordered item
-2. Another ordered item
-3. Final ordered item
-
-## Quote
-
-> This is a blockquote. It should look quieter than the main text while still being readable.
-
-## Image
-
-![Sample image](https://placehold.co/960x360/png?text=Markdown+Image)
-
-## Code
-
-\`\`\`json
-{
-  "title": "Developer notice",
-  "message": "Markdown **works** here."
-}
-\`\`\`
-
-## Table
-
-| Feature | Status |
-| --- | --- |
-| Headings | OK |
-| Links | OK |
-| Images | OK |
-| Code blocks | OK |
-| Tables | OK |
-
----
-
-End of sample.`;
-
 /** オーバーレイのスクロールルート内で、要素が縦方向ほぼ中央に来るよう scrollTop を計算する */
 function scrollElementToVerticalCenter(
   scroller: HTMLElement,
@@ -174,12 +120,8 @@ export function HomePage({ settings }: HomePageProps) {
   const developerSurvey = useDeveloperSurvey(language);
 
   const developerNoticeTitle =
-    DEVELOPER_NOTICE_MARKDOWN_DEMO
-      ? DEVELOPER_NOTICE_MARKDOWN_DEMO_TITLE
-      : developerNotice?.byLang?.[noticeLang]?.title || t.developerNotice.fallbackTitle;
-  const developerNoticeMessage = DEVELOPER_NOTICE_MARKDOWN_DEMO
-    ? DEVELOPER_NOTICE_MARKDOWN_DEMO_MESSAGE
-    : developerNotice?.byLang?.[noticeLang]?.message ?? '';
+    developerNotice?.byLang?.[noticeLang]?.title || t.developerNotice.fallbackTitle;
+  const developerNoticeMessage = developerNotice?.byLang?.[noticeLang]?.message ?? '';
   const developerNoticeHtml = useMemo(
     () => developerNoticeMessage ? renderMarkdown(developerNoticeMessage) : '',
     [developerNoticeMessage],
@@ -192,7 +134,7 @@ export function HomePage({ settings }: HomePageProps) {
     >
       <div className="p-stack">
 
-        {(developerNotice || DEVELOPER_NOTICE_MARKDOWN_DEMO) ? (
+        {developerNotice ? (
           <section className="p-panel">
             <span className="p-panel-head p-developer-notice-head">
               <span className="p-developer-notice-head-title">{developerNoticeTitle}</span>
