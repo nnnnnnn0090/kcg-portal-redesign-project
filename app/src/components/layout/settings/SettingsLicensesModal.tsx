@@ -18,31 +18,31 @@ const THIRD_PARTY_LICENSES: ThirdPartyLicense[] = [
     name: 'KCG Portal Redesign Project',
     license: 'MIT',
     copyright: 'Copyright (c) 2026 nnnnnnn0090',
-    url: 'https://github.com/nnnnnnn0090/kcg-portal-redesign-project',
+    url: 'https://github.com/nnnnnnn0090/kcg-portal-redesign-project/blob/main/LICENSE',
   },
   {
     name: 'DOMPurify',
     license: 'MPL-2.0 OR Apache-2.0',
     copyright: 'Copyright 2015 Mario Heiderich',
-    url: 'https://github.com/cure53/DOMPurify',
+    url: 'https://github.com/cure53/DOMPurify/blob/3.4.11/LICENSE',
   },
   {
     name: 'marked',
     license: 'MIT',
     copyright: 'Copyright (c) 2018+, MarkedJS; Copyright (c) 2011-2018, Christopher Jeffrey',
-    url: 'https://github.com/markedjs/marked',
+    url: 'https://github.com/markedjs/marked/blob/v18.0.5/LICENSE.md',
   },
   {
     name: 'React',
     license: 'MIT',
     copyright: 'Copyright (c) Meta Platforms, Inc. and affiliates.',
-    url: 'https://react.dev/',
+    url: 'https://github.com/facebook/react/blob/v19.2.5/LICENSE',
   },
   {
     name: 'React DOM',
     license: 'MIT',
     copyright: 'Copyright (c) Meta Platforms, Inc. and affiliates.',
-    url: 'https://react.dev/',
+    url: 'https://github.com/facebook/react/blob/v19.2.5/LICENSE',
   },
 ];
 
