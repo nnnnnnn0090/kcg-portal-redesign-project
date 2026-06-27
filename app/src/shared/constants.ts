@@ -32,6 +32,7 @@ export const SK = {
   /** 初回の言語選択を完了したら true */
   portalLanguagePickerDone:         'portalThemePortalLanguagePickerDone',
   home2WebMailOverlay:              'portalThemeHome2WebMailOverlay',
+  cplanOverlay:                     'portalThemeCplanOverlay',
   /** カレンダーグリッドの週の左端: `monday` | `sunday` */
   calendarWeekStart:               'portalThemeCalendarWeekStart',
   /** 拡張 UI の表示言語 */
@@ -104,6 +105,12 @@ export const PORTAL_HOSTNAME = new URL(PORTAL_ORIGIN).hostname;
 
 /** ポータル配下コンテンツスクリプトの manifest `matches` */
 export const PORTAL_CONTENT_SCRIPT_MATCHES = `${PORTAL_ORIGIN}/portal*` as const;
+
+/** Campus Plan Web（パス先頭の大文字・小文字違いを含む） */
+export const CPLAN_CONTENT_SCRIPT_MATCHES = [
+  `${PORTAL_ORIGIN}/gakusei/web/CplanMenuWeb/UI/*`,
+  `${PORTAL_ORIGIN}/Gakusei/web/CplanMenuWeb/UI/*`,
+] as const;
 
 /** Home2 Web メール（専用 content script） */
 export const HOME2_ORIGIN = 'https://home2.kcg.ac.jp' as const;
