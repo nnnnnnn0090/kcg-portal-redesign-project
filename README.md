@@ -9,8 +9,8 @@
 
 | ライブラリ | 用途 | ライセンス | 条文 |
 |------------|------|------------|------|
-| `react` / `react-dom` | 拡張の UI 描画 | MIT | [LICENSE](https://github.com/facebook/react/blob/v19.2.5/LICENSE) |
-| `marked` | Markdown 解析 | MIT | [LICENSE](https://github.com/markedjs/marked/blob/v18.0.5/LICENSE.md) |
+| `react` / `react-dom` | 拡張の UI 描画 | MIT | [LICENSE](https://github.com/react/react/blob/v19.2.5/LICENSE) |
+| `marked` | Markdown 解析 | MIT | [LICENSE](https://github.com/markedjs/marked/blob/v18.0.5/LICENSE) |
 | `dompurify` | Markdown 由来の HTML の安全なサニタイズ | MPL-2.0 OR Apache-2.0 | [LICENSE](https://github.com/cure53/DOMPurify/blob/3.4.11/LICENSE) |
 | `wxt` | 拡張のビルド・実行基盤 | MIT | [LICENSE](https://github.com/wxt-dev/wxt/blob/main/LICENSE) |
 | `vitest` / `playwright` | テスト | MIT | [vitest](https://github.com/vitest-dev/vitest/blob/main/LICENSE) / [playwright](https://github.com/microsoft/playwright/blob/main/LICENSE) |
