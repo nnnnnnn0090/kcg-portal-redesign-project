@@ -26,6 +26,13 @@ import { LinkEditor } from '../ui/LinkEditor';
 import { CalendarPanel, AssignmentCalendar, type DuePayload } from '../../features/calendar';
 import { useI18n } from '../../i18n';
 import { renderMarkdown } from '../../lib/markdown';
+import {
+  PROMOTION_DEMO_MODE,
+  PROMOTION_DEMO_NEWS,
+  createPromotionDemoAssignments,
+  createPromotionDemoKogiCalendar,
+  promotionDemoTodayIso,
+} from '../../shared/promotion-demo';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -61,6 +68,16 @@ export function HomePage({ settings }: HomePageProps) {
   const { overlayRoot } = usePortalDom();
 
   const { kinoData, kogiNews, newTopicsItems, linkItems } = useHomePortalInbox();
+  const demoKogiCalendar = useMemo(
+    () => PROMOTION_DEMO_MODE ? createPromotionDemoKogiCalendar() : undefined,
+    [],
+  );
+  const demoAssignmentPayload = useMemo(
+    () => PROMOTION_DEMO_MODE ? createPromotionDemoAssignments() : null,
+    [],
+  );
+  const demoTodayIso = PROMOTION_DEMO_MODE ? promotionDemoTodayIso() : undefined;
+  const displayedNews = PROMOTION_DEMO_MODE ? PROMOTION_DEMO_NEWS : newTopicsItems;
 
   const [linkConfig,        setLinkConfig]        = useState<LinkConfig>({ order: [], hidden: [], custom: [] });
   const [assignmentPayload, setAssignmentPayload] = useState<DuePayload | null>(null);
@@ -174,13 +191,16 @@ export function HomePage({ settings }: HomePageProps) {
           getKingLmsCourses={getKingLmsCourses}
           kogiDisplayDeps={kogiDisplayDeps}
           sleepMascotSlot
+          demoItems={demoKogiCalendar}
+          demoTodayIso={demoTodayIso}
         />
 
         {/* 課題カレンダー */}
         {!settings.hideAssignmentCalendar ? (
           <AssignmentCalendar
-            payload={assignmentPayload}
+            payload={demoAssignmentPayload ?? assignmentPayload}
             titles={{ week: t.home.assignmentWeek, month: t.home.assignmentMonth }}
+            demoTodayIso={demoTodayIso}
           />
         ) : null}
 
@@ -221,7 +241,7 @@ export function HomePage({ settings }: HomePageProps) {
           <section className="p-panel">
             <span className="p-panel-head">{t.home.news}</span>
             <div className="p-panel-body" id="p-news">
-              <NewsList items={newTopicsItems} />
+              <NewsList items={displayedNews} />
             </div>
           </section>
           <section className="p-panel p-panel-links">

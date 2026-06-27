@@ -36,4 +36,8 @@ export interface ViewMeta {
   weekStart:      CalendarWeekStart;
   /** グリッド内固定文言の表示言語 */
   language?:      AppLanguage;
+  /** プロモーションデモ等で「今日」の表示日を差し替える */
+  todayIso?:       string;
+  /** 課題ステータス判定に使う現在時刻 */
+  nowMs?:          number;
 }

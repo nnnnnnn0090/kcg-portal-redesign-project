@@ -39,12 +39,14 @@ import { useI18n } from '../../../i18n';
 interface AssignmentCalendarProps {
   payload: DuePayload | null;
   titles:  { week: string; month: string };
+  demoTodayIso?: string;
 }
 
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
-export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps) {
-  const todayIso = toIsoLocal(new Date());
+export function AssignmentCalendar({ payload, titles, demoTodayIso }: AssignmentCalendarProps) {
+  const todayIso = demoTodayIso ?? toIsoLocal(new Date());
+  const demoNowMs = demoTodayIso ? Date.parse(`${demoTodayIso}T12:00:00+09:00`) : undefined;
   const { settings, settingsReady } = useSettings();
   const { language, t } = useI18n();
   const weekStart = settings.calendarWeekStart;
@@ -72,7 +74,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
 
   useEffect(() => {
     if (!settingsReady) return;
-    const today = toIsoLocal(new Date());
+    const today = todayIso;
     const wp    = weekParamsRef.current;
 
     if (prevWeekStartRef.current === null) {
@@ -89,7 +91,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     const wr       = weekRangeContaining(anchor, weekStart);
     setWeekParams(wr);
     setMonthRef(isoToMonthRef(wr.start));
-  }, [settingsReady, weekStart]);
+  }, [settingsReady, weekStart, todayIso]);
 
   // ── 現在表示範囲の HTML を生成する ────────────────────────────────────
   const gridHtml = useMemo(() => {
@@ -100,9 +102,9 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     return buildCalendarGridHtml(
       filterCalItemsByRange(events, r.start, r.end),
       r,
-      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart, language },
+      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart, language, todayIso: demoTodayIso, nowMs: demoNowMs },
     );
-  }, [hasData, events, viewMode, monthRef, weekParams, weekStart, language]);
+  }, [hasData, events, viewMode, monthRef, weekParams, weekStart, language, demoTodayIso, demoNowMs]);
 
   // ── グリッド HTML を DOM に反映（スワイプ中は skip） ──────────────────
   useLayoutEffect(() => {
@@ -152,7 +154,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     const oldHtml = buildCalendarGridHtml(
       filterCalItemsByRange(events, r0.start, r0.end),
       r0,
-      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart, language },
+      { mode: viewMode, monthRef: viewMode === 'month' ? monthRef : null, ...assignmentViewMeta, weekStart, language, todayIso: demoTodayIso, nowMs: demoNowMs },
     );
 
     // 次の表示範囲を計算してステートを更新
@@ -175,7 +177,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
     const newHtml = buildCalendarGridHtml(
       filterCalItemsByRange(events, r1.start, r1.end),
       r1,
-      { mode: viewMode, monthRef: viewMode === 'month' ? nextMr : null, ...assignmentViewMeta, weekStart, language },
+      { mode: viewMode, monthRef: viewMode === 'month' ? nextMr : null, ...assignmentViewMeta, weekStart, language, todayIso: demoTodayIso, nowMs: demoNowMs },
     );
 
     if (prefersReducedMotion()) {
@@ -190,7 +192,7 @@ export function AssignmentCalendar({ payload, titles }: AssignmentCalendarProps)
       setSwipeAnimating(false);
       skipDomSyncRef.current = false;
     });
-  }, [swipeAnimating, hasData, viewMode, weekParams, monthRef, events, weekStart, language]);
+  }, [swipeAnimating, hasData, viewMode, weekParams, monthRef, events, weekStart, language, demoTodayIso, demoNowMs]);
 
   // ── 週/月 モード切替 ─────────────────────────────────────────────────
   function switchMode(mode: 'week' | 'month') {

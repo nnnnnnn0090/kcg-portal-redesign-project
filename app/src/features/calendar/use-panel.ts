@@ -34,6 +34,7 @@ import {
   calendarYearRangeBeforeInclusiveStart,
   filterCalItemsByRange,
   toIsoLocal,
+  weekRangeContaining,
   calParamsAfterWeekStartChange,
   type CalendarWeekStart,
 } from '../../lib/date';
@@ -73,6 +74,10 @@ export interface CalendarPanelConfig {
   forceVisibleDeps?: string;
   /** true のとき、設定でオンなら授業カレンダーにマスコットを載せる（ホームの授業パネルのみ指定） */
   sleepMascotSlot?: boolean;
+  /** プロモーション撮影用。指定時はAPIを使わず、このデータを表示する */
+  demoItems?: CalEvent[];
+  /** デモ表示上の今日 */
+  demoTodayIso?: string;
 }
 
 // ─── フック ───────────────────────────────────────────────────────────────
@@ -88,6 +93,8 @@ export function useCalendarPanel({
   getKingLmsCourses = () => [],
   kogiDisplayDeps,
   forceVisibleDeps,
+  demoItems,
+  demoTodayIso,
 }: CalendarPanelConfig) {
 
   const { settings, settingsReady } = useSettings();
@@ -108,8 +115,8 @@ export function useCalendarPanel({
   const pendingEnterAnimRef = useRef(false);
 
   // ── props を ref で保持（コールバック内での古い値参照を防ぐ）──────────
-  const propsRef = useRef({ calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType });
-  propsRef.current = { calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType };
+  const propsRef = useRef({ calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType, demoItems, demoTodayIso });
+  propsRef.current = { calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType, demoItems, demoTodayIso };
 
   // ── 可変な表示パラメータを ref で保持（state と同期・上記モジュールコメント参照） ─
   const calRef = useRef({
@@ -164,6 +171,7 @@ export function useCalendarPanel({
     calKind:        propsRef.current.calKind,
     weekStart,
     language,
+    todayIso:       propsRef.current.demoTodayIso,
   }), [weekStart, language]);
 
   // ── 現在表示している範囲の CalParams ─────────────────────────────────
@@ -304,6 +312,7 @@ export function useCalendarPanel({
 
   // ── postMessage ハンドラ（usePortalMessage と信頼条件を共有） ───────────
   const handleCapturedMessage = useCallback((msg: PortalCapturedMessage) => {
+    if (propsRef.current.demoItems) return;
     runCalendarPanelInboundMessage(msg as unknown as Record<string, unknown>, {
       msgType:       propsRef.current.msgType,
       calRef,
@@ -321,6 +330,29 @@ export function useCalendarPanel({
   }, [queueBulkYearFetch, redraw, redrawFromClient, weekStart, syncToolbarLockedFromRef]);
 
   usePortalMessage(handleCapturedMessage, { msgTypes: [msgType] });
+
+  useEffect(() => {
+    if (!demoItems) return;
+    const wr = calParamsAfterWeekStartChange(
+      { uKbn: '1', ...weekRangeContaining(toIsoLocal(new Date()), weekStart) },
+      weekStart,
+      toIsoLocal(new Date()),
+    );
+    const mr = isoToMonthRef(wr.start);
+    weekParamsRef.current = wr;
+    monthRefRef.current = mr;
+    setWeekParams(wr);
+    setMonthRef(mr);
+
+    const m = calRef.current;
+    m.storedUKbn = '1';
+    m.clientDataMode = true;
+    m.bulkItems = demoItems;
+    m.bulkParsed = { start: '2000-01-01', end: '2100-01-01' };
+    m.lastItems = demoItems;
+    m.lastParsed = wr;
+    redrawFromClient({ enterAnim: true });
+  }, [demoItems, redrawFromClient, weekStart]);
 
   // ── DOM 同期（gridHtml の変更を calBody に反映） ─────────────────────
   useLayoutEffect(() => {

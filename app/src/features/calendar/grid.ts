@@ -18,7 +18,7 @@ function weekdayLabels(weekStart: CalendarWeekStart, language: AppLanguage): str
 
 // ─── 1 日分のイベント HTML ────────────────────────────────────────────────
 
-function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind' | 'mode' | 'kingLmsCourses' | 'language'>): string {
+function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind' | 'mode' | 'kingLmsCourses' | 'language' | 'nowMs'>): string {
   const { calKind, mode, kingLmsCourses, language: rawLanguage } = opts;
   const language = normalizeLanguage(rawLanguage);
   const t = messagesForLanguage(language).calendar;
@@ -68,7 +68,7 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind'
     const sub = ev.assignmentSubmitted;
     const dueIso = calKind === 'assignment' ? String(ev.start ?? '').trim() : '';
     const assignmentStatus = calKind === 'assignment'
-      ? resolveAssignmentDisplayStatus(sub, dueIso || undefined)
+      ? resolveAssignmentDisplayStatus(sub, dueIso || undefined, opts.nowMs)
       : 'unknown';
     const subAttr = calKind === 'assignment' && sub !== undefined
       ? ` data-cal-assignment-submitted="${sub ? 'true' : 'false'}"`
@@ -126,7 +126,7 @@ export function buildCalendarGridHtml(
   const calKind        = viewMeta?.calKind ?? '';
   const weekStart      = viewMeta?.weekStart ?? 'monday';
   const language       = normalizeLanguage(viewMeta?.language);
-  const todayIso       = toIsoLocal(new Date());
+  const todayIso       = viewMeta?.todayIso ?? toIsoLocal(new Date());
 
   // イベントを日付でグループ化
   const byDay = new Map<string, CalEvent[]>();
@@ -162,7 +162,7 @@ export function buildCalendarGridHtml(
       });
     }
 
-    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, kingLmsCourses, language });
+    const evHtml  = buildDayEventsHtml(dayItems, { calKind, mode, kingLmsCourses, language, nowMs: viewMeta?.nowMs });
     const cls     = ['p-cal-cell', isMuted && 'is-muted', isToday && 'is-today'].filter(Boolean).join(' ');
     const ariaCur = isToday ? ' aria-current="date"' : '';
 
