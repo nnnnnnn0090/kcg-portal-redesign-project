@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, type FormEvent } from 'react';
 
-type CplanRoute = 'login' | 'main' | 'category';
+type CplanRoute = 'login' | 'main' | 'category' | 'attendance';
 
 interface CplanLink {
   label: string;
@@ -15,6 +15,20 @@ interface CplanSnapshot {
   title: string;
   announcementHtml: string;
   links: CplanLink[];
+  attendance?: CplanAttendanceSnapshot;
+}
+
+interface CplanAttendanceSnapshot {
+  courses: Array<{ value: string; label: string }>;
+  selectedCourse: string;
+  date: string;
+  period: string;
+  teacher: string;
+  result: string;
+  error: string;
+  message: string;
+  passwordMaxLength: number;
+  canSubmit: boolean;
 }
 
 const normalizeText = (value: string | null | undefined) => value?.replace(/\s+/g, ' ').trim() ?? '';
@@ -29,7 +43,35 @@ function detectRoute(): CplanRoute | null {
   if (page === 'loginform.aspx') return 'login';
   if (page === 'mainmenu.aspx' || page === 'mainmenuv2.aspx') return 'main';
   if (page === 'category.aspx' || page === 'categoryv2.aspx') return 'category';
+  if (page === 'wsk_gakuseishukketsushinsei.aspx') return 'attendance';
   return null;
+}
+
+function readAttendance(): CplanAttendanceSnapshot | null {
+  const courseSelect = document.getElementById('ddlRishuKogiList');
+  const password = document.getElementById('txtOnetimePass');
+  const submit = document.getElementById('btnUpdate');
+  if (!(courseSelect instanceof HTMLSelectElement)) return null;
+
+  const courses = Array.from(courseSelect.options).map((option) => ({
+    value: option.value,
+    label: normalizeText(option.textContent),
+  })).filter((course) => course.value && course.label);
+  if (courses.length === 0) return null;
+
+  return {
+    courses,
+    selectedCourse: courseSelect.value,
+    date: normalizeText(document.getElementById('lblKaikoYMD')?.textContent),
+    period: normalizeText(document.getElementById('lblJigenNm')?.textContent),
+    teacher: normalizeText(document.getElementById('lblKyoinNm')?.textContent),
+    result: normalizeText(document.getElementById('lblShukketsuTimeStamp')?.textContent),
+    error: normalizeText(document.getElementById('ucMainHeader_lblErrorMessage')?.textContent),
+    message: normalizeText(document.getElementById('lblOnetimeMessage')?.textContent),
+    passwordMaxLength: password instanceof HTMLInputElement && password.maxLength > 0 ? password.maxLength : 6,
+    canSubmit: password instanceof HTMLInputElement
+      && (submit instanceof HTMLInputElement || submit instanceof HTMLButtonElement),
+  };
 }
 
 function readMainLinks(): CplanLink[] {
@@ -65,6 +107,17 @@ function detectCulture(route: CplanRoute, links: CplanLink[]): 'ja' | 'en' {
   if (documentLanguage === 'ja' || documentLanguage.startsWith('ja-')) return 'ja';
   if (documentLanguage === 'en' || documentLanguage.startsWith('en-')) return 'en';
 
+  if (route === 'attendance') {
+    const attendanceUiText = [
+      document.getElementById('ucMainHeader_hdrMenuV2_lblTitle')?.textContent,
+      document.getElementById('ucMainHeader_hdrMenuV2_lbtnLogout')?.textContent,
+      document.getElementById('lblOnetimeMessage')?.textContent,
+      (document.getElementById('btnUpdate') as HTMLInputElement | null)?.value,
+    ].map(normalizeText).filter(Boolean).join(' ');
+    if (attendanceUiText && ASCII_MENU_LABEL.test(attendanceUiText)) return 'en';
+    if (JAPANESE_CPLAN_TEXT.test(attendanceUiText)) return 'ja';
+  }
+
   if (route === 'login') {
     const loginText = [
       document.querySelector('label[for="txtUserID"]')?.textContent,
@@ -82,16 +135,25 @@ function detectCulture(route: CplanRoute, links: CplanLink[]): 'ja' | 'en' {
 export function readCplanSnapshot(): CplanSnapshot | null {
   const route = detectRoute();
   if (!route) return null;
-  const title = normalizeText(document.getElementById('hdrMenu_lblTitle')?.textContent);
+  const title = normalizeText(
+    document.getElementById('hdrMenu_lblTitle')?.textContent
+    ?? document.getElementById('ucMainHeader_hdrMenuV2_lblTitle')?.textContent,
+  );
   const links = route === 'main' ? readMainLinks() : route === 'category' ? readCategoryLinks() : [];
+  const attendance = route === 'attendance' ? readAttendance() : undefined;
   if (route === 'main' && links.length === 0) return null;
+  if (route === 'attendance' && !attendance) return null;
   return {
     route,
     culture: detectCulture(route, links),
-    userName: normalizeText(document.getElementById('hdrMenu_lblUserName')?.textContent),
+    userName: normalizeText(
+      document.getElementById('hdrMenu_lblUserName')?.textContent
+      ?? document.getElementById('ucMainHeader_hdrMenuV2_lblUserName')?.textContent,
+    ),
     title,
     announcementHtml: document.getElementById('lblInfo')?.innerHTML ?? '',
     links,
+    attendance,
   };
 }
 
@@ -115,7 +177,7 @@ function activateNativeLink(link: CplanLink): void {
   link.element.click();
 }
 
-function submitAspNetPostBack(element: HTMLAnchorElement, eventTarget: string, eventArgument: string): void {
+function submitAspNetPostBack(element: HTMLElement, eventTarget: string, eventArgument: string): void {
   const form = element.closest('form') ?? document.querySelector<HTMLFormElement>('form');
   if (!form) return;
 
@@ -200,7 +262,8 @@ function CplanHeader({ snapshot }: { snapshot: CplanSnapshot }) {
   }, [snapshot.culture]);
 
   const logout = useCallback(() => {
-    const native = document.getElementById('hdrMenu_lbtnLogout');
+    const native = document.getElementById('hdrMenu_lbtnLogout')
+      ?? document.getElementById('ucMainHeader_hdrMenuV2_lbtnLogout');
     if (native instanceof HTMLAnchorElement) {
       activateNativeLink({ label: normalizeText(native.textContent), element: native });
       return;
@@ -215,7 +278,7 @@ function CplanHeader({ snapshot }: { snapshot: CplanSnapshot }) {
   return (
     <header className="p-cplan-header">
       <div className="p-cplan-header-inner">
-        <a className="p-cplan-brand" href="MainMenuV2.aspx">
+        <a className="p-cplan-brand" href="/gakusei/web/CplanMenuWeb/UI/MainMenuV2.aspx">
           <CplanLogo />
           <span>{text.product}</span>
         </a>
@@ -232,6 +295,77 @@ function CplanHeader({ snapshot }: { snapshot: CplanSnapshot }) {
         </div>
       </div>
     </header>
+  );
+}
+
+function CplanAttendance({ snapshot }: { snapshot: CplanSnapshot }) {
+  const attendance = snapshot.attendance;
+  const ja = snapshot.culture === 'ja';
+  const [course, setCourse] = useState(attendance?.selectedCourse ?? '');
+  const [password, setPassword] = useState('');
+  if (!attendance) return null;
+
+  const changeCourse = (value: string) => {
+    setCourse(value);
+    const native = document.getElementById('ddlRishuKogiList');
+    if (!(native instanceof HTMLSelectElement)) return;
+    native.value = value;
+    submitAspNetPostBack(native, native.name || 'ddlRishuKogiList', '');
+  };
+
+  const submitAttendance = (event: FormEvent) => {
+    event.preventDefault();
+    const nativePassword = document.getElementById('txtOnetimePass');
+    const nativeSubmit = document.getElementById('btnUpdate');
+    if (!(nativePassword instanceof HTMLInputElement)
+      || (!(nativeSubmit instanceof HTMLInputElement)
+        && !(nativeSubmit instanceof HTMLButtonElement))) return;
+    nativePassword.value = password;
+    nativeSubmit.click();
+  };
+
+  const resultRegistered = attendance.result && !/^(?:未登録|not registered)$/i.test(attendance.result);
+  return (
+    <><CplanHeader snapshot={snapshot} /><main className="p-cplan-main p-cplan-attendance">
+      <nav className="p-cplan-breadcrumb">
+        <a href="/gakusei/web/CplanMenuWeb/UI/MainMenuV2.aspx">{ja ? 'ホーム' : 'Home'}</a>
+        <span>›</span><span>{snapshot.title || (ja ? '学生出欠登録' : 'Student attendance')}</span>
+      </nav>
+      <div className="p-cplan-page-head"><CplanIcon label="出欠" large /><div>
+        <h1>{snapshot.title || (ja ? '学生出欠登録' : 'Student attendance')}</h1>
+      </div></div>
+      <form className="p-cplan-attendance-card" onSubmit={submitAttendance}>
+        <label className="p-cplan-field">
+          <span>{ja ? '講義' : 'Course'}</span>
+          <select value={course} onChange={(event) => changeCourse(event.target.value)}>
+            {attendance.courses.map((item) => <option value={item.value} key={item.value}>{item.label}</option>)}
+          </select>
+        </label>
+        <dl className="p-cplan-attendance-details">
+          <div><dt>{ja ? '日付' : 'Date'}</dt><dd>{attendance.date || '-'}</dd></div>
+          <div><dt>{ja ? '時限' : 'Period'}</dt><dd>{attendance.period || '-'}</dd></div>
+          <div><dt>{ja ? '教員' : 'Instructor'}</dt><dd>{attendance.teacher || '-'}</dd></div>
+          <div><dt>{ja ? '登録結果' : 'Registration status'}</dt><dd className={resultRegistered ? 'is-registered' : ''}>{attendance.result || '-'}</dd></div>
+        </dl>
+        {attendance.error ? <p className="p-cplan-attendance-error" role="alert">{attendance.error}</p> : null}
+        {attendance.canSubmit ? <>
+          <label className="p-cplan-field">
+            <span>{ja ? 'ワンタイムパスワード' : 'One-time password'}</span>
+            <input
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              maxLength={attendance.passwordMaxLength}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </label>
+          {attendance.message ? <p className="p-cplan-attendance-help">{attendance.message}</p> : null}
+          <button className="p-cplan-submit" type="submit" disabled={!password.trim()}>
+            {ja ? '出席登録' : 'Register attendance'}
+          </button>
+        </> : null}
+      </form>
+    </main></>
   );
 }
 
@@ -303,6 +437,7 @@ export function CplanApp({ snapshot }: { snapshot: CplanSnapshot }) {
   const content = useMemo(() => {
     if (snapshot.route === 'login') return <CplanLogin snapshot={snapshot} />;
     if (snapshot.route === 'category') return <CplanCategory snapshot={snapshot} />;
+    if (snapshot.route === 'attendance') return <CplanAttendance snapshot={snapshot} />;
     return <CplanMain snapshot={snapshot} />;
   }, [snapshot]);
   return content;

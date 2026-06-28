@@ -6,7 +6,14 @@ export default defineContentScript({
   runAt: 'document_start',
   main() {
     const page = location.pathname.split('/').pop()?.toLowerCase() ?? '';
-    if (!['loginform.aspx', 'mainmenu.aspx', 'mainmenuv2.aspx', 'category.aspx', 'categoryv2.aspx'].includes(page)) return;
+    if (![
+      'loginform.aspx',
+      'mainmenu.aspx',
+      'mainmenuv2.aspx',
+      'category.aspx',
+      'categoryv2.aspx',
+      'wsk_gakuseishukketsushinsei.aspx',
+    ].includes(page)) return;
 
     void storage.get(SK.cplanOverlay).then((snap) => {
       if (snap[SK.cplanOverlay] === false || document.documentElement.dataset.cplanOverlayDisabled === 'true') return;

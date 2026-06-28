@@ -110,6 +110,8 @@ export const PORTAL_CONTENT_SCRIPT_MATCHES = `${PORTAL_ORIGIN}/portal*` as const
 export const CPLAN_CONTENT_SCRIPT_MATCHES = [
   `${PORTAL_ORIGIN}/gakusei/web/CplanMenuWeb/UI/*`,
   `${PORTAL_ORIGIN}/Gakusei/web/CplanMenuWeb/UI/*`,
+  `${PORTAL_ORIGIN}/gakusei/web/skt/WebSktGakuseiShukketsuShinsei/UI/*`,
+  `${PORTAL_ORIGIN}/Gakusei/web/skt/WebSktGakuseiShukketsuShinsei/UI/*`,
 ] as const;
 
 /** Home2 Web メール（専用 content script） */
