@@ -15,6 +15,8 @@ import {
   EXTENSION_FEEDBACK_FORM_URL,
   PORTAL_COMMUNITY_DISCORD_INVITE_URL,
 } from '../../../shared/constants';
+import { MascotDecorationSetting } from './MascotDecorationSetting';
+import { SettingsSwitch } from './SettingsSwitch';
 
 interface SettingsLanguageSectionProps {
   settings:        Settings;
@@ -99,86 +101,56 @@ export function SettingsPortalOnlySections({
     <>
       <div className="p-settings-section">
         <div className="p-settings-section-title">{t.settings.homeDecoration}</div>
-        <label className="p-settings-row">
-          <input
-            type="checkbox"
-            checked={settings.showKogiCalMascot}
-            onChange={(e) => onSettingChange('showKogiCalMascot', e.target.checked)}
-          />
-          <span>{t.settings.showKogiCalMascot}</span>
-        </label>
+        <MascotDecorationSetting
+          artwork="calendar"
+          checked={settings.showKogiCalMascot}
+          label={t.settings.showKogiCalMascot}
+          onChange={(checked) => onSettingChange('showKogiCalMascot', checked)}
+        />
+        <MascotDecorationSetting
+          artwork="homeCorner"
+          checked={settings.showHomeCornerCharacter}
+          label={t.settings.showHomeCornerCharacter}
+          onChange={(checked) => onSettingChange('showHomeCornerCharacter', checked)}
+        />
       </div>
 
       <div className="p-settings-section">
         <div className="p-settings-section-title">{t.settings.display}</div>
 
-        <label className="p-settings-row">
-          <input
-            type="checkbox"
-            checked={settings.hideProfileName}
-            onChange={(e) => onSettingChange('hideProfileName', e.target.checked)}
-          />
-          <span>{t.settings.hideProfileName}</span>
-        </label>
-
-        <label className="p-settings-row">
-          <input
-            type="checkbox"
-            checked={settings.kinoEmptyForce}
-            onChange={(e) => onSettingChange('kinoEmptyForce', e.target.checked)}
-          />
-          <span>{t.settings.kinoEmptyForce}</span>
-        </label>
-
-        <label className="p-settings-row">
-          <input
-            type="checkbox"
-            checked={settings.hoshuCalForce}
-            onChange={(e) => onSettingChange('hoshuCalForce', e.target.checked)}
-          />
-          <span>{t.settings.hoshuCalForce}</span>
-        </label>
-
-        <label className="p-settings-row">
-          <input
-            type="checkbox"
-            checked={settings.campusCalForce}
-            onChange={(e) => onSettingChange('campusCalForce', e.target.checked)}
-          />
-          <span>{t.settings.campusCalForce}</span>
-        </label>
-
-        <label className="p-settings-row">
-          <input
-            type="checkbox"
-            checked={settings.hideAssignmentCalendar}
-            onChange={(e) => onSettingChange('hideAssignmentCalendar', e.target.checked)}
-          />
-          <span>{t.settings.hideAssignmentCalendar}</span>
-        </label>
+        <SettingsSwitch checked={settings.hideProfileName} label={t.settings.hideProfileName} onChange={(checked) => onSettingChange('hideProfileName', checked)} />
+        <SettingsSwitch checked={settings.kinoEmptyForce} label={t.settings.kinoEmptyForce} onChange={(checked) => onSettingChange('kinoEmptyForce', checked)} />
+        <SettingsSwitch checked={settings.hoshuCalForce} label={t.settings.hoshuCalForce} onChange={(checked) => onSettingChange('hoshuCalForce', checked)} />
+        <SettingsSwitch checked={settings.campusCalForce} label={t.settings.campusCalForce} onChange={(checked) => onSettingChange('campusCalForce', checked)} />
+        <SettingsSwitch checked={settings.hideAssignmentCalendar} label={t.settings.hideAssignmentCalendar} onChange={(checked) => onSettingChange('hideAssignmentCalendar', checked)} />
 
         <fieldset className="p-settings-fieldset">
           <legend className="p-settings-row-label">{t.settings.calendarWeekStart}</legend>
-          <label className="p-settings-row">
-            <input
-              type="radio"
-              name="portal-calendar-week-start"
-              checked={settings.calendarWeekStart === 'monday'}
-              onChange={() => onSettingChange('calendarWeekStart', 'monday')}
-            />
-            <span>{t.settings.weekStartMonday}</span>
-          </label>
-          <label className="p-settings-row">
-            <input
-              type="radio"
-              name="portal-calendar-week-start"
-              checked={settings.calendarWeekStart === 'sunday'}
-              onChange={() => onSettingChange('calendarWeekStart', 'sunday')}
-            />
-            <span>{t.settings.weekStartSunday}</span>
-          </label>
+          <div className="p-settings-segmented">
+            <label>
+              <input
+                type="radio"
+                name="portal-calendar-week-start"
+                checked={settings.calendarWeekStart === 'monday'}
+                onChange={() => onSettingChange('calendarWeekStart', 'monday')}
+              />
+              <span>{t.settings.weekStartMonday}</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="portal-calendar-week-start"
+                checked={settings.calendarWeekStart === 'sunday'}
+                onChange={() => onSettingChange('calendarWeekStart', 'sunday')}
+              />
+              <span>{t.settings.weekStartSunday}</span>
+            </label>
+          </div>
         </fieldset>
+      </div>
 
+      <div className="p-settings-section">
+        <div className="p-settings-section-title">{t.settings.help}</div>
         <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
           <button type="button" className="p-settings-tour-replay-btn" onClick={onReplayGuidedTour}>
             {t.settings.replayTour}
@@ -190,7 +162,10 @@ export function SettingsPortalOnlySections({
             {t.settings.openChangelog}
           </button>
         </div>
+      </div>
 
+      <div className="p-settings-section">
+        <div className="p-settings-section-title">{t.settings.dataIntegration}</div>
         <div className="p-settings-row p-settings-row-actions p-settings-king-lms-sync">
           <button
             type="button"
@@ -223,18 +198,14 @@ export function SettingsWebMailSection({
   return (
     <div className="p-settings-section">
       <div className="p-settings-section-title">{t.settings.webMail}</div>
-      <label className="p-settings-row">
-        <input
-          type="checkbox"
-          checked={settings.home2WebMailOverlay}
-          onChange={(e) => {
-            const next = e.target.checked;
+      <SettingsSwitch
+        checked={settings.home2WebMailOverlay}
+        label={t.settings.webMailOverlay}
+        onChange={(next) => {
             onSettingChange('home2WebMailOverlay', next);
             if (variant === 'home2' && !next) window.location.reload();
-          }}
-        />
-        <span>{t.settings.webMailOverlay}</span>
-      </label>
+        }}
+      />
       <p className="p-settings-hint">{t.settings.webMailReloadHint}</p>
     </div>
   );
@@ -248,14 +219,7 @@ export function SettingsCplanSection({
   return (
     <div className="p-settings-section">
       <div className="p-settings-section-title">{t.settings.campusPlan}</div>
-      <label className="p-settings-row">
-        <input
-          type="checkbox"
-          checked={settings.cplanOverlay}
-          onChange={(e) => onSettingChange('cplanOverlay', e.target.checked)}
-        />
-        <span>{t.settings.campusPlanOverlay}</span>
-      </label>
+      <SettingsSwitch checked={settings.cplanOverlay} label={t.settings.campusPlanOverlay} onChange={(checked) => onSettingChange('cplanOverlay', checked)} />
       <p className="p-settings-hint">{t.settings.campusPlanReloadHint}</p>
     </div>
   );

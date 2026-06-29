@@ -33,6 +33,7 @@ export interface Settings {
   campusCalForce:     boolean;
   hideProfileName:    boolean;
   showKogiCalMascot:  boolean;
+  showHomeCornerCharacter: boolean;
   /** ホームの課題カレンダーを出さない */
   hideAssignmentCalendar: boolean;
   home2WebMailOverlay: boolean;
@@ -60,6 +61,7 @@ const DEFAULTS: Settings = {
   campusCalForce:    false,
   hideProfileName:   false,
   showKogiCalMascot: false,
+  showHomeCornerCharacter: false,
   hideAssignmentCalendar: false,
   home2WebMailOverlay: true,
   cplanOverlay:        true,
@@ -76,6 +78,7 @@ const SETTINGS_TO_SK = {
   campusCalForce:  SK.campusCalForce,
   hideProfileName: SK.hideProfileName,
   showKogiCalMascot:  SK.showKogiCalMascot,
+  showHomeCornerCharacter: SK.showHomeCornerCharacter,
   hideAssignmentCalendar: SK.hideAssignmentCalendar,
   home2WebMailOverlay: SK.home2WebMailOverlay,
   cplanOverlay:        SK.cplanOverlay,
@@ -90,6 +93,7 @@ const STORAGE_KEYS = [
   SK.campusCalForce,
   SK.hideProfileName,
   SK.showKogiCalMascot,
+  SK.showHomeCornerCharacter,
   SK.hideAssignmentCalendar,
   SK.home2WebMailOverlay,
   SK.cplanOverlay,
@@ -105,6 +109,8 @@ function parseSettings(data: Record<string, unknown>): Settings {
     campusCalForce:  Boolean(data[SK.campusCalForce]  ?? DEFAULTS.campusCalForce),
     hideProfileName: Boolean(data[SK.hideProfileName] ?? DEFAULTS.hideProfileName),
     showKogiCalMascot: Boolean(data[SK.showKogiCalMascot] ?? DEFAULTS.showKogiCalMascot),
+    showHomeCornerCharacter:
+      Boolean(data[SK.showHomeCornerCharacter] ?? DEFAULTS.showHomeCornerCharacter),
     hideAssignmentCalendar:
       Boolean(data[SK.hideAssignmentCalendar] ?? DEFAULTS.hideAssignmentCalendar),
     home2WebMailOverlay: Boolean(data[SK.home2WebMailOverlay] ?? DEFAULTS.home2WebMailOverlay),

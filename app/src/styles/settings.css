@@ -48,7 +48,43 @@
 #portal-overlay fieldset.p-settings-fieldset legend.p-settings-row-label{padding:0;margin:0 0 .3rem .55rem;font-size:.8125rem;font-weight:600;color:var(--p-text-muted)}
 #portal-overlay fieldset.p-settings-fieldset > .p-settings-row{margin-bottom:.32rem}
 #portal-overlay fieldset.p-settings-fieldset > .p-settings-row:last-child{margin-bottom:.45rem}
+#portal-overlay .p-settings-segmented{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:.35rem .55rem .55rem;padding:3px;border:1px solid var(--p-border-light);border-radius:8px;background:var(--p-bg3)}
+#portal-overlay .p-settings-segmented label{position:relative;display:block;min-width:0;cursor:pointer}
+#portal-overlay .p-settings-segmented input{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;opacity:0;pointer-events:none}
+#portal-overlay .p-settings-segmented span{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:2rem;padding:.35rem .55rem;border-radius:5px;color:var(--p-text-dim);font-size:.75rem;font-weight:550;line-height:1.25;text-align:center;transition:background .15s,color .15s,box-shadow .15s}
+#portal-overlay .p-settings-segmented label:hover span{color:var(--p-text-muted);background:var(--p-bg-hover)}
+#portal-overlay .p-settings-segmented input:checked+span{background:var(--p-accent);color:#fff;box-shadow:0 1px 3px var(--p-shadow)}
+#portal-overlay .p-settings-segmented input:focus-visible+span{box-shadow:0 0 0 3px color-mix(in srgb,var(--p-accent) 22%,transparent)}
 #portal-overlay .p-settings-row + .p-settings-hint{margin-top:.15rem}
+#portal-overlay .p-settings-switch-row{display:grid;grid-template-columns:minmax(0,1fr) 2.5rem;align-items:center;gap:.75rem;margin:0 0 .35rem;padding:.48rem .55rem;border-radius:8px;color:var(--p-text-muted);font-size:.8125rem;line-height:1.4;cursor:pointer;transition:background .15s ease}
+#portal-overlay .p-settings-switch-row:hover{background:var(--p-bg-hover)}
+#portal-overlay .p-settings-section>.p-settings-switch-row:last-child{margin-bottom:0}
+#portal-overlay .p-settings-switch-row>span:first-child{min-width:0}
+#portal-overlay .p-settings-switch-row>input{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;opacity:0;pointer-events:none}
+#portal-overlay .p-settings-switch-track{position:relative;display:block;width:2.5rem;height:1.45rem;border:1px solid var(--p-border-hover);border-radius:999px;background:var(--p-bg-hover);box-sizing:border-box;transition:background .18s,border-color .18s,box-shadow .18s}
+#portal-overlay .p-settings-switch-track::after{content:'';position:absolute;top:.16rem;left:.17rem;width:.98rem;height:.98rem;border:0;border-radius:50%;background:var(--p-text-dim);box-shadow:0 1px 3px var(--p-shadow);transition:transform .18s,background .18s}
+#portal-overlay .p-settings-switch-row>input:checked+.p-settings-switch-track{border-color:var(--p-accent);background:var(--p-accent)}
+#portal-overlay .p-settings-switch-row>input:checked+.p-settings-switch-track::after{background:#fff;transform:translateX(1.02rem)}
+#portal-overlay .p-settings-switch-row>input:focus-visible+.p-settings-switch-track{box-shadow:0 0 0 3px color-mix(in srgb,var(--p-accent) 22%,transparent)}
+#portal-overlay .p-mascot-setting{display:grid;grid-template-columns:3.25rem minmax(0,1fr) 2.5rem;align-items:center;gap:.7rem;box-sizing:border-box;padding:.65rem;border:1px solid var(--p-border-light);border-radius:8px;background:var(--p-bg3)}
+#portal-overlay .p-mascot-setting+.p-mascot-setting{margin-top:.5rem}
+#portal-overlay .p-mascot-setting-preview{width:3.25rem;height:3.25rem;border:1px solid var(--p-border-light);border-radius:7px;background:var(--p-bg);overflow:hidden;box-sizing:border-box}
+#portal-overlay .p-mascot-setting-preview img{display:block;width:100%;height:100%;object-fit:cover}
+#portal-overlay .p-mascot-setting--calendar .p-mascot-setting-preview img{object-position:center bottom;transform:scale(1.08);transform-origin:center bottom}
+#portal-overlay .p-mascot-setting--homeCorner .p-mascot-setting-preview img{object-position:center 28%;transform:scale(1.05);transform-origin:center 28%}
+#portal-overlay .p-mascot-setting-copy{min-width:0}
+#portal-overlay .p-mascot-setting-copy>label{display:block;color:var(--p-text-muted);font-size:.75rem;font-weight:550;line-height:1.4;cursor:pointer}
+#portal-overlay .p-mascot-setting-copy>p{margin:.28rem 0 0;color:var(--p-text-dimmer);font-size:.6rem;line-height:1.35;letter-spacing:.02em}
+#portal-overlay .p-mascot-setting-copy a{color:var(--p-text-dim);font-weight:500;text-decoration:underline;text-underline-offset:2px}
+#portal-overlay .p-mascot-setting-copy a:visited{color:var(--p-text-dim)}
+#portal-overlay .p-mascot-setting-copy a:hover{color:var(--p-text-muted)}
+#portal-overlay .p-mascot-setting-switch{position:relative;display:block;width:2.5rem;height:1.45rem;cursor:pointer}
+#portal-overlay .p-mascot-setting-switch input{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
+#portal-overlay .p-mascot-setting-switch>span{position:absolute;inset:0;border:1px solid var(--p-border-hover);border-radius:999px;background:var(--p-bg-hover);transition:background .18s,border-color .18s,box-shadow .18s}
+#portal-overlay .p-mascot-setting-switch>span::after{content:'';position:absolute;top:.17rem;left:.18rem;width:.98rem;height:.98rem;border-radius:50%;background:var(--p-text-dim);box-shadow:0 1px 3px var(--p-shadow);transition:transform .18s,background .18s}
+#portal-overlay .p-mascot-setting-switch input:checked+span{border-color:var(--p-accent);background:var(--p-accent)}
+#portal-overlay .p-mascot-setting-switch input:checked+span::after{background:#fff;transform:translateX(1.02rem)}
+#portal-overlay .p-mascot-setting-switch input:focus-visible+span{box-shadow:0 0 0 3px color-mix(in srgb,var(--p-accent) 22%,transparent)}
 #portal-overlay .p-settings-king-lms-sync{flex-direction:column;align-items:stretch;gap:.45rem}
 #portal-overlay .p-settings-hint{margin:0;font-size:.72rem;line-height:1.45;color:var(--p-text-dimmer);font-weight:400}
 #portal-overlay .p-settings-hint--tight{margin:.4rem .55rem .1rem;padding:0 .55rem}

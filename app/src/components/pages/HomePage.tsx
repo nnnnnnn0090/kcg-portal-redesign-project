@@ -22,6 +22,7 @@ import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
 import { DeveloperSurveyPanel } from '../ui/DeveloperSurveyPanel';
+import { HomeCornerCharacter } from '../ui/HomeCornerCharacter';
 import { LinkEditor } from '../ui/LinkEditor';
 import { CalendarPanel, AssignmentCalendar, type DuePayload } from '../../features/calendar';
 import { useI18n } from '../../i18n';
@@ -268,6 +269,7 @@ export function HomePage({ settings }: HomePageProps) {
         </div>
 
       </div>
+      {settings.showHomeCornerCharacter ? <HomeCornerCharacter /> : null}
     </PageShell>
   );
 }
