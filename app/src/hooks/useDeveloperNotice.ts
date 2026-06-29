@@ -116,7 +116,7 @@ async function fetchDeveloperNoticeJson(): Promise<Response> {
     Pragma: 'no-cache',
   };
 
-  if (import.meta.env.PROD) {
+  if (import.meta.env.VITE_PORTAL_DISTRIBUTION_BUILD === '1') {
     const [userId, lifecycle] = await Promise.all([
       getOrCreateClientUserId(),
       getClientLifecycleTimestamps(),
