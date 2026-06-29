@@ -25,10 +25,6 @@ import { useI18n } from '../../i18n';
 
 type Row = Record<string, unknown>;
 
-interface KyukoPageProps {
-  kinoForce: boolean;
-}
-
 // ─── ヘルパー ─────────────────────────────────────────────────────────────
 
 /** 履修 token（userId + "_isRishu"）でフィルタリングする（ポータル `arrayFilter` と同じ 2 キーのみ） */
@@ -110,7 +106,7 @@ function TableBody({ rows, emptyMsg, colSpan, RowComp }: {
 
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
-export function KyukoPage({ kinoForce }: KyukoPageProps) {
+export function KyukoPage() {
   const { t } = useI18n();
   const nendo = String(currentNendo());
 
@@ -162,7 +158,7 @@ export function KyukoPage({ kinoForce }: KyukoPageProps) {
       variant="news"
       title={t.kyukoPage.title(nendo)}
     >
-      <KinoPanel data={kinoData} forceVisible={kinoForce} />
+      <KinoPanel data={kinoData} />
 
       <div className="p-news-page p-kyuko-page">
         <div className="p-news-primary">

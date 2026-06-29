@@ -119,9 +119,6 @@ export function SettingsPortalOnlySections({
         <div className="p-settings-section-title">{t.settings.display}</div>
 
         <SettingsSwitch checked={settings.hideProfileName} label={t.settings.hideProfileName} onChange={(checked) => onSettingChange('hideProfileName', checked)} />
-        <SettingsSwitch checked={settings.kinoEmptyForce} label={t.settings.kinoEmptyForce} onChange={(checked) => onSettingChange('kinoEmptyForce', checked)} />
-        <SettingsSwitch checked={settings.hoshuCalForce} label={t.settings.hoshuCalForce} onChange={(checked) => onSettingChange('hoshuCalForce', checked)} />
-        <SettingsSwitch checked={settings.campusCalForce} label={t.settings.campusCalForce} onChange={(checked) => onSettingChange('campusCalForce', checked)} />
         <SettingsSwitch checked={settings.hideAssignmentCalendar} label={t.settings.hideAssignmentCalendar} onChange={(checked) => onSettingChange('hideAssignmentCalendar', checked)} />
 
         <fieldset className="p-settings-fieldset">

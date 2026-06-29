@@ -52,9 +52,6 @@ export const neMessages: typeof jaMessages = {
     showKogiCalMascot: 'कक्षा क्यालेन्डरमा मास्कट देखाउनुहोस्',
     showHomeCornerCharacter: 'गृह पृष्ठको दायाँ तल पात्र देखाउनुहोस्',
     hideProfileName: 'हेडरमा मेरो नाम लुकाउनुहोस्',
-    kinoEmptyForce: 'सामग्री नभए पनि सूचना देखाउनुहोस्',
-    hoshuCalForce: 'खाली भए पनि पूरक कक्षा क्यालेन्डर देखाउनुहोस्',
-    campusCalForce: 'खाली भए पनि क्याम्पस क्यालेन्डर देखाउनुहोस्',
     hideAssignmentCalendar: 'असाइनमेन्ट क्यालेन्डर लुकाउनुहोस्',
     calendarWeekStart: 'क्यालेन्डर हप्ता सुरु हुने दिन',
     weekStartMonday: 'सोमबारदेखि आइतबार',
@@ -145,10 +142,6 @@ export const neMessages: typeof jaMessages = {
     maxLengthError: (max: number) => `${max} अक्षरभित्र लेख्नुहोस्।`,
     submitError: 'पठाउन सकिएन। केही समयपछि फेरि प्रयास गर्नुहोस्।',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: 'सूचना',
-    empty: 'सूचना छैन',
   },
   newsList: {
     empty: 'सूचना छैन',

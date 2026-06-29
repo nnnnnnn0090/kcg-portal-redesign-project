@@ -6,9 +6,6 @@
 // ─── chrome.storage.local のキー ───────────────────────────────────────────
 
 export const SK = {
-  kinoEmptyForce:                   'portalThemeKinoForceShowEmpty',
-  hoshuCalForce:                    'portalThemeHoshuCalForceShow',
-  campusCalForce:                   'portalThemeCampusCalForceShow',
   hideProfileName:                  'portalThemeHideProfileName',
   theme:                            'portalThemeColorTheme',
   showKogiCalMascot:                'portalThemeShowKogiCalMascot',

@@ -28,9 +28,6 @@ import {
 
 export interface Settings {
   theme:              string;
-  kinoEmptyForce:     boolean;
-  hoshuCalForce:      boolean;
-  campusCalForce:     boolean;
   hideProfileName:    boolean;
   showKogiCalMascot:  boolean;
   showHomeCornerCharacter: boolean;
@@ -56,9 +53,6 @@ export interface SettingsContextValue {
 
 const DEFAULTS: Settings = {
   theme:             'dark',
-  kinoEmptyForce:    false,
-  hoshuCalForce:     false,
-  campusCalForce:    false,
   hideProfileName:   false,
   showKogiCalMascot: false,
   showHomeCornerCharacter: false,
@@ -73,9 +67,6 @@ const DEFAULTS: Settings = {
 // satisfies で網羅性を保証し、SK への unsafe なキャストを排除する。
 const SETTINGS_TO_SK = {
   theme:           SK.theme,
-  kinoEmptyForce:  SK.kinoEmptyForce,
-  hoshuCalForce:   SK.hoshuCalForce,
-  campusCalForce:  SK.campusCalForce,
   hideProfileName: SK.hideProfileName,
   showKogiCalMascot:  SK.showKogiCalMascot,
   showHomeCornerCharacter: SK.showHomeCornerCharacter,
@@ -88,9 +79,6 @@ const SETTINGS_TO_SK = {
 
 const STORAGE_KEYS = [
   SK.theme,
-  SK.kinoEmptyForce,
-  SK.hoshuCalForce,
-  SK.campusCalForce,
   SK.hideProfileName,
   SK.showKogiCalMascot,
   SK.showHomeCornerCharacter,
@@ -104,9 +92,6 @@ const STORAGE_KEYS = [
 function parseSettings(data: Record<string, unknown>): Settings {
   return {
     theme:           String(data[SK.theme]           ?? DEFAULTS.theme),
-    kinoEmptyForce:  Boolean(data[SK.kinoEmptyForce]  ?? DEFAULTS.kinoEmptyForce),
-    hoshuCalForce:   Boolean(data[SK.hoshuCalForce]   ?? DEFAULTS.hoshuCalForce),
-    campusCalForce:  Boolean(data[SK.campusCalForce]  ?? DEFAULTS.campusCalForce),
     hideProfileName: Boolean(data[SK.hideProfileName] ?? DEFAULTS.hideProfileName),
     showKogiCalMascot: Boolean(data[SK.showKogiCalMascot] ?? DEFAULTS.showKogiCalMascot),
     showHomeCornerCharacter:

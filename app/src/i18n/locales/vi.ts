@@ -52,9 +52,6 @@ export const viMessages: typeof jaMessages = {
     showKogiCalMascot: 'Hiển thị linh vật trên lịch học',
     showHomeCornerCharacter: 'Hiển thị nhân vật ở góc dưới bên phải trang chủ',
     hideProfileName: 'Ẩn tên của tôi trên thanh tiêu đề',
-    kinoEmptyForce: 'Hiển thị thông báo ngay cả khi không có nội dung',
-    hoshuCalForce: 'Hiển thị lịch bù học ngay cả khi trống',
-    campusCalForce: 'Hiển thị lịch campus ngay cả khi trống',
     hideAssignmentCalendar: 'Ẩn lịch bài tập',
     calendarWeekStart: 'Tuần lịch bắt đầu từ',
     weekStartMonday: 'Thứ Hai đến Chủ Nhật',
@@ -145,10 +142,6 @@ export const viMessages: typeof jaMessages = {
     maxLengthError: (max: number) => `Vui lòng nhập tối đa ${max} ký tự.`,
     submitError: 'Không thể gửi. Vui lòng thử lại sau.',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: 'Thông báo',
-    empty: 'Không có thông báo',
   },
   newsList: {
     empty: 'Không có thông báo',

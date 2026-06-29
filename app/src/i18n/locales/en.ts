@@ -52,9 +52,6 @@ export const enMessages: typeof jaMessages = {
     showKogiCalMascot: 'Show mascot on the class calendar',
     showHomeCornerCharacter: 'Show character in the lower-right of Home',
     hideProfileName: 'Hide my name in the header',
-    kinoEmptyForce: 'Show notices even when there is no content',
-    hoshuCalForce: 'Show the make-up class calendar even when empty',
-    campusCalForce: 'Show the campus calendar even when empty',
     hideAssignmentCalendar: 'Hide assignment calendar',
     calendarWeekStart: 'Calendar week starts on',
     weekStartMonday: 'Monday to Sunday',
@@ -145,10 +142,6 @@ export const enMessages: typeof jaMessages = {
     maxLengthError: (max: number) => `Please enter ${max} characters or fewer.`,
     submitError: 'Could not submit. Please try again later.',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: 'Notice',
-    empty: 'No notices',
   },
   newsList: {
     empty: 'No notices',

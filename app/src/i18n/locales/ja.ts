@@ -49,9 +49,6 @@ export const jaMessages = {
     showKogiCalMascot: '授業カレンダーにマスコットを表示する',
     showHomeCornerCharacter: 'ホーム画面の右下にキャラクターを表示する',
     hideProfileName: 'ヘッダーに名前を表示しない',
-    kinoEmptyForce: 'お知らせを、内容がなくても表示する',
-    hoshuCalForce: '補修カレンダーを、予定がなくても表示する',
-    campusCalForce: 'キャンパスカレンダーを、予定がなくても表示する',
     hideAssignmentCalendar: '課題カレンダーを表示しない',
     calendarWeekStart: 'カレンダーの週の始まり',
     weekStartMonday: '月曜〜日曜',
@@ -142,10 +139,6 @@ export const jaMessages = {
     maxLengthError: (max: number) => `${max}文字以内で入力してください。`,
     submitError: '送信できませんでした。しばらくしてからもう一度お試しください。',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: 'お知らせ',
-    empty: 'お知らせはありません',
   },
   newsList: {
     empty: 'お知らせはありません',

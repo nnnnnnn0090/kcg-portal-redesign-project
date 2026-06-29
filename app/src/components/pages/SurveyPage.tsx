@@ -20,10 +20,6 @@ import { useI18n } from '../../i18n';
 
 type Row = Record<string, unknown>;
 
-interface SurveyPageProps {
-  kinoForce: boolean;
-}
-
 // ─── ヘルパー ─────────────────────────────────────────────────────────────
 
 /** null も含めて最初に存在するフィールドを文字列で返す（回答状態フラグ用） */
@@ -140,7 +136,7 @@ function SurveyRow({ row }: { row: Row }) {
 
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
-export function SurveyPage({ kinoForce }: SurveyPageProps) {
+export function SurveyPage() {
   const { t } = useI18n();
   const nendo = String(currentNendo());
 
@@ -176,7 +172,7 @@ export function SurveyPage({ kinoForce }: SurveyPageProps) {
 
   return (
     <PageShell variant="news" title={t.surveyPage.title}>
-      <KinoPanel data={kinoData} forceVisible={kinoForce} />
+      <KinoPanel data={kinoData} />
 
       <div className="p-news-page p-questionnaire-layout">
         <div className="p-news-primary">

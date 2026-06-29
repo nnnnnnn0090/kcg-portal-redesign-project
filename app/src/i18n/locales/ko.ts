@@ -52,9 +52,6 @@ export const koMessages: typeof jaMessages = {
     showKogiCalMascot: '수업 캘린더에 마스코트 표시',
     showHomeCornerCharacter: '홈 화면 오른쪽 아래에 캐릭터 표시',
     hideProfileName: '헤더에서 이름 숨기기',
-    kinoEmptyForce: '내용이 없어도 공지 표시',
-    hoshuCalForce: '일정이 없어도 보강 캘린더 표시',
-    campusCalForce: '일정이 없어도 캠퍼스 캘린더 표시',
     hideAssignmentCalendar: '과제 캘린더 숨기기',
     calendarWeekStart: '캘린더 주 시작일',
     weekStartMonday: '월요일~일요일',
@@ -145,10 +142,6 @@ export const koMessages: typeof jaMessages = {
     maxLengthError: (max: number) => `${max}자 이내로 입력해 주세요.`,
     submitError: '보낼 수 없습니다. 잠시 후 다시 시도해 주세요.',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: '공지',
-    empty: '공지 없음',
   },
   newsList: {
     empty: '공지 없음',

@@ -180,7 +180,7 @@ export function HomePage({ settings }: HomePageProps) {
           />
         ) : null}
 
-        <KinoPanel data={kinoData} forceVisible={settings.kinoEmptyForce} />
+        <KinoPanel data={kinoData} />
 
         {/* 授業カレンダー */}
         <CalendarPanel
@@ -213,8 +213,6 @@ export function HomePage({ settings }: HomePageProps) {
           modeGroupLabel={t.calendar.modeGroup(t.home.hoshuCalendar)}
           msgType={MSG.hoshuCalendar}
           hideWhenEmpty
-          getForceVisible={() => settings.hoshuCalForce}
-          forceVisibleDeps={String(settings.hoshuCalForce)}
         />
 
         {/* キャンパスカレンダー */}
@@ -225,8 +223,6 @@ export function HomePage({ settings }: HomePageProps) {
           modeGroupLabel={t.calendar.modeGroup(t.home.campusCalendar)}
           msgType={MSG.campusCalendar}
           hideWhenEmpty
-          getForceVisible={() => settings.campusCalForce}
-          forceVisibleDeps={String(settings.campusCalForce)}
         />
 
         {/* 授業に関するお知らせ */}

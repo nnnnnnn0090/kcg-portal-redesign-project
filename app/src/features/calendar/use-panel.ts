@@ -64,14 +64,10 @@ export interface CalendarPanelConfig {
   msgType: string;
   /** true のとき、データがない場合パネルを隠す */
   hideWhenEmpty?: boolean;
-  /** パネルを強制表示するかどうか（設定から読む） */
-  getForceVisible?: () => boolean;
   /** King LMS コース一覧（授業カレンダーでリンク解決に使う） */
   getKingLmsCourses?: () => Array<{ displayName?: string; externalAccessUrl?: string }>;
   /** コース一覧の内容が変わったとき再描画を促す値（変わると useEffect が走る） */
   kogiDisplayDeps?: string;
-  /** 強制表示設定変更時に再描画を促す文字列 */
-  forceVisibleDeps?: string;
   /** true のとき、設定でオンなら授業カレンダーにマスコットを載せる（ホームの授業パネルのみ指定） */
   sleepMascotSlot?: boolean;
   /** プロモーション撮影用。指定時はAPIを使わず、このデータを表示する */
@@ -89,10 +85,8 @@ export function useCalendarPanel({
   modeGroupLabel,
   msgType,
   hideWhenEmpty = false,
-  getForceVisible   = () => false,
   getKingLmsCourses = () => [],
   kogiDisplayDeps,
-  forceVisibleDeps,
   demoItems,
   demoTodayIso,
 }: CalendarPanelConfig) {
@@ -115,8 +109,8 @@ export function useCalendarPanel({
   const pendingEnterAnimRef = useRef(false);
 
   // ── props を ref で保持（コールバック内での古い値参照を防ぐ）──────────
-  const propsRef = useRef({ calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType, demoItems, demoTodayIso });
-  propsRef.current = { calUrl, calKind, hideWhenEmpty, getForceVisible, getKingLmsCourses, msgType, demoItems, demoTodayIso };
+  const propsRef = useRef({ calUrl, calKind, hideWhenEmpty, getKingLmsCourses, msgType, demoItems, demoTodayIso });
+  propsRef.current = { calUrl, calKind, hideWhenEmpty, getKingLmsCourses, msgType, demoItems, demoTodayIso };
 
   // ── 可変な表示パラメータを ref で保持（state と同期・上記モジュールコメント参照） ─
   const calRef = useRef({
@@ -189,8 +183,7 @@ export function useCalendarPanel({
 
   // ── パネル表示切替 ────────────────────────────────────────────────────
   const applyPanelVisibility = useCallback((html: string, hasItems: boolean, opts?: { enterAnim?: boolean }) => {
-    const { hideWhenEmpty: he, getForceVisible: gf } = propsRef.current;
-    if (he && !hasItems && !gf()) { setPanelVisible(false); return; }
+    if (propsRef.current.hideWhenEmpty && !hasItems) { setPanelVisible(false); return; }
     setPanelVisible(true);
     pendingEnterAnimRef.current = opts?.enterAnim ?? false;
     setGridHtml(html);
@@ -431,8 +424,7 @@ export function useCalendarPanel({
     if (viewModeRef.current === 'week') setTitle(formatWeekTitle(vp1.start, vp1.end, language));
     else if (monthRefRef.current) setTitle(formatMonthTitle(monthRefRef.current, language));
 
-    const { hideWhenEmpty: he, getForceVisible: gf } = propsRef.current;
-    if (he && newItems.length === 0 && !gf()) { setPanelVisible(false); return; }
+    if (propsRef.current.hideWhenEmpty && newItems.length === 0) { setPanelVisible(false); return; }
     setPanelVisible(true);
 
     skipDomSyncRef.current = true;
@@ -558,16 +550,6 @@ export function useCalendarPanel({
     if (m.clientDataMode && m.bulkParsed) redrawFromClient({ enterAnim: false });
     else if (m.lastParsed) redraw(m.lastItems, m.lastParsed, { enterAnim: false });
   }, [language, redraw, redrawFromClient]);
-
-  // ── 強制表示設定変更 → 可視性更新 ────────────────────────────────────
-  useEffect(() => {
-    if (forceVisibleDeps === undefined) return;
-    const m = calRef.current;
-    const { hideWhenEmpty: he, getForceVisible: gf } = propsRef.current;
-    if (he && !m.clientDataMode && m.lastParsed === null) { setPanelVisible(!!gf()); return; }
-    if (m.clientDataMode && m.bulkParsed) redrawFromClient({ enterAnim: false });
-    else if (m.lastParsed) redraw(m.lastItems, m.lastParsed, { enterAnim: false });
-  }, [forceVisibleDeps, redraw, redrawFromClient]);
 
   useEffect(() => () => {
     clearLoadingWatchdog();

@@ -23,13 +23,9 @@ import { useI18n } from '../../i18n';
 
 type NewsItem = NewsListItem;
 
-interface NewsPageProps {
-  kinoForce: boolean;
-}
-
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
-export function NewsPage({ kinoForce }: NewsPageProps) {
+export function NewsPage() {
   const { t } = useI18n();
   const y0           = new Date().getFullYear();
   const initialNendo = String(currentNendo());
@@ -138,7 +134,7 @@ export function NewsPage({ kinoForce }: NewsPageProps) {
 
   return (
     <PageShell variant="news" title={t.newsPage.title}>
-      <KinoPanel data={kinoData} forceVisible={kinoForce} />
+      <KinoPanel data={kinoData} />
 
       <div className="p-news-page">
         <div className="p-news-primary">

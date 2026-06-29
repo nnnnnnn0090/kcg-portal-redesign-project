@@ -52,9 +52,6 @@ export const idMessages: typeof jaMessages = {
     showKogiCalMascot: 'Tampilkan maskot di kalender kelas',
     showHomeCornerCharacter: 'Tampilkan karakter di kanan bawah Beranda',
     hideProfileName: 'Sembunyikan nama saya di header',
-    kinoEmptyForce: 'Tampilkan pengumuman meski tanpa konten',
-    hoshuCalForce: 'Tampilkan kalender kelas pengganti meski kosong',
-    campusCalForce: 'Tampilkan kalender kampus meski kosong',
     hideAssignmentCalendar: 'Sembunyikan kalender tugas',
     calendarWeekStart: 'Minggu kalender dimulai pada',
     weekStartMonday: 'Senin hingga Minggu',
@@ -145,10 +142,6 @@ export const idMessages: typeof jaMessages = {
     maxLengthError: (max: number) => `Masukkan maksimal ${max} karakter.`,
     submitError: 'Tidak dapat mengirim. Coba lagi nanti.',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: 'Pengumuman',
-    empty: 'Tidak ada pengumuman',
   },
   newsList: {
     empty: 'Tidak ada pengumuman',

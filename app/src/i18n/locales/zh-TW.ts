@@ -52,9 +52,6 @@ export const zhTWMessages: typeof jaMessages = {
     showKogiCalMascot: '在課程日曆上顯示吉祥物',
     showHomeCornerCharacter: '在首頁右下角顯示角色',
     hideProfileName: '在頁首隱藏姓名',
-    kinoEmptyForce: '即使沒有內容也顯示公告',
-    hoshuCalForce: '即使沒有行程也顯示補課日曆',
-    campusCalForce: '即使沒有行程也顯示校園日曆',
     hideAssignmentCalendar: '隱藏作業日曆',
     calendarWeekStart: '日曆一週起始日',
     weekStartMonday: '週一至週日',
@@ -145,10 +142,6 @@ export const zhTWMessages: typeof jaMessages = {
     maxLengthError: (max: number) => `請輸入 ${max} 個字以內。`,
     submitError: '無法送出。請稍後再試。',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: '公告',
-    empty: '暫無公告',
   },
   newsList: {
     empty: '暫無公告',

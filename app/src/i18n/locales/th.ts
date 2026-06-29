@@ -52,9 +52,6 @@ export const thMessages: typeof jaMessages = {
     showKogiCalMascot: 'แสดงมาสคอตในปฏิทินชั้นเรียน',
     showHomeCornerCharacter: 'แสดงตัวละครที่มุมล่างขวาของหน้าแรก',
     hideProfileName: 'ซ่อนชื่อของฉันในส่วนหัว',
-    kinoEmptyForce: 'แสดงประกาศแม้ไม่มีเนื้อหา',
-    hoshuCalForce: 'แสดงปฏิทินชดเชยแม้ว่าง',
-    campusCalForce: 'แสดงปฏิทินแคมปัสแม้ว่าง',
     hideAssignmentCalendar: 'ซ่อนปฏิทินงาน',
     calendarWeekStart: 'สัปดาห์ปฏิทินเริ่มวัน',
     weekStartMonday: 'จันทร์ถึงอาทิตย์',
@@ -145,10 +142,6 @@ export const thMessages: typeof jaMessages = {
     maxLengthError: (max: number) => `โปรดกรอกไม่เกิน ${max} ตัวอักษร`,
     submitError: 'ส่งไม่ได้ โปรดลองอีกครั้งภายหลัง',
     characterCount: (current: number, max: number) => `${current} / ${max}`,
-  },
-  kino: {
-    defaultTitle: 'ประกาศ',
-    empty: 'ไม่มีประกาศ',
   },
   newsList: {
     empty: 'ไม่มีประกาศ',

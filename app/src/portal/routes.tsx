@@ -53,13 +53,13 @@ export function PortalPageOutlet({ route, settings }: { route: PortalAppRoute; s
     case PAGE.HOME:
       return <HomePage settings={settings} />;
     case PAGE.NEWS:
-      return <Suspense fallback={<PageFallback />}><NewsPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
+      return <Suspense fallback={<PageFallback />}><NewsPage /></Suspense>;
     case PAGE.DETAIL:
       return <Suspense fallback={<PageFallback />}><DetailPage newsDetailId={route.detailId ?? ''} /></Suspense>;
     case PAGE.KYUKO:
-      return <Suspense fallback={<PageFallback />}><KyukoPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
+      return <Suspense fallback={<PageFallback />}><KyukoPage /></Suspense>;
     case PAGE.SURVEY:
-      return <Suspense fallback={<PageFallback />}><SurveyPage kinoForce={settings.kinoEmptyForce} /></Suspense>;
+      return <Suspense fallback={<PageFallback />}><SurveyPage /></Suspense>;
     default:
       return null;
   }
