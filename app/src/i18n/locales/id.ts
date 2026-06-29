@@ -91,7 +91,7 @@ export const idMessages: typeof jaMessages = {
     licenseCopyright: 'Pemberitahuan hak cipta',
   },
   header: {
-    portal: 'Portal:RE',
+    portal: 'Portal RE',
     webMail: 'Web Mail',
     settings: 'Pengaturan',
     logout: 'Keluar',
