@@ -44,7 +44,7 @@
   box-shadow:0 0 0 3px color-mix(in srgb,var(--p-accent) 16%,transparent)}
 #portal-overlay .p-settings-row-actions{padding-top:.1rem;justify-content:flex-start;cursor:default}
 #portal-overlay .p-settings-row-actions:hover{background:transparent}
-#portal-overlay fieldset.p-settings-fieldset{border:0;margin:.55rem 0 0;padding:0;min-width:0}
+#portal-overlay fieldset.p-settings-fieldset{border:0;margin:.85rem 0 0;padding:0;min-width:0}
 #portal-overlay fieldset.p-settings-fieldset legend.p-settings-row-label{padding:0;margin:0 0 .3rem .55rem;font-size:.8125rem;font-weight:600;color:var(--p-text-muted)}
 #portal-overlay fieldset.p-settings-fieldset > .p-settings-row{margin-bottom:.32rem}
 #portal-overlay fieldset.p-settings-fieldset > .p-settings-row:last-child{margin-bottom:.45rem}
