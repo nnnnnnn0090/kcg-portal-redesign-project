@@ -109,21 +109,28 @@ function preferredNoticeLang(preferred: AppLanguage, notice: DeveloperNoticeI18n
 
 /** リロードのたびに最新を取る（ブラウザ・CDN キャッシュを避ける） */
 async function fetchDeveloperNoticeJson(): Promise<Response> {
-  const [userId, lifecycle] = await Promise.all([
-    getOrCreateClientUserId(),
-    getClientLifecycleTimestamps(),
-  ]);
-  const url = `${DEVELOPER_NOTICE_JSON_URL}?_=${Date.now()}`;
+  const url = new URL(DEVELOPER_NOTICE_JSON_URL);
+  url.searchParams.set('_', String(Date.now()));
   const headers: Record<string, string> = {
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     Pragma: 'no-cache',
-    [CLIENT_USER_ID_HEADER]: userId,
-    [CLIENT_INSTALL_AT_HEADER]: lifecycle.installAt,
-    [CLIENT_LAST_UPDATED_AT_HEADER]: lifecycle.lastUpdatedAt,
   };
-  const version = readExtensionVersion();
-  if (version) headers[EXTENSION_VERSION_HEADER] = version;
-  return fetch(url, {
+
+  if (import.meta.env.PROD) {
+    const [userId, lifecycle] = await Promise.all([
+      getOrCreateClientUserId(),
+      getClientLifecycleTimestamps(),
+    ]);
+    headers[CLIENT_USER_ID_HEADER] = userId;
+    headers[CLIENT_INSTALL_AT_HEADER] = lifecycle.installAt;
+    headers[CLIENT_LAST_UPDATED_AT_HEADER] = lifecycle.lastUpdatedAt;
+    const version = readExtensionVersion();
+    if (version) headers[EXTENSION_VERSION_HEADER] = version;
+  } else {
+    url.searchParams.set('contentOnly', '1');
+  }
+
+  return fetch(url.toString(), {
     method: 'GET',
     cache: 'no-store',
     headers,
