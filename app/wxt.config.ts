@@ -19,10 +19,16 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'KCG Portal Redesign Project',
-    version: '6.1.0',
+    version: '6.2.0',
     description:
-      'Modern, readable UI for the Kyoto Computer Gakuin student portal (home.kcg.ac.jp). Unofficial theme extension.',
-    author: 'nnnnnnn0090',
+      '京都コンピュータ学院の学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',
+    author: { email: 'nnnnnnn0090@gmail.com' },
+    icons: {
+      16: 'icon/16.png',
+      32: 'icon/32.png',
+      48: 'icon/48.png',
+      128: 'icon/128.png',
+    },
     minimum_chrome_version: '111',
     permissions: ['storage'],
     host_permissions: [
