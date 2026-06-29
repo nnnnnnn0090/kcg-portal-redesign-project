@@ -22,7 +22,7 @@ export default defineConfig({
     version: '6.2.0',
     description:
       '京都コンピュータ学院の学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',
-    author: { email: 'nnnnnnn0090@gmail.com' },
+    author: 'nnnnnnn0090',
     icons: {
       16: 'icon/16.png',
       32: 'icon/32.png',
