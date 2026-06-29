@@ -91,7 +91,7 @@ export const neMessages: typeof jaMessages = {
     licenseCopyright: 'प्रतिलिपि अधिकार सूचना',
   },
   header: {
-    portal: 'RE:Portal',
+    portal: 'Portal:RE',
     webMail: 'Web मेल',
     settings: 'सेटिङ',
     logout: 'लगआउट',

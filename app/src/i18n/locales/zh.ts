@@ -91,7 +91,7 @@ export const zhMessages: typeof jaMessages = {
     licenseCopyright: '版权声明',
   },
   header: {
-    portal: 'RE:Portal',
+    portal: 'Portal:RE',
     webMail: 'Web 邮件',
     settings: '设置',
     logout: '退出登录',

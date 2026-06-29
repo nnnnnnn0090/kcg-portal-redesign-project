@@ -91,7 +91,7 @@ export const enMessages: typeof jaMessages = {
     licenseCopyright: 'Copyright notice',
   },
   header: {
-    portal: 'RE:Portal',
+    portal: 'Portal:RE',
     webMail: 'Web Mail',
     settings: 'Settings',
     logout: 'Log out',

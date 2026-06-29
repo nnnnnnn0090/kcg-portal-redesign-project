@@ -91,7 +91,7 @@ export const koMessages: typeof jaMessages = {
     licenseCopyright: '저작권 표시',
   },
   header: {
-    portal: 'RE:Portal',
+    portal: 'Portal:RE',
     webMail: 'Web 메일',
     settings: '설정',
     logout: '로그아웃',

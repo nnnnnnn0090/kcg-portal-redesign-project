@@ -91,7 +91,7 @@ export const viMessages: typeof jaMessages = {
     licenseCopyright: 'Thông báo bản quyền',
   },
   header: {
-    portal: 'RE:Portal',
+    portal: 'Portal:RE',
     webMail: 'Web Mail',
     settings: 'Cài đặt',
     logout: 'Đăng xuất',

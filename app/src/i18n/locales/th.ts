@@ -91,7 +91,7 @@ export const thMessages: typeof jaMessages = {
     licenseCopyright: 'ประกาศลิขสิทธิ์',
   },
   header: {
-    portal: 'RE:Portal',
+    portal: 'Portal:RE',
     webMail: 'Web Mail',
     settings: 'การตั้งค่า',
     logout: 'ออกจากระบบ',

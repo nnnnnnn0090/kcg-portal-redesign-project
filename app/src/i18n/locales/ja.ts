@@ -88,7 +88,7 @@ export const jaMessages = {
     licenseCopyright: '著作権表示',
   },
   header: {
-    portal: 'RE:Portal',
+    portal: 'Portal:RE',
     webMail: 'Web メール',
     settings: '設定',
     logout: 'ログアウト',
