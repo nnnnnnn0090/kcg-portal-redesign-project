@@ -19,7 +19,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'KCG Portal Redesign Project',
-    version: '6.2.0',
+    version: '6.2.1',
     description:
       '京都コンピュータ学院の学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',
     author: 'nnnnnnn0090',
@@ -42,7 +42,7 @@ export default defineConfig({
         id: 'kcg-portal-redesign-project@nnnnnnn0090.com',
         strict_min_version: '140.0',
         data_collection_permissions: { required: ['none'] },
-        update_url: "https://kcg-portal-redesign-project-web.vercel.app/updates.json",
+        update_url: 'https://kcg-portal-redesign-project-web.vercel.app/updates.json',
       } as WxtGeckoBaseline,
       gecko_android: { strict_min_version: '142.0' },
     },
