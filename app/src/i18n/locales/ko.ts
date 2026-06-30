@@ -33,17 +33,21 @@ export const koMessages: typeof jaMessages = {
   nav: {
     campusPlan: '캠퍼스 플랜',
     portalHost: {
-      home:          '홈',
-      newsList:      '공지 목록',
-      kyukoHoko:     '휴강·보강',
+      home: '홈',
+      newsList: '공지 목록',
+      kyukoHoko: '휴강·보강',
       questionnaire: '수업 평가 설문',
-      cabinet:       '캐비닛',
-      campusPlan:    '캠퍼스 플랜',
-      profile:       '프로필',
+      cabinet: '캐비닛',
+      campusPlan: '캠퍼스 플랜',
+      profile: '프로필',
     },
   },
   settings: {
     title: '설정',
+    general: '일반',
+    connections: '연동',
+    support: '지원',
+    about: '확장 프로그램 정보',
     colorTheme: '색상 테마',
     homeDecoration: '홈 장식',
     display: '표시 설정',
@@ -81,7 +85,8 @@ export const koMessages: typeof jaMessages = {
     updateAvailableHint:
       '수동으로 업데이트할 필요는 없습니다. 브라우저가 자동으로 확인하고 반영합니다. Google Chrome / Microsoft Edge는 시작 시와 약 5시간마다, Mozilla Firefox는 약 24시간마다입니다. 반영까지 시간이 걸릴 수 있으니, 잠시 기다려도 버전이 바뀌지 않을 때만 브라우저를 재시작해 보세요.',
     changelogFormatError: '변경 기록 형식을 읽을 수 없습니다.',
-    changelogFetchError: '변경 기록을 가져올 수 없습니다. 네트워크 연결이나 사이트 상태를 확인하세요.',
+    changelogFetchError:
+      '변경 기록을 가져올 수 없습니다. 네트워크 연결이나 사이트 상태를 확인하세요.',
     changelogTitle: '변경 기록',
     openLicenses: '라이선스 정보',
     openPrivacyPolicy: '개인정보처리방침',
@@ -212,7 +217,8 @@ export const koMessages: typeof jaMessages = {
   surveyPage: {
     title: '수업 평가 설문',
     list: '설문 목록',
-    listShowing: (year: string) => `${year} 학년도 응답 기간 중인 수업 평가 설문 목록을 표시하고 있습니다.`,
+    listShowing: (year: string) =>
+      `${year} 학년도 응답 기간 중인 수업 평가 설문 목록을 표시하고 있습니다.`,
     listEmpty: (year: string) => `${year} 학년도 조건에 맞는 응답 기간 중 설문이 없습니다.`,
     emptyFiltered: '필터 조건에 맞는 설문이 없습니다.',
     ariaList: '수업 평가 설문 목록',
@@ -234,7 +240,8 @@ export const koMessages: typeof jaMessages = {
     login: '로그인',
     inbox: '받은편지함',
     inboxAddress: '받은편지함',
-    mailboxCaption: (lo: number, hi: number, total: number) => `받은 메일 ${lo}–${hi} 표시 중. (총 ${total})`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `받은 메일 ${lo}–${hi} 표시 중. (총 ${total})`,
     byteUnit: '바이트',
     updateListFailed: '목록을 업데이트할 수 없습니다. 연결을 확인하거나 페이지를 새로고침하세요.',
     mailListToolbar: '메일 목록 작업',
@@ -291,7 +298,8 @@ export const koMessages: typeof jaMessages = {
     noDates: '표시할 날짜가 없습니다',
     weekdaysMonday: ['월', '화', '수', '목', '금', '토', '일'],
     weekdaysSunday: ['일', '월', '화', '수', '목', '금', '토'],
-    monthTitle: (year: number, month: number) => `${new Intl.DateTimeFormat('ko-KR', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
+    monthTitle: (year: number, month: number) =>
+      `${new Intl.DateTimeFormat('ko-KR', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
     weekRange: (start: string, end: string) => `${start} – ${end}`,
     pending: '미제출',
     course: '코스',
@@ -322,7 +330,8 @@ export const koMessages: typeof jaMessages = {
     secondsAgo: (s: number) => `${s}초 전`,
     minutesSecondsAgo: (m: number, s: number) => `${m}분 ${s}초 전`,
     hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h}시간 ${m}분 ${s}초 전`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d}일 ${h}시간 ${m}분 ${s}초 전`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d}일 ${h}시간 ${m}분 ${s}초 전`,
     monthsAgo: (m: number) => `약 ${m}개월 전`,
     yearsAgo: (y: number) => `약 ${y}년 전`,
     overdueDays: (d: number) => `마감 ${d}일 경과`,
@@ -338,6 +347,23 @@ export const koMessages: typeof jaMessages = {
   guidedTour: {
     primaryDone: '알겠습니다',
     end: '튜토리얼 종료',
+    back: '뒤로',
+    skip: '안내 건너뛰기',
+    welcomeEyebrow: '빠른 설정',
+    themeEyebrow: '화면 스타일 선택',
+    guideEyebrow: '사용 방법',
+    themeTitle: '나에게 맞는 테마 선택',
+    themeBody:
+      '패널 뒤는 실제 홈 화면입니다. 테마를 누르면 화면 전체에 즉시 적용되어 가독성을 비교할 수 있습니다.',
+    themeRecommended: '추천',
+    themeAll: '모든 테마',
+    themeOther: '기타 테마',
+    themeCollapse: '추천만 보기',
+    themeHint: '테마는 나중에 설정에서 언제든 변경할 수 있습니다.',
+    weekStartBody:
+      '수업 및 과제 캘린더를 월요일과 일요일 중 어느 요일부터 시작할지 선택하세요. 뒤의 캘린더에 즉시 반영됩니다.',
+    weekStartHint: '주의 시작 요일은 나중에 설정에서 언제든 변경할 수 있습니다.',
+    welcomeFeatures: ['초기 설정', '보기 쉬운 수업 캘린더', '과제 캘린더', '출석 등록 링크'],
     steps: [
       {
         id: 'welcome',
@@ -345,9 +371,19 @@ export const koMessages: typeof jaMessages = {
         body: 'KCG Portal Redesign Project를 설치해 주셔서 감사합니다.\n\n자주 사용하는 기능을 간단히 안내합니다.',
       },
       {
+        id: 'navigation',
+        title: '헤더',
+        body: '왼쪽 메뉴에서 공지, 휴강·보강, 수업 평가, 캐비닛, Campus Plan 등 주요 페이지를 바로 열 수 있습니다.\n\n오른쪽에는 프로필, 설정, 로그아웃이 있습니다.',
+      },
+      {
         id: 'settings',
         title: '여기서 시작: 설정',
         body: '오른쪽 위 이 버튼에서 설정을 엽니다.\n\n테마 색상 변경, 코스 목록 다시 가져오기, King LMS 연동을 관리할 수 있습니다.',
+      },
+      {
+        id: 'assignment-overview',
+        title: '과제 캘린더',
+        body: 'King LMS 과제를 마감일별로 표시하고 미제출, 제출 완료, 기한 초과의 예상 상태와 남은 시간을 확인할 수 있습니다. 과제를 클릭하면 King LMS에서 열립니다.',
       },
       {
         id: 'assignment',
@@ -357,12 +393,22 @@ export const koMessages: typeof jaMessages = {
       {
         id: 'kogi',
         title: '수업 캘린더',
-        body: '수업을 클릭하면 해당 King LMS 코스 페이지로 바로 이동합니다.\n\n먼저 코스 목록을 가져와야 할 수 있으며, 그때 안내가 표시됩니다.',
+        body: '요일별 수업 일정을 확인할 수 있습니다. 화살표 버튼으로 이전 또는 다음 주·월로 이동합니다.',
+      },
+      {
+        id: 'calendar-mode',
+        title: '주 보기와 월 보기',
+        body: '「주」는 이번 주 시간표를 크게 볼 때, 「월」은 앞으로의 일정을 한 번에 볼 때 편리합니다. 이 버튼으로 언제든 전환할 수 있습니다.',
+      },
+      {
+        id: 'kogi-hover',
+        title: '수업 상세 정보 보기',
+        body: '수업에 마우스를 올리면 전체 수업명, 강의실, 교시와 자세한 시작·종료 시간을 볼 수 있습니다.',
       },
       {
         id: 'kogi-context',
-        title: '수업 우클릭',
-        body: '수업 캘린더에서 수업을 우클릭하면 강의계획서나 King LMS 코스를 새 탭에서 열 수 있는 메뉴가 나타납니다.\n\n좌클릭은 코스 페이지로 바로 이동, 우클릭은 메뉴에서 선택합니다.',
+        title: '수업 클릭',
+        body: '좌클릭하면 해당 King LMS 코스로 바로 이동합니다. 우클릭하면 강의계획서 또는 King LMS를 새 탭에서 열 수 있습니다.\n\n처음에는 코스 목록 가져오기 안내가 표시될 수 있습니다.',
       },
       {
         id: 'shortcuts',

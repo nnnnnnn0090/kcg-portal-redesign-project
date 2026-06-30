@@ -30,17 +30,21 @@ export const jaMessages = {
   nav: {
     campusPlan: 'キャンパスプラン',
     portalHost: {
-      home:          'ホーム',
-      newsList:      'お知らせ一覧',
-      kyukoHoko:     '休講補講等一覧',
+      home: 'ホーム',
+      newsList: 'お知らせ一覧',
+      kyukoHoko: '休講補講等一覧',
       questionnaire: '授業評価アンケート回答',
-      cabinet:       'キャビネット',
-      campusPlan:    'キャンパスプラン',
-      profile:       'プロフィール',
+      cabinet: 'キャビネット',
+      campusPlan: 'キャンパスプラン',
+      profile: 'プロフィール',
     },
   },
   settings: {
     title: '設定',
+    general: '一般',
+    connections: '連携',
+    support: 'サポート',
+    about: 'この拡張について',
     colorTheme: 'カラーテーマ',
     homeDecoration: 'ホームの装飾',
     display: '表示設定',
@@ -78,7 +82,8 @@ export const jaMessages = {
     updateAvailableHint:
       '手動で更新する操作は不要です。ブラウザが自動で確認・反映します。Google Chrome / Microsoft Edge は起動時とおおよそ5時間ごと、Mozilla Firefox は約24時間ごとです。反映まで時間がかかることもあるため、しばらく待ってもバージョンが変わらない場合のみブラウザを再起動してください。',
     changelogFormatError: '更新履歴の形式を読み取れませんでした。',
-    changelogFetchError: '更新履歴を取得できませんでした。ネットワークやサイト側の状態をご確認ください。',
+    changelogFetchError:
+      '更新履歴を取得できませんでした。ネットワークやサイト側の状態をご確認ください。',
     changelogTitle: '更新履歴',
     openLicenses: 'ライセンス情報',
     openPrivacyPolicy: 'プライバシーポリシー',
@@ -209,8 +214,10 @@ export const jaMessages = {
   surveyPage: {
     title: '授業評価アンケート回答',
     list: 'アンケート一覧',
-    listShowing: (year: string) => `${year}年度の回答期間中の授業評価アンケート一覧を表示しています。`,
-    listEmpty: (year: string) => `${year}年度の条件に一致する回答期間中の授業評価アンケートはありません。`,
+    listShowing: (year: string) =>
+      `${year}年度の回答期間中の授業評価アンケート一覧を表示しています。`,
+    listEmpty: (year: string) =>
+      `${year}年度の条件に一致する回答期間中の授業評価アンケートはありません。`,
     emptyFiltered: '条件に一致するアンケートはありません。',
     ariaList: '授業評価アンケート一覧',
     lecture: '講義',
@@ -231,9 +238,11 @@ export const jaMessages = {
     login: 'ログイン',
     inbox: '受信トレイ',
     inboxAddress: '受信箱',
-    mailboxCaption: (lo: number, hi: number, total: number) => `受信メールの${lo}〜${hi}を表示しています。(総数=${total})`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `受信メールの${lo}〜${hi}を表示しています。(総数=${total})`,
     byteUnit: 'バイト',
-    updateListFailed: '一覧の更新に失敗しました。通信状況を確認するか、ページを再読み込みしてください。',
+    updateListFailed:
+      '一覧の更新に失敗しました。通信状況を確認するか、ページを再読み込みしてください。',
     mailListToolbar: 'メール一覧の操作',
     listPosition: '一覧の位置',
     firstNewerPage: '先頭へ（新着のページへ）',
@@ -304,8 +313,10 @@ export const jaMessages = {
     assignmentRefreshBusyAria: '課題データを取り込むため King LMS のページへ移動する準備中',
     assignmentRefreshAria: '課題の最新データを King LMS から取り込み（別ページへ移動）',
     assignmentRefreshLead: '課題の最新データを取りに、King LMS の画面へ移動します。',
-    assignmentRefreshHint: 'このままお待ちください。まもなくページが切り替わります（数秒かかることがあります）。',
-    assignmentNoData: '保存された課題はまだありません。「最新の状態に更新」で King LMS から取り込めます。',
+    assignmentRefreshHint:
+      'このままお待ちください。まもなくページが切り替わります（数秒かかることがあります）。',
+    assignmentNoData:
+      '保存された課題はまだありません。「最新の状態に更新」で King LMS から取り込めます。',
     assignmentCacheNote: (capturedAgo: string | null) =>
       `表示は${capturedAgo != null ? ` ${capturedAgo} ` : ' '}King LMS から取得した内容の保存データです。最新の状態でない可能性があります。「最新の状態に更新」で更新できます。`,
     assignmentBetaNote:
@@ -319,7 +330,8 @@ export const jaMessages = {
     secondsAgo: (s: number) => `${s}秒前に`,
     minutesSecondsAgo: (m: number, s: number) => `${m}分${s}秒前に`,
     hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h}時間${m}分${s}秒前に`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d}日${h}時間${m}分${s}秒前に`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d}日${h}時間${m}分${s}秒前に`,
     monthsAgo: (m: number) => `約${m}か月前に`,
     yearsAgo: (y: number) => `約${y}年前に`,
     overdueDays: (d: number) => `期限から${d}日経過`,
@@ -333,58 +345,86 @@ export const jaMessages = {
     minutes: (m: number) => `${m}分`,
   },
   guidedTour: {
-    primaryDone: 'わかった',
-    end: 'チュートリアルを終了',
+    primaryDone: 'ポータルを使い始める',
+    end: '案内を終了',
+    back: '戻る',
+    skip: 'あとで見る',
+    welcomeEyebrow: 'かんたんセットアップ',
+    themeEyebrow: '初期設定',
+    guideEyebrow: '機能ガイド',
+    themeTitle: 'お好みのテーマを選んでください',
+    themeBody:
+      '選んだテーマは、背景のホーム画面へすぐに反映されます。実際の表示を見比べながら、使いやすいものを選べます。',
+    themeRecommended: 'おすすめのテーマ',
+    themeAll: 'すべてのテーマ',
+    themeOther: 'その他のテーマ',
+    themeCollapse: 'おすすめに戻す',
+    themeHint: 'テーマは、あとから設定で変更できます。',
+    weekStartBody:
+      '授業・課題カレンダーを、月曜日と日曜日のどちらから始めるか選んでください。選んだ内容は、背景のカレンダーへすぐに反映されます。',
+    weekStartHint: '週の始まりは、あとから設定で変更できます。',
+    welcomeFeatures: ['初期設定', '授業カレンダー', '課題カレンダー', '出欠登録リンク'],
     steps: [
       {
         id: 'welcome',
-        title: 'ようこそ',
-        body: '「KCG Portal Redesign Project」をインストールしていただき、ありがとうございます。\n\nここでは、よく使う機能を中心に、短くご案内します。',
-      },
-      {
-        id: 'settings',
-        title: 'まずはここ：設定',
-        body: '右上のこのボタンから開けます。\n\nテーマカラーの変更や、コース一覧の再取得（King LMSとの連携）などが行えます。',
+        title: '毎日のポータルを、もっと使いやすく',
+        body: 'はじめにテーマと週の始まりを設定します。そのあと、授業・課題カレンダーと、よく使うリンクを順番にご案内します。',
       },
       {
         id: 'assignment',
-        title: '課題を確認するには',
-        body: 'このボタンから King LMS の課題を取り込めます。\n\n初回は一度押しておくのがおすすめです。',
+        title: '課題データを更新する',
+        body: '「最新の状態に更新」を押すと King LMS へ移動し、最新の課題を取り込みます。取り込みが終わると、自動でポータルへ戻ります。\n\nKing LMS にログインしていない場合は、先にログイン画面が表示されます。',
       },
       {
         id: 'kogi',
         title: '授業カレンダー',
-        body: '各講義をクリックすると、King LMS のコースページへ直接移動できます。\n\n初回はコース一覧の取得が必要な場合があります（その際は案内が表示されます）。',
+        body: '授業予定を曜日ごとにまとめて確認できます。「戻る」「次へ」で、前後の週や月へ移動できます。',
+      },
+      {
+        id: 'calendar-mode',
+        title: '週表示と月表示を切り替える',
+        body: '「週」は時間割を詳しく見るとき、「月」は先の予定までまとめて見るときに便利です。いつでもこのボタンで切り替えられます。',
+      },
+      {
+        id: 'kogi-hover',
+        title: '講義の詳細を見る',
+        body: '講義にマウスを重ねると、講義名、教室、時限、開始・終了時刻などの詳しい情報を確認できます。',
       },
       {
         id: 'kogi-context',
-        title: '講義を右クリック',
-        body: '授業カレンダー上の講義を右クリックすると、シラバスや King LMS のコースを別タブで開くメニューが表示されます。\n\n左クリックはコースページへの直行、右クリックはメニューから選ぶ動きです。',
+        title: '講義ページを開く',
+        body: '講義をクリックすると、対応する King LMS のコースを開きます。右クリックすると、シラバスまたは King LMS を新しいタブで開けます。\n\n初回のみ、コース一覧の取り込みを案内する場合があります。',
+      },
+      {
+        id: 'assignment-overview',
+        title: '課題カレンダー',
+        body: 'King LMS の課題を締切日ごとに表示します。提出状況の目安、締切までの残り時間、期限切れの課題をひと目で確認できます。\n\n課題をクリックすると、King LMS の該当ページを開きます。',
       },
       {
         id: 'shortcuts',
-        title: 'ショートカット',
-        body: 'よく使うページへのリンクをまとめられます。「編集」から、並べ替え・非表示・独自リンクの追加ができます。',
+        title: 'よく使うページをまとめる',
+        body: 'よく使うページへのリンクをホームにまとめられます。「編集」から、並べ替え、表示・非表示の変更、リンクの追加ができます。',
       },
       {
         id: 'attendance',
-        title: '出欠登録',
-        body: '「学生出欠登録」から出欠の申請画面へ進めます。表示されないときは「編集」で一覧を開き、非表示になっていないか確認してください。',
+        title: '出欠登録を開く',
+        body: '「学生出欠登録」から、出欠の申請画面を開けます。リンクが表示されていない場合は、「編集」から表示へ切り替えてください。',
       },
       {
         id: 'webmail',
-        title: 'Web メール（KCG WebMail）',
-        body: 'ここから Home2 の Web メールを別タブで開けます。\n\n画面は拡張のオーバーレイで見やすく表示されます。オフにしたいときは「設定」の「Web メール」から切り替えられます。',
+        title: 'Webメールを開く',
+        body: '「KCG WebMail」から、Home2 の Webメールを新しいタブで開けます。\n\nWebメールの表示切り替えは、「設定」の「Web メール」から変更できます。',
       },
       {
         id: 'done',
-        title: '以上です',
-        body: '困ったときは「設定」からいつでもこの案内を確認できます。\n\n気に入ったら、ぜひ友だちにも教えてあげてください❤️',
+        title: 'セットアップが完了しました',
+        body: 'これで準備は完了です。まずは課題データを更新し、よく使うページをショートカットへ追加しておくと便利です。\n\nこの案内は、「設定」からいつでも開き直せます。',
       },
     ],
   },
   sync: {
-    courseGuideToast: '初回セットアップは完了しました。King LMS を開くには、該当の講義をもう一度クリックしてください。',
+    courseGuideToast:
+      '初回セットアップは完了しました。King LMS を開くには、該当の講義をもう一度クリックしてください。',
     courseTimeout: 'コース一覧の取得が時間内に完了しませんでした',
     assignmentDone: '課題を取得しました',
     assignmentTimeout: '課題の取得が時間内に完了しませんでした',

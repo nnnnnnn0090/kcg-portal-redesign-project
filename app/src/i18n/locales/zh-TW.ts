@@ -33,17 +33,21 @@ export const zhTWMessages: typeof jaMessages = {
   nav: {
     campusPlan: '校園計畫',
     portalHost: {
-      home:          '首頁',
-      newsList:      '公告列表',
-      kyukoHoko:     '停課與補課',
+      home: '首頁',
+      newsList: '公告列表',
+      kyukoHoko: '停課與補課',
       questionnaire: '課程評價問卷',
-      cabinet:       '檔案櫃',
-      campusPlan:    '校園計畫',
-      profile:       '個人資料',
+      cabinet: '檔案櫃',
+      campusPlan: '校園計畫',
+      profile: '個人資料',
     },
   },
   settings: {
     title: '設定',
+    general: '一般',
+    connections: '連線',
+    support: '支援',
+    about: '關於擴充功能',
     colorTheme: '色彩主題',
     homeDecoration: '首頁裝飾',
     display: '顯示設定',
@@ -234,7 +238,8 @@ export const zhTWMessages: typeof jaMessages = {
     login: '登入',
     inbox: '收件匣',
     inboxAddress: '收件匣',
-    mailboxCaption: (lo: number, hi: number, total: number) => `正在顯示第 ${lo}–${hi} 封郵件。（共 ${total} 封）`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `正在顯示第 ${lo}–${hi} 封郵件。（共 ${total} 封）`,
     byteUnit: '位元組',
     updateListFailed: '無法更新列表。請檢查網路連線或重新載入頁面。',
     mailListToolbar: '郵件列表操作',
@@ -291,7 +296,8 @@ export const zhTWMessages: typeof jaMessages = {
     noDates: '沒有可顯示的日期',
     weekdaysMonday: ['一', '二', '三', '四', '五', '六', '日'],
     weekdaysSunday: ['日', '一', '二', '三', '四', '五', '六'],
-    monthTitle: (year: number, month: number) => `${new Intl.DateTimeFormat('zh-TW', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
+    monthTitle: (year: number, month: number) =>
+      `${new Intl.DateTimeFormat('zh-TW', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
     weekRange: (start: string, end: string) => `${start} – ${end}`,
     pending: '未提交',
     course: '課程',
@@ -322,7 +328,8 @@ export const zhTWMessages: typeof jaMessages = {
     secondsAgo: (s: number) => `${s} 秒前`,
     minutesSecondsAgo: (m: number, s: number) => `${m} 分 ${s} 秒前`,
     hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h} 小時 ${m} 分 ${s} 秒前`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d} 天 ${h} 小時 ${m} 分 ${s} 秒前`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d} 天 ${h} 小時 ${m} 分 ${s} 秒前`,
     monthsAgo: (m: number) => `約 ${m} 個月前`,
     yearsAgo: (y: number) => `約 ${y} 年前`,
     overdueDays: (d: number) => `已逾期 ${d} 天`,
@@ -338,6 +345,21 @@ export const zhTWMessages: typeof jaMessages = {
   guidedTour: {
     primaryDone: '知道了',
     end: '結束教學',
+    back: '返回',
+    skip: '略過導覽',
+    welcomeEyebrow: '快速設定',
+    themeEyebrow: '選擇外觀',
+    guideEyebrow: '使用方式',
+    themeTitle: '選擇適合您的主題',
+    themeBody: '此面板後方是真實的首頁。點選主題即可立即套用至整個畫面，並直接比較可讀性。',
+    themeRecommended: '推薦',
+    themeAll: '全部主題',
+    themeOther: '其他主題',
+    themeCollapse: '僅顯示推薦',
+    themeHint: '之後可隨時在設定中變更主題。',
+    weekStartBody: '請選擇課程和作業日曆從星期一或星期日開始。選擇後會立即反映至後方的日曆。',
+    weekStartHint: '之後可隨時在設定中變更一週的起始日。',
+    welcomeFeatures: ['初始設定', '更易讀的課程日曆', '作業日曆', '出缺席登記連結'],
     steps: [
       {
         id: 'welcome',
@@ -345,9 +367,19 @@ export const zhTWMessages: typeof jaMessages = {
         body: '感謝您安裝 KCG Portal Redesign Project。\n\n本指南將簡要介紹您最常用的功能。',
       },
       {
+        id: 'navigation',
+        title: '頁首',
+        body: '左側選單可直接開啟通知、停課與補課、課程評價、檔案櫃和 Campus Plan 等主要頁面。\n\n右側提供個人資料、設定和登出。',
+      },
+      {
         id: 'settings',
         title: '從這裡開始：設定',
         body: '點擊右上角的此按鈕開啟設定。\n\n您可以變更主題色彩、重新取得課程列表，以及管理 King LMS 整合。',
+      },
+      {
+        id: 'assignment-overview',
+        title: '作業日曆',
+        body: '依截止日期顯示 King LMS 作業，並可查看未繳交、已繳交、已逾期的估計狀態和剩餘時間。點擊作業可在 King LMS 中開啟。',
       },
       {
         id: 'assignment',
@@ -357,12 +389,22 @@ export const zhTWMessages: typeof jaMessages = {
       {
         id: 'kogi',
         title: '課程日曆',
-        body: '點擊課程可直接開啟對應的 King LMS 課程頁面。\n\n擴充功能可能需要先取得課程列表，屆時會有引導提示。',
+        body: '依星期查看課程安排。使用箭頭按鈕可移動到上一週、下一週或前後月份。',
+      },
+      {
+        id: 'calendar-mode',
+        title: '週檢視和月檢視',
+        body: '「週」適合放大查看本週課表，「月」適合一次查看更遠的安排。可用這兩個按鈕隨時切換。',
+      },
+      {
+        id: 'kogi-hover',
+        title: '查看課程詳細資訊',
+        body: '將滑鼠停在課程上，可查看完整課程名稱、教室、節次以及詳細的開始和結束時間。',
       },
       {
         id: 'kogi-context',
-        title: '右鍵點擊課程',
-        body: '在課程日曆上右鍵點擊課程，可在新分頁中開啟教學大綱或 King LMS 課程選單。\n\n左鍵直接開啟課程頁面，右鍵從選單選擇。',
+        title: '點擊課程',
+        body: '左鍵點擊可直接開啟對應的 King LMS 課程。右鍵點擊會顯示選單，可在新分頁開啟教學大綱或 King LMS。\n\n首次使用時可能會提示取得課程列表。',
       },
       {
         id: 'shortcuts',

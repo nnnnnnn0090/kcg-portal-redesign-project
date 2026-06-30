@@ -1,184 +1,988 @@
-/* 初回案内チュートリアル（スポットライト + 説明カード） */
+/* 初回オンボーディング（初期設定 + 実画面スポットライト） */
 
-@keyframes p-tour-dim-in{
-  from{opacity:0}
-  to{opacity:1}
+@keyframes p-tour-dim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
-@keyframes p-tour-card-fade-scale{
-  from{opacity:0;transform:scale(.97)}
-  to{opacity:1;transform:scale(1)}
+@keyframes p-tour-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-@keyframes p-tour-dim-out{
-  from{opacity:1}
-  to{opacity:0}
+@keyframes p-tour-center-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
-@keyframes p-tour-card-fade-scale-out{
-  from{opacity:1;transform:scale(1)}
-  to{opacity:0;transform:scale(.97) translateY(4px)}
+@keyframes p-tour-dock-enter {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-@keyframes p-tour-svg-in{
-  from{opacity:0}
-  to{opacity:1}
+@keyframes p-tour-dock-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
-@keyframes p-tour-ring-pulse{
-  from{opacity:.72}
-  to{opacity:1}
+@keyframes p-tour-dim-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes p-tour-card-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+@keyframes p-tour-svg-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes p-tour-ring-pulse {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes p-tour-finish-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-#portal-overlay .p-tour-root{
-  position:fixed;inset:0;z-index:85;pointer-events:none;
-  isolation:isolate;
+#portal-overlay .p-tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  pointer-events: none;
+  isolation: isolate;
+  color: var(--p-text);
 }
-#portal-overlay .p-tour-dim-full{
-  position:absolute;inset:0;z-index:0;pointer-events:auto;
-  background:rgba(8,10,18,.42);
-  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  touch-action:none;
-  animation:p-tour-dim-in .38s var(--p-enter-ease,cubic-bezier(.4,0,.2,1)) both;
+#portal-overlay:has(.p-tour-root--character) .p-home-corner-character {
+  z-index: 86;
 }
-#portal-overlay .p-tour-svg{
-  position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:auto;
-  touch-action:none;
-  animation:p-tour-svg-in .4s var(--p-enter-ease,cubic-bezier(.4,0,.2,1)) .05s both;
+#portal-overlay .p-tour-root.is-finishing {
+  pointer-events: none;
+  animation: p-tour-dim-out 0.36s ease-out forwards;
 }
-#portal-overlay .p-tour-spot-ring{
-  animation:p-tour-ring-pulse 2.2s ease-in-out infinite alternate;
+#portal-overlay .p-tour-dim-full {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: auto;
+  background: rgba(6, 8, 16, 0.68);
+  touch-action: none;
+  animation: p-tour-dim-in 0.28s var(--p-enter-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
 }
-#portal-overlay .p-tour-card{
-  position:fixed;pointer-events:auto;z-index:2;
-  max-width:min(22rem,calc(100vw - 1.5rem));
-  padding:1rem 1.15rem 1.1rem;border-radius:14px;border:1px solid var(--p-border);
-  /* 背後が透けないよう実色のみ（ガラス表現は使わない） */
-  background:var(--p-bg);color:var(--p-text);
-  box-shadow:0 20px 56px var(--p-shadow-strong);
+#portal-overlay .p-tour-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  touch-action: none;
+  animation: p-tour-svg-in 0.28s var(--p-enter-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
 }
-#portal-overlay .p-tour-card--center{
-  left:50%;top:50%;transform:translate(-50%,-50%);
+#portal-overlay .p-tour-spot-ring {
+  opacity: 1;
 }
-#portal-overlay .p-tour-card-inner{
-  animation:p-tour-card-fade-scale var(--p-enter-dur,.36s) var(--p-enter-ease,cubic-bezier(.4,0,.2,1)) both;
+#portal-overlay .p-tour-target-outline {
+  outline: 3px solid var(--p-accent-light);
+  outline-offset: -3px;
+  border-radius: 14px;
 }
-#portal-overlay .p-tour-card h2{
-  margin:0 0 .55rem;font-size:1rem;font-weight:700;color:var(--p-text-bright);letter-spacing:-.02em;
+
+#portal-overlay .p-tour-card {
+  position: fixed;
+  z-index: 2;
+  box-sizing: border-box;
+  pointer-events: auto;
+  max-width: calc(100vw - 1.5rem);
+  padding: 1.25rem;
+  border: 1px solid var(--p-border-hover);
+  border-radius: 20px;
+  background: var(--p-bg);
+  color: var(--p-text);
+  box-shadow: 0 16px 36px var(--p-shadow-strong);
+  animation: p-tour-card-enter 0.3s var(--p-enter-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
 }
-#portal-overlay .p-tour-card p{
-  margin:0 0 1rem;font-size:.875rem;line-height:1.55;color:var(--p-text-muted);
+#portal-overlay .p-tour-card--center {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation-name: p-tour-center-enter;
 }
-#portal-overlay .p-tour-card-actions{
-  display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;justify-content:space-between;
+#portal-overlay .p-tour-card h2,
+#portal-overlay .p-tour-theme-dock h2 {
+  margin: 0;
+  color: var(--p-text-bright);
+  font-size: 1.35rem;
+  font-weight: 750;
+  line-height: 1.28;
+  letter-spacing: -0.025em;
 }
-#portal-overlay .p-tour-primary{
-  padding:.5rem 1.15rem;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:.875rem;
-  background:var(--p-accent);color:var(--p-bg);box-shadow:0 4px 16px color-mix(in srgb,var(--p-accent) 35%,transparent);
-  transition:transform .15s ease,filter .15s ease;
+#portal-overlay .p-tour-card p,
+#portal-overlay .p-tour-theme-dock p {
+  margin: 0.65rem 0 1.15rem;
+  color: var(--p-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  white-space: pre-line;
 }
-#portal-overlay .p-tour-primary:hover{filter:brightness(1.06)}
-#portal-overlay .p-tour-primary:active{transform:scale(.98)}
-#portal-overlay .p-tour-skip{
-  padding:.35rem .5rem;border:none;background:transparent;color:var(--p-text-dim);font-size:.75rem;cursor:pointer;font-family:inherit;text-decoration:underline;
+#portal-overlay .p-tour-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.55rem;
+  padding: 0 0.55rem;
+  border: 1px solid var(--p-accent-border);
+  border-radius: 999px;
+  background: var(--p-accent-bg);
+  color: var(--p-accent-light);
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: 0.08em;
 }
-#portal-overlay .p-tour-skip:hover{color:var(--p-text)}
-#portal-overlay .p-tour-progress{
-  margin-top:.65rem;font-size:.68rem;color:var(--p-text-dimmer);letter-spacing:.04em;
+#portal-overlay .p-tour-card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
 }
-@media (prefers-reduced-motion:reduce){
+
+/* 進捗 */
+#portal-overlay .p-tour-progress {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--p-text-dim);
+}
+#portal-overlay .p-tour-progress-count {
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+#portal-overlay .p-tour-progress-count span {
+  margin: 0 0.15rem;
+  color: var(--p-text-dimmer);
+}
+#portal-overlay .p-tour-progress-track {
+  display: block;
+  width: 3.5rem;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--p-border);
+}
+#portal-overlay .p-tour-progress-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--p-accent);
+  transition: width 0.28s ease;
+}
+
+/* 共通操作 */
+#portal-overlay .p-tour-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+#portal-overlay .p-tour-card-actions-secondary {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+#portal-overlay .p-tour-primary,
+#portal-overlay .p-tour-back,
+#portal-overlay .p-tour-skip {
+  min-height: 2.45rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+#portal-overlay .p-tour-primary {
+  min-width: 6rem;
+  border: 1px solid transparent;
+  background: var(--p-accent);
+  color: var(--p-bg);
+  box-shadow: 0 5px 18px color-mix(in srgb, var(--p-accent) 30%, transparent);
+}
+#portal-overlay .p-tour-primary:disabled {
+  cursor: wait;
+  filter: none;
+}
+#portal-overlay .p-tour-finish-spinner {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  margin: 0 auto;
+  border: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: p-tour-finish-spin 0.7s linear infinite;
+}
+#portal-overlay .p-tour-primary:hover {
+  filter: brightness(1.08);
+}
+#portal-overlay .p-tour-primary:active,
+#portal-overlay .p-tour-back:active {
+  transform: scale(0.98);
+}
+#portal-overlay .p-tour-back {
+  border: 1px solid var(--p-border);
+  background: var(--p-bg3);
+  color: var(--p-text);
+}
+#portal-overlay .p-tour-back:hover {
+  border-color: var(--p-border-hover);
+  background: var(--p-bg-hover);
+}
+#portal-overlay .p-tour-skip {
+  min-height: 2rem;
+  padding: 0.35rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--p-text-dim);
+  font-size: 0.72rem;
+}
+#portal-overlay .p-tour-skip:hover {
+  color: var(--p-text);
+  background: var(--p-bg-hover);
+}
+#portal-overlay .p-tour-primary:focus-visible,
+#portal-overlay .p-tour-back:focus-visible,
+#portal-overlay .p-tour-skip:focus-visible,
+#portal-overlay .p-tour-theme-option:focus-visible,
+#portal-overlay .p-tour-week-start-option:focus-visible,
+#portal-overlay .p-lang-picker-btn:focus-visible,
+#portal-overlay .p-lang-picker-continue:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--p-accent) 70%, white);
+  outline-offset: 2px;
+}
+
+/* 導入カード */
+#portal-overlay .p-tour-welcome-card {
+  width: min(42rem, calc(100vw - 1.5rem));
+  padding: 1.55rem;
+}
+#portal-overlay .p-tour-welcome-card h2 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+#portal-overlay .p-tour-welcome-card > div > p {
+  max-width: 35rem;
+  margin-bottom: 1.2rem;
+}
+#portal-overlay .p-tour-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+#portal-overlay .p-tour-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--p-border-light);
+  border-radius: 12px;
+  background: var(--p-bg3);
+}
+#portal-overlay .p-tour-feature > span {
+  flex: 0 0 auto;
+  color: var(--p-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+#portal-overlay .p-tour-feature > strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--p-text);
+  font-size: 0.77rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* スポットライト説明 */
+#portal-overlay .p-tour-spotlight-card {
+  width: min(24.375rem, calc(100vw - 1.5rem));
+}
+#portal-overlay .p-tour-spotlight-card p {
+  margin-bottom: 0.2rem;
+}
+
+/* 完了 */
+#portal-overlay .p-tour-done-card {
+  width: min(31rem, calc(100vw - 1.5rem));
+  padding: 1.55rem;
+  text-align: center;
+}
+#portal-overlay .p-tour-done-card .p-tour-progress {
+  justify-content: center;
+  margin: 0.85rem 0 1rem;
+}
+#portal-overlay .p-tour-done-card .p-tour-card-actions {
+  text-align: left;
+}
+#portal-overlay .p-tour-done-mark {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto;
+  border: 1px solid var(--p-accent-border);
+  border-radius: 18px;
+  background: var(--p-accent-bg);
+  color: var(--p-accent);
+  font-size: 1.7rem;
+  font-weight: 800;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--p-accent) 15%, transparent);
+}
+
+/* 実画面を見ながら選ぶテーマドック */
+#portal-overlay .p-tour-theme-guard {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: auto;
+  touch-action: pan-y;
+  background: linear-gradient(
+    to bottom,
+    transparent 38%,
+    color-mix(in srgb, var(--p-bg) 20%, transparent) 72%,
+    color-mix(in srgb, var(--p-bg) 70%, transparent)
+  );
+  animation: p-tour-dim-in 0.25s ease both;
+}
+#portal-overlay .p-tour-theme-dock {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  max-height: min(32rem, 62dvh);
+  overflow: auto;
+  pointer-events: auto;
+  border: 1px solid var(--p-border-hover);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  background: var(--p-bg);
+  box-shadow: 0 -12px 30px var(--p-shadow-strong);
+  overscroll-behavior: contain;
+  animation: p-tour-dock-enter 0.36s var(--p-enter-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+}
+#portal-overlay .p-tour-theme-dock.is-exiting {
+  pointer-events: none;
+  animation: p-tour-dock-exit 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+#portal-overlay .p-tour-theme-selection-dock {
+  max-height: min(26rem, 55dvh);
+}
+#portal-overlay .p-tour-theme-selection-dock .p-tour-theme-dock-inner {
+  padding-top: 0.9rem;
+  padding-bottom: 0.75rem;
+}
+#portal-overlay .p-tour-theme-selection-dock .p-tour-theme-lists {
+  max-height: 13rem;
+}
+#portal-overlay .p-tour-theme-dock-inner {
+  width: min(72rem, 100%);
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 1.15rem 1.35rem 1rem;
+}
+#portal-overlay .p-tour-theme-copy {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+#portal-overlay .p-tour-theme-copy > div {
+  max-width: 48rem;
+}
+#portal-overlay .p-tour-theme-copy h2 {
+  margin-top: 0.55rem;
+  font-size: 1.25rem;
+}
+#portal-overlay .p-tour-theme-copy p {
+  margin: 0.35rem 0 0.75rem;
+  line-height: 1.55;
+}
+#portal-overlay .p-tour-theme-copy > .p-tour-progress {
+  margin-top: 0.3rem;
+}
+#portal-overlay .p-tour-theme-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.2rem 0 0.45rem;
+  color: var(--p-text-dim);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+#portal-overlay .p-tour-theme-lists {
+  display: grid;
+  gap: 0.55rem;
+  max-height: 17rem;
+  overflow-y: auto;
+  padding: 0 0.18rem 0.35rem;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+#portal-overlay .p-tour-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.45rem;
+  padding: 0.12rem 0;
+}
+#portal-overlay .p-tour-theme-grid--recommended {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+#portal-overlay .p-tour-theme-option {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.8rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 3.6rem;
+  padding: 0.4rem 0.55rem;
+  overflow: hidden;
+  border: 2px solid var(--p-tour-preview-border);
+  border-radius: 11px;
+  background: var(--p-tour-preview-bg);
+  color: var(--p-tour-preview-text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease,
+    border-color 0.14s ease;
+}
+#portal-overlay .p-tour-theme-option:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+}
+#portal-overlay .p-tour-theme-option.is-active {
+  border-color: var(--p-tour-preview-accent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--p-tour-preview-accent) 38%, transparent),
+    0 5px 14px rgba(0, 0, 0, 0.18);
+}
+#portal-overlay .p-tour-theme-option-preview {
+  position: relative;
+  display: block;
+  width: 2.8rem;
+  height: 2.05rem;
+  overflow: hidden;
+  border: 1px solid var(--p-tour-preview-border);
+  border-radius: 6px;
+  background: var(--p-tour-preview-bg2);
+}
+#portal-overlay .p-tour-theme-option-window {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.48rem 0.35rem 0;
+}
+#portal-overlay .p-tour-theme-option-window > span {
+  display: block;
+  width: 72%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--p-tour-preview-text);
+  opacity: 0.65;
+}
+#portal-overlay .p-tour-theme-option-window > span + span {
+  width: 48%;
+  opacity: 0.35;
+}
+#portal-overlay .p-tour-theme-option-accent {
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 3px;
+  background: var(--p-tour-preview-accent);
+}
+#portal-overlay .p-tour-theme-option-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#portal-overlay .p-tour-theme-option-check {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.28rem;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: var(--p-tour-preview-accent);
+  color: var(--p-tour-preview-bg);
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+#portal-overlay .p-tour-theme-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.45rem;
+}
+#portal-overlay .p-tour-theme-footer > p {
+  margin: 0;
+  color: var(--p-text-dim);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+#portal-overlay .p-tour-theme-footer .p-tour-card-actions {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+/* 初回の週始まり選択 */
+#portal-overlay .p-tour-week-start-dock .p-tour-theme-dock-inner {
+  width: min(54rem, 100%);
+}
+#portal-overlay .p-tour-week-start-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0.3rem 0 0.5rem;
+}
+#portal-overlay .p-tour-week-start-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.8rem;
+  border: 2px solid var(--p-border);
+  border-radius: 13px;
+  background: var(--p-bg3);
+  color: var(--p-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: left;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+#portal-overlay .p-tour-week-start-option:hover {
+  transform: translateY(-1px);
+  border-color: var(--p-border-hover);
+  background: var(--p-bg-hover);
+}
+#portal-overlay .p-tour-week-start-option.is-active {
+  border-color: var(--p-accent);
+  background: var(--p-accent-bg);
+  color: var(--p-text-bright);
+  box-shadow: 0 0 0 1px var(--p-accent);
+}
+#portal-overlay .p-tour-week-start-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.22rem;
+}
+#portal-overlay .p-tour-week-start-days > span {
+  display: grid;
+  place-items: center;
+  min-height: 1.8rem;
+  border: 1px solid var(--p-border-light);
+  border-radius: 6px;
+  background: var(--p-bg);
+  color: var(--p-text-muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+#portal-overlay .p-tour-week-start-days > span.is-first {
+  border-color: var(--p-accent-border);
+  background: var(--p-accent-bg);
+  color: var(--p-accent-light);
+}
+#portal-overlay .p-tour-week-start-footer {
+  border-top: 1px solid var(--p-border-light);
+  margin-top: 0.65rem;
+  padding-top: 0.75rem;
+}
+
+/* 初回のホームキャラクター選択 */
+#portal-overlay .p-tour-character-option {
+  align-items: stretch;
+}
+#portal-overlay .p-tour-character-preview {
+  position: relative;
+  display: block;
+  height: 5rem;
+  overflow: hidden;
+  border: 1px solid var(--p-border-light);
+  border-radius: 9px;
+  background: var(--p-bg);
+}
+#portal-overlay .p-tour-character-preview-panel {
+  position: absolute;
+  inset: 0.55rem 2.8rem 0.55rem 0.55rem;
+  border: 1px solid var(--p-border);
+  border-radius: 6px;
+  background: var(--p-bg2);
+}
+#portal-overlay .p-tour-character-preview-panel::before,
+#portal-overlay .p-tour-character-preview-panel::after {
+  position: absolute;
+  left: 0.55rem;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: var(--p-border-hover);
+  content: '';
+}
+#portal-overlay .p-tour-character-preview-panel::before {
+  top: 0.65rem;
+  width: 52%;
+}
+#portal-overlay .p-tour-character-preview-panel::after {
+  top: 1.2rem;
+  width: 34%;
+}
+#portal-overlay .p-tour-character-preview img {
+  position: absolute;
+  right: 0.2rem;
+  bottom: -0.25rem;
+  width: 3.9rem;
+  height: 4.7rem;
+  object-fit: contain;
+  object-position: bottom right;
+}
+#portal-overlay .p-tour-theme-footer .p-tour-character-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+#portal-overlay .p-tour-theme-footer .p-tour-character-credit a:hover {
+  color: var(--p-text-muted);
+}
+
+/* 初回言語選択 */
+#portal-overlay .p-lang-picker-card {
+  width: min(36rem, calc(100vw - 1.5rem));
+  max-height: min(88dvh, 38rem);
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+#portal-overlay .p-lang-picker-card h2 {
+  font-size: 1.55rem;
+}
+#portal-overlay .p-lang-picker-card p {
+  margin: 0.5rem 0 1rem;
+}
+#portal-overlay .p-lang-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+#portal-overlay .p-lang-picker-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 3.15rem;
+  padding: 0.45rem;
+  border: 1px solid var(--p-border);
+  border-radius: 10px;
+  background: var(--p-bg3);
+  color: var(--p-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 550;
+  line-height: 1.2;
+  text-align: center;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s,
+    transform 0.15s;
+}
+#portal-overlay .p-lang-picker-btn:hover {
+  border-color: var(--p-border-hover);
+  background: var(--p-bg-hover);
+  transform: translateY(-1px);
+}
+#portal-overlay .p-lang-picker-btn.is-selected {
+  border-color: var(--p-accent);
+  background: var(--p-accent-bg);
+  color: var(--p-accent-light);
+  box-shadow: inset 0 0 0 1px var(--p-accent);
+}
+#portal-overlay .p-lang-picker-actions {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--p-border-light);
+}
+#portal-overlay .p-lang-picker-continue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.7rem;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--p-accent);
+  color: var(--p-bg);
+  box-shadow: 0 5px 18px color-mix(in srgb, var(--p-accent) 30%, transparent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+#portal-overlay .p-lang-picker-continue:hover {
+  filter: brightness(1.08);
+}
+#portal-overlay .p-lang-picker-continue:active {
+  transform: scale(0.99);
+}
+#portal-overlay .p-lang-picker-continue:disabled,
+#portal-overlay .p-lang-picker-btn:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+}
+
+/* 言語画面の退出 */
+#portal-overlay .p-tour-root.is-exiting .p-tour-dim-full {
+  pointer-events: none;
+  animation: p-tour-dim-out 0.34s var(--p-enter-ease, cubic-bezier(0.4, 0, 0.2, 1)) forwards;
+}
+#portal-overlay .p-tour-root.is-exiting .p-tour-card {
+  pointer-events: none;
+}
+#portal-overlay .p-tour-root.is-exiting .p-tour-card-inner {
+  animation: p-tour-card-out 0.3s var(--p-enter-ease, cubic-bezier(0.4, 0, 0.2, 1)) forwards;
+}
+
+@media (max-width: 900px) {
+  #portal-overlay .p-tour-theme-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  #portal-overlay .p-tour-card {
+    padding: 1.05rem;
+    border-radius: 16px;
+  }
+  #portal-overlay .p-tour-card h2 {
+    font-size: 1.2rem;
+  }
+  #portal-overlay .p-tour-card p {
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+  #portal-overlay .p-tour-welcome-card {
+    padding: 1.15rem;
+  }
+  #portal-overlay .p-tour-welcome-card h2 {
+    font-size: 1.45rem;
+  }
+  #portal-overlay .p-tour-feature-grid {
+    grid-template-columns: 1fr;
+  }
+  #portal-overlay .p-tour-feature:nth-child(n + 4) {
+    display: none;
+  }
+  #portal-overlay .p-tour-card-actions {
+    align-items: flex-end;
+  }
+  #portal-overlay .p-tour-card-actions-secondary {
+    align-items: flex-start;
+    flex-direction: column-reverse;
+    gap: 0.1rem;
+  }
+  #portal-overlay .p-tour-primary {
+    min-width: 5.5rem;
+  }
+
+  #portal-overlay .p-tour-theme-dock {
+    max-height: 68dvh;
+    border-radius: 18px 18px 0 0;
+  }
+  #portal-overlay .p-tour-theme-selection-dock {
+    max-height: 60dvh;
+  }
+  #portal-overlay .p-tour-theme-dock-inner {
+    padding: 0.9rem 0.85rem 0.75rem;
+  }
+  #portal-overlay .p-tour-theme-copy {
+    gap: 0.75rem;
+  }
+  #portal-overlay .p-tour-theme-copy h2 {
+    font-size: 1.05rem;
+  }
+  #portal-overlay .p-tour-theme-copy p {
+    font-size: 0.76rem;
+    line-height: 1.45;
+  }
+  #portal-overlay .p-tour-theme-copy .p-tour-progress-track {
+    display: none;
+  }
+  #portal-overlay .p-tour-theme-lists {
+    max-height: 13rem;
+    overflow-y: auto;
+  }
+  #portal-overlay .p-tour-theme-grid {
+    display: flex;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.15rem 0.15rem 0.45rem;
+    scroll-snap-type: x proximity;
+  }
+  #portal-overlay .p-tour-theme-option {
+    flex: 0 0 9.5rem;
+    scroll-snap-align: start;
+  }
+  #portal-overlay .p-tour-theme-footer {
+    align-items: flex-end;
+  }
+  #portal-overlay .p-tour-theme-footer > p {
+    display: none;
+  }
+  #portal-overlay .p-tour-theme-footer .p-tour-card-actions {
+    width: 100%;
+  }
+  #portal-overlay .p-tour-week-start-options {
+    grid-template-columns: 1fr;
+  }
+
+  #portal-overlay .p-lang-picker-card {
+    padding: 1.15rem;
+  }
+  #portal-overlay .p-lang-picker-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  #portal-overlay .p-tour-progress-track {
+    display: none;
+  }
+  #portal-overlay .p-tour-card-actions-secondary {
+    max-width: 55%;
+  }
+  #portal-overlay .p-lang-picker-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-height: 640px) {
+  #portal-overlay .p-tour-theme-dock {
+    max-height: 82dvh;
+  }
+  #portal-overlay .p-tour-theme-selection-dock {
+    max-height: 70dvh;
+  }
+  #portal-overlay .p-tour-theme-copy p {
+    margin-bottom: 0.35rem;
+  }
+  #portal-overlay .p-tour-theme-lists {
+    max-height: 11rem;
+  }
+  #portal-overlay .p-tour-welcome-card {
+    max-height: calc(100dvh - 1.5rem);
+    overflow: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
   #portal-overlay .p-tour-dim-full,
   #portal-overlay .p-tour-svg,
-  #portal-overlay .p-tour-card-inner{
-    animation-duration:.01ms!important;animation-iteration-count:1!important;
-  }
-  #portal-overlay .p-tour-spot-ring{
-    animation:none!important;
-  }
+  #portal-overlay .p-tour-card,
+  #portal-overlay .p-tour-theme-guard,
+  #portal-overlay .p-tour-theme-dock,
+  #portal-overlay .p-tour-theme-dock.is-exiting,
   #portal-overlay .p-tour-root.is-exiting .p-tour-dim-full,
-  #portal-overlay .p-tour-root.is-exiting .p-tour-card-inner{
-    animation-duration:.01ms!important;animation-iteration-count:1!important;
+  #portal-overlay .p-tour-root.is-exiting .p-tour-card-inner {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
-}
-
-#portal-overlay .p-tour-root.is-exiting .p-tour-dim-full{
-  animation:p-tour-dim-out .34s var(--p-enter-ease,cubic-bezier(.4,0,.2,1)) forwards;
-  pointer-events:none;
-}
-#portal-overlay .p-tour-root.is-exiting .p-tour-card{
-  pointer-events:none;
-}
-#portal-overlay .p-tour-root.is-exiting .p-tour-card-inner{
-  animation:p-tour-card-fade-scale-out .3s var(--p-enter-ease,cubic-bezier(.4,0,.2,1)) forwards;
-}
-#portal-overlay .p-tour-root.is-exiting .p-lang-picker-continue:disabled,
-#portal-overlay .p-tour-root.is-exiting .p-lang-picker-btn:disabled{
-  opacity:.72;cursor:default;
-}
-
-/* 初回言語選択（チュートリアル前） */
-#portal-overlay .p-lang-picker-card{
-  width:min(26rem,calc(100vw - 1.5rem));
-  max-width:min(26rem,calc(100vw - 1.5rem));
-  max-height:min(88dvh,36rem);
-  overflow-y:auto;
-}
-#portal-overlay .p-lang-picker-card .p-tour-card p{
-  margin:0 0 .85rem;
-}
-#portal-overlay .p-lang-picker-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  grid-auto-rows:3rem;
-  gap:.45rem;
-  margin:.5rem 0 0;
-}
-#portal-overlay .p-lang-picker-actions{
-  margin-top:.45rem;
-  padding-top:.4rem;
-  border-top:1px solid var(--p-border-light);
-}
-#portal-overlay .p-lang-picker-continue{
-  display:flex;align-items:center;justify-content:center;
-  width:100%;min-height:2.35rem;padding:.5rem 1rem;
-  border:none;border-radius:9px;cursor:pointer;font-family:inherit;
-  font-weight:600;font-size:.875rem;letter-spacing:.01em;line-height:1.2;
-  background:var(--p-accent);color:#fff;
-  box-shadow:0 2px 10px color-mix(in srgb,var(--p-accent) 28%,transparent);
-  transition:transform .15s ease,filter .15s ease,box-shadow .15s ease;
-}
-#portal-overlay .p-lang-picker-continue:hover{
-  filter:brightness(1.05);
-  box-shadow:0 3px 14px color-mix(in srgb,var(--p-accent) 34%,transparent);
-}
-#portal-overlay .p-lang-picker-continue:active{transform:scale(.985)}
-#portal-overlay .p-lang-picker-continue:disabled{
-  opacity:.72;cursor:default;transform:none;
-}
-#portal-overlay .p-lang-picker-continue:focus-visible{
-  outline:2px solid var(--p-accent);outline-offset:2px;
-}
-#portal-overlay .p-lang-picker-btn{
-  display:flex;align-items:center;justify-content:center;
-  box-sizing:border-box;
-  width:100%;height:3rem;min-height:3rem;max-height:3rem;
-  padding:.32rem .42rem;border-radius:8px;
-  border:2px solid var(--p-border);background:var(--p-bg3);
-  color:var(--p-text);font-size:.75rem;font-weight:500;line-height:1.15;
-  cursor:pointer;font-family:inherit;text-align:center;
-  overflow:hidden;word-break:break-word;
-  transition:border-color .15s,background .15s,color .15s;
-}
-#portal-overlay .p-lang-picker-btn:hover{
-  border-color:var(--p-border-hover);background:var(--p-bg-hover);
-}
-#portal-overlay .p-lang-picker-btn.is-selected{
-  border-color:var(--p-accent);background:var(--p-accent-bg);color:var(--p-accent);
-}
-#portal-overlay .p-lang-picker-btn:focus-visible{
-  outline:2px solid var(--p-accent);outline-offset:2px;
-}
-#portal-overlay .p-lang-picker-btn:disabled{
-  opacity:.65;cursor:default;
-}
-@media (max-width:420px){
-  #portal-overlay .p-lang-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-width:360px){
-  #portal-overlay .p-lang-picker-grid{grid-template-columns:1fr}
+  #portal-overlay .p-tour-spot-ring {
+    animation: none !important;
+  }
+  #portal-overlay .p-tour-progress-track > span {
+    transition: none;
+  }
 }

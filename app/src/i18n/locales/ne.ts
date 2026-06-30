@@ -33,17 +33,21 @@ export const neMessages: typeof jaMessages = {
   nav: {
     campusPlan: 'क्याम्पस योजना',
     portalHost: {
-      home:          'गृह',
-      newsList:      'सूचना सूची',
-      kyukoHoko:     'रद्द र पूरक कक्षा',
+      home: 'गृह',
+      newsList: 'सूचना सूची',
+      kyukoHoko: 'रद्द र पूरक कक्षा',
       questionnaire: 'पाठ्यक्रम मूल्याङ्कन सर्वेक्षण',
-      cabinet:       'क्याबिनेट',
-      campusPlan:    'क्याम्पस योजना',
-      profile:       'प्रोफाइल',
+      cabinet: 'क्याबिनेट',
+      campusPlan: 'क्याम्पस योजना',
+      profile: 'प्रोफाइल',
     },
   },
   settings: {
     title: 'सेटिङ',
+    general: 'सामान्य',
+    connections: 'जडान',
+    support: 'सहायता',
+    about: 'एक्सटेन्सनबारे',
     colorTheme: 'रङ थिम',
     homeDecoration: 'गृह सजावट',
     display: 'प्रदर्शन',
@@ -234,7 +238,8 @@ export const neMessages: typeof jaMessages = {
     login: 'लगइन',
     inbox: 'इनबक्स',
     inboxAddress: 'इनबक्स',
-    mailboxCaption: (lo: number, hi: number, total: number) => `प्राप्त मेल ${lo}–${hi} देखाइँदैछ। (कुल=${total})`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `प्राप्त मेल ${lo}–${hi} देखाइँदैछ। (कुल=${total})`,
     byteUnit: 'बाइट',
     updateListFailed: 'सूची अद्यावधिक गर्न सकिएन। जडान जाँच गर्नुहोस् वा पृष्ठ पुनः लोड गर्नुहोस्।',
     mailListToolbar: 'मेल सूची कार्य',
@@ -291,7 +296,8 @@ export const neMessages: typeof jaMessages = {
     noDates: 'देखाउन मिति छैन',
     weekdaysMonday: ['सोम', 'मङ्गल', 'बुध', 'बिही', 'शुक्र', 'शनि', 'आइत'],
     weekdaysSunday: ['आइत', 'सोम', 'मङ्गल', 'बुध', 'बिही', 'शुक्र', 'शनि'],
-    monthTitle: (year: number, month: number) => `${new Intl.DateTimeFormat('ne-NP', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
+    monthTitle: (year: number, month: number) =>
+      `${new Intl.DateTimeFormat('ne-NP', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
     weekRange: (start: string, end: string) => `${start} – ${end}`,
     pending: 'पेश नगरिएको',
     course: 'पाठ्यक्रम',
@@ -308,7 +314,8 @@ export const neMessages: typeof jaMessages = {
     assignmentRefreshAria: 'King LMS बाट नवीनतम असाइनमेन्ट डाटा आयात (अर्को पृष्ठ खुल्छ)',
     assignmentRefreshLead: 'विस्तारले नवीनतम असाइनमेन्ट डाटा ल्याउन King LMS खोल्नेछ।',
     assignmentRefreshHint: 'कृपया पर्खनुहोस्। पृष्ठ छिट्टै बदलिनेछ; केही सेकेन्ड लाग्न सक्छ।',
-    assignmentNoData: 'बचत गरिएका असाइनमेन्ट छैनन्। King LMS बाट आयात गर्न "अद्यावधिक" प्रयोग गर्नुहोस्।',
+    assignmentNoData:
+      'बचत गरिएका असाइनमेन्ट छैनन्। King LMS बाट आयात गर्न "अद्यावधिक" प्रयोग गर्नुहोस्।',
     assignmentCacheNote: (capturedAgo: string | null) =>
       `यो दृश्यले King LMS बाट ल्याइएको बचत डाटा${capturedAgo != null ? ` (${capturedAgo})` : ''} प्रयोग गर्छ। अद्यावधिक नहुन सक्छ। "अद्यावधिक" प्रयोग गर्नुहोस्।`,
     assignmentBetaNote:
@@ -321,8 +328,10 @@ export const neMessages: typeof jaMessages = {
     justNow: 'भर्खरै',
     secondsAgo: (s: number) => `${s} सेकेन्ड अघि`,
     minutesSecondsAgo: (m: number, s: number) => `${m} मिनेट ${s} सेकेन्ड अघि`,
-    hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h} घण्टा ${m} मिनेट ${s} सेकेन्ड अघि`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d} दिन ${h} घण्टा ${m} मिनेट ${s} सेकेन्ड अघि`,
+    hoursMinutesSecondsAgo: (h: number, m: number, s: number) =>
+      `${h} घण्टा ${m} मिनेट ${s} सेकेन्ड अघि`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d} दिन ${h} घण्टा ${m} मिनेट ${s} सेकेन्ड अघि`,
     monthsAgo: (m: number) => `लगभग ${m} महिना अघि`,
     yearsAgo: (y: number) => `लगभग ${y} वर्ष अघि`,
     overdueDays: (d: number) => `${d} दिन ढिलो`,
@@ -338,6 +347,28 @@ export const neMessages: typeof jaMessages = {
   guidedTour: {
     primaryDone: 'बुझें',
     end: 'ट्युटोरियल समाप्त',
+    back: 'पछाडि',
+    skip: 'मार्गदर्शन छोड्नुहोस्',
+    welcomeEyebrow: 'छिटो सेटअप',
+    themeEyebrow: 'रूप छान्नुहोस्',
+    guideEyebrow: 'प्रयोग गर्ने तरिका',
+    themeTitle: 'तपाईंलाई मिल्ने थिम छान्नुहोस्',
+    themeBody:
+      'यस प्यानल पछाडि वास्तविक होम स्क्रिन छ। थिम थिचेर तुरुन्त लागू गर्नुहोस् र पढ्न सजिलो भएको तुलना गर्नुहोस्।',
+    themeRecommended: 'सिफारिस',
+    themeAll: 'सबै थिम',
+    themeOther: 'अन्य थिम',
+    themeCollapse: 'सिफारिस मात्र',
+    themeHint: 'पछि सेटिङबाट जुनसुकै बेला थिम बदल्न सक्नुहुन्छ।',
+    weekStartBody:
+      'कक्षा र असाइनमेन्ट क्यालेन्डर सोमबार वा आइतबारमध्ये कुन दिनबाट सुरु गर्ने छान्नुहोस्। पछाडिको क्यालेन्डर तुरुन्त अपडेट हुन्छ।',
+    weekStartHint: 'हप्ताको सुरु हुने दिन पछि सेटिङबाट बदल्न सकिन्छ।',
+    welcomeFeatures: [
+      'प्रारम्भिक सेटअप',
+      'सजिलै पढिने कक्षा क्यालेन्डर',
+      'असाइनमेन्ट क्यालेन्डर',
+      'उपस्थिति लिङ्क',
+    ],
     steps: [
       {
         id: 'welcome',
@@ -345,9 +376,19 @@ export const neMessages: typeof jaMessages = {
         body: 'KCG Portal Redesign Project स्थापना गर्नुभएकोमा धन्यवाद।\n\nयो छोटो मार्गदर्शनले तपाईंले धेरै प्रयोग गर्ने सुविधाहरू देखाउँछ।',
       },
       {
+        id: 'navigation',
+        title: 'चाहिएको पृष्ठमा छिटो जानुहोस्',
+        body: 'सूचना, कक्षा परिवर्तन, पाठ्यक्रम सर्वेक्षण, क्याबिनेट र Campus Plan जस्ता मुख्य पृष्ठ हेडरबाट खोल्न सक्नुहुन्छ।',
+      },
+      {
         id: 'settings',
         title: 'यहाँबाट सुरु: सेटिङ',
         body: 'माथि दायाँ यो बटनबाट सेटिङ खोल्नुहोस्।\n\nथिम रङ, पाठ्यक्रम सूची पुनः ल्याउने र King LMS एकीकरण व्यवस्थापन गर्न सक्नुहुन्छ।',
+      },
+      {
+        id: 'assignment-overview',
+        title: 'असाइनमेन्ट क्यालेन्डर',
+        body: 'King LMS का असाइनमेन्ट समयसीमाअनुसार देखिन्छन्। बाँकी समय र नबुझाएको, बुझाएको वा म्याद सकिएको अनुमानित अवस्था हेर्नुहोस्। असाइनमेन्ट क्लिक गर्दा King LMS मा खुल्छ।',
       },
       {
         id: 'assignment',
@@ -358,6 +399,16 @@ export const neMessages: typeof jaMessages = {
         id: 'kogi',
         title: 'कक्षा क्यालेन्डर',
         body: 'कक्षा क्लिक गर्दा सम्बन्धित King LMS पाठ्यक्रम पृष्ठ सिधै खुल्छ।\n\nपहिले पाठ्यक्रम सूची ल्याउनु पर्न सक्छ; त्यसबेला मार्गदर्शन देखिन्छ।',
+      },
+      {
+        id: 'calendar-mode',
+        title: 'हप्ता र महिना दृश्य',
+        body: 'हालको समयतालिका ठूलो हेर्न हप्ता र अगाडिका योजना एकैपटक हेर्न महिना प्रयोग गर्नुहोस्। यी बटनबाट दृश्य बदल्न सकिन्छ।',
+      },
+      {
+        id: 'kogi-hover',
+        title: 'कक्षाको विस्तृत जानकारी',
+        body: 'कक्षामाथि माउस राख्दा पूरा नाम, कोठा, अवधि तथा सुरु र अन्त्य हुने समय देखिन्छ।',
       },
       {
         id: 'kogi-context',

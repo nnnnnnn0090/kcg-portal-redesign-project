@@ -33,17 +33,21 @@ export const enMessages: typeof jaMessages = {
   nav: {
     campusPlan: 'Campus plan',
     portalHost: {
-      home:          'Home',
-      newsList:      'Notice list',
-      kyukoHoko:     'Cancellations & make-up',
+      home: 'Home',
+      newsList: 'Notice list',
+      kyukoHoko: 'Cancellations & make-up',
       questionnaire: 'Course evaluations',
-      cabinet:       'Cabinet',
-      campusPlan:    'Campus plan',
-      profile:       'Profile',
+      cabinet: 'Cabinet',
+      campusPlan: 'Campus plan',
+      profile: 'Profile',
     },
   },
   settings: {
     title: 'Settings',
+    general: 'General',
+    connections: 'Connections',
+    support: 'Support',
+    about: 'About this extension',
     colorTheme: 'Color theme',
     homeDecoration: 'Home decoration',
     display: 'Display',
@@ -81,7 +85,8 @@ export const enMessages: typeof jaMessages = {
     updateAvailableHint:
       'No manual update is required. Your browser checks and applies updates automatically. Google Chrome and Microsoft Edge check on startup and about every 5 hours; Mozilla Firefox about every 24 hours. It can take time to apply, so only restart the browser if the version still has not changed after waiting a while.',
     changelogFormatError: 'Could not read the changelog format.',
-    changelogFetchError: 'Could not fetch the changelog. Check your network connection or the site status.',
+    changelogFetchError:
+      'Could not fetch the changelog. Check your network connection or the site status.',
     changelogTitle: 'Changelog',
     openLicenses: 'License information',
     openPrivacyPolicy: 'Privacy policy',
@@ -212,8 +217,10 @@ export const enMessages: typeof jaMessages = {
   surveyPage: {
     title: 'Course Evaluation Surveys',
     list: 'Survey list',
-    listShowing: (year: string) => `Showing course evaluation surveys currently open in the ${year} academic year.`,
-    listEmpty: (year: string) => `No currently open course evaluation surveys match the ${year} academic year filters.`,
+    listShowing: (year: string) =>
+      `Showing course evaluation surveys currently open in the ${year} academic year.`,
+    listEmpty: (year: string) =>
+      `No currently open course evaluation surveys match the ${year} academic year filters.`,
     emptyFiltered: 'No surveys match the current filters.',
     ariaList: 'Course evaluation survey list',
     lecture: 'Course',
@@ -234,7 +241,8 @@ export const enMessages: typeof jaMessages = {
     login: 'Log in',
     inbox: 'Inbox',
     inboxAddress: 'Inbox',
-    mailboxCaption: (lo: number, hi: number, total: number) => `Showing received mail ${lo}-${hi}. (Total=${total})`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `Showing received mail ${lo}-${hi}. (Total=${total})`,
     byteUnit: 'bytes',
     updateListFailed: 'Could not update the list. Check your connection or reload the page.',
     mailListToolbar: 'Mail list actions',
@@ -291,7 +299,8 @@ export const enMessages: typeof jaMessages = {
     noDates: 'No displayable dates',
     weekdaysMonday: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     weekdaysSunday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    monthTitle: (year: number, month: number) => `${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
+    monthTitle: (year: number, month: number) =>
+      `${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
     weekRange: (start: string, end: string) => `${start} – ${end}`,
     pending: 'Not submitted',
     course: 'Course',
@@ -307,8 +316,10 @@ export const enMessages: typeof jaMessages = {
     assignmentRefreshBusyAria: 'Preparing to open King LMS to import assignment data',
     assignmentRefreshAria: 'Import the latest assignment data from King LMS (opens another page)',
     assignmentRefreshLead: 'The extension will open King LMS to fetch the latest assignment data.',
-    assignmentRefreshHint: 'Please wait. The page will change shortly; this may take a few seconds.',
-    assignmentNoData: 'There are no saved assignments yet. Use "Update" to import them from King LMS.',
+    assignmentRefreshHint:
+      'Please wait. The page will change shortly; this may take a few seconds.',
+    assignmentNoData:
+      'There are no saved assignments yet. Use "Update" to import them from King LMS.',
     assignmentCacheNote: (capturedAgo: string | null) =>
       `This view uses saved data fetched from King LMS${capturedAgo != null ? ` ${capturedAgo}` : ''}. It may not be up to date. Use "Update" to refresh it.`,
     assignmentBetaNote:
@@ -322,7 +333,8 @@ export const enMessages: typeof jaMessages = {
     secondsAgo: (s: number) => `${s} seconds ago`,
     minutesSecondsAgo: (m: number, s: number) => `${m} min ${s} sec ago`,
     hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h} hr ${m} min ${s} sec ago`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d} d ${h} hr ${m} min ${s} sec ago`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d} d ${h} hr ${m} min ${s} sec ago`,
     monthsAgo: (m: number) => `about ${m} months ago`,
     yearsAgo: (y: number) => `about ${y} years ago`,
     overdueDays: (d: number) => `${d} days past due`,
@@ -338,16 +350,48 @@ export const enMessages: typeof jaMessages = {
   guidedTour: {
     primaryDone: 'Got it',
     end: 'End tutorial',
+    back: 'Back',
+    skip: 'Skip guide',
+    welcomeEyebrow: 'Quick setup',
+    themeEyebrow: 'Choose your look',
+    guideEyebrow: 'How it works',
+    themeTitle: 'Choose a theme that works for you',
+    themeBody:
+      'The real home screen is behind this panel. Try a theme to apply it instantly and compare readability in context.',
+    themeRecommended: 'Recommended',
+    themeAll: 'All themes',
+    themeOther: 'Other themes',
+    themeCollapse: 'Show recommended',
+    themeHint: 'You can change your theme anytime in Settings.',
+    weekStartBody:
+      'Choose whether class and assignment calendars begin with Monday or Sunday. The calendar behind this panel updates immediately.',
+    weekStartHint: 'You can change the start of the week anytime in Settings.',
+    welcomeFeatures: [
+      'Initial setup',
+      'Improved class calendar',
+      'Assignment calendar',
+      'Attendance link',
+    ],
     steps: [
       {
         id: 'welcome',
-        title: 'Welcome',
-        body: 'Thank you for installing KCG Portal Redesign Project.\n\nThis short guide highlights the features you will use most often.',
+        title: 'A better portal for every day',
+        body: 'First, choose how the portal looks. Then take a one-minute tour of classes, assignments, shortcuts, and the tools you will use most.',
+      },
+      {
+        id: 'navigation',
+        title: 'Header',
+        body: 'Use the menu on the left for announcements, class changes, course surveys, the cabinet, Campus Plan, and other key pages.\n\nYour profile, Settings, and Log out are on the right.',
       },
       {
         id: 'settings',
-        title: 'Start here: Settings',
-        body: 'Open settings from this button in the upper right.\n\nYou can change the theme color, fetch the course list again, and manage King LMS integration.',
+        title: 'Make it yours in Settings',
+        body: 'Change the theme, home decorations, assignment calendar, week start, Web Mail and Campus Plan overlays, or King LMS data sync here.\n\nYou can also reopen this guide and the changelog anytime.',
+      },
+      {
+        id: 'assignment-overview',
+        title: 'Assignment calendar',
+        body: 'See King LMS assignments by due date, including estimated pending, submitted, and overdue states and the time remaining. Click an assignment to open it in King LMS.',
       },
       {
         id: 'assignment',
@@ -357,12 +401,22 @@ export const enMessages: typeof jaMessages = {
       {
         id: 'kogi',
         title: 'Class calendar',
-        body: 'Click a class to open the matching King LMS course page directly.\n\nThe extension may need to fetch the course list first; if so, it will guide you.',
+        body: 'Review your class schedule by day. Use the arrow buttons to move to the previous or next week or month.',
+      },
+      {
+        id: 'calendar-mode',
+        title: 'Week and month views',
+        body: 'Use Week for a larger view of the current timetable and Month to look further ahead. Switch between them with these buttons.',
+      },
+      {
+        id: 'kogi-hover',
+        title: 'See class details',
+        body: 'Hover over a class to see its full name, room, period, and detailed start and end times.',
       },
       {
         id: 'kogi-context',
-        title: 'Right-click a class',
-        body: 'Right-click a class on the class calendar to open a menu for the syllabus or the King LMS course in a new tab.\n\nLeft-click opens the course page directly; right-click lets you choose from the menu.',
+        title: 'Click a class',
+        body: 'Left-click to open the matching King LMS course directly. Right-click to choose the syllabus or King LMS and open it in a new tab.\n\nThe extension may ask to fetch your course list once.',
       },
       {
         id: 'shortcuts',
@@ -381,8 +435,8 @@ export const enMessages: typeof jaMessages = {
       },
       {
         id: 'done',
-        title: 'All set',
-        body: 'You can reopen this guide from Settings whenever you need it.\n\nIf you like the extension, share it with a friend❤️',
+        title: 'You are ready',
+        body: 'A good next step is to refresh assignments and add your most-used pages to Shortcuts.\n\nYou can reopen this guide from Settings whenever you need it.',
       },
     ],
   },
@@ -399,8 +453,10 @@ export const enMessages: typeof jaMessages = {
     coursesSaving: 'Saving course list...',
     assignmentFetching: 'Fetching assignments...',
     loginPlease: 'Please log in',
-    loginAfterAssignment: 'After login, assignments will be fetched and you will return to the portal.',
-    loginAfterCourses: 'After login, the course list will be saved and you will return to the portal.',
+    loginAfterAssignment:
+      'After login, assignments will be fetched and you will return to the portal.',
+    loginAfterCourses:
+      'After login, the course list will be saved and you will return to the portal.',
   },
   themeNames: themeNames.en,
 };

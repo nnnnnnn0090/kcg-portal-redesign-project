@@ -33,17 +33,21 @@ export const thMessages: typeof jaMessages = {
   nav: {
     campusPlan: 'แผนแคมปัส',
     portalHost: {
-      home:          'หน้าแรก',
-      newsList:      'รายการประกาศ',
-      kyukoHoko:     'ยกเลิกและชดเชย',
+      home: 'หน้าแรก',
+      newsList: 'รายการประกาศ',
+      kyukoHoko: 'ยกเลิกและชดเชย',
       questionnaire: 'แบบสำรวจประเมินรายวิชา',
-      cabinet:       'ตู้เอกสาร',
-      campusPlan:    'แผนแคมปัส',
-      profile:       'โปรไฟล์',
+      cabinet: 'ตู้เอกสาร',
+      campusPlan: 'แผนแคมปัส',
+      profile: 'โปรไฟล์',
     },
   },
   settings: {
     title: 'การตั้งค่า',
+    general: 'ทั่วไป',
+    connections: 'การเชื่อมต่อ',
+    support: 'ช่วยเหลือ',
+    about: 'เกี่ยวกับส่วนขยาย',
     colorTheme: 'ธีมสี',
     homeDecoration: 'ตกแต่งหน้าแรก',
     display: 'การแสดงผล',
@@ -234,7 +238,8 @@ export const thMessages: typeof jaMessages = {
     login: 'เข้าสู่ระบบ',
     inbox: 'กล่องขาเข้า',
     inboxAddress: 'กล่องขาเข้า',
-    mailboxCaption: (lo: number, hi: number, total: number) => `แสดงจดหมาย ${lo}–${hi} (รวม=${total})`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `แสดงจดหมาย ${lo}–${hi} (รวม=${total})`,
     byteUnit: 'ไบต์',
     updateListFailed: 'อัปเดตรายการไม่ได้ ตรวจสอบการเชื่อมต่อหรือโหลดหน้าใหม่',
     mailListToolbar: 'การดำเนินการรายการจดหมาย',
@@ -291,7 +296,8 @@ export const thMessages: typeof jaMessages = {
     noDates: 'ไม่มีวันที่แสดงได้',
     weekdaysMonday: ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'],
     weekdaysSunday: ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'],
-    monthTitle: (year: number, month: number) => `${new Intl.DateTimeFormat('th-TH', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
+    monthTitle: (year: number, month: number) =>
+      `${new Intl.DateTimeFormat('th-TH', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
     weekRange: (start: string, end: string) => `${start} – ${end}`,
     pending: 'ยังไม่ส่ง',
     course: 'คอร์ส',
@@ -321,8 +327,10 @@ export const thMessages: typeof jaMessages = {
     justNow: 'เมื่อสักครู่',
     secondsAgo: (s: number) => `${s} วินาทีที่แล้ว`,
     minutesSecondsAgo: (m: number, s: number) => `${m} นาที ${s} วินาทีที่แล้ว`,
-    hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h} ชม. ${m} นาที ${s} วินาทีที่แล้ว`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d} วัน ${h} ชม. ${m} นาที ${s} วินาทีที่แล้ว`,
+    hoursMinutesSecondsAgo: (h: number, m: number, s: number) =>
+      `${h} ชม. ${m} นาที ${s} วินาทีที่แล้ว`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d} วัน ${h} ชม. ${m} นาที ${s} วินาทีที่แล้ว`,
     monthsAgo: (m: number) => `ประมาณ ${m} เดือนที่แล้ว`,
     yearsAgo: (y: number) => `ประมาณ ${y} ปีที่แล้ว`,
     overdueDays: (d: number) => `เลยกำหนด ${d} วัน`,
@@ -338,6 +346,28 @@ export const thMessages: typeof jaMessages = {
   guidedTour: {
     primaryDone: 'เข้าใจแล้ว',
     end: 'จบบทแนะนำ',
+    back: 'ย้อนกลับ',
+    skip: 'ข้ามคำแนะนำ',
+    welcomeEyebrow: 'ตั้งค่าอย่างรวดเร็ว',
+    themeEyebrow: 'เลือกรูปลักษณ์',
+    guideEyebrow: 'วิธีใช้งาน',
+    themeTitle: 'เลือกธีมที่เหมาะกับคุณ',
+    themeBody:
+      'ด้านหลังแผงนี้คือหน้าหลักจริง ลองเลือกธีมเพื่อใช้กับทั้งหน้าทันทีและเปรียบเทียบความอ่านง่าย',
+    themeRecommended: 'แนะนำ',
+    themeAll: 'ธีมทั้งหมด',
+    themeOther: 'ธีมอื่นๆ',
+    themeCollapse: 'แสดงเฉพาะที่แนะนำ',
+    themeHint: 'เปลี่ยนธีมภายหลังได้ทุกเมื่อในการตั้งค่า',
+    weekStartBody:
+      'เลือกให้ปฏิทินชั้นเรียนและงานเริ่มที่วันจันทร์หรือวันอาทิตย์ ปฏิทินด้านหลังจะอัปเดตทันที',
+    weekStartHint: 'เปลี่ยนวันเริ่มต้นสัปดาห์ภายหลังได้ทุกเมื่อในการตั้งค่า',
+    welcomeFeatures: [
+      'การตั้งค่าเริ่มต้น',
+      'ปฏิทินชั้นเรียนที่ดูง่ายขึ้น',
+      'ปฏิทินงาน',
+      'ลิงก์ลงทะเบียนเข้าเรียน',
+    ],
     steps: [
       {
         id: 'welcome',
@@ -345,9 +375,19 @@ export const thMessages: typeof jaMessages = {
         body: 'ขอบคุณที่ติดตั้ง KCG Portal Redesign Project\n\nคู่มือสั้นนี้แนะนำฟีเจอร์ที่คุณใช้บ่อยที่สุด',
       },
       {
+        id: 'navigation',
+        title: 'ไปยังหน้าที่ต้องการได้ทันที',
+        body: 'เปิดประกาศ การเปลี่ยนแปลงชั้นเรียน แบบประเมิน ตู้เอกสาร Campus Plan และหน้าหลักอื่น ๆ ได้จากส่วนหัว',
+      },
+      {
         id: 'settings',
         title: 'เริ่มที่นี่: การตั้งค่า',
         body: 'เปิดการตั้งค่าจากปุ่มนี้มุมขวาบน\n\nเปลี่ยนสีธีม ดึงรายการคอร์สอีกครั้ง และจัดการการเชื่อมต่อ King LMS',
+      },
+      {
+        id: 'assignment-overview',
+        title: 'ปฏิทินงาน',
+        body: 'แสดงงาน King LMS ตามกำหนดส่ง พร้อมสถานะโดยประมาณว่ายังไม่ส่ง ส่งแล้ว หรือเลยกำหนด และเวลาที่เหลือ คลิกงานเพื่อเปิดใน King LMS',
       },
       {
         id: 'assignment',
@@ -358,6 +398,16 @@ export const thMessages: typeof jaMessages = {
         id: 'kogi',
         title: 'ปฏิทินชั้นเรียน',
         body: 'คลิกชั้นเรียนเพื่อเปิดหน้าคอร์ส King LMS โดยตรง\n\nอาจต้องดึงรายการคอร์สก่อน จะมีคำแนะนำให้',
+      },
+      {
+        id: 'calendar-mode',
+        title: 'มุมมองสัปดาห์และเดือน',
+        body: 'ใช้สัปดาห์เพื่อดูตารางปัจจุบันขนาดใหญ่ และใช้เดือนเพื่อดูแผนล่วงหน้า สลับได้ด้วยสองปุ่มนี้',
+      },
+      {
+        id: 'kogi-hover',
+        title: 'ดูรายละเอียดชั้นเรียน',
+        body: 'วางเมาส์เหนือชั้นเรียนเพื่อดูชื่อเต็ม ห้อง คาบเรียน และเวลาเริ่มกับสิ้นสุดโดยละเอียด',
       },
       {
         id: 'kogi-context',

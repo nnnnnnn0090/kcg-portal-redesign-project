@@ -6,67 +6,67 @@
 // ─── chrome.storage.local のキー ───────────────────────────────────────────
 
 export const SK = {
-  hideProfileName:                  'portalThemeHideProfileName',
-  theme:                            'portalThemeColorTheme',
-  showKogiCalMascot:                'portalThemeShowKogiCalMascot',
-  showHomeCornerCharacter:          'portalThemeShowHomeCornerCharacter',
+  hideProfileName: 'portalThemeHideProfileName',
+  theme: 'portalThemeColorTheme',
+  showKogiCalMascot: 'portalThemeShowKogiCalMascot',
+  showHomeCornerCharacter: 'portalThemeShowHomeCornerCharacter',
   /** ホームの King LMS 連携「課題」カレンダーを表示しない */
-  hideAssignmentCalendar:          'portalThemeHideAssignmentCalendar',
-  kingLmsCourses:                   'portalThemeKingLmsCourses',
-  kingLmsAssignmentDue:             'portalThemeKingLmsAssignmentDue',
-  kingLmsSyncPending:               'portalThemeKingLmsSyncPending',
-  kingLmsSyncReturnUrl:             'portalThemeKingLmsSyncReturnUrl',
-  kingLmsSyncAwaitCourse:           'portalThemeKingLmsSyncAwaitCourse',
+  hideAssignmentCalendar: 'portalThemeHideAssignmentCalendar',
+  kingLmsCourses: 'portalThemeKingLmsCourses',
+  kingLmsAssignmentDue: 'portalThemeKingLmsAssignmentDue',
+  kingLmsSyncPending: 'portalThemeKingLmsSyncPending',
+  kingLmsSyncReturnUrl: 'portalThemeKingLmsSyncReturnUrl',
+  kingLmsSyncAwaitCourse: 'portalThemeKingLmsSyncAwaitCourse',
   /** 設定パネルからのコース一覧再取得のとき true（戻りトーストを短くする） */
-  kingLmsCourseSyncToastQuiet:      'portalThemeKingLmsCourseSyncToastQuiet',
-  kingLmsAssignmentSyncPending:     'portalThemeKingLmsAssignmentSyncPending',
-  kingLmsAssignmentSyncReturnUrl:   'portalThemeKingLmsAssignmentSyncReturnUrl',
+  kingLmsCourseSyncToastQuiet: 'portalThemeKingLmsCourseSyncToastQuiet',
+  kingLmsAssignmentSyncPending: 'portalThemeKingLmsAssignmentSyncPending',
+  kingLmsAssignmentSyncReturnUrl: 'portalThemeKingLmsAssignmentSyncReturnUrl',
   kingLmsAssignmentSyncAwaitCalendar: 'portalThemeKingLmsAssignmentSyncAwaitCalendar',
   /** 課題同期でホームへ戻った直後、課題カレンダーへスクロールする（読み取り後に false に戻す） */
-  portalScrollToAssignmentOnce:   'portalThemeScrollToAssignmentOnce',
-  shortcutConfig:                   'portalThemeShortcutConfig',
-  /** 初回の案内チュートリアルを完了（またはスキップ）したら true */
-  portalGuidedTourDone:             'portalThemePortalGuidedTourDone',
+  portalScrollToAssignmentOnce: 'portalThemeScrollToAssignmentOnce',
+  shortcutConfig: 'portalThemeShortcutConfig',
+  /** v2 オンボーディングを完了（またはスキップ）したら true */
+  portalGuidedTourDone: 'portalThemePortalOnboardingV2Done',
   /** 初回の言語選択を完了したら true */
-  portalLanguagePickerDone:         'portalThemePortalLanguagePickerDone',
-  home2WebMailOverlay:              'portalThemeHome2WebMailOverlay',
-  cplanOverlay:                     'portalThemeCplanOverlay',
+  portalLanguagePickerDone: 'portalThemePortalLanguagePickerDone',
+  home2WebMailOverlay: 'portalThemeHome2WebMailOverlay',
+  cplanOverlay: 'portalThemeCplanOverlay',
   /** カレンダーグリッドの週の左端: `monday` | `sunday` */
-  calendarWeekStart:               'portalThemeCalendarWeekStart',
+  calendarWeekStart: 'portalThemeCalendarWeekStart',
   /** 拡張 UI の表示言語 */
-  language:                        'portalThemeLanguage',
+  language: 'portalThemeLanguage',
   /** 更新通知済みの拡張 manifest version（`readExtensionVersion()` と比較） */
-  extensionVersionSeen:            'portalThemeExtensionVersionSeen',
+  extensionVersionSeen: 'portalThemeExtensionVersionSeen',
   /** 開発者お知らせパネルの表示言語（`ja` / `en` / `zh` / `zh_TW` / `ko` / `vi` / `ne` / `id` / `th`） */
-  developerNoticeLang:             'portalThemeDeveloperNoticeLang',
+  developerNoticeLang: 'portalThemeDeveloperNoticeLang',
   /** 開発者アンケートの回答済み状態（`surveyId:revision` の配列） */
-  developerSurveyAnswered:         'portalThemeDeveloperSurveyAnswered',
+  developerSurveyAnswered: 'portalThemeDeveloperSurveyAnswered',
   /** 拡張機能インストールごとに1つ発行する匿名ユーザー ID（notice.json 等の識別用） */
-  clientUserId:                    'portalThemeClientUserId',
+  clientUserId: 'portalThemeClientUserId',
   /** 拡張の初回記録日時（ISO 8601） */
-  clientInstallAt:                 'portalThemeClientInstallAt',
+  clientInstallAt: 'portalThemeClientInstallAt',
   /** 拡張の最終バージョン更新日時（ISO 8601） */
-  clientLastUpdatedAt:             'portalThemeClientLastUpdatedAt',
+  clientLastUpdatedAt: 'portalThemeClientLastUpdatedAt',
   /** ライフサイクル追跡用の最後に記録した manifest version */
-  clientLastKnownVersion:          'portalThemeClientLastKnownVersion',
+  clientLastKnownVersion: 'portalThemeClientLastKnownVersion',
 } as const;
 
 // ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
 
 export const KING_LMS_HOOK = {
-  source:          'portalThemeKingLmsHook',
-  syncAbortType:   'portalThemeKingLmsSyncAbort',
-  coursesPostType:   SK.kingLmsCourses,
+  source: 'portalThemeKingLmsHook',
+  syncAbortType: 'portalThemeKingLmsSyncAbort',
+  coursesPostType: SK.kingLmsCourses,
   assignmentDuePostType: SK.kingLmsAssignmentDue,
 } as const;
 
 // ─── ポータルページ識別子 ────────────────────────────────────────────────────
 
 export const PAGE = {
-  HOME:   'home',
-  NEWS:   'news',
+  HOME: 'home',
+  NEWS: 'news',
   DETAIL: 'detail',
-  KYUKO:  'kyuko',
+  KYUKO: 'kyuko',
   SURVEY: 'survey',
 } as const;
 
@@ -75,10 +75,10 @@ export type PageType = (typeof PAGE)[keyof typeof PAGE];
 // ─── ポータル boot / オーバーレイの element id（early / content / themes で共有） ─
 
 export const PORTAL_DOM = {
-  bootCover:       'kcg-portal-boot-cover', /* 起動フラッシュ防止＋オーバーレイ下の固定背景 */
+  bootCover: 'kcg-portal-boot-cover' /* 起動フラッシュ防止＋オーバーレイ下の固定背景 */,
   headThemeStyle: 'portal-theme-vars',
-  overlayRoot:    'portal-overlay',
-  overlayCss:     'portal-overlay-css',
+  overlayRoot: 'portal-overlay',
+  overlayCss: 'portal-overlay-css',
   /** Home2 Mail ログイン画面でホスト側の重複 UI を隠す style タグ */
   home2HostTweak: 'kcg-portal-home2-host-tweak',
 } as const;
@@ -92,7 +92,7 @@ export const HOME2_MAIL_OVERLAY_HEADER_ONLY_CLASS = 'p-surface-home2-mail-header
 /** portal.content: ブートカバーを外すまでの requestAnimationFrame 段階 */
 export const PORTAL_BOOT_COVER_RAF_FRAMES = {
   withToast: 5,
-  default:   3,
+  default: 3,
 } as const;
 
 /** 学生ポータル（拡張の主対象オリジン） */
@@ -134,19 +134,19 @@ export const HOME2_TOP_PAGE_URL = `${HOME2_ORIGIN}/Default.aspx` as const;
 // ─── postMessage type（fetch フックが送るキャプチャ種別）────────────────────
 
 export const MSG = {
-  kinoMessage:         'portalThemePortalKinoMessageCaptured',
-  kogiCalendar:        'portalThemeKogiCalendarCaptured',
-  hoshuCalendar:       'portalThemeHoshuCalendarCaptured',
-  campusCalendar:      'portalThemeCampusCalendarCaptured',
-  kyukoInfo:           'portalThemeKyukoInfoCaptured',
-  hokoInfo:            'portalThemeHokoInfoCaptured',
-  kyoshitsuChange:     'portalThemeKyoshitsuChangeInfoCaptured',
-  questionnaireInfo:   'portalThemeQuestionnaireInfoCaptured',
+  kinoMessage: 'portalThemePortalKinoMessageCaptured',
+  kogiCalendar: 'portalThemeKogiCalendarCaptured',
+  hoshuCalendar: 'portalThemeHoshuCalendarCaptured',
+  campusCalendar: 'portalThemeCampusCalendarCaptured',
+  kyukoInfo: 'portalThemeKyukoInfoCaptured',
+  hokoInfo: 'portalThemeHokoInfoCaptured',
+  kyoshitsuChange: 'portalThemeKyoshitsuChangeInfoCaptured',
+  questionnaireInfo: 'portalThemeQuestionnaireInfoCaptured',
   deliveredNewsDetail: 'portalThemeDeliveredNewsDetailCaptured',
-  deliveredNews:       'portalThemeDeliveredNewsCaptured',
-  newTopics:           'portalThemeNewTopicsCaptured',
-  kogiNews:            'portalThemeKogiNewsCaptured',
-  userHtmlLink:        'portalThemeUserHtmlLinkCaptured',
+  deliveredNews: 'portalThemeDeliveredNewsCaptured',
+  newTopics: 'portalThemeNewTopicsCaptured',
+  kogiNews: 'portalThemeKogiNewsCaptured',
+  userHtmlLink: 'portalThemeUserHtmlLinkCaptured',
 } as const;
 
 export type MsgType = (typeof MSG)[keyof typeof MSG];
@@ -155,11 +155,11 @@ export type MsgType = (typeof MSG)[keyof typeof MSG];
 
 export const FETCH_HOOK = {
   /** postMessage の source（fetch フック由来） */
-  source:        'portalThemeFetchObserver',
+  source: 'portalThemeFetchObserver',
   /** キャプチャ済みメッセージの再送要求 */
   replayRequest: 'portalThemeReplayIntercepted',
   /** pageFetch 依頼 */
-  pageFetch:     'portalThemePageFetchRequest',
+  pageFetch: 'portalThemePageFetchRequest',
   /** 学ポータル本体 `li.logoff` のログアウト（MAIN ワールドで実行） */
   logoffTrigger: 'portalThemeLogoffTrigger',
 } as const;
@@ -170,11 +170,11 @@ export const PORTAL_CP_AUTHORIZE_READY = 'portalCpAuthorizeReady' as const;
 // ─── King LMS 同期ハッシュ（location.hash で結果を伝達する） ───────────────
 
 export const SYNC_HASH = {
-  courseDone:         'portal-king-lms-sync-ok',
-  courseTimeout:      'portal-king-lms-sync-timeout',
-  assignmentDone:     'portal-king-lms-assignment-sync-ok',
-  assignmentTimeout:  'portal-king-lms-assignment-sync-timeout',
-  assignmentError:    'portal-king-lms-assignment-sync-error',
+  courseDone: 'portal-king-lms-sync-ok',
+  courseTimeout: 'portal-king-lms-sync-timeout',
+  assignmentDone: 'portal-king-lms-assignment-sync-ok',
+  assignmentTimeout: 'portal-king-lms-assignment-sync-timeout',
+  assignmentError: 'portal-king-lms-assignment-sync-error',
 } as const;
 
 // ─── 外部 URL ────────────────────────────────────────────────────────────────
@@ -232,7 +232,9 @@ export const EXTENSION_AUTHOR_PROFILE_URL = 'https://x.com/nnnnnnn0090';
 /** `Redesigned by` のリンク文言（`EXTENSION_AUTHOR_PROFILE_URL` と対） */
 export const EXTENSION_AUTHOR_CREDIT_TEXT = 'nnnnnnn0090' as const;
 
-function vitePrivateUrl(key: 'VITE_PORTAL_DISCORD_INVITE_URL' | 'VITE_EXTENSION_FEEDBACK_FORM_URL'): string {
+function vitePrivateUrl(
+  key: 'VITE_PORTAL_DISCORD_INVITE_URL' | 'VITE_EXTENSION_FEEDBACK_FORM_URL',
+): string {
   const raw = import.meta.env[key];
   return typeof raw === 'string' ? raw.trim() : '';
 }
@@ -251,13 +253,16 @@ export const EXTENSION_FEEDBACK_FORM_URL = vitePrivateUrl('VITE_EXTENSION_FEEDBA
 
 // ─── ホームのショートカットに常に含める固定リンク ──────────────────────────
 
-export const HOME_SHORTCUT_EXTRAS: ReadonlyArray<{ readonly midashi: string; readonly url: string }> = [
+export const HOME_SHORTCUT_EXTRAS: ReadonlyArray<{
+  readonly midashi: string;
+  readonly url: string;
+}> = [
   {
     midashi: '学生出欠登録',
     url: `${PORTAL_ORIGIN}/gakusei/web/skt/WebSktGakuseiShukketsuShinsei/UI/WSK_GakuseiShukketsuShinsei.aspx`,
   },
   {
     midashi: 'KCG WebMail',
-    url:     HOME2_MAIL_DIRECTORY_URL,
+    url: HOME2_MAIL_DIRECTORY_URL,
   },
 ];

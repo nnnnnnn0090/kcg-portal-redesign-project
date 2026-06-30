@@ -33,17 +33,21 @@ export const idMessages: typeof jaMessages = {
   nav: {
     campusPlan: 'Rencana kampus',
     portalHost: {
-      home:          'Beranda',
-      newsList:      'Daftar pengumuman',
-      kyukoHoko:     'Pembatalan & pengganti',
+      home: 'Beranda',
+      newsList: 'Daftar pengumuman',
+      kyukoHoko: 'Pembatalan & pengganti',
       questionnaire: 'Survei evaluasi mata kuliah',
-      cabinet:       'Kabinet',
-      campusPlan:    'Rencana kampus',
-      profile:       'Profil',
+      cabinet: 'Kabinet',
+      campusPlan: 'Rencana kampus',
+      profile: 'Profil',
     },
   },
   settings: {
     title: 'Pengaturan',
+    general: 'Umum',
+    connections: 'Integrasi',
+    support: 'Bantuan',
+    about: 'Tentang ekstensi',
     colorTheme: 'Tema warna',
     homeDecoration: 'Dekorasi beranda',
     display: 'Tampilan',
@@ -81,7 +85,8 @@ export const idMessages: typeof jaMessages = {
     updateAvailableHint:
       'Tidak perlu memperbarui secara manual. Browser memeriksa dan menerapkan pembaruan otomatis. Google Chrome / Microsoft Edge saat startup dan sekitar setiap 5 jam; Mozilla Firefox sekitar setiap 24 jam. Penerapan bisa membutuhkan waktu, jadi mulai ulang browser hanya jika versi belum berubah setelah menunggu.',
     changelogFormatError: 'Tidak dapat membaca format catatan perubahan.',
-    changelogFetchError: 'Tidak dapat mengambil catatan perubahan. Periksa koneksi jaringan atau status situs.',
+    changelogFetchError:
+      'Tidak dapat mengambil catatan perubahan. Periksa koneksi jaringan atau status situs.',
     changelogTitle: 'Catatan perubahan',
     openLicenses: 'Informasi lisensi',
     openPrivacyPolicy: 'Kebijakan privasi',
@@ -212,8 +217,10 @@ export const idMessages: typeof jaMessages = {
   surveyPage: {
     title: 'Survei Evaluasi Mata Kuliah',
     list: 'Daftar survei',
-    listShowing: (year: string) => `Menampilkan survei evaluasi mata kuliah yang sedang dibuka pada tahun akademik ${year}.`,
-    listEmpty: (year: string) => `Tidak ada survei terbuka yang cocok dengan filter tahun akademik ${year}.`,
+    listShowing: (year: string) =>
+      `Menampilkan survei evaluasi mata kuliah yang sedang dibuka pada tahun akademik ${year}.`,
+    listEmpty: (year: string) =>
+      `Tidak ada survei terbuka yang cocok dengan filter tahun akademik ${year}.`,
     emptyFiltered: 'Tidak ada survei yang cocok dengan filter.',
     ariaList: 'Daftar survei evaluasi mata kuliah',
     lecture: 'Mata kuliah',
@@ -234,7 +241,8 @@ export const idMessages: typeof jaMessages = {
     login: 'Masuk',
     inbox: 'Kotak masuk',
     inboxAddress: 'Kotak masuk',
-    mailboxCaption: (lo: number, hi: number, total: number) => `Menampilkan surat ${lo}–${hi}. (Total=${total})`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `Menampilkan surat ${lo}–${hi}. (Total=${total})`,
     byteUnit: 'byte',
     updateListFailed: 'Tidak dapat memperbarui daftar. Periksa koneksi atau muat ulang halaman.',
     mailListToolbar: 'Tindakan daftar surat',
@@ -291,7 +299,8 @@ export const idMessages: typeof jaMessages = {
     noDates: 'Tidak ada tanggal yang dapat ditampilkan',
     weekdaysMonday: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
     weekdaysSunday: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
-    monthTitle: (year: number, month: number) => `${new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
+    monthTitle: (year: number, month: number) =>
+      `${new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
     weekRange: (start: string, end: string) => `${start} – ${end}`,
     pending: 'Belum dikumpulkan',
     course: 'Kursus',
@@ -307,8 +316,10 @@ export const idMessages: typeof jaMessages = {
     assignmentRefreshBusyAria: 'Menyiapkan membuka King LMS untuk mengimpor data tugas',
     assignmentRefreshAria: 'Impor data tugas terbaru dari King LMS (membuka halaman lain)',
     assignmentRefreshLead: 'Ekstensi akan membuka King LMS untuk mengambil data tugas terbaru.',
-    assignmentRefreshHint: 'Harap tunggu. Halaman akan segera berubah; mungkin memakan beberapa detik.',
-    assignmentNoData: 'Belum ada tugas tersimpan. Gunakan "Perbarui" untuk mengimpor dari King LMS.',
+    assignmentRefreshHint:
+      'Harap tunggu. Halaman akan segera berubah; mungkin memakan beberapa detik.',
+    assignmentNoData:
+      'Belum ada tugas tersimpan. Gunakan "Perbarui" untuk mengimpor dari King LMS.',
     assignmentCacheNote: (capturedAgo: string | null) =>
       `Tampilan ini menggunakan data tersimpan dari King LMS${capturedAgo != null ? ` (${capturedAgo})` : ''}. Mungkin belum terbaru. Gunakan "Perbarui" untuk menyegarkan.`,
     assignmentBetaNote:
@@ -322,7 +333,8 @@ export const idMessages: typeof jaMessages = {
     secondsAgo: (s: number) => `${s} detik lalu`,
     minutesSecondsAgo: (m: number, s: number) => `${m} mnt ${s} dtk lalu`,
     hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h} jam ${m} mnt ${s} dtk lalu`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d} hr ${h} jam ${m} mnt ${s} dtk lalu`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d} hr ${h} jam ${m} mnt ${s} dtk lalu`,
     monthsAgo: (m: number) => `sekitar ${m} bulan lalu`,
     yearsAgo: (y: number) => `sekitar ${y} tahun lalu`,
     overdueDays: (d: number) => `${d} hari lewat batas`,
@@ -338,6 +350,28 @@ export const idMessages: typeof jaMessages = {
   guidedTour: {
     primaryDone: 'Mengerti',
     end: 'Akhiri tutorial',
+    back: 'Kembali',
+    skip: 'Lewati panduan',
+    welcomeEyebrow: 'Penyiapan cepat',
+    themeEyebrow: 'Pilih tampilan',
+    guideEyebrow: 'Cara penggunaan',
+    themeTitle: 'Pilih tema yang cocok untuk Anda',
+    themeBody:
+      'Di balik panel ini adalah layar beranda yang sebenarnya. Pilih tema untuk menerapkannya langsung dan bandingkan keterbacaannya.',
+    themeRecommended: 'Rekomendasi',
+    themeAll: 'Semua tema',
+    themeOther: 'Tema lainnya',
+    themeCollapse: 'Tampilkan rekomendasi',
+    themeHint: 'Tema dapat diubah kapan saja di Pengaturan.',
+    weekStartBody:
+      'Pilih apakah kalender kelas dan tugas dimulai pada Senin atau Minggu. Kalender di belakang panel ini langsung diperbarui.',
+    weekStartHint: 'Awal minggu dapat diubah kapan saja di Pengaturan.',
+    welcomeFeatures: [
+      'Penyiapan awal',
+      'Kalender kelas yang lebih jelas',
+      'Kalender tugas',
+      'Tautan kehadiran',
+    ],
     steps: [
       {
         id: 'welcome',
@@ -345,9 +379,19 @@ export const idMessages: typeof jaMessages = {
         body: 'Terima kasih telah menginstal KCG Portal Redesign Project.\n\nPanduan singkat ini menyoroti fitur yang paling sering Anda gunakan.',
       },
       {
+        id: 'navigation',
+        title: 'Langsung ke halaman yang dibutuhkan',
+        body: 'Buka pengumuman, perubahan kelas, survei mata kuliah, kabinet, Campus Plan, dan halaman utama lainnya langsung dari header.',
+      },
+      {
         id: 'settings',
         title: 'Mulai di sini: Pengaturan',
         body: 'Buka pengaturan dari tombol ini di kanan atas.\n\nAnda dapat mengubah warna tema, mengambil daftar kursus lagi, dan mengelola integrasi King LMS.',
+      },
+      {
+        id: 'assignment-overview',
+        title: 'Kalender tugas',
+        body: 'Menampilkan tugas King LMS berdasarkan tenggat, beserta perkiraan status belum dikumpulkan, sudah dikumpulkan, terlambat, dan waktu tersisa. Klik tugas untuk membukanya di King LMS.',
       },
       {
         id: 'assignment',
@@ -358,6 +402,16 @@ export const idMessages: typeof jaMessages = {
         id: 'kogi',
         title: 'Kalender kelas',
         body: 'Klik kelas untuk membuka halaman kursus King LMS yang sesuai.\n\nEkstensi mungkin perlu mengambil daftar kursus dulu; jika ya, akan ada panduan.',
+      },
+      {
+        id: 'calendar-mode',
+        title: 'Tampilan minggu dan bulan',
+        body: 'Gunakan Minggu untuk melihat jadwal saat ini dengan jelas dan Bulan untuk melihat rencana lebih jauh. Beralih dengan dua tombol ini.',
+      },
+      {
+        id: 'kogi-hover',
+        title: 'Lihat detail kelas',
+        body: 'Arahkan mouse ke kelas untuk melihat nama lengkap, ruang, periode, serta waktu mulai dan selesai.',
       },
       {
         id: 'kogi-context',

@@ -33,17 +33,21 @@ export const viMessages: typeof jaMessages = {
   nav: {
     campusPlan: 'Kế hoạch campus',
     portalHost: {
-      home:          'Trang chủ',
-      newsList:      'Danh sách thông báo',
-      kyukoHoko:     'Hủy & bù học',
+      home: 'Trang chủ',
+      newsList: 'Danh sách thông báo',
+      kyukoHoko: 'Hủy & bù học',
       questionnaire: 'Khảo sát đánh giá môn học',
-      cabinet:       'Tủ hồ sơ',
-      campusPlan:    'Kế hoạch campus',
-      profile:       'Hồ sơ',
+      cabinet: 'Tủ hồ sơ',
+      campusPlan: 'Kế hoạch campus',
+      profile: 'Hồ sơ',
     },
   },
   settings: {
     title: 'Cài đặt',
+    general: 'Chung',
+    connections: 'Kết nối',
+    support: 'Hỗ trợ',
+    about: 'Giới thiệu tiện ích',
     colorTheme: 'Chủ đề màu',
     homeDecoration: 'Trang trí trang chủ',
     display: 'Hiển thị',
@@ -81,7 +85,8 @@ export const viMessages: typeof jaMessages = {
     updateAvailableHint:
       'Không cần cập nhật thủ công. Trình duyệt tự kiểm tra và áp dụng. Google Chrome / Microsoft Edge khi khởi động và khoảng 5 giờ một lần; Mozilla Firefox khoảng 24 giờ một lần. Việc áp dụng có thể mất thời gian, nên chỉ khởi động lại trình duyệt nếu đợi một lúc mà phiên bản vẫn chưa đổi.',
     changelogFormatError: 'Không đọc được định dạng nhật ký thay đổi.',
-    changelogFetchError: 'Không tải được nhật ký thay đổi. Kiểm tra kết nối mạng hoặc trạng thái trang web.',
+    changelogFetchError:
+      'Không tải được nhật ký thay đổi. Kiểm tra kết nối mạng hoặc trạng thái trang web.',
     changelogTitle: 'Nhật ký thay đổi',
     openLicenses: 'Thông tin giấy phép',
     openPrivacyPolicy: 'Chính sách quyền riêng tư',
@@ -212,7 +217,8 @@ export const viMessages: typeof jaMessages = {
   surveyPage: {
     title: 'Khảo sát đánh giá môn học',
     list: 'Danh sách khảo sát',
-    listShowing: (year: string) => `Đang hiển thị khảo sát đánh giá môn học đang mở năm học ${year}.`,
+    listShowing: (year: string) =>
+      `Đang hiển thị khảo sát đánh giá môn học đang mở năm học ${year}.`,
     listEmpty: (year: string) => `Không có khảo sát đang mở phù hợp năm học ${year}.`,
     emptyFiltered: 'Không có khảo sát phù hợp bộ lọc.',
     ariaList: 'Danh sách khảo sát đánh giá môn học',
@@ -234,7 +240,8 @@ export const viMessages: typeof jaMessages = {
     login: 'Đăng nhập',
     inbox: 'Hộp thư đến',
     inboxAddress: 'Hộp thư đến',
-    mailboxCaption: (lo: number, hi: number, total: number) => `Hiển thị thư ${lo}–${hi}. (Tổng=${total})`,
+    mailboxCaption: (lo: number, hi: number, total: number) =>
+      `Hiển thị thư ${lo}–${hi}. (Tổng=${total})`,
     byteUnit: 'byte',
     updateListFailed: 'Không cập nhật được danh sách. Kiểm tra kết nối hoặc tải lại trang.',
     mailListToolbar: 'Thao tác danh sách thư',
@@ -291,7 +298,8 @@ export const viMessages: typeof jaMessages = {
     noDates: 'Không có ngày hiển thị',
     weekdaysMonday: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
     weekdaysSunday: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-    monthTitle: (year: number, month: number) => `${new Intl.DateTimeFormat('vi-VN', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
+    monthTitle: (year: number, month: number) =>
+      `${new Intl.DateTimeFormat('vi-VN', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1))}`,
     weekRange: (start: string, end: string) => `${start} – ${end}`,
     pending: 'Chưa nộp',
     course: 'Khóa học',
@@ -321,8 +329,10 @@ export const viMessages: typeof jaMessages = {
     justNow: 'vừa xong',
     secondsAgo: (s: number) => `${s} giây trước`,
     minutesSecondsAgo: (m: number, s: number) => `${m} phút ${s} giây trước`,
-    hoursMinutesSecondsAgo: (h: number, m: number, s: number) => `${h} giờ ${m} phút ${s} giây trước`,
-    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) => `${d} ngày ${h} giờ ${m} phút ${s} giây trước`,
+    hoursMinutesSecondsAgo: (h: number, m: number, s: number) =>
+      `${h} giờ ${m} phút ${s} giây trước`,
+    daysHoursMinutesSecondsAgo: (d: number, h: number, m: number, s: number) =>
+      `${d} ngày ${h} giờ ${m} phút ${s} giây trước`,
     monthsAgo: (m: number) => `khoảng ${m} tháng trước`,
     yearsAgo: (y: number) => `khoảng ${y} năm trước`,
     overdueDays: (d: number) => `quá hạn ${d} ngày`,
@@ -338,6 +348,28 @@ export const viMessages: typeof jaMessages = {
   guidedTour: {
     primaryDone: 'Đã hiểu',
     end: 'Kết thúc hướng dẫn',
+    back: 'Quay lại',
+    skip: 'Bỏ qua hướng dẫn',
+    welcomeEyebrow: 'Thiết lập nhanh',
+    themeEyebrow: 'Chọn giao diện',
+    guideEyebrow: 'Cách sử dụng',
+    themeTitle: 'Chọn chủ đề phù hợp với bạn',
+    themeBody:
+      'Phía sau bảng này là màn hình chính thật. Chọn một chủ đề để áp dụng ngay và so sánh độ dễ đọc.',
+    themeRecommended: 'Đề xuất',
+    themeAll: 'Tất cả chủ đề',
+    themeOther: 'Chủ đề khác',
+    themeCollapse: 'Chỉ hiện đề xuất',
+    themeHint: 'Bạn có thể đổi chủ đề bất cứ lúc nào trong Cài đặt.',
+    weekStartBody:
+      'Chọn lịch học và lịch bài tập bắt đầu từ thứ Hai hay Chủ nhật. Lịch phía sau sẽ cập nhật ngay lập tức.',
+    weekStartHint: 'Bạn có thể đổi ngày bắt đầu tuần bất cứ lúc nào trong Cài đặt.',
+    welcomeFeatures: [
+      'Thiết lập ban đầu',
+      'Lịch học dễ xem hơn',
+      'Lịch bài tập',
+      'Liên kết điểm danh',
+    ],
     steps: [
       {
         id: 'welcome',
@@ -345,9 +377,19 @@ export const viMessages: typeof jaMessages = {
         body: 'Cảm ơn bạn đã cài đặt KCG Portal Redesign Project.\n\nHướng dẫn ngắn này giới thiệu các tính năng bạn dùng thường xuyên nhất.',
       },
       {
+        id: 'navigation',
+        title: 'Đi thẳng đến trang bạn cần',
+        body: 'Mở thông báo, thay đổi lớp học, khảo sát môn học, tủ tài liệu, Campus Plan và các trang chính ngay từ đầu trang.',
+      },
+      {
         id: 'settings',
         title: 'Bắt đầu tại đây: Cài đặt',
         body: 'Mở cài đặt từ nút này ở góc trên bên phải.\n\nBạn có thể đổi màu chủ đề, lấy lại danh sách khóa học và quản lý tích hợp King LMS.',
+      },
+      {
+        id: 'assignment-overview',
+        title: 'Lịch bài tập',
+        body: 'Hiển thị bài tập King LMS theo hạn nộp, cùng trạng thái ước tính chưa nộp, đã nộp, quá hạn và thời gian còn lại. Nhấp bài tập để mở trong King LMS.',
       },
       {
         id: 'assignment',
@@ -358,6 +400,16 @@ export const viMessages: typeof jaMessages = {
         id: 'kogi',
         title: 'Lịch học',
         body: 'Nhấp lớp học để mở trực tiếp trang khóa King LMS tương ứng.\n\nTiện ích có thể cần lấy danh sách khóa học trước; khi đó sẽ có hướng dẫn.',
+      },
+      {
+        id: 'calendar-mode',
+        title: 'Chế độ tuần và tháng',
+        body: 'Dùng Tuần để xem rõ thời khóa biểu hiện tại và Tháng để xem trước các lịch xa hơn. Chuyển đổi bằng hai nút này.',
+      },
+      {
+        id: 'kogi-hover',
+        title: 'Xem chi tiết lớp học',
+        body: 'Di chuột lên một lớp để xem tên đầy đủ, phòng học, tiết học và thời gian bắt đầu, kết thúc chi tiết.',
       },
       {
         id: 'kogi-context',
@@ -400,7 +452,8 @@ export const viMessages: typeof jaMessages = {
     assignmentFetching: 'Đang lấy bài tập…',
     loginPlease: 'Vui lòng đăng nhập',
     loginAfterAssignment: 'Sau khi đăng nhập, bài tập sẽ được lấy và bạn quay lại cổng thông tin.',
-    loginAfterCourses: 'Sau khi đăng nhập, danh sách khóa học sẽ được lưu và bạn quay lại cổng thông tin.',
+    loginAfterCourses:
+      'Sau khi đăng nhập, danh sách khóa học sẽ được lưu và bạn quay lại cổng thông tin.',
   },
   themeNames: themeNames.vi,
 };
