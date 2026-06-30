@@ -35,16 +35,17 @@ import {
 } from './SettingsPanelSections';
 
 const extensionVersion = readExtensionVersion();
+type SettingsTab = 'appearance' | 'connections' | 'support';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
 interface SettingsPanelProps {
   /** ポップオーバー外枠 DOM（Escape 連携などで他フックから参照する） */
   popoverSurfaceRef?: Ref<HTMLDivElement | null>;
-  isOpen:          boolean;
-  settings:        Settings;
-  onClose:         () => void;
-  onThemeChange:   (name: string) => void;
+  isOpen: boolean;
+  settings: Settings;
+  onClose: () => void;
+  onThemeChange: (name: string) => void;
   onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   /** 初回案内チュートリアルを先頭から再表示する */
   onReplayGuidedTour: () => void;
@@ -60,19 +61,22 @@ export interface SettingsPanelHandle {
 // ─── コンポーネント ────────────────────────────────────────────────────────
 
 export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>(
-  function SettingsPanel({
-    popoverSurfaceRef,
-    isOpen,
-    settings,
-    onClose,
-    onThemeChange,
-    onSettingChange,
-    onReplayGuidedTour,
-    variant = 'portal',
-  }, ref) {
+  function SettingsPanel(
+    {
+      popoverSurfaceRef,
+      isOpen,
+      settings,
+      onClose,
+      onThemeChange,
+      onSettingChange,
+      onReplayGuidedTour,
+      variant = 'portal',
+    },
+    ref,
+  ) {
     const { t } = useI18n();
     const { latestVersion, updateAvailable } = useExtensionUpdateAvailable();
-    const popRef  = useRef<HTMLDivElement>(null);
+    const popRef = useRef<HTMLDivElement>(null);
     const changelogCloseRef = useRef<HTMLButtonElement>(null);
     const changelogModalRootRef = useRef<HTMLDivElement>(null);
     const licensesCloseRef = useRef<HTMLButtonElement>(null);
@@ -86,6 +90,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     const [changelogLoading, setChangelogLoading] = useState(false);
     const [changelogErr, setChangelogErr] = useState<string | null>(null);
     const [changelogList, setChangelogList] = useState<ParsedChangelogRelease[] | null>(null);
+    const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
 
     const resetChangelogModal = useCallback(() => {
       changelogFetchGenRef.current += 1;
@@ -264,8 +269,14 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     useEffect(() => {
       if (!closing) return;
       const el = popRef.current;
-      const finish = () => { setClosing(false); onClose(); };
-      if (!el) { finish(); return; }
+      const finish = () => {
+        setClosing(false);
+        onClose();
+      };
+      if (!el) {
+        finish();
+        return;
+      }
 
       // reduced-motion 環境では animationend が発火しないため 30ms でフォールバック。
       // 通常は CSS の閉じアニメーション（約 200ms）が終わる前に animationend が来るが、
@@ -289,7 +300,8 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     useEffect(() => {
       if (!isOpen || closing) return;
       const sel = `#${PORTAL_DOM.overlayRoot}`;
-      const root = (popRef.current?.closest(sel) ?? document.getElementById(PORTAL_DOM.overlayRoot)) as HTMLElement | null;
+      const root = (popRef.current?.closest(sel) ??
+        document.getElementById(PORTAL_DOM.overlayRoot)) as HTMLElement | null;
       if (!root) return;
       function onPointerDown(e: PointerEvent) {
         const t = e.target as Node;
@@ -343,9 +355,8 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       requestClose,
     ]);
 
-    const overlayEl = typeof document !== 'undefined'
-      ? document.getElementById(PORTAL_DOM.overlayRoot)
-      : null;
+    const overlayEl =
+      typeof document !== 'undefined' ? document.getElementById(PORTAL_DOM.overlayRoot) : null;
 
     const changelogModalMounted = changelogModalOpen || changelogModalClosing;
     const licensesModalMounted = licensesModalOpen || licensesModalClosing;
@@ -372,105 +383,185 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
         onRequestClose={requestCloseLicensesModal}
       />
     );
+    const legalSection = (
+      <div className="p-settings-section p-settings-section-licenses p-settings-section--about">
+        <div className="p-settings-section-title">{t.settings.about}</div>
+        <div className="p-settings-action-stack">
+          <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+            <button
+              type="button"
+              className="p-settings-tour-replay-btn"
+              onClick={openLicensesModal}
+            >
+              {t.settings.openLicenses}
+            </button>
+          </div>
+          <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+            <a
+              className="p-settings-tour-replay-btn"
+              href="https://kcg-portal-redesign-project-web.vercel.app/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t.settings.openPrivacyPolicy}
+            </a>
+          </div>
+        </div>
+      </div>
+    );
 
     return (
       <>
-      <div
-        ref={assignPopSurface}
-        className={`p-settings-pop${closing ? ' is-closing' : ''}`}
-        id="p-settings-pop"
-        hidden={!isOpen && !closing}
-        aria-hidden={!isOpen}
-      >
         <div
-          className="p-settings-dialog"
-          id="p-settings-dialog"
-          role="dialog"
-          aria-modal={false}
-          aria-labelledby="p-settings-heading"
-          tabIndex={-1}
+          ref={assignPopSurface}
+          className={`p-settings-pop${closing ? ' is-closing' : ''}`}
+          id="p-settings-pop"
+          hidden={!isOpen && !closing}
+          aria-hidden={!isOpen}
         >
-          <h2 id="p-settings-heading">{t.settings.title}</h2>
-
-          {updateAvailable && latestVersion && extensionVersion ? (
-            <div className="p-settings-update-callout" role="status" aria-live="polite">
-              <p className="p-settings-update-callout-title">{t.settings.updateAvailableTitle}</p>
-              <p className="p-settings-update-callout-body">
-                {t.settings.updateAvailableBody(extensionVersion, latestVersion)}
-              </p>
-              <p className="p-settings-update-callout-hint">{t.settings.updateAvailableHint}</p>
+          <div
+            className="p-settings-dialog"
+            id="p-settings-dialog"
+            role="dialog"
+            aria-modal={false}
+            aria-labelledby="p-settings-heading"
+            tabIndex={-1}
+          >
+            <div className="p-settings-nav">
+              <h2 id="p-settings-heading">{t.settings.title}</h2>
+              {variant === 'portal' ? (
+                <div className="p-settings-tabs" role="tablist" aria-label={t.settings.title}>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'appearance'}
+                    className={activeTab === 'appearance' ? 'is-active' : undefined}
+                    onClick={() => setActiveTab('appearance')}
+                  >
+                    {t.settings.general}
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'connections'}
+                    className={activeTab === 'connections' ? 'is-active' : undefined}
+                    onClick={() => setActiveTab('connections')}
+                  >
+                    {t.settings.connections}
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'support'}
+                    className={activeTab === 'support' ? 'is-active' : undefined}
+                    onClick={() => setActiveTab('support')}
+                  >
+                    {t.settings.support}
+                  </button>
+                </div>
+              ) : null}
             </div>
-          ) : null}
 
-          <SettingsLanguageSection settings={settings} onSettingChange={onSettingChange} />
+            {updateAvailable && latestVersion && extensionVersion ? (
+              <div className="p-settings-update-callout" role="status" aria-live="polite">
+                <p className="p-settings-update-callout-title">{t.settings.updateAvailableTitle}</p>
+                <p className="p-settings-update-callout-body">
+                  {t.settings.updateAvailableBody(extensionVersion, latestVersion)}
+                </p>
+                <p className="p-settings-update-callout-hint">{t.settings.updateAvailableHint}</p>
+              </div>
+            ) : null}
 
-          <SettingsThemeSection settings={settings} onThemeChange={onThemeChange} />
+            {variant === 'portal' ? (
+              <>
+                <div className="p-settings-tab-panel" role="tabpanel" key={activeTab}>
+                  {activeTab === 'appearance' ? (
+                    <>
+                      <SettingsThemeSection settings={settings} onThemeChange={onThemeChange} />
+                      <SettingsLanguageSection
+                        settings={settings}
+                        onSettingChange={onSettingChange}
+                      />
+                      <SettingsPortalOnlySections
+                        group="appearance"
+                        settings={settings}
+                        onSettingChange={onSettingChange}
+                        onReplayGuidedTour={onReplayGuidedTour}
+                        onOpenChangelog={openChangelogModal}
+                      />
+                    </>
+                  ) : null}
 
-          {variant === 'portal' ? (
-            <SettingsPortalOnlySections
-              settings={settings}
-              onSettingChange={onSettingChange}
-              onReplayGuidedTour={onReplayGuidedTour}
-              onOpenChangelog={openChangelogModal}
-            />
-          ) : null}
+                  {activeTab === 'connections' ? (
+                    <>
+                      <SettingsPortalOnlySections
+                        group="connections"
+                        settings={settings}
+                        onSettingChange={onSettingChange}
+                        onReplayGuidedTour={onReplayGuidedTour}
+                        onOpenChangelog={openChangelogModal}
+                      />
+                      <SettingsCplanSection settings={settings} onSettingChange={onSettingChange} />
+                      <SettingsWebMailSection
+                        settings={settings}
+                        variant={variant}
+                        onSettingChange={onSettingChange}
+                      />
+                    </>
+                  ) : null}
 
-          <SettingsWebMailSection
-            settings={settings}
-            variant={variant}
-            onSettingChange={onSettingChange}
-          />
+                  {activeTab === 'support' ? (
+                    <>
+                      <SettingsPortalOnlySections
+                        group="support"
+                        settings={settings}
+                        onSettingChange={onSettingChange}
+                        onReplayGuidedTour={onReplayGuidedTour}
+                        onOpenChangelog={openChangelogModal}
+                      />
+                      <SettingsFeedbackSection />
+                      {legalSection}
+                    </>
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <>
+                <SettingsLanguageSection settings={settings} onSettingChange={onSettingChange} />
+                <SettingsThemeSection settings={settings} onThemeChange={onThemeChange} />
+                <SettingsWebMailSection
+                  settings={settings}
+                  variant={variant}
+                  onSettingChange={onSettingChange}
+                />
+                <SettingsFeedbackSection />
+                <SettingsHome2ChangelogSection onOpenChangelog={openChangelogModal} />
+                {legalSection}
+              </>
+            )}
 
-          {variant === 'portal' ? (
-            <SettingsCplanSection settings={settings} onSettingChange={onSettingChange} />
-          ) : null}
-
-          <SettingsFeedbackSection />
-
-          {variant === 'home2' ? (
-            <SettingsHome2ChangelogSection onOpenChangelog={openChangelogModal} />
-          ) : null}
-
-          <div className="p-settings-section p-settings-section-licenses">
-            <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
-              <button type="button" className="p-settings-tour-replay-btn" onClick={openLicensesModal}>
-                {t.settings.openLicenses}
-              </button>
-            </div>
-            <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
-              <a
-                className="p-settings-tour-replay-btn"
-                href="https://kcg-portal-redesign-project-web.vercel.app/privacy-policy"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t.settings.openPrivacyPolicy}
-              </a>
-            </div>
+            {extensionVersion ? (
+              <div className="p-settings-footer">
+                <p className="p-settings-credit" role="note">
+                  Created by{' '}
+                  <a
+                    className="p-settings-credit-link"
+                    href="https://x.com/nnnnnnn0090"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    nnnnnnn0090
+                  </a>
+                </p>
+                <p className="p-settings-version" role="note">
+                  {t.settings.version(extensionVersion)}
+                </p>
+              </div>
+            ) : null}
           </div>
-
-          {extensionVersion ? (
-            <div className="p-settings-footer">
-              <p className="p-settings-credit" role="note">
-                Created by{' '}
-                <a
-                  className="p-settings-credit-link"
-                  href="https://x.com/nnnnnnn0090"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  nnnnnnn0090
-                </a>
-              </p>
-              <p className="p-settings-version" role="note">
-                {t.settings.version(extensionVersion)}
-              </p>
-            </div>
-          ) : null}
         </div>
-      </div>
-      {changelogModal}
-      {licensesModal}
+        {changelogModal}
+        {licensesModal}
       </>
     );
   },

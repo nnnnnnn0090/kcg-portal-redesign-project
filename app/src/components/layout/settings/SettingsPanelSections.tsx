@@ -5,12 +5,7 @@
 import { THEMES } from '../../../themes';
 import type { Settings } from '../../../context/settings';
 import { beginKingLmsCourseListSync } from '../../../lib/king-lms-course-sync';
-import {
-  APP_LANGUAGES,
-  APP_LANGUAGE_LABELS,
-  themeDisplayName,
-  useI18n,
-} from '../../../i18n';
+import { APP_LANGUAGES, APP_LANGUAGE_LABELS, themeDisplayName, useI18n } from '../../../i18n';
 import {
   EXTENSION_FEEDBACK_FORM_URL,
   PORTAL_COMMUNITY_DISCORD_INVITE_URL,
@@ -19,7 +14,7 @@ import { MascotDecorationSetting } from './MascotDecorationSetting';
 import { SettingsSwitch } from './SettingsSwitch';
 
 interface SettingsLanguageSectionProps {
-  settings:        Settings;
+  settings: Settings;
   onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
 }
 
@@ -29,7 +24,7 @@ export function SettingsLanguageSection({
 }: SettingsLanguageSectionProps) {
   const { t } = useI18n();
   return (
-    <div className="p-settings-section">
+    <div className="p-settings-section p-settings-section--language">
       <div className="p-settings-section-title">{t.language.sectionTitle}</div>
       <label className="p-settings-row p-settings-row--select">
         <span>{t.language.selectLabel}</span>
@@ -51,14 +46,14 @@ export function SettingsLanguageSection({
 }
 
 interface SettingsThemeSectionProps {
-  settings:      Settings;
+  settings: Settings;
   onThemeChange: (name: string) => void;
 }
 
 export function SettingsThemeSection({ settings, onThemeChange }: SettingsThemeSectionProps) {
   const { language, t } = useI18n();
   return (
-    <div className="p-settings-section">
+    <div className="p-settings-section p-settings-section--theme">
       <div className="p-settings-section-title">{t.settings.colorTheme}</div>
       <div className="p-theme-picker" id="p-theme-picker">
         {Object.entries(THEMES).map(([key, meta]) => (
@@ -73,9 +68,7 @@ export function SettingsThemeSection({ settings, onThemeChange }: SettingsThemeS
               <span className="p-theme-btn-swatch" style={{ background: meta.bg }} />
               <span className="p-theme-btn-swatch" style={{ background: meta.accent }} />
             </span>
-            <span className="p-theme-btn-label">
-              {themeDisplayName(key, meta.name, language)}
-            </span>
+            <span className="p-theme-btn-label">{themeDisplayName(key, meta.name, language)}</span>
           </button>
         ))}
       </div>
@@ -84,84 +77,84 @@ export function SettingsThemeSection({ settings, onThemeChange }: SettingsThemeS
 }
 
 interface SettingsPortalOnlySectionsProps {
-  settings:           Settings;
-  onSettingChange:    <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  settings: Settings;
+  group: 'appearance' | 'connections' | 'support';
+  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onReplayGuidedTour: () => void;
-  onOpenChangelog:    () => void;
+  onOpenChangelog: () => void;
 }
 
 export function SettingsPortalOnlySections({
   settings,
+  group,
   onSettingChange,
   onReplayGuidedTour,
   onOpenChangelog,
 }: SettingsPortalOnlySectionsProps) {
   const { t } = useI18n();
-  return (
-    <>
-      <div className="p-settings-section">
-        <div className="p-settings-section-title">{t.settings.homeDecoration}</div>
-        <MascotDecorationSetting
-          artwork="calendar"
-          checked={settings.showKogiCalMascot}
-          label={t.settings.showKogiCalMascot}
-          onChange={(checked) => onSettingChange('showKogiCalMascot', checked)}
-        />
-        <MascotDecorationSetting
-          artwork="homeCorner"
-          checked={settings.showHomeCornerCharacter}
-          label={t.settings.showHomeCornerCharacter}
-          onChange={(checked) => onSettingChange('showHomeCornerCharacter', checked)}
-        />
-      </div>
-
-      <div className="p-settings-section">
-        <div className="p-settings-section-title">{t.settings.display}</div>
-
-        <SettingsSwitch checked={settings.hideProfileName} label={t.settings.hideProfileName} onChange={(checked) => onSettingChange('hideProfileName', checked)} />
-        <SettingsSwitch checked={settings.hideAssignmentCalendar} label={t.settings.hideAssignmentCalendar} onChange={(checked) => onSettingChange('hideAssignmentCalendar', checked)} />
-
-        <fieldset className="p-settings-fieldset">
-          <legend className="p-settings-row-label">{t.settings.calendarWeekStart}</legend>
-          <div className="p-settings-segmented">
-            <label>
-              <input
-                type="radio"
-                name="portal-calendar-week-start"
-                checked={settings.calendarWeekStart === 'monday'}
-                onChange={() => onSettingChange('calendarWeekStart', 'monday')}
-              />
-              <span>{t.settings.weekStartMonday}</span>
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="portal-calendar-week-start"
-                checked={settings.calendarWeekStart === 'sunday'}
-                onChange={() => onSettingChange('calendarWeekStart', 'sunday')}
-              />
-              <span>{t.settings.weekStartSunday}</span>
-            </label>
-          </div>
-        </fieldset>
-      </div>
-
-      <div className="p-settings-section">
-        <div className="p-settings-section-title">{t.settings.help}</div>
-        <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
-          <button type="button" className="p-settings-tour-replay-btn" onClick={onReplayGuidedTour}>
-            {t.settings.replayTour}
-          </button>
+  if (group === 'appearance') {
+    return (
+      <>
+        <div className="p-settings-section p-settings-section--decoration">
+          <div className="p-settings-section-title">{t.settings.homeDecoration}</div>
+          <MascotDecorationSetting
+            artwork="calendar"
+            checked={settings.showKogiCalMascot}
+            label={t.settings.showKogiCalMascot}
+            onChange={(checked) => onSettingChange('showKogiCalMascot', checked)}
+          />
+          <MascotDecorationSetting
+            artwork="homeCorner"
+            checked={settings.showHomeCornerCharacter}
+            label={t.settings.showHomeCornerCharacter}
+            onChange={(checked) => onSettingChange('showHomeCornerCharacter', checked)}
+          />
         </div>
 
-        <div className="p-settings-row p-settings-row-actions p-settings-tour-replay p-settings-changelog-after-tour">
-          <button type="button" className="p-settings-tour-replay-btn" onClick={onOpenChangelog}>
-            {t.settings.openChangelog}
-          </button>
-        </div>
-      </div>
+        <div className="p-settings-section p-settings-section--display">
+          <div className="p-settings-section-title">{t.settings.display}</div>
+          <SettingsSwitch
+            checked={settings.hideProfileName}
+            label={t.settings.hideProfileName}
+            onChange={(checked) => onSettingChange('hideProfileName', checked)}
+          />
+          <SettingsSwitch
+            checked={settings.hideAssignmentCalendar}
+            label={t.settings.hideAssignmentCalendar}
+            onChange={(checked) => onSettingChange('hideAssignmentCalendar', checked)}
+          />
 
-      <div className="p-settings-section">
+          <fieldset className="p-settings-fieldset">
+            <legend className="p-settings-row-label">{t.settings.calendarWeekStart}</legend>
+            <div className="p-settings-segmented">
+              <label>
+                <input
+                  type="radio"
+                  name="portal-calendar-week-start"
+                  checked={settings.calendarWeekStart === 'monday'}
+                  onChange={() => onSettingChange('calendarWeekStart', 'monday')}
+                />
+                <span>{t.settings.weekStartMonday}</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="portal-calendar-week-start"
+                  checked={settings.calendarWeekStart === 'sunday'}
+                  onChange={() => onSettingChange('calendarWeekStart', 'sunday')}
+                />
+                <span>{t.settings.weekStartSunday}</span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+      </>
+    );
+  }
+
+  if (group === 'connections') {
+    return (
+      <div className="p-settings-section p-settings-section--king-lms">
         <div className="p-settings-section-title">{t.settings.dataIntegration}</div>
         <div className="p-settings-row p-settings-row-actions p-settings-king-lms-sync">
           <button
@@ -171,18 +164,35 @@ export function SettingsPortalOnlySections({
           >
             {t.settings.resyncCourses}
           </button>
-          <p className="p-settings-hint">
-            {t.settings.resyncCoursesHint}
-          </p>
+          <p className="p-settings-hint">{t.settings.resyncCoursesHint}</p>
         </div>
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="p-settings-section p-settings-section--help">
+      <div className="p-settings-section-title">{t.settings.help}</div>
+      <div className="p-settings-action-stack">
+        <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+          <button type="button" className="p-settings-tour-replay-btn" onClick={onReplayGuidedTour}>
+            {t.settings.replayTour}
+          </button>
+        </div>
+
+        <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
+          <button type="button" className="p-settings-tour-replay-btn" onClick={onOpenChangelog}>
+            {t.settings.openChangelog}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
 interface SettingsWebMailSectionProps {
-  settings:        Settings;
-  variant:         'portal' | 'home2';
+  settings: Settings;
+  variant: 'portal' | 'home2';
   onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
 }
 
@@ -193,14 +203,14 @@ export function SettingsWebMailSection({
 }: SettingsWebMailSectionProps) {
   const { t } = useI18n();
   return (
-    <div className="p-settings-section">
+    <div className="p-settings-section p-settings-section--webmail">
       <div className="p-settings-section-title">{t.settings.webMail}</div>
       <SettingsSwitch
         checked={settings.home2WebMailOverlay}
         label={t.settings.webMailOverlay}
         onChange={(next) => {
-            onSettingChange('home2WebMailOverlay', next);
-            if (variant === 'home2' && !next) window.location.reload();
+          onSettingChange('home2WebMailOverlay', next);
+          if (variant === 'home2' && !next) window.location.reload();
         }}
       />
       <p className="p-settings-hint">{t.settings.webMailReloadHint}</p>
@@ -208,15 +218,16 @@ export function SettingsWebMailSection({
   );
 }
 
-export function SettingsCplanSection({
-  settings,
-  onSettingChange,
-}: SettingsLanguageSectionProps) {
+export function SettingsCplanSection({ settings, onSettingChange }: SettingsLanguageSectionProps) {
   const { t } = useI18n();
   return (
-    <div className="p-settings-section">
+    <div className="p-settings-section p-settings-section--cplan">
       <div className="p-settings-section-title">{t.settings.campusPlan}</div>
-      <SettingsSwitch checked={settings.cplanOverlay} label={t.settings.campusPlanOverlay} onChange={(checked) => onSettingChange('cplanOverlay', checked)} />
+      <SettingsSwitch
+        checked={settings.cplanOverlay}
+        label={t.settings.campusPlanOverlay}
+        onChange={(checked) => onSettingChange('cplanOverlay', checked)}
+      />
       <p className="p-settings-hint">{t.settings.campusPlanReloadHint}</p>
     </div>
   );
@@ -229,16 +240,17 @@ export function SettingsFeedbackSection() {
   const hasFeedbackForm = feedbackFormUrl.length > 0;
   const hasDiscordCommunity = discordInviteUrl.length > 0;
   const showFeedbackSection = hasFeedbackForm || hasDiscordCommunity;
-  const feedbackSectionTitle = hasFeedbackForm && hasDiscordCommunity
-    ? t.settings.feedbackCommunity
-    : hasFeedbackForm
-      ? t.settings.feedback
-      : t.settings.community;
+  const feedbackSectionTitle =
+    hasFeedbackForm && hasDiscordCommunity
+      ? t.settings.feedbackCommunity
+      : hasFeedbackForm
+        ? t.settings.feedback
+        : t.settings.community;
 
   if (!showFeedbackSection) return null;
 
   return (
-    <div className="p-settings-section">
+    <div className="p-settings-section p-settings-section--feedback">
       <div className="p-settings-section-title">{feedbackSectionTitle}</div>
       {hasFeedbackForm ? (
         <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
@@ -255,9 +267,7 @@ export function SettingsFeedbackSection() {
       {hasDiscordCommunity ? (
         <>
           {hasFeedbackForm ? (
-            <p className="p-settings-hint p-settings-hint--tight">
-              {t.settings.discordHint}
-            </p>
+            <p className="p-settings-hint p-settings-hint--tight">{t.settings.discordHint}</p>
           ) : null}
           <div className="p-settings-row p-settings-row-actions p-settings-tour-replay">
             <a
@@ -292,7 +302,9 @@ interface SettingsHome2ChangelogSectionProps {
   onOpenChangelog: () => void;
 }
 
-export function SettingsHome2ChangelogSection({ onOpenChangelog }: SettingsHome2ChangelogSectionProps) {
+export function SettingsHome2ChangelogSection({
+  onOpenChangelog,
+}: SettingsHome2ChangelogSectionProps) {
   const { t } = useI18n();
   return (
     <div className="p-settings-section p-settings-section-changelog-only">
