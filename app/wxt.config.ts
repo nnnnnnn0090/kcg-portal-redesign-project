@@ -19,7 +19,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'KCG Portal Redesign Project',
-    version: '6.2.1',
+    version: '6.1.2',
     description:
       '京都コンピュータ学院の学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',
     author: 'nnnnnnn0090',
