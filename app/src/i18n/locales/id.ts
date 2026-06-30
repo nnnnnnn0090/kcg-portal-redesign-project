@@ -67,7 +67,7 @@ export const idMessages: typeof jaMessages = {
       'Digunakan untuk membuka kursus King LMS dari kalender kelas. Ekstensi akan mengunjungi King LMS sekali untuk mengambil daftar, lalu kembali ke portal.',
     webMail: 'Web Mail',
     webMailOverlay: 'Tampilkan overlay ekstensi',
-    webMailReloadHint: 'Muat ulang halaman setelah mematikan opsi ini.',
+    webMailReloadHint: 'Perubahan berlaku saat Anda membuka Web Mail berikutnya.',
     campusPlan: 'Campus Plan',
     campusPlanOverlay: 'Tampilkan overlay ekstensi',
     campusPlanReloadHint: 'Perubahan berlaku saat Anda membuka Campus Plan berikutnya.',

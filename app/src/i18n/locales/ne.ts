@@ -67,7 +67,7 @@ export const neMessages: typeof jaMessages = {
       'कक्षा क्यालेन्डरबाट King LMS पाठ्यक्रम खोल्न प्रयोग हुन्छ। विस्तारले सूची ल्याउन एक पटक King LMS भ्रमण गर्छ, त्यसपछि पोर्टलमा फर्कन्छ।',
     webMail: 'Web मेल',
     webMailOverlay: 'विस्तार ओभरले देखाउनुहोस्',
-    webMailReloadHint: 'यो बन्द गरेपछि पृष्ठ पुनः लोड गर्नुहोस्।',
+    webMailReloadHint: 'अर्को पटक Web Mail खोल्दा परिवर्तन लागू हुन्छ।',
     campusPlan: 'Campus Plan',
     campusPlanOverlay: 'विस्तार ओभरले देखाउनुहोस्',
     campusPlanReloadHint: 'अर्को पटक Campus Plan खोल्दा परिवर्तन लागू हुन्छ।',

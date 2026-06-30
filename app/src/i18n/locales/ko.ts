@@ -67,7 +67,7 @@ export const koMessages: typeof jaMessages = {
       '수업 캘린더에서 King LMS 코스를 열 때 사용합니다. 목록을 가져오기 위해 King LMS를 한 번 방문한 뒤 포털로 돌아옵니다.',
     webMail: 'Web 메일',
     webMailOverlay: '확장 오버레이 표시',
-    webMailReloadHint: '끈 후에는 페이지를 새로고침하세요.',
+    webMailReloadHint: '다음에 Web 메일을 열 때 변경 사항이 적용됩니다.',
     campusPlan: '캠퍼스 플랜',
     campusPlanOverlay: '확장 오버레이 표시',
     campusPlanReloadHint: '다음에 캠퍼스 플랜을 열 때 변경 사항이 적용됩니다.',

@@ -67,7 +67,7 @@ export const enMessages: typeof jaMessages = {
       'Used to open King LMS courses from class calendar items. The extension will visit King LMS once to fetch the list, then return to the portal.',
     webMail: 'Web Mail',
     webMailOverlay: 'Show the extension overlay',
-    webMailReloadHint: 'Reload the page after turning this off.',
+    webMailReloadHint: 'The change applies the next time you open Web Mail.',
     campusPlan: 'Campus Plan',
     campusPlanOverlay: 'Show the extension overlay',
     campusPlanReloadHint: 'The change applies the next time you open Campus Plan.',

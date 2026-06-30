@@ -67,7 +67,7 @@ export const thMessages: typeof jaMessages = {
       'ใช้เปิดคอร์ส King LMS จากปฏิทินชั้นเรียน ส่วนขยายจะเข้า King LMS ครั้งหนึ่งเพื่อดึงรายการ แล้วกลับพอร์ทัล',
     webMail: 'Web Mail',
     webMailOverlay: 'แสดงโอเวอร์เลย์ส่วนขยาย',
-    webMailReloadHint: 'โหลดหน้าใหม่หลังปิดตัวเลือกนี้',
+    webMailReloadHint: 'การเปลี่ยนแปลงจะมีผลเมื่อเปิด Web Mail ครั้งถัดไป',
     campusPlan: 'Campus Plan',
     campusPlanOverlay: 'แสดงโอเวอร์เลย์ส่วนขยาย',
     campusPlanReloadHint: 'การเปลี่ยนแปลงจะมีผลเมื่อเปิด Campus Plan ครั้งถัดไป',

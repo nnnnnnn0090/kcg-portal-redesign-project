@@ -64,7 +64,7 @@ export const jaMessages = {
       '講義のクリックで King LMS のコースへ移動するために使用します。一覧取得のため一度 King LMS へ移動します（終了後にポータルへ戻ります）。',
     webMail: 'Web メール',
     webMailOverlay: '拡張のオーバーレイを表示する',
-    webMailReloadHint: 'オフにしたあと反映するにはページを再読み込みしてください。',
+    webMailReloadHint: '変更は次にWebメールを開いたときから反映されます。',
     campusPlan: 'キャンパスプラン',
     campusPlanOverlay: '拡張のオーバーレイを表示する',
     campusPlanReloadHint: '変更は次にキャンパスプランを開いたときから反映されます。',

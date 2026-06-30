@@ -67,7 +67,7 @@ export const viMessages: typeof jaMessages = {
       'Dùng để mở khóa học King LMS từ lịch học. Tiện ích sẽ truy cập King LMS một lần để lấy danh sách, rồi quay lại cổng thông tin.',
     webMail: 'Web Mail',
     webMailOverlay: 'Hiển thị lớp phủ tiện ích',
-    webMailReloadHint: 'Tải lại trang sau khi tắt tùy chọn này.',
+    webMailReloadHint: 'Thay đổi được áp dụng khi bạn mở Web Mail lần tới.',
     campusPlan: 'Campus Plan',
     campusPlanOverlay: 'Hiển thị lớp phủ tiện ích',
     campusPlanReloadHint: 'Thay đổi được áp dụng khi bạn mở Campus Plan lần tới.',

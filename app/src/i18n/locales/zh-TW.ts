@@ -67,7 +67,7 @@ export const zhTWMessages: typeof jaMessages = {
       '用於從課程日曆開啟 King LMS 課程。擴充功能將造訪 King LMS 一次以取得列表，然後返回入口網站。',
     webMail: 'Web 郵件',
     webMailOverlay: '顯示擴充功能疊加層',
-    webMailReloadHint: '關閉後請重新載入頁面以生效。',
+    webMailReloadHint: '下次開啟 Web 郵件時變更將生效。',
     campusPlan: '校園計畫',
     campusPlanOverlay: '顯示擴充功能疊加層',
     campusPlanReloadHint: '下次開啟校園計畫時變更將生效。',
