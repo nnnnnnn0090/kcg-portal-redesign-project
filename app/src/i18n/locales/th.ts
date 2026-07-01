@@ -161,6 +161,8 @@ export const thMessages: typeof jaMessages = {
   },
   newsPage: {
     title: 'รายการประกาศ',
+    generalTab: 'ประกาศ',
+    lostPropertyTab: 'ของหาย',
     nendoAria: 'แสดงปีการศึกษา',
     nendoButton: (year: string) => `ปีการศึกษา ${year}`,
     nendoShowing: (year: string) => `กำลังแสดงประกาศปีการศึกษา ${year}`,

@@ -161,6 +161,8 @@ export const neMessages: typeof jaMessages = {
   },
   newsPage: {
     title: 'सूचना सूची',
+    generalTab: 'सूचना',
+    lostPropertyTab: 'हराएको सामान',
     nendoAria: 'शैक्षिक वर्ष देखाउनुहोस्',
     nendoButton: (year: string) => `${year} शैक्षिक वर्ष`,
     nendoShowing: (year: string) => `${year} शैक्षिक वर्षका सूचना देखाइँदैछ।`,

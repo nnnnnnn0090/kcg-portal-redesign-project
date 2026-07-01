@@ -161,6 +161,8 @@ export const zhMessages: typeof jaMessages = {
   },
   newsPage: {
     title: '公告列表',
+    generalTab: '公告',
+    lostPropertyTab: '失物招领',
     nendoAria: '显示学年',
     nendoButton: (year: string) => `${year} 学年`,
     nendoShowing: (year: string) => `正在显示 ${year} 学年的公告列表。`,

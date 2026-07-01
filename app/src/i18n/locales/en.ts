@@ -162,6 +162,8 @@ export const enMessages: typeof jaMessages = {
   },
   newsPage: {
     title: 'Notice List',
+    generalTab: 'Notices',
+    lostPropertyTab: 'Lost property',
     nendoAria: 'Display academic year',
     nendoButton: (year: string) => `${year} academic year`,
     nendoShowing: (year: string) => `Showing notices for the ${year} academic year.`,

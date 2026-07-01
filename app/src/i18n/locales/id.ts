@@ -162,6 +162,8 @@ export const idMessages: typeof jaMessages = {
   },
   newsPage: {
     title: 'Daftar Pengumuman',
+    generalTab: 'Pengumuman',
+    lostPropertyTab: 'Barang hilang',
     nendoAria: 'Tampilkan tahun akademik',
     nendoButton: (year: string) => `Tahun akademik ${year}`,
     nendoShowing: (year: string) => `Menampilkan pengumuman tahun akademik ${year}.`,

@@ -159,6 +159,8 @@ export const jaMessages = {
   },
   newsPage: {
     title: 'お知らせ一覧',
+    generalTab: 'お知らせ',
+    lostPropertyTab: '拾得物',
     nendoAria: '表示年度',
     nendoButton: (year: string) => `${year} 年度`,
     nendoShowing: (year: string) => `${year}年度のお知らせ一覧を表示しています。`,

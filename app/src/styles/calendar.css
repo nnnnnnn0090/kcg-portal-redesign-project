@@ -200,6 +200,9 @@
   backdrop-filter:blur(10px);color:var(--p-text);font-size:.8125rem;line-height:1.45;
   word-break:keep-all;overflow-wrap:normal}
 #portal-overlay .p-cal-hover-pop[hidden]{display:none!important}
+#portal-overlay .p-cal-hover-pop.is-entering{animation:p-cal-hover-pop-in .14s cubic-bezier(.2,.8,.2,1) both}
+@keyframes p-cal-hover-pop-in{from{opacity:0;transform:translateY(4px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){#portal-overlay .p-cal-hover-pop.is-entering{animation:none}}
 #portal-overlay .p-cal-pop-title{font-weight:600;color:var(--p-text-bright);font-size:.875rem;margin:0 0 .48rem;letter-spacing:-.01em;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 #portal-overlay .p-cal-pop-rail-wrap{margin:.35rem 0 0}

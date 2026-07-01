@@ -8,6 +8,7 @@
   flex:1 1 auto;min-height:0;max-height:420px;overflow:auto;
   padding-top:.55rem;padding-bottom:.55rem;
 }
+#portal-overlay #p-news > .p-news-tabs{position:sticky;top:-.55rem;z-index:1;margin:-.55rem -1.15rem .2rem;padding-left:1.5rem;background:var(--p-bg2)}
 #portal-overlay .p-panel{background:var(--p-bg2);border:1px solid var(--p-border);
   border-radius:16px;box-shadow:0 4px 24px var(--p-shadow);overflow:hidden;min-height:0;
   animation:p-fade-in var(--p-enter-dur) var(--p-enter-ease) both;backdrop-filter:blur(8px)}

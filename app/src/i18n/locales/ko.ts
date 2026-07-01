@@ -162,6 +162,8 @@ export const koMessages: typeof jaMessages = {
   },
   newsPage: {
     title: '공지 목록',
+    generalTab: '공지',
+    lostPropertyTab: '분실물',
     nendoAria: '표시 학년도',
     nendoButton: (year: string) => `${year} 학년도`,
     nendoShowing: (year: string) => `${year} 학년도 공지 목록을 표시하고 있습니다.`,

@@ -21,6 +21,8 @@ import { useDeveloperSurvey } from '../../hooks/useDeveloperSurvey';
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
+import { NewsTabs, type NewsTab } from '../ui/NewsTabs';
+import { isLostPropertyNews } from '../../lib/news-classification';
 import { DeveloperSurveyPanel } from '../ui/DeveloperSurveyPanel';
 import { HomeCornerCharacter } from '../ui/HomeCornerCharacter';
 import { LinkEditor } from '../ui/LinkEditor';
@@ -83,6 +85,11 @@ export function HomePage({ settings }: HomePageProps) {
   const [linkConfig,        setLinkConfig]        = useState<LinkConfig>({ order: [], hidden: [], custom: [] });
   const [assignmentPayload, setAssignmentPayload] = useState<DuePayload | null>(null);
   const [linksEditing,      setLinksEditing]      = useState(false);
+  const [newsTab,           setNewsTab]           = useState<NewsTab>('general');
+
+  const tabbedNews = displayedNews.filter((item) =>
+    newsTab === 'lostProperty' ? isLostPropertyNews(item) : !isLostPropertyNews(item),
+  );
 
   useHomeStorageBootstrap({ setLinkConfig, setAssignmentPayload, setCourses });
 
@@ -238,7 +245,13 @@ export function HomePage({ settings }: HomePageProps) {
           <section className="p-panel">
             <span className="p-panel-head">{t.home.news}</span>
             <div className="p-panel-body" id="p-news">
-              <NewsList items={displayedNews} />
+              <NewsTabs
+                activeTab={newsTab}
+                generalLabel={t.newsPage.generalTab}
+                lostPropertyLabel={t.newsPage.lostPropertyTab}
+                onChange={setNewsTab}
+              />
+              <NewsList items={tabbedNews} />
             </div>
           </section>
           <section className="p-panel p-panel-links">

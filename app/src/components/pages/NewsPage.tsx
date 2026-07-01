@@ -19,7 +19,9 @@ import {
 import { PageShell } from '../layout/PageShell';
 import { KinoPanel } from '../ui/KinoPanel';
 import { NewsList } from '../ui/NewsList';
+import { NewsTabs, type NewsTab } from '../ui/NewsTabs';
 import { useI18n } from '../../i18n';
+import { isLostPropertyNews } from '../../lib/news-classification';
 
 type NewsItem = NewsListItem;
 
@@ -36,6 +38,7 @@ export function NewsPage() {
   const [checkedSenders, setCheckedSenders] = useState<Set<string>>(new Set());
   const [checkedCats,    setCheckedCats]    = useState<Set<string>>(new Set());
   const [keyword,        setKeyword]        = useState('');
+  const [newsTab,        setNewsTab]        = useState<NewsTab>('general');
   const [filterOptions,  setFilterOptions]  = useState<ParsedNewsListFilters>(() =>
     parsePortalNewsListFilters(),
   );
@@ -87,7 +90,9 @@ export function NewsPage() {
 
   function filteredList(): NewsItem[] {
     if (!Array.isArray(raw)) return [];
-    let list = raw.slice();
+    let list = raw.filter((item) =>
+      newsTab === 'lostProperty' ? isLostPropertyNews(item) : !isLostPropertyNews(item),
+    );
     if (checkedSenders.size > 0) {
       list = list.filter((i) => checkedSenders.has(String(i.sender ?? '')));
     }
@@ -159,6 +164,12 @@ export function NewsPage() {
 
           <section className="p-panel">
             <span className="p-panel-head">{t.newsPage.title}</span>
+            <NewsTabs
+              activeTab={newsTab}
+              generalLabel={t.newsPage.generalTab}
+              lostPropertyLabel={t.newsPage.lostPropertyTab}
+              onChange={setNewsTab}
+            />
             <div className="p-panel-body" id="p-news-page-list">
               {raw === null ? (
                 <p className="p-empty">{t.common.loading}</p>

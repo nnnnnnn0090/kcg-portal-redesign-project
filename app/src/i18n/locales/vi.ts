@@ -162,6 +162,8 @@ export const viMessages: typeof jaMessages = {
   },
   newsPage: {
     title: 'Danh sách thông báo',
+    generalTab: 'Thông báo',
+    lostPropertyTab: 'Đồ thất lạc',
     nendoAria: 'Hiển thị năm học',
     nendoButton: (year: string) => `Năm học ${year}`,
     nendoShowing: (year: string) => `Đang hiển thị thông báo năm học ${year}.`,

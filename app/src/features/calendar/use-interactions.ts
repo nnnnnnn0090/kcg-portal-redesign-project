@@ -47,11 +47,16 @@ function attachCalendarTooltipAndContextMenu(
   t: I18nMessages,
 ): () => void {
   let hideTimer = 0;
+  let hoverRevision = 0;
+  let activeHoverAnchor: Element | null = null;
   let resolvingPrimaryCourseClick = false;
 
   function hide() {
     if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
+    hoverRevision++;
+    activeHoverAnchor = null;
     hoverPopEl.hidden = true;
+    hoverPopEl.classList.remove('is-entering');
     hoverPopEl.replaceChildren();
   }
 
@@ -69,8 +74,21 @@ function attachCalendarTooltipAndContextMenu(
     hoverPopEl.style.top  = `${Math.max(pad, top)}px`;
   }
 
+  function revealTooltip(anchor: Element, revision: number) {
+    hoverPopEl.hidden = false;
+    positionHover(anchor);
+    hoverPopEl.classList.remove('is-entering');
+    void hoverPopEl.offsetWidth;
+    hoverPopEl.classList.add('is-entering');
+    afterLayout(() => {
+      if (revision === hoverRevision && activeHoverAnchor === anchor) positionHover(anchor);
+    });
+  }
+
   function showTooltip(anchor: Element) {
     if (!(anchor instanceof HTMLElement)) return;
+    const revision = ++hoverRevision;
+    activeHoverAnchor = anchor;
     const title = anchor.dataset.calTitle || '';
     const meta  = anchor.dataset.calMeta  || '';
     const tip   = (anchor.dataset.calTip  || '').trim();
@@ -124,8 +142,7 @@ function attachCalendarTooltipAndContextMenu(
       }
       blocks.push('</div></div>');
       setHtml(hoverPopEl, blocks.join(''));
-      hoverPopEl.hidden = false;
-      afterLayout(() => positionHover(anchor));
+      revealTooltip(anchor, revision);
       return;
     }
 
@@ -209,24 +226,38 @@ function attachCalendarTooltipAndContextMenu(
     blocks.push('</div></div>');
 
     setHtml(hoverPopEl, blocks.join(''));
-    hoverPopEl.hidden = false;
-    afterLayout(() => positionHover(anchor));
+    revealTooltip(anchor, revision);
   }
 
   function onMouseOver(e: MouseEvent) {
     const hit = e.target instanceof Element ? e.target.closest('.p-cal-ev') : null;
     if (!hit || !overlayRoot.contains(hit)) return;
     if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
-    showTooltip(hit);
+    if (hit !== activeHoverAnchor || hoverPopEl.hidden) showTooltip(hit);
   }
 
   function onMouseOut(e: MouseEvent) {
     const rel = e.relatedTarget;
     if (rel instanceof Node && overlayRoot.contains(rel)) {
       const next = rel instanceof Element ? rel.closest('.p-cal-ev') : null;
-      if (next) { if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; } showTooltip(next); return; }
+      if (next) {
+        if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
+        if (next !== activeHoverAnchor || hoverPopEl.hidden) showTooltip(next);
+        return;
+      }
     }
-    hideTimer = window.setTimeout(hide, 60);
+    const revision = hoverRevision;
+    hideTimer = window.setTimeout(() => {
+      hideTimer = 0;
+      if (revision === hoverRevision) hide();
+    }, 60);
+  }
+
+  function onPointerMove(e: PointerEvent) {
+    const hit = e.target instanceof Element ? e.target.closest('.p-cal-ev') : null;
+    if (!hit || !overlayRoot.contains(hit)) return;
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
+    if (hit !== activeHoverAnchor || hoverPopEl.hidden) showTooltip(hit);
   }
 
   function onKogiPrimaryClick(e: MouseEvent) {
@@ -268,6 +299,7 @@ function attachCalendarTooltipAndContextMenu(
   overlayRoot.addEventListener('click', onKogiPrimaryClick);
   overlayRoot.addEventListener('mouseover', onMouseOver);
   overlayRoot.addEventListener('mouseout',  onMouseOut);
+  overlayRoot.addEventListener('pointermove', onPointerMove, { passive: true });
   overlayRoot.addEventListener('scroll', hide, { passive: true, capture: true });
   window.addEventListener('scroll', hide, { passive: true, capture: true });
 
@@ -337,6 +369,7 @@ function attachCalendarTooltipAndContextMenu(
     overlayRoot.removeEventListener('click', onKogiPrimaryClick);
     overlayRoot.removeEventListener('mouseover', onMouseOver);
     overlayRoot.removeEventListener('mouseout',  onMouseOut);
+    overlayRoot.removeEventListener('pointermove', onPointerMove);
     overlayRoot.removeEventListener('scroll', hide, { capture: true } as AddEventListenerOptions);
     window.removeEventListener('scroll', hide, { capture: true } as AddEventListenerOptions);
     overlayRoot.removeEventListener('contextmenu', onContextMenu);
