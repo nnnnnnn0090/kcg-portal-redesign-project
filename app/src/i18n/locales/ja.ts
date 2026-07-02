@@ -100,6 +100,7 @@ export const jaMessages = {
     portalMenu: 'ポータルメニュー',
     home2Menu: 'Home2 メニュー',
     profileTitle: 'プロフィール',
+    communityActivity: 'みんなの活動',
   },
   footer: {
     aria: 'フッター',

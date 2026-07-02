@@ -102,6 +102,7 @@ export const zhTWMessages: typeof jaMessages = {
     portalMenu: '入口網站選單',
     home2Menu: 'Home2 選單',
     profileTitle: '個人資料',
+    communityActivity: '大家的動態',
   },
   footer: {
     aria: '頁尾',

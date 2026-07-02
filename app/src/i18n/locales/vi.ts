@@ -103,6 +103,7 @@ export const viMessages: typeof jaMessages = {
     portalMenu: 'Menu cổng thông tin',
     home2Menu: 'Menu Home2',
     profileTitle: 'Hồ sơ',
+    communityActivity: 'Hoạt động cộng đồng',
   },
   footer: {
     aria: 'Chân trang',

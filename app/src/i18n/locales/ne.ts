@@ -102,6 +102,7 @@ export const neMessages: typeof jaMessages = {
     portalMenu: 'पोर्टल मेनु',
     home2Menu: 'Home2 मेनु',
     profileTitle: 'प्रोफाइल',
+    communityActivity: 'सबैका गतिविधि',
   },
   footer: {
     aria: 'फुटर',

@@ -103,6 +103,7 @@ export const enMessages: typeof jaMessages = {
     portalMenu: 'Portal menu',
     home2Menu: 'Home2 menu',
     profileTitle: 'Profile',
+    communityActivity: "Everyone's activities",
   },
   footer: {
     aria: 'Footer',

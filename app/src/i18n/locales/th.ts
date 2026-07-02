@@ -102,6 +102,7 @@ export const thMessages: typeof jaMessages = {
     portalMenu: 'เมนูพอร์ทัล',
     home2Menu: 'เมนู Home2',
     profileTitle: 'โปรไฟล์',
+    communityActivity: 'กิจกรรมของทุกคน',
   },
   footer: {
     aria: 'ส่วนท้าย',

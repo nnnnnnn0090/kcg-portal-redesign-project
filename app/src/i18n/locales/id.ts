@@ -103,6 +103,7 @@ export const idMessages: typeof jaMessages = {
     portalMenu: 'Menu portal',
     home2Menu: 'Menu Home2',
     profileTitle: 'Profil',
+    communityActivity: 'Aktivitas Bersama',
   },
   footer: {
     aria: 'Footer',

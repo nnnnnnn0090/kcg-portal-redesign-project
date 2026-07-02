@@ -103,6 +103,7 @@ export const koMessages: typeof jaMessages = {
     portalMenu: '포털 메뉴',
     home2Menu: 'Home2 메뉴',
     profileTitle: '프로필',
+    communityActivity: '모두의 활동',
   },
   footer: {
     aria: '푸터',

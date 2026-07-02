@@ -102,6 +102,7 @@ export const zhMessages: typeof jaMessages = {
     portalMenu: '门户菜单',
     home2Menu: 'Home2 菜单',
     profileTitle: '个人资料',
+    communityActivity: '大家的动态',
   },
   footer: {
     aria: '页脚',
