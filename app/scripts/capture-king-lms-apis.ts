@@ -6,11 +6,14 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { KING_LMS_API_CAPTURE_KEY, type KingLmsApiCaptureRow } from '../src/lib/king-lms-api-capture';
+import { buildKingLmsSamlLoginUrl, KING_LMS_ASSIGNMENT_SYNC_TARGET_URL } from '../src/shared/king-lms-url';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const OUT_DIR = path.join(ROOT, 'app/.king-lms-api-capture');
 const CHROME_DEV = path.join(ROOT, 'scripts/chrome-dev.sh');
-const TARGET_URL = 'https://king-lms.kcg.edu/ultra/calendar?kcg_capture=1';
+const captureTarget = new URL(KING_LMS_ASSIGNMENT_SYNC_TARGET_URL);
+captureTarget.searchParams.set('kcg_capture', '1');
+const TARGET_URL = buildKingLmsSamlLoginUrl(captureTarget.href);
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -92,7 +95,7 @@ async function main() {
   reloadChromeTab();
   await sleep(20_000);
 
-  let captures = readSessionCaptures();
+  const captures = readSessionCaptures();
   console.log(`captures after reload: ${captures.length}`);
 
   captures.forEach((row, index) => {

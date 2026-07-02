@@ -14,6 +14,7 @@ import { readStoredCourses, useCourses, type CourseRow } from '../../context/cou
 import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
 import { usePortalDom } from '../../context/portalDom';
 import { useI18n, type AppLanguage, type I18nMessages } from '../../i18n';
+import { buildKingLmsSamlLoginUrl } from '../../shared/king-lms-url';
 
 /** tooltip 先頭の「コード：」は左ラベルに寄せるため、値から除く */
 function stripLeadingCodeJaPrefix(raw: string): string {
@@ -21,12 +22,13 @@ function stripLeadingCodeJaPrefix(raw: string): string {
 }
 
 function openKingLmsUrl(url: string): void {
-  const opened = window.open(url, '_blank');
+  const loginUrl = buildKingLmsSamlLoginUrl(url);
+  const opened = window.open(loginUrl, '_blank');
   if (opened) {
     try { opened.opener = null; } catch { /* ignore */ }
     return;
   }
-  window.location.href = url;
+  window.location.href = loginUrl;
 }
 
 function kingLmsUrlForEvent(ev: Element, courses: CourseRow[]): string {
@@ -342,7 +344,7 @@ function attachCalendarTooltipAndContextMenu(
     const btn = e.target instanceof Element ? e.target.closest('button') : null;
     if (!btn || !menuEl.contains(btn)) return;
     if (btn === btnSyl  && urlSyllabus) window.open(urlSyllabus, '_blank', 'noopener,noreferrer');
-    if (btn === btnKing && urlKingLms)  window.open(urlKingLms,  '_blank', 'noopener,noreferrer');
+    if (btn === btnKing && urlKingLms)  window.open(buildKingLmsSamlLoginUrl(urlKingLms), '_blank', 'noopener,noreferrer');
     closeCtx();
   }
 

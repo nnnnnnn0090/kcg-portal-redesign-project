@@ -179,17 +179,12 @@ export const SYNC_HASH = {
 
 // ─── 外部 URL ────────────────────────────────────────────────────────────────
 
-/** King LMS のオリジン（コースリンク・課題リンク・コンテンツスクリプト matches に使用） */
-export const KING_LMS_ORIGIN = 'https://king-lms.kcg.edu' as const;
-
-/** `location.hostname` 比較用（KING_LMS_ORIGIN と一致） */
-export const KING_LMS_HOSTNAME = new URL(KING_LMS_ORIGIN).hostname;
-
-/** King LMS コース同期のエントリ URL（授業カレンダー → King LMS リンク用） */
-export const KING_LMS_COURSE_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/course` as const;
-
-/** King LMS 課題同期のエントリ URL */
-export const KING_LMS_ASSIGNMENT_SYNC_URL = `${KING_LMS_ORIGIN}/ultra/calendar` as const;
+export {
+  KING_LMS_ORIGIN,
+  KING_LMS_HOSTNAME,
+  KING_LMS_COURSE_SYNC_URL,
+  KING_LMS_ASSIGNMENT_SYNC_URL,
+} from './king-lms-url';
 /** 拡張紹介ページ・開発者お知らせ JSON のオリジン（host_permissions と URL 生成用） */
 export const EXTENSION_PROMO_ORIGIN = 'https://kcg-portal-redesign-project-web.vercel.app' as const;
 

@@ -4,7 +4,7 @@
  */
 
 import { KING_LMS_ORIGIN } from '../../shared/constants';
-import { isLoginRedirectPage } from './bridge-urls';
+import { isLoginRedirectPage, isSamlLoginPage } from './bridge-urls';
 import { cancelPendingForLoginRedirect, maybeShowOverlayFromStorage } from './bridge-storage-sync';
 import { installMessageListener } from './bridge-message-listener';
 
@@ -20,6 +20,7 @@ export default defineContentScript({
 
 function scheduleInit(): void {
   function run(): void {
+    if (isSamlLoginPage()) return;
     if (isLoginRedirectPage()) { void cancelPendingForLoginRedirect(); return; }
     void maybeShowOverlayFromStorage();
   }

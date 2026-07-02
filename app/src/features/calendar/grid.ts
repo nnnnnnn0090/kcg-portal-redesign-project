@@ -9,6 +9,7 @@ import { parseKogiMeta, parseLeadingPeriodTitle, kogiPeriodNum, kogiPeriodTimeRa
 import type { CalEvent, ViewMeta } from './types';
 import { assignmentStatusLabel, resolveAssignmentDisplayStatus } from './assignment';
 import { messagesForLanguage, normalizeLanguage, type AppLanguage } from '../../i18n/messages';
+import { buildKingLmsSamlLoginUrl } from '../../shared/king-lms-url';
 
 /** 列順は `enumerateRange` と一致するよう weekStart に応じて並べる */
 function weekdayLabels(weekStart: CalendarWeekStart, language: AppLanguage): string[] {
@@ -93,8 +94,11 @@ function buildDayEventsHtml(dayItems: CalEvent[], opts: Pick<ViewMeta, 'calKind'
     if (assignmentStatus === 'overdue') evClasses.push('is-assignment-overdue');
     const evClass = evClasses.join(' ');
 
-    parts.push(href
-      ? `<a class="${escAttr(evClass)}" href="${escAttr(href)}" target="_blank" rel="noopener noreferrer" ${dataAttrs}>${inner}</a>`
+    const navigationHref = href && (calKind === 'kogi' || calKind === 'assignment')
+      ? buildKingLmsSamlLoginUrl(href)
+      : href;
+    parts.push(navigationHref
+      ? `<a class="${escAttr(evClass)}" href="${escAttr(navigationHref)}" target="_blank" rel="noopener noreferrer" ${dataAttrs}>${inner}</a>`
       : `<div class="${escAttr(evClass)}" ${dataAttrs}>${inner}</div>`);
 
     if (pNum !== null) prevPeriod = pNum;

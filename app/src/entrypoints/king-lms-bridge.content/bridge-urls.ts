@@ -3,6 +3,11 @@
  */
 
 import { KING_LMS_HOSTNAME } from '../../shared/constants';
+import { isKingLmsSamlLoginUrl } from '../../shared/king-lms-url';
+
+export function isSamlLoginPage(): boolean {
+  return isKingLmsSamlLoginUrl(location.href);
+}
 
 export function isLoginRedirectPage(): boolean {
   try {
