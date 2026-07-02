@@ -15,6 +15,12 @@ import {
 import { SK } from '../shared/constants';
 import storage from '../lib/storage';
 import { syncPortalTheme } from '../themes';
+import {
+  EMPTY_CUSTOM_THEMES,
+  parseCustomThemeCollection,
+  type CustomTheme,
+  type StoredCustomThemeCollection,
+} from '../themes/custom-themes';
 import type { CalendarWeekStart } from '../lib/date';
 import { parseCalendarWeekStart } from '../lib/date';
 import {
@@ -27,14 +33,14 @@ import {
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
 export interface Settings {
-  theme:              string;
-  hideProfileName:    boolean;
-  showKogiCalMascot:  boolean;
+  theme: string;
+  hideProfileName: boolean;
+  showKogiCalMascot: boolean;
   showHomeCornerCharacter: boolean;
   /** ホームの課題カレンダーを出さない */
   hideAssignmentCalendar: boolean;
   home2WebMailOverlay: boolean;
-  cplanOverlay:        boolean;
+  cplanOverlay: boolean;
   /** カレンダーの列を「月〜日」または「日〜土」で始める */
   calendarWeekStart: CalendarWeekStart;
   /** 拡張 UI の表示言語 */
@@ -42,23 +48,26 @@ export interface Settings {
 }
 
 export interface SettingsContextValue {
-  settings:      Settings;
+  settings: Settings;
   /** ストレージからの初回読み込みが完了したら true になる */
   settingsReady: boolean;
   updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  updateTheme:   (name: string) => void;
+  updateTheme: (name: string) => void;
+  customThemes: StoredCustomThemeCollection;
+  saveCustomTheme: (theme: CustomTheme) => void;
+  deleteCustomTheme: (id: string) => void;
 }
 
 // ─── デフォルト値 ─────────────────────────────────────────────────────────
 
 const DEFAULTS: Settings = {
-  theme:             'dark',
-  hideProfileName:   false,
+  theme: 'dark',
+  hideProfileName: false,
   showKogiCalMascot: false,
   showHomeCornerCharacter: false,
   hideAssignmentCalendar: false,
   home2WebMailOverlay: true,
-  cplanOverlay:        true,
+  cplanOverlay: true,
   calendarWeekStart: 'monday',
   language: DEFAULT_LANGUAGE,
 };
@@ -66,13 +75,13 @@ const DEFAULTS: Settings = {
 // Settings キーから storage キーへの明示的マッピング。
 // satisfies で網羅性を保証し、SK への unsafe なキャストを排除する。
 const SETTINGS_TO_SK = {
-  theme:           SK.theme,
+  theme: SK.theme,
   hideProfileName: SK.hideProfileName,
-  showKogiCalMascot:  SK.showKogiCalMascot,
+  showKogiCalMascot: SK.showKogiCalMascot,
   showHomeCornerCharacter: SK.showHomeCornerCharacter,
   hideAssignmentCalendar: SK.hideAssignmentCalendar,
   home2WebMailOverlay: SK.home2WebMailOverlay,
-  cplanOverlay:        SK.cplanOverlay,
+  cplanOverlay: SK.cplanOverlay,
   calendarWeekStart: SK.calendarWeekStart,
   language: SK.language,
 } satisfies Record<keyof Settings, string>;
@@ -87,17 +96,20 @@ const STORAGE_KEYS = [
   SK.cplanOverlay,
   SK.calendarWeekStart,
   SK.language,
+  SK.customThemes,
 ] as const;
 
 function parseSettings(data: Record<string, unknown>): Settings {
   return {
-    theme:           String(data[SK.theme]           ?? DEFAULTS.theme),
+    theme: String(data[SK.theme] ?? DEFAULTS.theme),
     hideProfileName: Boolean(data[SK.hideProfileName] ?? DEFAULTS.hideProfileName),
     showKogiCalMascot: Boolean(data[SK.showKogiCalMascot] ?? DEFAULTS.showKogiCalMascot),
-    showHomeCornerCharacter:
-      Boolean(data[SK.showHomeCornerCharacter] ?? DEFAULTS.showHomeCornerCharacter),
-    hideAssignmentCalendar:
-      Boolean(data[SK.hideAssignmentCalendar] ?? DEFAULTS.hideAssignmentCalendar),
+    showHomeCornerCharacter: Boolean(
+      data[SK.showHomeCornerCharacter] ?? DEFAULTS.showHomeCornerCharacter,
+    ),
+    hideAssignmentCalendar: Boolean(
+      data[SK.hideAssignmentCalendar] ?? DEFAULTS.hideAssignmentCalendar,
+    ),
     home2WebMailOverlay: Boolean(data[SK.home2WebMailOverlay] ?? DEFAULTS.home2WebMailOverlay),
     cplanOverlay: Boolean(data[SK.cplanOverlay] ?? DEFAULTS.cplanOverlay),
     calendarWeekStart: parseCalendarWeekStart(data[SK.calendarWeekStart]),
@@ -110,11 +122,15 @@ function parseSettings(data: Record<string, unknown>): Settings {
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings,      setSettings]      = useState<Settings>(DEFAULTS);
+  const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [settingsReady, setSettingsReady] = useState(false);
+  const [customThemes, setCustomThemes] =
+    useState<StoredCustomThemeCollection>(EMPTY_CUSTOM_THEMES);
 
   useEffect(() => {
     void storage.get([...STORAGE_KEYS]).then((data) => {
+      const parsedThemes = parseCustomThemeCollection(data[SK.customThemes]);
+      setCustomThemes(parsedThemes);
       setSettings(parseSettings(data));
       setSettingsReady(true);
     });
@@ -125,14 +141,55 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     void storage.set({ [SETTINGS_TO_SK[key]]: value });
   }, []);
 
-  const updateTheme = useCallback((name: string) => {
-    updateSetting('theme', name);
-    syncPortalTheme(name);
-  }, [updateSetting]);
+  const updateTheme = useCallback(
+    (name: string) => {
+      updateSetting('theme', name);
+      syncPortalTheme(name, customThemes);
+    },
+    [customThemes, updateSetting],
+  );
+
+  const saveCustomTheme = useCallback((theme: CustomTheme) => {
+    setCustomThemes((previous) => {
+      const themes = previous.themes.some((item) => item.id === theme.id)
+        ? previous.themes.map((item) => (item.id === theme.id ? theme : item))
+        : [...previous.themes, theme];
+      const next = { schemaVersion: 1 as const, themes };
+      void storage.set({ [SK.customThemes]: next });
+      return next;
+    });
+  }, []);
+
+  const deleteCustomTheme = useCallback((id: string) => {
+    setCustomThemes((previous) => {
+      const next = {
+        schemaVersion: 1 as const,
+        themes: previous.themes.filter((theme) => theme.id !== id),
+      };
+      void storage.set({ [SK.customThemes]: next });
+      return next;
+    });
+  }, []);
 
   const value = useMemo(
-    () => ({ settings, settingsReady, updateSetting, updateTheme }),
-    [settings, settingsReady, updateSetting, updateTheme],
+    () => ({
+      settings,
+      settingsReady,
+      updateSetting,
+      updateTheme,
+      customThemes,
+      saveCustomTheme,
+      deleteCustomTheme,
+    }),
+    [
+      settings,
+      settingsReady,
+      updateSetting,
+      updateTheme,
+      customThemes,
+      saveCustomTheme,
+      deleteCustomTheme,
+    ],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

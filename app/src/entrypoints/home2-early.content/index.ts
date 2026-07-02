@@ -2,12 +2,8 @@
  * Home2 Web メールで `document_start` に読み込まれ、オーバーレイ有効時のみテーマ変数とブートカバーを適用します。
  */
 
-import { bootCoverBg, portalHeadThemeCssByName } from '../../themes';
-import {
-  HOME2_MAIL_CONTENT_SCRIPT_MATCHES,
-  PORTAL_DOM,
-  SK,
-} from '../../shared/constants';
+import { bootCoverBg, parseCustomThemeCollection, portalHeadThemeCssByName } from '../../themes';
+import { HOME2_MAIL_CONTENT_SCRIPT_MATCHES, PORTAL_DOM, SK } from '../../shared/constants';
 import storage from '../../lib/storage';
 
 export default defineContentScript({
@@ -16,7 +12,9 @@ export default defineContentScript({
 
   main() {
     void (async () => {
-      const snap = await storage.get([SK.home2WebMailOverlay, SK.theme]).catch(() => ({} as Record<string, unknown>));
+      const snap = await storage
+        .get([SK.home2WebMailOverlay, SK.theme, SK.customThemes])
+        .catch(() => ({}) as Record<string, unknown>);
       if (snap[SK.home2WebMailOverlay] === false) return;
 
       let bootCoverEl: HTMLElement | null = null;
@@ -33,7 +31,9 @@ export default defineContentScript({
         bootCoverEl.style.background = color;
       }
 
-      let themeStyle = document.getElementById(PORTAL_DOM.headThemeStyle) as HTMLStyleElement | null;
+      let themeStyle = document.getElementById(
+        PORTAL_DOM.headThemeStyle,
+      ) as HTMLStyleElement | null;
       if (!themeStyle) {
         themeStyle = document.createElement('style');
         themeStyle.id = PORTAL_DOM.headThemeStyle;
@@ -42,8 +42,9 @@ export default defineContentScript({
       }
 
       const name = String(snap[SK.theme] ?? '').trim() || 'dark';
-      themeStyle.textContent = portalHeadThemeCssByName(name);
-      paintBootCover(bootCoverBg(name));
+      const customThemes = parseCustomThemeCollection(snap[SK.customThemes]);
+      themeStyle.textContent = portalHeadThemeCssByName(name, customThemes);
+      paintBootCover(bootCoverBg(name, customThemes));
     })();
   },
 });

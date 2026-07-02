@@ -305,6 +305,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       if (!root) return;
       function onPointerDown(e: PointerEvent) {
         const t = e.target as Node;
+        if (document.getElementById('p-theme-studio-root')) return;
         if (popRef.current?.contains(t)) return;
         if (document.getElementById('p-changelog-modal-root')?.contains(t)) return;
         if (document.getElementById('p-licenses-modal-root')?.contains(t)) return;
@@ -328,6 +329,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       if (!isOpen) return;
       function onKeyDown(e: KeyboardEvent) {
         if (e.key !== 'Escape') return;
+        if (document.getElementById('p-theme-studio-root')) return;
         if (changelogModalClosing) return;
         if (licensesModalClosing) return;
         if (licensesModalOpen) {
@@ -477,7 +479,11 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
                 <div className="p-settings-tab-panel" role="tabpanel" key={activeTab}>
                   {activeTab === 'appearance' ? (
                     <>
-                      <SettingsThemeSection settings={settings} onThemeChange={onThemeChange} />
+                      <SettingsThemeSection
+                        settings={settings}
+                        onThemeChange={onThemeChange}
+                        onEditorOpen={requestClose}
+                      />
                       <SettingsLanguageSection
                         settings={settings}
                         onSettingChange={onSettingChange}
@@ -528,7 +534,11 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
             ) : (
               <>
                 <SettingsLanguageSection settings={settings} onSettingChange={onSettingChange} />
-                <SettingsThemeSection settings={settings} onThemeChange={onThemeChange} />
+                <SettingsThemeSection
+                  settings={settings}
+                  onThemeChange={onThemeChange}
+                  onEditorOpen={requestClose}
+                />
                 <SettingsWebMailSection
                   settings={settings}
                   variant={variant}

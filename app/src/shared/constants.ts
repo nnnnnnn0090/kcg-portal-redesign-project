@@ -8,6 +8,7 @@
 export const SK = {
   hideProfileName: 'portalThemeHideProfileName',
   theme: 'portalThemeColorTheme',
+  customThemes: 'portalThemeCustomThemes',
   showKogiCalMascot: 'portalThemeShowKogiCalMascot',
   showHomeCornerCharacter: 'portalThemeShowHomeCornerCharacter',
   /** ホームの King LMS 連携「課題」カレンダーを表示しない */

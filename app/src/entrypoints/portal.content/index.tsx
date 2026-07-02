@@ -7,7 +7,15 @@ import { createElement } from 'react';
 import overlayCss from '../../styles/overlay.css?inline';
 import { matchPortalRoute } from '../../portal/router';
 import { resolveKingLmsMountToastMessage } from '../../portal/sync-hash';
-import { appendPortalOverlayShell, ensurePortalBackdrop, portalHeadThemeCssByName, removePortalBackdrop, syncPortalTheme } from '../../themes';
+import {
+  appendPortalOverlayShell,
+  ensurePortalBackdrop,
+  parseCustomThemeCollection,
+  portalHeadThemeCssByName,
+  removePortalBackdrop,
+  syncPortalTheme,
+  type StoredCustomThemeCollection,
+} from '../../themes';
 import storage from '../../lib/storage';
 import {
   PORTAL_BOOT_COVER_RAF_FRAMES,
@@ -16,12 +24,18 @@ import {
   SK,
 } from '../../shared/constants';
 
-function retainPortalBackdropAfterFrames(frameCount: number, themeName: string): void {
+function retainPortalBackdropAfterFrames(
+  frameCount: number,
+  themeName: string,
+  customThemes: StoredCustomThemeCollection,
+): void {
   if (frameCount <= 0) {
-    ensurePortalBackdrop(themeName);
+    ensurePortalBackdrop(themeName, customThemes);
     return;
   }
-  requestAnimationFrame(() => retainPortalBackdropAfterFrames(frameCount - 1, themeName));
+  requestAnimationFrame(() =>
+    retainPortalBackdropAfterFrames(frameCount - 1, themeName, customThemes),
+  );
 }
 
 export default defineContentScript({
@@ -39,18 +53,21 @@ export default defineContentScript({
       try {
         const [syncToastMsg, themeSnap] = await Promise.all([
           resolveKingLmsMountToastMessage(),
-          storage.get([SK.theme]),
+          storage.get([SK.theme, SK.customThemes]),
         ]);
         const themeName = String(themeSnap[SK.theme] ?? '').trim() || 'dark';
+        const customThemes = parseCustomThemeCollection(themeSnap[SK.customThemes]);
 
-        const preservedTheme = document.getElementById(PORTAL_DOM.headThemeStyle)?.textContent ?? '';
+        const preservedTheme =
+          document.getElementById(PORTAL_DOM.headThemeStyle)?.textContent ?? '';
         const title = document.querySelector('title')?.cloneNode(true) ?? null;
         document.head.replaceChildren();
         if (title) document.head.appendChild(title);
 
         const themeStyle = document.createElement('style');
         themeStyle.id = PORTAL_DOM.headThemeStyle;
-        themeStyle.textContent = preservedTheme || portalHeadThemeCssByName(themeName);
+        themeStyle.textContent =
+          preservedTheme || portalHeadThemeCssByName(themeName, customThemes);
         document.head.appendChild(themeStyle);
 
         const overlayStyle = document.createElement('style');
@@ -60,7 +77,7 @@ export default defineContentScript({
 
         const { scroller } = appendPortalOverlayShell();
 
-        syncPortalTheme(themeName);
+        syncPortalTheme(themeName, customThemes);
 
         document.documentElement.style.overflow = 'hidden';
         document.body.style.overflow = 'hidden';
@@ -72,7 +89,7 @@ export default defineContentScript({
         const root = createRoot(scroller);
         root.render(
           createElement(PortalApp, {
-            surface:      'portal',
+            surface: 'portal',
             route,
             syncToastMsg,
             overlayRoot: scroller,
@@ -82,7 +99,7 @@ export default defineContentScript({
         const coverFrames = syncToastMsg
           ? PORTAL_BOOT_COVER_RAF_FRAMES.withToast
           : PORTAL_BOOT_COVER_RAF_FRAMES.default;
-        retainPortalBackdropAfterFrames(coverFrames, themeName);
+        retainPortalBackdropAfterFrames(coverFrames, themeName, customThemes);
       } catch {
         removePortalBackdrop();
       }

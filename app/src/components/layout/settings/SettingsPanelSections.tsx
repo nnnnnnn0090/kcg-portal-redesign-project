@@ -2,8 +2,15 @@
  * 設定パネル内のセクション単位 UI（テーマ・ポータル専用・Web メール・フィードバック等）。
  */
 
-import { THEMES } from '../../../themes';
-import type { Settings } from '../../../context/settings';
+import { useState } from 'react';
+import {
+  THEMES,
+  createCustomTheme,
+  customThemeRef,
+  resolveThemeTokens,
+  type CustomTheme,
+} from '../../../themes';
+import { useSettings, type Settings } from '../../../context/settings';
 import { beginKingLmsCourseListSync } from '../../../lib/king-lms-course-sync';
 import { APP_LANGUAGES, APP_LANGUAGE_LABELS, themeDisplayName, useI18n } from '../../../i18n';
 import {
@@ -12,6 +19,7 @@ import {
 } from '../../../shared/constants';
 import { MascotDecorationSetting } from './MascotDecorationSetting';
 import { SettingsSwitch } from './SettingsSwitch';
+import { ThemeStudio, downloadTheme } from './ThemeStudio';
 
 interface SettingsLanguageSectionProps {
   settings: Settings;
@@ -48,13 +56,48 @@ export function SettingsLanguageSection({
 interface SettingsThemeSectionProps {
   settings: Settings;
   onThemeChange: (name: string) => void;
+  onEditorOpen?: () => void;
 }
 
-export function SettingsThemeSection({ settings, onThemeChange }: SettingsThemeSectionProps) {
+export function SettingsThemeSection({
+  settings,
+  onThemeChange,
+  onEditorOpen,
+}: SettingsThemeSectionProps) {
   const { language, t } = useI18n();
+  const { customThemes, saveCustomTheme, deleteCustomTheme } = useSettings();
+  const [editing, setEditing] = useState<CustomTheme | 'new' | null>(null);
+  const ja = language === 'ja';
+
+  const openEditor = (theme: CustomTheme | 'new') => {
+    setEditing(theme);
+    onEditorOpen?.();
+  };
+
+  const removeTheme = (theme: CustomTheme) => {
+    if (!window.confirm(ja ? `「${theme.name}」を削除しますか？` : `Delete “${theme.name}”?`))
+      return;
+    if (settings.theme === customThemeRef(theme.id)) onThemeChange(theme.baseTheme);
+    deleteCustomTheme(theme.id);
+  };
+
+  const duplicateTheme = (theme: CustomTheme) => {
+    const copy = createCustomTheme(
+      ja ? `${theme.name} のコピー` : `${theme.name} copy`,
+      theme.baseTheme,
+      { name: theme.name, ...theme.tokens },
+    );
+    saveCustomTheme(copy);
+  };
+
   return (
     <div className="p-settings-section p-settings-section--theme">
-      <div className="p-settings-section-title">{t.settings.colorTheme}</div>
+      <div className="p-settings-section-title p-theme-section-title">
+        <span>{t.settings.colorTheme}</span>
+        <button type="button" onClick={() => openEditor('new')}>
+          ＋ {ja ? '独自テーマ' : 'Custom'}
+        </button>
+      </div>
       <div className="p-theme-picker" id="p-theme-picker">
         {Object.entries(THEMES).map(([key, meta]) => (
           <button
@@ -71,7 +114,50 @@ export function SettingsThemeSection({ settings, onThemeChange }: SettingsThemeS
             <span className="p-theme-btn-label">{themeDisplayName(key, meta.name, language)}</span>
           </button>
         ))}
+        {customThemes.themes.map((theme) => {
+          const ref = customThemeRef(theme.id);
+          const tokens = resolveThemeTokens(ref, customThemes);
+          return (
+            <div
+              className={`p-theme-custom-card${settings.theme === ref ? ' is-active' : ''}`}
+              key={theme.id}
+            >
+              <button
+                type="button"
+                className="p-theme-btn p-theme-custom-select"
+                onClick={() => onThemeChange(ref)}
+              >
+                <span className="p-theme-btn-swatches" aria-hidden>
+                  <span className="p-theme-btn-swatch" style={{ background: tokens.bg }} />
+                  <span className="p-theme-btn-swatch" style={{ background: tokens.accent }} />
+                </span>
+                <span className="p-theme-btn-label">{theme.name}</span>
+              </button>
+              <div className="p-theme-custom-actions">
+                <button type="button" onClick={() => openEditor(theme)}>
+                  {ja ? '編集' : 'Edit'}
+                </button>
+                <button type="button" onClick={() => duplicateTheme(theme)}>
+                  {ja ? '複製' : 'Copy'}
+                </button>
+                <button type="button" onClick={() => downloadTheme(theme)}>
+                  {ja ? '書出' : 'Export'}
+                </button>
+                <button type="button" onClick={() => removeTheme(theme)}>
+                  {ja ? '削除' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
+      {editing ? (
+        <ThemeStudio
+          theme={editing === 'new' ? undefined : editing}
+          baseRef={settings.theme}
+          onClose={() => setEditing(null)}
+        />
+      ) : null}
     </div>
   );
 }

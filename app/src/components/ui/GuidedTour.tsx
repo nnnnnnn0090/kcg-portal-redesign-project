@@ -19,7 +19,7 @@ import storage from '../../lib/storage';
 import { usePortalDom } from '../../context/portalDom';
 import { useSettings } from '../../context/settings';
 import { themeDisplayName, useI18n } from '../../i18n';
-import { THEMES } from '../../themes';
+import { THEMES, type ThemeTokens } from '../../themes';
 import { LanguagePicker } from './LanguagePicker';
 import type { AppLanguage } from '../../i18n/messages';
 import homeCornerCharacterUrl from '../../assets/914_20260621035718-display.webp';
@@ -663,7 +663,7 @@ export function GuidedTour({
     );
     const recommendedKeys = new Set<string>(RECOMMENDED_THEME_KEYS);
     const otherThemes = allThemes.filter(([key]) => !recommendedKeys.has(key));
-    const renderThemeOptions = (themes: typeof allThemes) =>
+    const renderThemeOptions = (themes: readonly (readonly [string, ThemeTokens])[]) =>
       themes.map(([key, meta]) => {
         const name = themeDisplayName(key, meta.name, language);
         const active = settings.theme === key;
@@ -741,7 +741,12 @@ export function GuidedTour({
             </div>
 
             <div className="p-tour-theme-footer">
-              <p>{t.guidedTour.themeHint}</p>
+              <p>
+                {t.guidedTour.themeHint}{' '}
+                {language === 'ja'
+                  ? '設定では、独自テーマも作成できます。'
+                  : 'You can also create a custom theme later in Settings.'}
+              </p>
               {renderActions()}
             </div>
           </div>

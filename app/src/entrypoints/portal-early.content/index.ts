@@ -3,7 +3,7 @@
  * `storage` のテーマ値を読み、反映後にブートカバーの色を更新します。
  */
 
-import { bootCoverBg, portalHeadThemeCssByName } from '../../themes';
+import { bootCoverBg, parseCustomThemeCollection, portalHeadThemeCssByName } from '../../themes';
 import { PORTAL_CONTENT_SCRIPT_MATCHES, PORTAL_DOM, SK } from '../../shared/constants';
 import storage from '../../lib/storage';
 
@@ -33,11 +33,15 @@ export default defineContentScript({
 
     paintBootCover(bootCoverBg());
 
-    void storage.get(SK.theme).then((data) => {
-      const name = String(data[SK.theme] ?? '');
-      const el = document.getElementById(PORTAL_DOM.headThemeStyle);
-      if (el) el.textContent = portalHeadThemeCssByName(name);
-      paintBootCover(bootCoverBg(name));
-    }).catch(() => {});
+    void storage
+      .get([SK.theme, SK.customThemes])
+      .then((data) => {
+        const name = String(data[SK.theme] ?? '');
+        const customThemes = parseCustomThemeCollection(data[SK.customThemes]);
+        const el = document.getElementById(PORTAL_DOM.headThemeStyle);
+        if (el) el.textContent = portalHeadThemeCssByName(name, customThemes);
+        paintBootCover(bootCoverBg(name, customThemes));
+      })
+      .catch(() => {});
   },
 });
