@@ -50,6 +50,12 @@ export const SK = {
   clientLastUpdatedAt: 'portalThemeClientLastUpdatedAt',
   /** ライフサイクル追跡用の最後に記録した manifest version */
   clientLastKnownVersion: 'portalThemeClientLastKnownVersion',
+  /** みんなの活動へ送信した投稿の審査状態確認情報 */
+  communitySubmissions: 'portalThemeCommunitySubmissions',
+  /** みんなの活動のログインセッション（サーバー発行） */
+  communityAuthToken: 'portalThemeCommunityAuthToken',
+  /** 「みんなの活動」が学校公式サービスではないことへの初回同意 */
+  communityDisclaimerAccepted: 'portalThemeCommunityDisclaimerAccepted',
 } as const;
 
 // ─── King LMS postMessage（hooks → bridge）──────────────────────────────────
@@ -188,6 +194,19 @@ export {
 } from './king-lms-url';
 /** 拡張紹介ページ・開発者お知らせ JSON のオリジン（host_permissions と URL 生成用） */
 export const EXTENSION_PROMO_ORIGIN = 'https://kcg-portal-redesign-project-web.vercel.app' as const;
+
+function communityApiOrigin(): string {
+  const raw = import.meta.env.VITE_COMMUNITY_API_ORIGIN?.trim() || 'http://127.0.0.1:8787';
+  try {
+    const url = new URL(raw);
+    return url.origin;
+  } catch {
+    return 'http://127.0.0.1:8787';
+  }
+}
+
+/** 「みんなの活動」ローカルサーバー。トンネル利用時は環境変数で差し替える。 */
+export const COMMUNITY_API_ORIGIN = communityApiOrigin();
 
 /** 拡張機能紹介ページ */
 export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;

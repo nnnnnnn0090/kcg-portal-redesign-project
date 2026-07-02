@@ -1,6 +1,7 @@
 import { defineConfig } from 'wxt';
 import {
   EXTENSION_PROMO_ORIGIN,
+  COMMUNITY_API_ORIGIN,
   HOME2_ORIGIN,
   KING_LMS_ORIGIN,
   PORTAL_ORIGIN,
@@ -29,6 +30,12 @@ export default defineConfig({
       48: 'icon/48.png',
       128: 'icon/128.png',
     },
+    web_accessible_resources: [
+      {
+        resources: ['community/activity-icon.png'],
+        matches: [`${PORTAL_ORIGIN}/*`],
+      },
+    ],
     minimum_chrome_version: '111',
     permissions: ['storage'],
     host_permissions: [
@@ -36,6 +43,7 @@ export default defineConfig({
       `${KING_LMS_ORIGIN}/*`,
       `${EXTENSION_PROMO_ORIGIN}/*`,
       `${HOME2_ORIGIN}/*`,
+      `${COMMUNITY_API_ORIGIN}/*`,
     ],
     browser_specific_settings: {
       gecko: {
