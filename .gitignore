@@ -6,6 +6,9 @@
 /app/.chrome-dev-profile
 /app/.chrome-e2e-profile
 /app/.king-lms-api-capture
+/community-server/data
+/community-server/node_modules
+/community-server/.env
 
 # 非公開 URL（Discord 招待・フォーム等）用。`app/.env.example` を参照。
 /app/.env
@@ -17,3 +20,4 @@ KCG WebMail*
 kcg.edu*
 /aaa_files
 aaa.html
+/community-server

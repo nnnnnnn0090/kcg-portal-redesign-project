@@ -1,0 +1,290 @@
+@media (max-width: 960px) {
+  #portal-overlay .community-root {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+  #portal-overlay .community-app {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+  #portal-overlay .community-sidebar {
+    align-items: stretch;
+    padding-inline: var(--community-space-2);
+  }
+  #portal-overlay .community-brand {
+    justify-content: center;
+    margin-inline: calc(var(--community-space-2) * -1);
+    padding-inline: 0;
+  }
+  #portal-overlay .community-brand strong,
+  #portal-overlay .community-sidebar nav span,
+  #portal-overlay .community-create {
+    font-size: 0;
+  }
+  #portal-overlay .community-sidebar nav button {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  #portal-overlay .community-create {
+    min-height: 44px;
+    padding: 0;
+  }
+  #portal-overlay .community-create svg {
+    width: 20px;
+    height: 20px;
+  }
+  #portal-overlay .community-account p,
+  #portal-overlay .community-account-user > span:last-child {
+    display: none;
+  }
+  #portal-overlay .community-account-user {
+    justify-content: center;
+    padding: var(--community-space-1);
+  }
+  #portal-overlay .community-account > button:not(.community-account-user) {
+    padding: 0;
+    font-size: var(--community-font-xs);
+  }
+  #portal-overlay .community-content {
+    padding-inline: var(--community-space-4);
+  }
+  #portal-overlay .community-create-body {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+@media (max-width: 760px) {
+  #portal-overlay .community-create-body,
+  #portal-overlay .community-post-dialog {
+    grid-template-columns: 1fr;
+  }
+  #portal-overlay .community-post-viewer-head {
+    grid-column: auto;
+  }
+  #portal-overlay .community-post-dialog {
+    display: block;
+    height: auto;
+    overflow: auto;
+  }
+  #portal-overlay .community-post-viewer-image {
+    height: clamp(280px, 52vh, 480px);
+    min-height: 0;
+  }
+  #portal-overlay .community-post-viewer-track img {
+    max-height: none;
+  }
+  #portal-overlay .community-post-viewer-panel {
+    border-top: 1px solid var(--p-border);
+    border-left: 0;
+  }
+  #portal-overlay .community-auth {
+    grid-template-columns: 1fr;
+  }
+  #portal-overlay .community-auth-intro {
+    display: none;
+  }
+  #portal-overlay .community-create-body > .community-fields .community-caption-field {
+    min-height: 220px;
+    flex: none;
+  }
+}
+
+@media (max-width: 620px) {
+  #portal-overlay .community-root {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+  #portal-overlay .community-app {
+    display: block;
+  }
+  #portal-overlay .community-sidebar {
+    display: none;
+  }
+  #portal-overlay .community-main {
+    height: 100%;
+    grid-template-rows: 56px minmax(0, 1fr) 64px;
+  }
+  #portal-overlay .community-topbar {
+    padding-inline: var(--community-space-3);
+  }
+  #portal-overlay .community-topbar small {
+    display: none;
+  }
+  #portal-overlay .community-topbar strong {
+    font-size: var(--community-font-md);
+  }
+  #portal-overlay .community-refresh,
+  #portal-overlay .community-logout {
+    width: var(--community-control);
+    padding: 0;
+    font-size: 0;
+  }
+  #portal-overlay .community-topbar .community-auth-actions button {
+    width: var(--community-control);
+    padding: 0 var(--community-space-1);
+    overflow: hidden;
+    font-size: var(--community-font-xs);
+  }
+  #portal-overlay .community-refresh svg {
+    display: block;
+  }
+  #portal-overlay .community-mobile-nav {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border-top: 1px solid var(--p-border);
+    background: var(--p-bg2);
+  }
+  #portal-overlay .community-mobile-nav.is-guest {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  #portal-overlay .community-mobile-nav button {
+    min-width: 0;
+    min-height: 64px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    border-radius: 0;
+    padding: 0 var(--community-space-1);
+    font-size: var(--community-font-xs);
+  }
+  #portal-overlay .community-mobile-nav button.is-active {
+    color: var(--p-accent-light);
+    background: var(--p-accent-bg);
+  }
+  #portal-overlay .community-content {
+    padding: var(--community-space-6) var(--community-space-3) 48px;
+  }
+  #portal-overlay .community-screen-heading {
+    align-items: start;
+    gap: var(--community-space-3);
+  }
+  #portal-overlay .community-screen-heading h1 {
+    font-size: 24px;
+  }
+  #portal-overlay .community-screen-heading > button {
+    min-width: var(--community-control);
+    padding-inline: var(--community-space-3);
+  }
+  #portal-overlay .community-grid {
+    grid-template-columns: 1fr;
+  }
+  #portal-overlay .community-feed-panel {
+    padding: var(--community-space-3);
+  }
+  #portal-overlay .community-modal-layer {
+    padding: var(--community-space-3);
+  }
+  #portal-overlay .community-dialog,
+  #portal-overlay .community-post-dialog {
+    max-height: calc(100vh - 24px);
+    border-radius: 16px;
+  }
+  #portal-overlay .community-auth-panel {
+    padding: var(--community-space-6) var(--community-space-4);
+  }
+  #portal-overlay .community-create-body {
+    padding: var(--community-space-4);
+  }
+  #portal-overlay .community-composer-filmstrip-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  #portal-overlay .community-composer-stage.has-image {
+    padding: 0;
+  }
+  #portal-overlay .community-composer-stage > img {
+    inset: var(--community-space-2);
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+  }
+  #portal-overlay .community-profile-info {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding-inline: var(--community-space-4);
+  }
+  #portal-overlay .community-profile-actions {
+    grid-column: 1 / -1;
+    padding-top: 0;
+  }
+  #portal-overlay .community-profile-actions button {
+    width: 100%;
+  }
+  #portal-overlay .community-avatar.is-large {
+    width: 76px;
+    height: 76px;
+    flex-basis: 76px;
+  }
+  #portal-overlay .community-profile-copy h1 {
+    font-size: 20px;
+  }
+  #portal-overlay .community-profile-editor-media,
+  #portal-overlay .community-profile-editor-fields {
+    padding-inline: var(--community-space-4);
+  }
+  #portal-overlay .community-social-editor {
+    grid-template-columns: 1fr;
+  }
+  #portal-overlay .community-profile-review-note {
+    margin-inline: var(--community-space-4);
+  }
+  #portal-overlay .community-profile-editor-identity {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  #portal-overlay .community-profile-editor-identity > button {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 0;
+  }
+  #portal-overlay .community-academic-selects {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  #portal-overlay .community-root {
+    grid-template-columns: 12px minmax(0, 1fr);
+  }
+  #portal-overlay .community-topbar {
+    gap: var(--community-space-1);
+  }
+  #portal-overlay .community-topbar strong {
+    max-width: 120px;
+  }
+  #portal-overlay .community-screen-heading {
+    display: grid;
+  }
+  #portal-overlay .community-screen-heading > button {
+    justify-self: start;
+  }
+  #portal-overlay .community-section-heading {
+    align-items: end;
+  }
+  #portal-overlay .community-profile-stats {
+    gap: var(--community-space-2);
+  }
+  #portal-overlay .community-profile-stats > span,
+  #portal-overlay .community-profile-stats > button {
+    padding-inline: var(--community-space-2);
+  }
+  #portal-overlay .community-post-viewer-head {
+    padding-inline: var(--community-space-3);
+  }
+  #portal-overlay .community-post-viewer-panel {
+    padding: 0;
+  }
+  #portal-overlay .community-post-viewer-panel > .community-post-copy,
+  #portal-overlay .community-post-viewer-panel > .community-post-actions,
+  #portal-overlay .community-post-viewer-panel > aside {
+    margin-right: var(--community-space-4);
+    margin-left: var(--community-space-4);
+  }
+  #portal-overlay .community-comments {
+    padding-right: var(--community-space-4);
+    padding-left: var(--community-space-4);
+  }
+  #portal-overlay .community-post-viewer-panel > p {
+    padding-right: var(--community-space-4);
+    padding-left: var(--community-space-4);
+  }
+  #portal-overlay .community-connections-list > button {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  #portal-overlay .community-connections-list em {
+    display: none;
+  }
+}

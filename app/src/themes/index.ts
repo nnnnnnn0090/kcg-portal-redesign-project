@@ -15,6 +15,15 @@ import {
 export { THEMES, DEFAULT_THEME, type ThemeTokens };
 export * from './custom-themes';
 
+function avatarRingColor(background: string): '#000' | '#fff' {
+  const hex = background.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i)?.[1];
+  if (!hex) return '#fff';
+  const normalized = hex.length === 3 ? [...hex].map((value) => value + value).join('') : hex;
+  const [red, green, blue] = [0, 2, 4].map((offset) => Number.parseInt(normalized.slice(offset, offset + 2), 16));
+  const luminance = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
+  return luminance > 0.55 ? '#000' : '#fff';
+}
+
 // ─── CSS 生成 ─────────────────────────────────────────────────────────────
 
 /** テーマトークンを `#portal-overlay` スコープ用の CSS カスタムプロパティ文字列へ変換します。 */
@@ -26,7 +35,7 @@ export function getThemeCss(t: ThemeTokens): string {
     `--p-text:${t.text};--p-text-muted:${t.textMuted};--p-text-dim:${t.textDim};` +
     `--p-text-dimmer:${t.textDimmer};--p-text-bright:${t.textBright};` +
     `--p-accent:${t.accent};--p-accent-light:${t.accentLight};` +
-    `--p-accent-bg:${t.accentBg};--p-accent-border:${t.accentBorder};` +
+    `--p-accent-bg:${t.accentBg};--p-accent-border:${t.accentBorder};--p-avatar-ring:${avatarRingColor(t.bg)};` +
     `--p-danger:${t.danger};--p-danger-hover:${t.dangerHover};` +
     `--p-shadow:${t.shadow};--p-shadow-strong:${t.shadowStrong}}`
   );
@@ -140,6 +149,7 @@ export function applyThemeToElement(el: HTMLElement, t: ThemeTokens): void {
   el.style.setProperty('--p-accent-light', t.accentLight);
   el.style.setProperty('--p-accent-bg', t.accentBg);
   el.style.setProperty('--p-accent-border', t.accentBorder);
+  el.style.setProperty('--p-avatar-ring', avatarRingColor(t.bg));
   el.style.setProperty('--p-danger', t.danger);
   el.style.setProperty('--p-danger-hover', t.dangerHover);
   el.style.setProperty('--p-shadow', t.shadow);
