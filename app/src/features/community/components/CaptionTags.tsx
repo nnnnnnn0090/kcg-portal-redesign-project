@@ -15,7 +15,9 @@ export function renderCaptionWithTags(
     if (index > lastIndex) nodes.push(caption.slice(lastIndex, index));
     nodes.push(
       <button
-        className="community-caption-tag"
+        className={
+          'community-caption-tag tw-inline tw-border-0 tw-bg-transparent tw-p-0 tw-font-inherit tw-text-community-accent-light tw-cursor-pointer'
+        }
         key={`tag-${key++}`}
         type="button"
         onClick={() => onTagClick(tag)}

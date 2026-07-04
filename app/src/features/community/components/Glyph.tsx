@@ -48,7 +48,13 @@ export function Glyph({
     ),
   };
   return (
-    <svg viewBox="0 0 24 24" aria-hidden>
+    <svg
+      className={
+        'community-glyph tw-block tw-h-[18px] tw-w-[18px] tw-flex-none tw-fill-none tw-stroke-current tw-stroke-[1.9] [stroke-linecap:round] [stroke-linejoin:round]'
+      }
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
       {paths[name]}
     </svg>
   );

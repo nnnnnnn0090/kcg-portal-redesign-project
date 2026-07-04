@@ -5,6 +5,7 @@ import { Avatar } from '../components/Avatar';
 import { Busy, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
 import type { ModalLayerProps } from './types';
+import { cn } from '../classNames';
 
 export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const {
@@ -48,7 +49,8 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const createDragPreview = (image: string, index: number) => {
     removeDragPreview();
     const preview = document.createElement('div');
-    preview.className = 'community-image-drag-preview';
+    preview.className =
+      'community-image-drag-preview tw-pointer-events-none tw-fixed tw-left-[-120px] tw-top-[-120px] tw-z-[2147483647] tw-h-[78px] tw-w-[78px] tw-overflow-hidden tw-rounded-[10px] tw-border-2 tw-border-white tw-bg-[#111] tw-shadow-2xl [&_img]:tw-block [&_img]:tw-h-full [&_img]:tw-w-full [&_img]:tw-object-cover [&_span]:tw-absolute [&_span]:tw-left-1.5 [&_span]:tw-top-1.5 [&_span]:tw-rounded-full [&_span]:tw-bg-black/75 [&_span]:tw-px-1.5 [&_span]:tw-py-0.5 [&_span]:tw-text-xs [&_span]:tw-text-white';
     const previewImage = document.createElement('img');
     previewImage.src = image;
     const badge = document.createElement('span');
@@ -114,15 +116,29 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
 
   return (
     <form
-      className="community-dialog community-create-dialog"
+      className={
+        'community-dialog tw-max-h-[min(90vh,900px)] tw-w-full tw-max-w-[620px] tw-overflow-auto tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[620px]:tw-max-h-[calc(100vh-24px)] max-[620px]:tw-rounded-2xl [&>footer]:tw-flex [&>footer]:tw-justify-end [&>footer]:tw-gap-2 [&>footer]:tw-border-t [&>footer]:tw-border-community-border [&>footer]:tw-bg-community-bg2 [&>footer]:tw-p-4 [&>footer>button]:tw-inline-flex [&>footer>button]:tw-min-h-10 [&>footer>button]:tw-appearance-none [&>footer>button]:tw-items-center [&>footer>button]:tw-justify-center [&>footer>button]:tw-gap-2 [&>footer>button]:tw-rounded-lg [&>footer>button]:tw-border [&>footer>button]:tw-border-community-border [&>footer>button]:tw-bg-community-bg3 [&>footer>button]:tw-px-4 [&>footer>button]:tw-text-sm [&>footer>button]:tw-font-bold [&>footer>button]:tw-text-community-text [&>footer>button]:tw-cursor-pointer [&>footer>button.is-primary]:tw-border-community-accent [&>footer>button.is-primary]:tw-bg-community-accent [&>footer>button.is-primary]:tw-text-community-bg [&_button:disabled]:tw-cursor-not-allowed [&_button:disabled]:tw-opacity-[.55] community-create-dialog tw-w-full tw-max-w-[980px]'
+      }
       method="post"
       onSubmitCapture={(event) => event.preventDefault()}
       onSubmit={submitPost}
     >
       <DialogHeader title={ja ? '新しい投稿' : 'New post'} close={close} />
-      <div className="community-create-body">
-        <section className="community-image-composer">
-          <header className="community-composer-media-head">
+      <div
+        className={
+          'community-create-body tw-grid tw-grid-cols-[minmax(0,1.12fr)_minmax(320px,.88fr)] tw-gap-6 tw-bg-community-bg tw-p-6 max-[960px]:tw-grid-cols-[minmax(0,1fr)_320px] max-[760px]:tw-grid-cols-1 max-[620px]:tw-p-4 [&>.community-fields]:tw-flex [&>.community-fields]:tw-flex-col [&>.community-fields]:tw-rounded-xl [&>.community-fields]:tw-border [&>.community-fields]:tw-border-community-border-light [&>.community-fields]:tw-bg-community-bg2 [&>.community-fields]:tw-p-4'
+        }
+      >
+        <section
+          className={
+            'community-image-composer tw-grid tw-min-w-0 tw-content-start tw-gap-3 tw-rounded-xl tw-border tw-border-community-border-light tw-bg-community-bg2 tw-p-3 [&>input]:tw-sr-only'
+          }
+        >
+          <header
+            className={
+              'community-composer-media-head tw-flex tw-min-h-10 tw-items-center tw-justify-between tw-gap-3 [&>div]:tw-grid [&>div]:tw-min-w-0 [&>div]:tw-leading-snug [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright [&_span]:tw-text-xs [&_span]:tw-text-community-muted [&>label]:tw-inline-flex [&>label]:tw-min-h-9 [&>label]:tw-items-center [&>label]:tw-gap-1 [&>label]:tw-rounded-lg [&>label]:tw-border [&>label]:tw-border-[var(--p-accent-border)] [&>label]:tw-bg-community-accent-bg [&>label]:tw-px-3 [&>label]:tw-text-[13px] [&>label]:tw-font-bold [&>label]:tw-text-community-accent-light [&>label]:tw-cursor-pointer [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+            }
+          >
             <div>
               <strong>{ja ? '写真' : 'Photos'}</strong>
               <span>{ja ? '最大4枚・1枚6MBまで' : 'Up to 4 photos · 6MB each'}</span>
@@ -136,11 +152,21 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
               <span>{postImages.length}/4</span>
             )}
           </header>
-          <div className={`community-composer-stage${postImages.length ? ' has-image' : ''}`}>
+          <div
+            className={cn(
+              'community-composer-stage tw-relative tw-grid tw-aspect-[4/3] tw-min-h-0 tw-place-items-center tw-overflow-hidden tw-rounded-[11px] tw-border tw-border-dashed tw-border-[var(--p-border-hover)] tw-bg-community-bg [&.has-image]:tw-border-solid [&.has-image]:tw-border-community-border [&.has-image]:tw-bg-[#08090d] [&>img]:tw-absolute [&>img]:tw-inset-4 [&>img]:tw-block [&>img]:tw-h-[calc(100%-32px)] [&>img]:tw-w-[calc(100%-32px)] [&>img]:tw-object-contain max-[620px]:[&>img]:tw-inset-2 max-[620px]:[&>img]:tw-h-[calc(100%-16px)] max-[620px]:[&>img]:tw-w-[calc(100%-16px)]',
+              postImages.length > 0 && 'has-image',
+            )}
+          >
             {postImages.length ? (
               <img src={postImages[selectedImage]} alt="" />
             ) : (
-              <label className="community-composer-empty" htmlFor="community-post-images">
+              <label
+                className={
+                  'community-composer-empty tw-grid tw-h-full tw-w-full tw-place-content-center tw-justify-items-center tw-gap-2 tw-p-6 tw-text-center tw-text-community-muted tw-cursor-pointer hover:tw-bg-[var(--p-bg-hover)] [&_svg]:tw-mb-1 [&_svg]:tw-h-[38px] [&_svg]:tw-w-[38px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-community-accent-light [&_strong]:tw-text-base [&_strong]:tw-text-community-bright [&_span]:tw-text-[13px] [&_small]:tw-text-xs'
+                }
+                htmlFor="community-post-images"
+              >
                 <Glyph name="image" />
                 <strong>{ja ? '投稿する写真を追加' : 'Add photos'}</strong>
                 <span>{ja ? 'クリックして写真を選択' : 'Click to choose photos'}</span>
@@ -149,11 +175,24 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
             )}
           </div>
           {postImages.length ? (
-            <div className="community-composer-filmstrip">
-              <div className="community-composer-filmstrip-list">
+            <div
+              className={
+                'community-composer-filmstrip tw-grid tw-gap-2 [&>p]:tw-m-0 [&>p]:tw-flex [&>p]:tw-items-center [&>p]:tw-justify-center [&>p]:tw-gap-1 [&>p]:tw-text-xs [&>p]:tw-text-community-muted'
+              }
+            >
+              <div
+                className={
+                  'community-composer-filmstrip-list tw-grid tw-grid-cols-6 tw-gap-2 max-[620px]:tw-grid-cols-3'
+                }
+              >
                 {postImages.map((image, index) => (
                   <div
-                    className={`community-composer-thumb${selectedImage === index ? ' is-selected' : ''}${draggedImage === index ? ' is-dragging' : ''}${dragTargetImage === index && draggedImage !== index ? ' is-drop-target' : ''}`}
+                    className={cn(
+                      'community-composer-thumb tw-relative tw-aspect-square tw-min-w-0 tw-rounded-[9px] tw-border-2 tw-border-transparent tw-bg-community-bg3 tw-cursor-grab tw-transition [&.is-selected]:tw-border-community-accent [&.is-selected]:tw-ring-2 [&.is-selected]:tw-ring-community-accent-bg [&.is-dragging]:tw-scale-95 [&.is-dragging]:tw-opacity-20 [&.is-drop-target]:tw-translate-y-[-3px] [&.is-drop-target]:tw-border-community-accent-light [&.is-drop-target]:tw-shadow-lg',
+                      selectedImage === index && 'is-selected',
+                      draggedImage === index && 'is-dragging',
+                      dragTargetImage === index && draggedImage !== index && 'is-drop-target',
+                    )}
                     draggable
                     key={`${image.slice(-24)}-${index}`}
                     onDragStart={(event) => {
@@ -183,7 +222,9 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                     }}
                   >
                     <button
-                      className="community-composer-thumb-preview"
+                      className={
+                        'community-composer-thumb-preview tw-block tw-h-full tw-w-full tw-overflow-hidden tw-rounded-[7px] tw-border-0 tw-bg-transparent tw-p-0 [&_img]:tw-block [&_img]:tw-h-full [&_img]:tw-w-full [&_img]:tw-object-cover [&_span]:tw-absolute [&_span]:tw-bottom-1 [&_span]:tw-left-1 [&_span]:tw-min-w-5 [&_span]:tw-rounded-md [&_span]:tw-bg-black/70 [&_span]:tw-px-1.5 [&_span]:tw-py-px [&_span]:tw-text-xs [&_span]:tw-leading-[18px] [&_span]:tw-text-white'
+                      }
                       type="button"
                       onClick={() => setSelectedImage(index)}
                       aria-label={`${ja ? '写真' : 'Photo'} ${index + 1}`}
@@ -192,7 +233,9 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                       <span>{index + 1}</span>
                     </button>
                     <button
-                      className="community-composer-thumb-remove"
+                      className={
+                        'community-composer-thumb-remove tw-absolute tw-right-1 tw-top-1 tw-z-[2] tw-grid tw-h-6 tw-w-6 tw-place-items-center tw-rounded-md tw-border tw-border-white/30 tw-bg-black/70 tw-p-0 tw-text-white tw-opacity-80 tw-cursor-pointer hover:tw-opacity-100 focus-visible:tw-opacity-100 [&_svg]:tw-h-3 [&_svg]:tw-w-3 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+                      }
                       type="button"
                       onClick={() => removeImage(index)}
                       aria-label={ja ? `写真${index + 1}を削除` : `Remove photo ${index + 1}`}
@@ -222,8 +265,12 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
             }}
           />
         </section>
-        <div className="community-fields">
-          <div className="community-posting-user">
+        <div className={'community-fields tw-grid tw-min-w-0 tw-content-start tw-gap-4'}>
+          <div
+            className={
+              'community-posting-user tw-flex tw-items-center tw-gap-3 tw-border-b tw-border-community-border tw-pb-3 [&>span]:tw-grid [&>span]:tw-min-w-0 [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
+            }
+          >
             <Avatar user={user} />
             <span>
               <strong>{user.displayName}</strong>
@@ -238,7 +285,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
               required
             />
           </Field>
-          <div className="community-caption-field">
+          <div className={'community-caption-field tw-relative'}>
             <Field label={ja ? '本文' : 'Caption'}>
               <textarea
                 ref={captionInput}
@@ -284,7 +331,9 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
             </Field>
             {tagSearch !== null ? (
               <div
-                className="community-tag-suggestions"
+                className={
+                  'community-tag-suggestions tw-absolute tw-inset-x-0 tw-top-[calc(100%+8px)] tw-z-[3] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card [&.is-profile-tags]:tw-static [&.is-profile-tags]:tw-mt-[-8px] [&_header]:tw-flex [&_header]:tw-justify-between [&_header]:tw-gap-2 [&_header]:tw-border-b [&_header]:tw-border-community-border [&_header]:tw-px-3 [&_header]:tw-py-2 [&_header]:tw-text-xs [&_header]:tw-text-community-muted [&_button]:tw-flex [&_button]:tw-min-h-10 [&_button]:tw-w-full [&_button]:tw-items-center [&_button]:tw-gap-2 [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-3 [&_button]:tw-text-left [&_button]:tw-text-sm [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-accent-bg [&_button.is-active]:tw-bg-community-accent-bg [&_b]:tw-text-community-accent-light'
+                }
                 role="listbox"
                 aria-label={ja ? 'タグ候補' : 'Tag suggestions'}
               >
@@ -295,7 +344,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                 {matchingTags.length ? (
                   matchingTags.map((item, index) => (
                     <button
-                      className={index === activeTagIndex ? 'is-active' : ''}
+                      className={cn(index === activeTagIndex && 'is-active')}
                       key={item}
                       type="button"
                       role="option"
@@ -309,12 +358,16 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                     </button>
                   ))
                 ) : tagSearch ? (
-                  <div className="community-tag-new">
+                  <div
+                    className={'community-tag-new tw-p-3 tw-text-[13px] tw-text-community-muted'}
+                  >
                     <b>#{tagSearch}</b>
                     <span>{ja ? '新しいタグとして投稿できます' : 'This will be a new tag'}</span>
                   </div>
                 ) : (
-                  <div className="community-tag-new">
+                  <div
+                    className={'community-tag-new tw-p-3 tw-text-[13px] tw-text-community-muted'}
+                  >
                     <span>
                       {ja
                         ? '文字を続けて入力すると新しいタグを作れます'
@@ -325,7 +378,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
               </div>
             ) : null}
           </div>
-          <p className="community-help">
+          <p className={'community-help tw-m-0 tw-text-[13px] tw-text-community-muted'}>
             {ja ? '投稿は運営による審査後に公開されます。' : 'Posts are published after review.'}
           </p>
           <ErrorMessage text={error} />
@@ -335,7 +388,12 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
         <button type="button" onClick={close}>
           {ja ? 'キャンセル' : 'Cancel'}
         </button>
-        <button className="is-primary" disabled={busy || !postImages.length}>
+        <button
+          className={
+            'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-bg'
+          }
+          disabled={busy || !postImages.length}
+        >
           {busy ? <Busy /> : null}
           {ja ? '審査へ送信' : 'Submit'}
         </button>

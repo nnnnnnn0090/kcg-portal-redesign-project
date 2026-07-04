@@ -10,6 +10,7 @@ import { HomeScreen } from './screens/HomeScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { useCommunityActions, useCommunityState } from './state/CommunityProvider';
+import { cn } from './classNames';
 
 export function CommunityShell() {
   const state = useCommunityState();
@@ -102,15 +103,24 @@ export function CommunityShell() {
               : 'Profile';
 
   return (
-    <div className={`community-root${closing ? ' is-closing' : ''}`}>
+    <div
+      className={cn(
+        'community-root tw-fixed tw-inset-0 tw-z-[2147483300] tw-grid tw-grid-cols-[clamp(44px,6vw,88px)_minmax(0,1fr)] tw-font-community tw-text-sm tw-leading-relaxed tw-text-community-text tw-animate-community-fade-in max-[960px]:tw-grid-cols-[52px_minmax(0,1fr)] max-[620px]:tw-grid-cols-[24px_minmax(0,1fr)] max-[420px]:tw-grid-cols-[12px_minmax(0,1fr)] [&_*]:tw-box-border [&_button]:tw-font-inherit [&_input]:tw-font-inherit [&_textarea]:tw-font-inherit [&_button]:tw-text-inherit [&_button:focus-visible]:tw-outline [&_button:focus-visible]:tw-outline-2 [&_button:focus-visible]:tw-outline-community-accent [&_button:focus-visible]:tw-outline-offset-2 [&_a:focus-visible]:tw-outline [&_a:focus-visible]:tw-outline-2 [&_a:focus-visible]:tw-outline-community-accent [&_a:focus-visible]:tw-outline-offset-2 [&.is-closing]:tw-pointer-events-none [&.is-closing]:tw-animate-community-fade-out motion-reduce:[&_*]:tw-transition-none motion-reduce:[&_*]:tw-animate-none',
+        closing && 'is-closing',
+      )}
+    >
       <button
-        className="community-gutter"
+        className={
+          'community-gutter tw-cursor-w-resize tw-border-0 tw-bg-[color-mix(in_srgb,#000_48%,transparent)]'
+        }
         type="button"
         onClick={closeDrawer}
         aria-label={ja ? '閉じる' : 'Close'}
       />
       <section
-        className="community-app"
+        className={
+          'community-app tw-grid tw-h-full tw-min-w-0 tw-grid-cols-[224px_minmax(0,1fr)] tw-overflow-hidden tw-bg-community-bg tw-shadow-[-18px_0_60px_color-mix(in_srgb,#000_30%,transparent)] tw-animate-community-slide-in max-[960px]:tw-grid-cols-[76px_minmax(0,1fr)] max-[620px]:tw-block [.is-closing_&]:tw-animate-community-slide-out'
+        }
         role="dialog"
         aria-modal="true"
         aria-label={ja ? 'みんなの活動' : 'Community'}
@@ -123,14 +133,25 @@ export function CommunityShell() {
           go={go}
           onLogin={() => setModal({ kind: 'auth', mode: 'login' })}
         />
-        <div className="community-main">
-          <header className="community-topbar">
+        <div
+          className={
+            'community-main tw-grid tw-h-full tw-min-w-0 tw-grid-rows-[56px_minmax(0,1fr)] tw-overflow-hidden max-[620px]:tw-grid-rows-[56px_minmax(0,1fr)_64px]'
+          }
+        >
+          <header
+            className={
+              'community-topbar tw-flex tw-min-w-0 tw-items-center tw-gap-2 tw-border-b tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg2)_94%,transparent)] tw-px-4 max-[620px]:tw-px-3 max-[420px]:tw-gap-1 [&>div:first-child]:tw-mr-auto [&>div:first-child]:tw-min-w-0 [&_small]:tw-block [&_small]:tw-text-[10px] [&_small]:tw-font-bold [&_small]:tw-tracking-[.08em] [&_small]:tw-text-community-accent-light max-[620px]:[&_small]:tw-hidden [&_strong]:tw-block [&_strong]:tw-overflow-hidden [&_strong]:tw-text-ellipsis [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright max-[420px]:[&_strong]:tw-max-w-[120px]'
+            }
+          >
             <div>
               <strong>{pageTitle}</strong>
               <small>CAMPUS COMMUNITY</small>
             </div>
             <button
-              className={`community-refresh${refreshing ? ' is-refreshing' : ''}`}
+              className={cn(
+                'community-refresh tw-inline-flex tw-h-10 tw-min-w-10 tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-cursor-pointer disabled:tw-cursor-wait disabled:tw-opacity-60 max-[620px]:tw-w-10 max-[620px]:tw-px-0 max-[620px]:[&>span]:tw-hidden [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current',
+                refreshing && 'is-refreshing',
+              )}
               type="button"
               onClick={() => void refreshCurrentPage()}
               disabled={refreshing}
@@ -141,24 +162,37 @@ export function CommunityShell() {
               <span>{refreshing ? (ja ? '更新中' : 'Refreshing') : ja ? '更新' : 'Refresh'}</span>
             </button>
             {!user ? (
-              <div className="community-auth-actions">
+              <div
+                className={
+                  'community-auth-actions tw-flex tw-items-center tw-gap-2 [&>button]:tw-h-10 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 [&>button]:tw-font-semibold [&>button]:tw-cursor-pointer max-[620px]:[&>button]:tw-w-10 max-[620px]:[&>button]:tw-overflow-hidden max-[620px]:[&>button]:tw-px-1 max-[620px]:[&>button]:tw-text-xs'
+                }
+              >
                 <button onClick={() => setModal({ kind: 'auth', mode: 'register' })}>
                   {ja ? '新規登録' : 'Sign up'}
                 </button>
                 <button
-                  className="is-primary"
+                  className={
+                    'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-bg'
+                  }
                   onClick={() => setModal({ kind: 'auth', mode: 'login' })}
                 >
                   {ja ? 'ログイン' : 'Log in'}
                 </button>
               </div>
             ) : (
-              <button className="community-logout" onClick={() => void logout()}>
+              <button
+                className={
+                  'community-logout tw-inline-flex tw-h-10 tw-min-w-10 tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-cursor-pointer max-[620px]:tw-w-10 max-[620px]:tw-px-1 max-[620px]:tw-text-xs'
+                }
+                onClick={() => void logout()}
+              >
                 {ja ? 'ログアウト' : 'Log out'}
               </button>
             )}
             <button
-              className="community-close"
+              className={
+                'community-close tw-grid tw-h-10 tw-w-10 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+              }
               type="button"
               onClick={closeDrawer}
               aria-label={ja ? '閉じる' : 'Close'}

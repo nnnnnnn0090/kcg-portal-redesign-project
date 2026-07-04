@@ -5,6 +5,7 @@ import { Avatar } from '../components/Avatar';
 import { renderCaptionWithTags } from '../components/CaptionTags';
 import { Busy, ErrorMessage } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
+import { cn } from '../classNames';
 
 export function PostDialog({
   post,
@@ -120,10 +121,20 @@ export function PostDialog({
     }
   };
   return (
-    <article className="community-post-dialog">
-      <div className="community-post-viewer-image">
+    <article
+      className={
+        'community-post-dialog tw-grid tw-h-[min(780px,90vh)] tw-w-full tw-max-w-[1080px] tw-grid-cols-[minmax(0,1.35fr)_minmax(360px,.85fr)] tw-overflow-hidden tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[760px]:tw-block max-[760px]:tw-h-auto max-[760px]:tw-max-h-[calc(100vh-24px)] max-[760px]:tw-overflow-auto'
+      }
+    >
+      <div
+        className={
+          'community-post-viewer-image tw-relative tw-grid tw-min-h-0 tw-place-items-center tw-overflow-hidden tw-bg-[#08090d] max-[760px]:tw-h-[clamp(280px,52vh,480px)] [&>button]:tw-absolute [&>button]:tw-top-1/2 [&>button]:tw-z-[2] [&>button]:tw-grid [&>button]:tw-h-10 [&>button]:tw-w-10 [&>button]:tw-translate-y-[-50%] [&>button]:tw-place-items-center [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-white/20 [&>button]:tw-bg-black/55 [&>button]:tw-text-white [&>button]:tw-cursor-pointer [&>button.is-prev]:tw-left-3 [&>button.is-next]:tw-right-3 [&>span]:tw-absolute [&>span]:tw-bottom-3 [&>span]:tw-left-1/2 [&>span]:tw-z-[2] [&>span]:tw-translate-x-[-50%] [&>span]:tw-rounded-full [&>span]:tw-bg-black/70 [&>span]:tw-px-2 [&>span]:tw-py-1 [&>span]:tw-text-xs [&>span]:tw-text-white'
+        }
+      >
         <div
-          className="community-post-viewer-track"
+          className={
+            'community-post-viewer-track tw-flex tw-h-full tw-transition-transform [&_img]:tw-h-full [&_img]:tw-w-full [&_img]:tw-flex-[0_0_100%] [&_img]:tw-object-contain'
+          }
           style={{ transform: `translateX(-${imageIndex * 100}%)` }}
         >
           {images.map((image, index) => (
@@ -133,7 +144,7 @@ export function PostDialog({
         {images.length > 1 ? (
           <>
             <button
-              className="is-prev"
+              className={'is-prev'}
               type="button"
               onClick={() => setImageIndex((imageIndex - 1 + images.length) % images.length)}
               aria-label={ja ? '前の写真' : 'Previous photo'}
@@ -143,7 +154,7 @@ export function PostDialog({
               </svg>
             </button>
             <button
-              className="is-next"
+              className={'is-next'}
               type="button"
               onClick={() => setImageIndex((imageIndex + 1) % images.length)}
               aria-label={ja ? '次の写真' : 'Next photo'}
@@ -159,10 +170,20 @@ export function PostDialog({
         ) : null}
       </div>
 
-      <section className="community-post-viewer-panel">
-        <header className="community-post-viewer-head">
+      <section
+        className={
+          'community-post-viewer-panel tw-min-w-0 tw-overflow-y-auto tw-border-l tw-border-community-border tw-bg-community-bg max-[760px]:tw-border-l-0 max-[760px]:tw-border-t max-[760px]:tw-border-community-border'
+        }
+      >
+        <header
+          className={
+            'community-post-viewer-head tw-sticky tw-top-0 tw-z-[2] tw-flex tw-min-h-16 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-community-border tw-bg-community-bg2 tw-px-4 tw-py-3 max-[420px]:tw-px-3'
+          }
+        >
           <button
-            className="community-post-author"
+            className={
+              'community-post-author tw-flex tw-min-w-0 tw-items-center tw-gap-3 tw-border-0 tw-bg-transparent tw-p-0 tw-text-left tw-cursor-pointer disabled:tw-cursor-default [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-overflow-hidden [&_strong]:tw-text-ellipsis [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
+            }
             type="button"
             onClick={onAuthorClick}
             disabled={!onAuthorClick}
@@ -174,12 +195,18 @@ export function PostDialog({
               <span>@{post.authorLoginId}</span>
             </div>
           </button>
-          <div className="community-post-header-actions">
+          <div
+            className={
+              'community-post-header-actions tw-flex tw-items-center tw-gap-2 [&>time]:tw-mr-1 [&>time]:tw-whitespace-nowrap [&>time]:tw-text-xs [&>time]:tw-text-community-muted'
+            }
+          >
             <time>{new Date(post.createdAt).toLocaleDateString(ja ? 'ja-JP' : 'en-US')}</time>
             {token &&
             viewerLoginId?.toLocaleLowerCase() !== post.authorLoginId.toLocaleLowerCase() ? (
               <button
-                className="community-post-delete"
+                className={
+                  'community-post-delete tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer'
+                }
                 type="button"
                 disabled={reportBusy}
                 onClick={() => void reportPost()}
@@ -188,12 +215,20 @@ export function PostDialog({
               </button>
             ) : null}
             {onDelete ? (
-              <button className="community-post-delete" type="button" onClick={onDelete}>
+              <button
+                className={
+                  'community-post-delete tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer'
+                }
+                type="button"
+                onClick={onDelete}
+              >
                 {ja ? '削除' : 'Delete'}
               </button>
             ) : null}
             <button
-              className="community-post-close"
+              className={
+                'community-post-close tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+              }
               onClick={close}
               aria-label={ja ? '閉じる' : 'Close'}
             >
@@ -201,12 +236,20 @@ export function PostDialog({
             </button>
           </div>
         </header>
-        <section className="community-post-content">
-          <div className="community-post-copy">
+        <section className={'community-post-content tw-px-5 tw-py-5'}>
+          <div
+            className={
+              'community-post-copy tw-grid tw-gap-3 [&_h2]:tw-m-0 [&_h2]:tw-break-words [&_h2]:tw-text-2xl [&_h2]:tw-leading-tight [&_h2]:tw-text-community-bright'
+            }
+          >
             <h2>{post.title}</h2>
           </div>
           {post.caption.trim() ? (
-            <div className="community-post-caption">
+            <div
+              className={
+                'community-post-caption tw-whitespace-pre-wrap tw-break-words [&_p]:tw-m-0 [&_p]:tw-leading-7'
+              }
+            >
               <p>{renderCaptionWithTags(post.caption, onTagClick)}</p>
             </div>
           ) : null}
@@ -217,17 +260,32 @@ export function PostDialog({
             {post.rejectionReason}
           </aside>
         ) : null}
-        <div className="community-post-actions">
+        <div
+          className={
+            'community-post-actions tw-mx-5 tw-flex tw-items-center tw-justify-between tw-gap-3 tw-border-y tw-border-community-border tw-py-3'
+          }
+        >
           <button
-            className={`community-detail-like${post.likedByMe ? ' is-active' : ''}`}
+            className={cn(
+              'community-detail-like tw-flex tw-items-center tw-gap-2 tw-rounded-full tw-border tw-border-community-border tw-bg-community-bg3 tw-p-1.5 tw-pr-4 tw-text-community-muted tw-cursor-pointer [&.is-active]:tw-border-community-danger [&.is-active]:tw-text-community-danger',
+              post.likedByMe && 'is-active',
+            )}
             type="button"
             onClick={() => toggleLike(post)}
             aria-label={ja ? 'いいね' : 'Like'}
           >
-            <span className="community-like-icon">
+            <span
+              className={
+                'community-like-icon tw-grid tw-h-9 tw-w-9 tw-place-items-center tw-rounded-full tw-bg-community-bg2 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [.is-active_&]:tw-bg-[color-mix(in_srgb,var(--p-danger,#e54867)_12%,var(--p-bg2))] [.is-active_&_svg]:tw-fill-current'
+              }
+            >
               <Glyph name="heart" />
             </span>
-            <span className="community-like-copy">
+            <span
+              className={
+                'community-like-copy tw-grid tw-text-left [&_strong]:tw-text-sm [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
+              }
+            >
               <strong>
                 {post.likedByMe ? (ja ? 'いいね済み' : 'Liked') : ja ? 'いいね' : 'Like'}
               </strong>
@@ -236,43 +294,75 @@ export function PostDialog({
               </small>
             </span>
           </button>
-          <button className="community-post-likes-list" type="button" onClick={openLikes}>
+          <button
+            className={
+              'community-post-likes-list tw-rounded-lg tw-border-0 tw-bg-transparent tw-p-2 tw-text-[13px] tw-text-community-accent-light tw-cursor-pointer hover:tw-bg-community-accent-bg'
+            }
+            type="button"
+            onClick={openLikes}
+          >
             <span>{ja ? 'いいねした人' : 'People who liked this'}</span>
             <span aria-hidden>›</span>
           </button>
         </div>
-        <div className="community-comments">
-          <div className="community-comments-heading">
+        <div className={'community-comments tw-border-t tw-border-community-border tw-p-5'}>
+          <div
+            className={
+              'community-comments-heading tw-mb-4 tw-flex tw-items-center tw-justify-between [&_strong]:tw-text-community-bright [&_span]:tw-rounded-full [&_span]:tw-bg-community-bg3 [&_span]:tw-px-2 [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
+            }
+          >
             <strong>{ja ? 'コメント' : 'Comments'}</strong>
             <span>{comments.length}</span>
           </div>
-          <div className="community-comment-list">
+          <div
+            className={
+              'community-comment-list tw-grid tw-gap-3 [&>p]:tw-m-0 [&>p]:tw-text-[13px] [&>p]:tw-text-community-muted'
+            }
+          >
             {commentsLoading ? (
               <p>{ja ? '読み込み中…' : 'Loading…'}</p>
             ) : comments.length ? (
               comments.map((comment) => (
-                <article className={`community-comment is-${comment.status}`} key={comment.id}>
+                <article
+                  className={cn(
+                    'community-comment tw-grid tw-grid-cols-[36px_minmax(0,1fr)] tw-items-start tw-gap-3',
+                    `is-${comment.status}`,
+                  )}
+                  key={comment.id}
+                >
                   <button
-                    className="community-comment-author"
+                    className={
+                      'community-comment-author tw-rounded-full tw-border-0 tw-bg-transparent tw-p-0 tw-cursor-pointer'
+                    }
                     type="button"
                     onClick={() => onCommentAuthorClick(comment.authorLoginId)}
                     aria-label={`${comment.authorName}のプロフィールを開く`}
                   >
                     <Avatar name={comment.authorName} url={comment.authorAvatarUrl} />
                   </button>
-                  <div className="community-comment-card">
+                  <div
+                    className={
+                      'community-comment-card tw-min-w-0 tw-rounded-xl tw-bg-community-bg2 tw-p-3 [.is-pending_&]:tw-border [.is-pending_&]:tw-border-[#e7a92f] [.is-rejected_&]:tw-border [.is-rejected_&]:tw-border-community-danger [&>header]:tw-flex [&>header]:tw-items-start [&>header]:tw-justify-between [&>header]:tw-gap-2 [&>p]:tw-mb-0 [&>p]:tw-mt-2 [&>p]:tw-whitespace-pre-wrap [&>p]:tw-break-words [&>small]:tw-mt-2 [&>small]:tw-block [&>small]:tw-text-xs [&>small]:tw-text-community-muted'
+                    }
+                  >
                     <header>
                       <button
-                        className="community-comment-author-name"
+                        className={
+                          'community-comment-author-name tw-border-0 tw-bg-transparent tw-p-0 tw-text-left tw-cursor-pointer [&_strong]:tw-text-[13px] [&_strong]:tw-text-community-bright [&_span]:tw-ml-2 [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
+                        }
                         type="button"
                         onClick={() => onCommentAuthorClick(comment.authorLoginId)}
                       >
                         <strong>{comment.authorName}</strong>
                         <span>@{comment.authorLoginId}</span>
                       </button>
-                      <div className="community-comment-meta-actions">
+                      <div
+                        className={
+                          'community-comment-meta-actions tw-flex tw-flex-wrap tw-items-center tw-justify-end tw-gap-2 [&_time]:tw-text-xs [&_time]:tw-text-community-muted [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-p-0 [&_button]:tw-text-xs [&_button]:tw-text-community-danger [&_em]:tw-rounded-full [&_em]:tw-bg-[#e7a92f]/10 [&_em]:tw-px-2 [&_em]:tw-py-0.5 [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-[#e7a92f] [&_em.is-rejected]:tw-bg-community-danger/10 [&_em.is-rejected]:tw-text-community-danger'
+                        }
+                      >
                         {comment.status !== 'approved' ? (
-                          <em className={`is-${comment.status}`}>
+                          <em className={cn(`is-${comment.status}`)}>
                             {comment.status === 'pending'
                               ? ja
                                 ? '審査中'
@@ -308,7 +398,12 @@ export function PostDialog({
             )}
           </div>
           {token ? (
-            <form className="community-comment-form" onSubmit={submitComment}>
+            <form
+              className={
+                'community-comment-form tw-mt-4 tw-grid tw-gap-2 [&_textarea]:tw-w-full [&_textarea]:tw-resize-y [&_textarea]:tw-rounded-lg [&_textarea]:tw-border [&_textarea]:tw-border-community-border [&_textarea]:tw-bg-community-bg2 [&_textarea]:tw-px-3 [&_textarea]:tw-py-2.5 [&_textarea]:tw-text-community-text [&>div]:tw-flex [&>div]:tw-items-center [&>div]:tw-justify-between [&>div]:tw-gap-3 [&_small]:tw-text-community-muted [&_button]:tw-inline-flex [&_button]:tw-min-h-9 [&_button]:tw-items-center [&_button]:tw-gap-1.5 [&_button]:tw-rounded-lg [&_button]:tw-border-0 [&_button]:tw-bg-community-accent [&_button]:tw-px-3 [&_button]:tw-font-bold [&_button]:tw-text-community-bg disabled:[&_button]:tw-opacity-55'
+              }
+              onSubmit={submitComment}
+            >
               <textarea
                 value={commentText}
                 onChange={(event) => setCommentText(event.target.value)}
@@ -329,7 +424,11 @@ export function PostDialog({
               </div>
             </form>
           ) : (
-            <p className="community-comment-login-note">
+            <p
+              className={
+                'community-comment-login-note tw-mt-6 tw-rounded-lg tw-bg-community-bg2 tw-p-4 tw-text-[13px] tw-text-community-muted'
+              }
+            >
               {ja ? 'コメントするにはログインしてください。' : 'Log in to comment.'}
             </p>
           )}
