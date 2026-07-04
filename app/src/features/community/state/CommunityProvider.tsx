@@ -13,7 +13,7 @@ import {
 import type { AppLanguage } from '../../../i18n/messages';
 import storage from '../../../lib/storage';
 import { SK } from '../../../shared/constants';
-import { communityApi } from '../api';
+import { communityApi, setCommunityRequestLoginId } from '../api';
 import { SOCIAL_PLATFORMS } from '../constants';
 import { communityImageFiles, isCommunityImageFile } from '../imageFiles';
 import type { CommunityPage, CommunityPost, CommunityUser } from '../types';
@@ -100,6 +100,11 @@ export function CommunityProvider({
       value: { ja: language === 'ja', defaultAuthorName },
     });
   }, [defaultAuthorName, language]);
+
+  useEffect(() => {
+    setCommunityRequestLoginId(user?.loginId);
+    return () => setCommunityRequestLoginId(null);
+  }, [user?.loginId]);
 
   const closeDrawer = useCallback(() => {
     if (closing) return;
@@ -240,6 +245,7 @@ export function CommunityProvider({
       if (!authToken) return;
       try {
         const result = await communityApi.session(authToken);
+        setCommunityRequestLoginId(result.user.loginId);
         const hydratedUser = await hydrateOwnProfileImages(result.user, authToken);
         setToken(authToken);
         setUser(hydratedUser);
@@ -250,6 +256,7 @@ export function CommunityProvider({
         void loadBookmarks(authToken);
         void loadNotifications(authToken);
       } catch {
+        setCommunityRequestLoginId(null);
         await storage.set({ [SK.communityAuthToken]: '' });
       }
     })();
@@ -458,6 +465,7 @@ export function CommunityProvider({
         password: form.get('communitySecret'),
       });
       await storage.set({ [SK.communityAuthToken]: result.token });
+      setCommunityRequestLoginId(result.user.loginId);
       const hydratedUser = await hydrateOwnProfileImages(result.user, result.token);
       setToken(result.token);
       setUser(hydratedUser);
@@ -476,7 +484,8 @@ export function CommunityProvider({
   };
 
   const logout = async () => {
-    if (token) void communityApi.logout(token).catch(() => undefined);
+    if (token) await communityApi.logout(token).catch(() => undefined);
+    setCommunityRequestLoginId(null);
     await storage.set({ [SK.communityAuthToken]: '' });
     objectUrls.current.forEach(URL.revokeObjectURL);
     objectUrls.current = [];

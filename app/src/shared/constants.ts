@@ -222,6 +222,9 @@ export const DEVELOPER_SURVEY_JSON_URL = `${EXTENSION_PROMO_ORIGIN}/survey.json`
 /** 開発者アンケート回答送信用エンドポイント */
 export const DEVELOPER_SURVEY_RESPONSE_URL = `${EXTENSION_PROMO_ORIGIN}/survey-response` as const;
 
+/** 「みんなの活動」入口の公開可否を匿名UUIDで確認するエンドポイント */
+export const COMMUNITY_ACCESS_URL = `${EXTENSION_PROMO_ORIGIN}/community-access` as const;
+
 /** notice.json 等へ付与する匿名ユーザー識別子ヘッダー */
 export const CLIENT_USER_ID_HEADER = 'X-KCG-Portal-User-Id' as const;
 

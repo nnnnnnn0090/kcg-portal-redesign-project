@@ -10,6 +10,8 @@ import {
   HOME2_MAIL_DEFAULT_URL,
   HOME2_ORIGIN,
   HOME2_TOP_PAGE_URL,
+  CLIENT_USER_ID_HEADER,
+  COMMUNITY_ACCESS_URL,
   PORTAL_DOM,
   SK,
 } from '../../shared/constants';
@@ -20,6 +22,7 @@ import { useI18n } from '../../i18n';
 import type { AppLanguage, I18nMessages } from '../../i18n/messages';
 import { useExtensionUpdateAvailable } from '../../hooks/useExtensionUpdateAvailable';
 import { CommunityActivityDrawer } from './CommunityActivityDrawer';
+import { getOrCreateClientUserId } from '../../lib/client-user-id';
 
 // ─── ナビゲーション型 ─────────────────────────────────────────────────────
 
@@ -271,6 +274,7 @@ export function Header({
   const [showLogout, setShowLogout] = useState(navSource === 'portal');
   const [activityOpen, setActivityOpen] = useState(false);
   const [activityConsentOpen, setActivityConsentOpen] = useState(false);
+  const [communityEnabled, setCommunityEnabled] = useState(false);
   const profile = usePortalProfile(t.header.profileTitle);
 
   const navItems = useMemo(() => {
@@ -302,6 +306,28 @@ export function Header({
       webMailLo instanceof HTMLInputElement && !webMailLo.closest(`#${PORTAL_DOM.overlayRoot}`);
 
     setShowLogout(nativePortalLogout || hasWebMailLogout);
+  }, [navSource]);
+
+  useEffect(() => {
+    if (navSource !== 'portal') {
+      setCommunityEnabled(false);
+      return;
+    }
+    const controller = new AbortController();
+    void getOrCreateClientUserId()
+      .then((userId) =>
+        fetch(COMMUNITY_ACCESS_URL, {
+          cache: 'no-store',
+          headers: { [CLIENT_USER_ID_HEADER]: userId },
+          signal: controller.signal,
+        }),
+      )
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error())))
+      .then((result: { enabled?: unknown }) => setCommunityEnabled(result.enabled === true))
+      .catch(() => {
+        if (!controller.signal.aborted) setCommunityEnabled(false);
+      });
+    return () => controller.abort();
   }, [navSource]);
 
   /**
@@ -388,7 +414,7 @@ export function Header({
             </nav>
           )}
 
-          {navSource === 'portal' && language === 'ja' ? (
+          {navSource === 'portal' && language === 'ja' && communityEnabled ? (
             <button
               type="button"
               className="p-community-activity-entry"

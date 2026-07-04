@@ -1,5 +1,7 @@
 import type { ApiEnvelope, ApiProblem } from './contract';
 import { COMMUNITY_API_ORIGIN } from '../../shared/constants';
+import { CLIENT_USER_ID_HEADER } from '../../shared/constants';
+import { getOrCreateClientUserId } from '../../lib/client-user-id';
 import type {
   CommunityComment,
   CommunityNotification,
@@ -7,10 +9,24 @@ import type {
   CommunityUser,
 } from './types';
 
+const COMMUNITY_LOGIN_ID_HEADER = 'X-KCG-Community-Login-Id';
+let requestLoginId = '';
+
+export function setCommunityRequestLoginId(loginId: string | null | undefined) {
+  requestLoginId = loginId?.trim() ?? '';
+}
+
+async function withRequestIdentity(init?: RequestInit): Promise<RequestInit> {
+  const headers = new Headers(init?.headers);
+  headers.set(CLIENT_USER_ID_HEADER, await getOrCreateClientUserId());
+  if (requestLoginId) headers.set(COMMUNITY_LOGIN_ID_HEADER, requestLoginId);
+  return { ...init, headers };
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${COMMUNITY_API_ORIGIN}/api${path}`, {
     cache: 'no-store',
-    ...init,
+    ...(await withRequestIdentity(init)),
   });
   if (response.status === 204) return null as T;
   const body = (await response.json().catch(() => null)) as ApiEnvelope<T> | ApiProblem | null;
@@ -75,7 +91,7 @@ export const communityApi = {
   ownPostImage: async (token: string, id: string, position = 0) => {
     const response = await fetch(
       `${COMMUNITY_API_ORIGIN}/api/posts/${encodeURIComponent(id)}/images/${position}`,
-      authorized(token),
+      await withRequestIdentity(authorized(token)),
     );
     if (!response.ok) throw new Error('画像を読み込めませんでした');
     return URL.createObjectURL(await response.blob());
@@ -83,7 +99,7 @@ export const communityApi = {
   ownProfileImage: async (token: string, kind: 'avatar' | 'header') => {
     const response = await fetch(
       `${COMMUNITY_API_ORIGIN}/api/me/profile-submission/images/${kind}`,
-      authorized(token),
+      await withRequestIdentity(authorized(token)),
     );
     if (!response.ok) throw new Error('画像を読み込めませんでした');
     return URL.createObjectURL(await response.blob());
