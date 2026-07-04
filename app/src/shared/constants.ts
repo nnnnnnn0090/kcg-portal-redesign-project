@@ -197,6 +197,10 @@ function communityApiOrigin(): string {
   const raw = import.meta.env.VITE_COMMUNITY_API_ORIGIN?.trim() || 'http://127.0.0.1:8787';
   try {
     const url = new URL(raw);
+    if (url.hostname === '0.0.0.0') url.hostname = '127.0.0.1';
+    if (url.protocol === 'https:' && ['0.0.0.0', '127.0.0.1', 'localhost'].includes(url.hostname)) {
+      url.protocol = 'http:';
+    }
     return url.origin;
   } catch {
     return 'http://127.0.0.1:8787';

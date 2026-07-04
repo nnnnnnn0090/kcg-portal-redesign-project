@@ -1,0 +1,7 @@
+**
+!community-server/
+!community-server/**
+community-server/node_modules/
+community-server/.next/
+community-server/data/
+community-server/.env
