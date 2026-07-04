@@ -34,7 +34,7 @@ export function buildKingLmsSamlLoginUrl(destination: string): string {
     // 不正な遷移先は下の King LMS ホームへフォールバックする。
   }
 
-  let redirectUrl = KING_LMS_HOME_URL;
+  let redirectUrl: string = KING_LMS_HOME_URL;
   try {
     const candidate = new URL(rawDestination);
     if (candidate.origin === KING_LMS_ORIGIN) redirectUrl = candidate.href;

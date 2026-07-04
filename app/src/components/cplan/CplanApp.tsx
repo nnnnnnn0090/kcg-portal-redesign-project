@@ -173,7 +173,7 @@ export function readCplanSnapshot(): CplanSnapshot | null {
   );
   const links =
     route === 'main' ? readMainLinks() : route === 'category' ? readCategoryLinks() : [];
-  const attendance = route === 'attendance' ? readAttendance() : undefined;
+  const attendance = route === 'attendance' ? (readAttendance() ?? undefined) : undefined;
   if (route === 'main' && links.length === 0) return null;
   if (route === 'attendance' && !attendance) return null;
   return {
@@ -220,7 +220,11 @@ function submitAspNetPostBack(
   if (!form) return;
 
   const setHiddenValue = (name: string, value: string) => {
-    let input = form.elements.namedItem(name);
+    let input: HTMLInputElement | null = null;
+    const existing = form.elements.namedItem(name);
+    if (existing instanceof HTMLInputElement) {
+      input = existing;
+    }
     if (!(input instanceof HTMLInputElement)) {
       input = document.createElement('input');
       input.type = 'hidden';

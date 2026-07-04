@@ -20,6 +20,7 @@ import {
 import { MascotDecorationSetting } from './MascotDecorationSetting';
 import { SettingsSwitch } from './SettingsSwitch';
 import { ThemeStudio, downloadTheme } from './ThemeStudio';
+import { ColorSwatch } from '../../ui/ColorSwatch';
 
 interface SettingsLanguageSectionProps {
   settings: Settings;
@@ -108,8 +109,8 @@ export function SettingsThemeSection({
             onClick={() => onThemeChange(key)}
           >
             <span className="p-theme-btn-swatches" aria-hidden>
-              <span className="p-theme-btn-swatch" style={{ background: meta.bg }} />
-              <span className="p-theme-btn-swatch" style={{ background: meta.accent }} />
+              <ColorSwatch className="p-theme-btn-swatch" color={meta.bg} />
+              <ColorSwatch className="p-theme-btn-swatch" color={meta.accent} />
             </span>
             <span className="p-theme-btn-label">{themeDisplayName(key, meta.name, language)}</span>
           </button>
@@ -128,8 +129,8 @@ export function SettingsThemeSection({
                 onClick={() => onThemeChange(ref)}
               >
                 <span className="p-theme-btn-swatches" aria-hidden>
-                  <span className="p-theme-btn-swatch" style={{ background: tokens.bg }} />
-                  <span className="p-theme-btn-swatch" style={{ background: tokens.accent }} />
+                  <ColorSwatch className="p-theme-btn-swatch" color={tokens.bg} />
+                  <ColorSwatch className="p-theme-btn-swatch" color={tokens.accent} />
                 </span>
                 <span className="p-theme-btn-label">{theme.name}</span>
               </button>

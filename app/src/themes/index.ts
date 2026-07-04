@@ -11,6 +11,7 @@ import {
   resolveThemeTokens,
   type StoredCustomThemeCollection,
 } from './custom-themes';
+import { upsertRuntimeCss } from './runtime-style';
 
 export { THEMES, DEFAULT_THEME, type ThemeTokens };
 export * from './custom-themes';
@@ -37,7 +38,7 @@ export function getThemeCss(t: ThemeTokens): string {
     `--p-accent:${t.accent};--p-accent-light:${t.accentLight};` +
     `--p-accent-bg:${t.accentBg};--p-accent-border:${t.accentBorder};--p-avatar-ring:${avatarRingColor(t.bg)};` +
     `--p-danger:${t.danger};--p-danger-hover:${t.dangerHover};` +
-    `--p-shadow:${t.shadow};--p-shadow-strong:${t.shadowStrong}}`
+    `--p-shadow:${t.shadow};--p-shadow-strong:${t.shadowStrong};background:${t.bg}}`
   );
 }
 
@@ -48,9 +49,14 @@ export function themeTokensForName(
   return resolveThemeTokens(name, customThemes);
 }
 
-/** オーバーレイ用変数に加え、`html` の初期背景色まで含めた先頭注入用 CSS 文字列です。 */
+/** オーバーレイ用変数に加え、ホスト面と起動カバーの背景まで含めた runtime CSS 文字列です。 */
 export function portalHeadThemeCss(t: ThemeTokens): string {
-  return `${getThemeCss(t)}html{background-color:${t.bg}!important}`;
+  return (
+    `${getThemeCss(t)}` +
+    `html.kcg-portal-surface,body.kcg-portal-surface{background-color:${t.bg};overflow:hidden}` +
+    `#${PORTAL_DOM.bootCover}{position:fixed;inset:0;z-index:${PORTAL_BACKDROP_Z};pointer-events:none;` +
+    `margin:0;padding:0;border:0;width:100%;height:100%;background:${t.bg}}`
+  );
 }
 
 export function portalHeadThemeCssByName(
@@ -79,24 +85,17 @@ export function ensurePortalBackdrop(
   themeName?: string,
   customThemes: StoredCustomThemeCollection = EMPTY_CUSTOM_THEMES,
 ): void {
-  const bg = bootCoverBg(themeName, customThemes);
   const overlay = document.getElementById(PORTAL_DOM.overlayRoot);
   let el = document.getElementById(PORTAL_DOM.bootCover) as HTMLElement | null;
   if (!el) {
     el = document.createElement('div');
     el.id = PORTAL_DOM.bootCover;
+    el.className = 'tw-fixed tw-inset-0 tw-z-boot-cover tw-pointer-events-none tw-m-0 tw-h-full tw-w-full tw-border-0 tw-p-0';
     el.setAttribute('aria-hidden', 'true');
   }
-  el.style.position = 'fixed';
-  el.style.inset = '0';
-  el.style.zIndex = String(PORTAL_BACKDROP_Z);
-  el.style.pointerEvents = 'none';
-  el.style.margin = '0';
-  el.style.padding = '0';
-  el.style.border = '0';
-  el.style.width = '100%';
-  el.style.height = '100%';
-  el.style.background = bg;
+  if (themeName != null) {
+    upsertRuntimeCss(PORTAL_DOM.headThemeStyle, portalHeadThemeCss(themeTokensForName(themeName, customThemes)));
+  }
 
   const parent = document.body ?? document.documentElement;
   if (overlay?.parentElement === parent) {
@@ -122,42 +121,24 @@ export function appendPortalOverlayShell(): { overlay: HTMLElement; scroller: HT
 }
 
 function syncDocumentSurfaceBg(bg: string): void {
-  document.documentElement.style.backgroundColor = bg;
-  document.body.style.backgroundColor = bg;
+  void bg;
+  document.documentElement.classList.add('kcg-portal-surface');
+  document.body?.classList.add('kcg-portal-surface');
 }
 
 // ─── テーマ適用 ────────────────────────────────────────────────────────────
 
 /**
- * `#portal-overlay` の `style` に CSS 変数を直接書き込みます。
- * `<style>` 注入より参照のズレが起きにくく、テーマのライブ切替にも向きます。
+ * Runtime CSS に CSS 変数を書き込みます。
+ * 任意のユーザー作成テーマ色は build-time class にできないため、この関数に集約します。
  */
 export function applyThemeToElement(el: HTMLElement, t: ThemeTokens): void {
-  el.style.setProperty('--p-bg', t.bg);
-  el.style.setProperty('--p-bg2', t.bgSecondary);
-  el.style.setProperty('--p-bg3', t.bgTertiary);
-  el.style.setProperty('--p-bg-hover', t.bgHover);
-  el.style.setProperty('--p-border', t.border);
-  el.style.setProperty('--p-border-light', t.borderLight);
-  el.style.setProperty('--p-border-hover', t.borderHover);
-  el.style.setProperty('--p-text', t.text);
-  el.style.setProperty('--p-text-muted', t.textMuted);
-  el.style.setProperty('--p-text-dim', t.textDim);
-  el.style.setProperty('--p-text-dimmer', t.textDimmer);
-  el.style.setProperty('--p-text-bright', t.textBright);
-  el.style.setProperty('--p-accent', t.accent);
-  el.style.setProperty('--p-accent-light', t.accentLight);
-  el.style.setProperty('--p-accent-bg', t.accentBg);
-  el.style.setProperty('--p-accent-border', t.accentBorder);
-  el.style.setProperty('--p-avatar-ring', avatarRingColor(t.bg));
-  el.style.setProperty('--p-danger', t.danger);
-  el.style.setProperty('--p-danger-hover', t.dangerHover);
-  el.style.setProperty('--p-shadow', t.shadow);
-  el.style.setProperty('--p-shadow-strong', t.shadowStrong);
+  void el;
+  upsertRuntimeCss(PORTAL_DOM.headThemeStyle, portalHeadThemeCss(t));
 }
 
 /**
- * `head` 内の `#portal-theme-vars` と `#portal-overlay` の両方へテーマを反映します。
+ * Runtime CSS と `#portal-overlay` の両方へテーマを反映します。
  * React のマウント前後を問わず同じ関数で呼べます。
  */
 export function syncPortalTheme(
@@ -168,15 +149,22 @@ export function syncPortalTheme(
 }
 
 export function syncPortalThemeTokens(t: ThemeTokens): void {
-  const styleEl = document.getElementById(PORTAL_DOM.headThemeStyle);
-  if (styleEl) styleEl.textContent = portalHeadThemeCss(t);
+  upsertRuntimeCss(PORTAL_DOM.headThemeStyle, portalHeadThemeCss(t));
   const overlay = document.getElementById(PORTAL_DOM.overlayRoot) as HTMLElement | null;
   if (overlay) {
     applyThemeToElement(overlay, t);
-    overlay.style.background = t.bg;
   }
   syncDocumentSurfaceBg(t.bg);
   ensurePortalBackdrop();
-  const backdrop = document.getElementById(PORTAL_DOM.bootCover) as HTMLElement | null;
-  if (backdrop) backdrop.style.background = t.bg;
+}
+
+export function syncCplanSurfaceRuntime(): void {
+  upsertRuntimeCss(
+    'portal-cplan-runtime',
+    `html.kcg-portal-surface,body.kcg-portal-surface{background-color:#111111;overflow:hidden}` +
+      `#${PORTAL_DOM.overlayRoot}.p-surface-cplan{background:#111111}` +
+      `#${PORTAL_DOM.bootCover}{position:fixed;inset:0;z-index:${PORTAL_BACKDROP_Z};` +
+      'pointer-events:none;margin:0;padding:0;border:0;width:100%;height:100%;background:#111111}',
+  );
+  syncDocumentSurfaceBg('#111111');
 }

@@ -14,6 +14,7 @@ import {
   filterCalItemsByRange,
   calendarRealignAnchorIso,
 } from '../../../lib/date';
+import { clearRuntimeElementCss, setRuntimeElementCss } from '../../../lib/runtime-element-style';
 import { useSettings } from '../../../context/settings';
 import { buildCalendarGridHtml } from '../grid';
 import { SK, KING_LMS_ASSIGNMENT_SYNC_URL } from '../../../shared/constants';
@@ -204,8 +205,8 @@ export function AssignmentCalendar({ payload, titles, demoTodayIso }: Assignment
       el.dataset.calMode = mode;
       // モード切替前の高さを保持してレイアウトシフトを緩和する
       const h = Math.round(el.getBoundingClientRect().height);
-      if (h > 64) el.style.minHeight = `${h}px`;
-      requestAnimationFrame(() => { el.style.minHeight = ''; });
+      if (h > 64) setRuntimeElementCss(el, 'min-height', `min-height:${h}px`);
+      requestAnimationFrame(() => { clearRuntimeElementCss(el, 'min-height'); });
     }
   }
 

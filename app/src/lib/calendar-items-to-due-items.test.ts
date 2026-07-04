@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   assignmentSyncCalendarRange,
@@ -10,10 +9,7 @@ import {
 import { normalizeCalendarItemsResponse } from './king-lms-calendar-response';
 
 describe('calendar-items-to-due-items', () => {
-  const capturePath = path.join(
-    process.cwd(),
-    '.king-lms-api-capture/27-_learn_api_v1_calendars_calendarItems.json',
-  );
+  const capturePath = new URL('./__fixtures__/calendar-items.json', import.meta.url);
 
   it('converts captured calendarItems to DueItem rows', () => {
     const row = JSON.parse(fs.readFileSync(capturePath, 'utf8')) as { raw: unknown };

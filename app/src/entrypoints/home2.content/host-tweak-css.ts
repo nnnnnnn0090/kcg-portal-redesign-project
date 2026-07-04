@@ -1,126 +1,126 @@
 /**
- * Home2 Web メールのホストページ用 CSS（レイアウト別）。オーバーレイ表示時に `style` 要素へ注入する。
+ * Home2 Web メールのホストページ用 CSS（レイアウト別）。オーバーレイ表示時に runtime CSS carrier へ渡す。
  */
 
 import type { Home2MailLayout } from '../../portal/home2-mail-router';
 
 export const HOME2_MAIL_LOGIN_HOST_TWEAK_CSS = `
 .page > div:first-of-type {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .main #divTitle,
 .page .main #divLogin {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .main #MainContent_chkShowLastPage {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  margin: -1px !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  opacity: 0;
+  pointer-events: none;
 }
 .page .main > hr:first-of-type {
-  visibility: hidden !important;
-  height: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
+  visibility: hidden;
+  height: 0;
+  margin: 0;
+  border: 0;
 }
 .page .footer {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 `;
 
 export const HOME2_MAIL_MAILHEAD_HOST_TWEAK_CSS = `
 .page > div:first-of-type {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .main > div:first-of-type {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 #MainContent_Table_HEAD,
 #MainContent_Table1,
 #MainContent_butLogout {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .footer {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 `;
 
 export const HOME2_MAIL_SENDMAIL_HOST_TWEAK_CSS = `
 .page > div:first-of-type {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .main #MainContent_Label1,
 .page .main #MainContent_Label2,
@@ -150,52 +150,52 @@ export const HOME2_MAIL_SENDMAIL_HOST_TWEAK_CSS = `
 .page .main #MainContent_labSendError,
 .page .main #MainContent_RegularExpressionValidator1,
 .page .main > hr {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .footer {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 `;
 
 export const HOME2_MAIL_READMAIL_HOST_TWEAK_CSS = `
 .page > div:first-of-type {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .main > div:first-of-type {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 #MainContent_Table1,
 #MainContent_txtBody,
@@ -203,25 +203,25 @@ export const HOME2_MAIL_READMAIL_HOST_TWEAK_CSS = `
 #MainContent_ListBox1,
 #MainContent_butBinFileSave,
 #MainContent_butLogout {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .page .footer {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 `;
 

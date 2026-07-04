@@ -64,7 +64,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     const ta = document.createElement('textarea');
     ta.value = text;
     ta.setAttribute('readonly', '');
-    ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+    ta.className = 'tw-fixed tw-left-[-9999px] tw-top-0 tw-opacity-0';
     document.body.appendChild(ta);
     ta.select();
     const ok = document.execCommand('copy');

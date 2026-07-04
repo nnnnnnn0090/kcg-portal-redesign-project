@@ -234,7 +234,7 @@ export function KyukoPage() {
         <aside className="p-news-aside" aria-label={t.kyukoPage.filterAria}>
           <h2 className="p-news-filter-page-title">{t.newsPage.filterTitle}</h2>
           <div className="p-news-mat">
-            <label className="p-settings-row" style={{ margin: 0, cursor: 'pointer', padding: '.35rem 0' }}>
+            <label className="p-settings-row tw-m-0 tw-cursor-pointer tw-py-[.35rem]">
               <input
                 type="checkbox"
                 disabled={!rishuReady}

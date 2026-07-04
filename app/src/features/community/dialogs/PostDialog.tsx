@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { communityApi } from '../api';
 import type { CommunityComment, CommunityPost } from '../types';
 import { Avatar } from '../components/Avatar';
@@ -6,6 +6,7 @@ import { renderCaptionWithTags } from '../components/CaptionTags';
 import { Busy, ErrorMessage } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
 import { cn } from '../classNames';
+import { clearRuntimeElementCss, setRuntimeElementCss } from '../../../lib/runtime-element-style';
 
 export function PostDialog({
   post,
@@ -34,6 +35,7 @@ export function PostDialog({
 }) {
   const images = post.imageUrls?.length ? post.imageUrls : [post.previewUrl || post.imageUrl];
   const [imageIndex, setImageIndex] = useState(0);
+  const imageTrackRef = useRef<HTMLDivElement>(null);
   const [comments, setComments] = useState<CommunityComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
@@ -59,6 +61,13 @@ export function PostDialog({
       active = false;
     };
   }, [ja, post.id, token]);
+
+  useEffect(() => {
+    const track = imageTrackRef.current;
+    if (!track) return;
+    setRuntimeElementCss(track, 'carousel-offset', `transform:translateX(-${imageIndex * 100}%)`);
+    return () => clearRuntimeElementCss(track, 'carousel-offset');
+  }, [imageIndex]);
 
   const submitComment = async (event: FormEvent) => {
     event.preventDefault();
@@ -132,10 +141,10 @@ export function PostDialog({
         }
       >
         <div
+          ref={imageTrackRef}
           className={
             'community-post-viewer-track tw-flex tw-h-full tw-transition-transform [&_img]:tw-h-full [&_img]:tw-w-full [&_img]:tw-flex-[0_0_100%] [&_img]:tw-object-contain'
           }
-          style={{ transform: `translateX(-${imageIndex * 100}%)` }}
         >
           {images.map((image, index) => (
             <img src={image} alt="" key={`${image}-${index}`} />

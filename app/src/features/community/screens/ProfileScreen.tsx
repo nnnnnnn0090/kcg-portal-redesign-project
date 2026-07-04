@@ -35,6 +35,7 @@ export function ProfileScreen({
   onTagClick: (tag: string) => void;
 }) {
   const [filter, setFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
+  const [headerBroken, setHeaderBroken] = useState(false);
   const shown = !isOwn || filter === 'all' ? posts : posts.filter((post) => post.status === filter);
   return (
     <main
@@ -57,13 +58,11 @@ export function ProfileScreen({
               'community-profile-banner tw-h-[clamp(170px,22vw,260px)] tw-overflow-hidden tw-bg-gradient-to-br tw-from-community-accent-bg tw-to-community-bg3 [&>img]:tw-block [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-cover'
             }
           >
-            {user.headerUrl ? (
+            {user.headerUrl && !headerBroken ? (
               <img
                 src={user.headerUrl}
                 alt=""
-                onError={(event) => {
-                  event.currentTarget.style.display = 'none';
-                }}
+                onError={() => setHeaderBroken(true)}
               />
             ) : null}
           </div>

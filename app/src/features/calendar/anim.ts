@@ -4,6 +4,7 @@
  */
 
 import { setHtml } from '../../lib/dom';
+import { clearRuntimeElementCss, setRuntimeElementCss } from '../../lib/runtime-element-style';
 
 // ─── アクセシビリティ ─────────────────────────────────────────────────────
 
@@ -75,7 +76,7 @@ export function clearCalBodyLoadingAttrs(mount: HTMLElement | null | undefined):
   if (!mount) return;
   delete mount.dataset.calLoading;
   delete mount.dataset.calMode;
-  mount.style.minHeight = '';
+  clearRuntimeElementCss(mount, 'min-height');
 }
 
 // ─── スワイプアニメーション ───────────────────────────────────────────────
@@ -168,19 +169,20 @@ export function setCalBodyHtmlSmooth(
 
   if (Math.abs(h0 - h1) < 3) { onDone?.(); return; }
 
-  el.style.transition = '';
-  el.style.minHeight  = `${h0}px`;
+  setRuntimeElementCss(el, 'height-transition', `transition:none;min-height:${h0}px`);
 
   afterLayout(() => {
     // cubic-bezier(0.33, 1, 0.32, 1) は「勢いよく伸びてぴたっと止まる」ease-out 系カーブ。
-    el.style.transition = 'min-height 0.42s cubic-bezier(0.33, 1, 0.32, 1)';
-    el.style.minHeight  = `${h1}px`;
+    setRuntimeElementCss(
+      el,
+      'height-transition',
+      `transition:min-height 0.42s cubic-bezier(0.33, 1, 0.32, 1);min-height:${h1}px`,
+    );
   });
 
   // 550ms = transition 時間 420ms + バッファ 130ms。transitionend が来なかった場合のフォールバック。
   waitForTransition(el, 'min-height', () => {
-    el.style.minHeight  = '';
-    el.style.transition = '';
+    clearRuntimeElementCss(el, 'height-transition');
     onDone?.();
   }, 550);
 }

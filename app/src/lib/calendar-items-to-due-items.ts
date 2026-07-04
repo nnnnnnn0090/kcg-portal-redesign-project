@@ -34,7 +34,7 @@ export function calendarItemToDueItem(row: unknown): DueItem | null {
   const title      = r.title;
 
   return {
-    courseId:   calendarId != null ? calendarId : undefined,
+    courseId:   calendarId != null ? String(calendarId).trim() : undefined,
     courseName: calendarItemCourseName(r),
     title:      title != null ? String(title) : undefined,
     dueDate,

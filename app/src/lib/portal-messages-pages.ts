@@ -70,6 +70,7 @@ export interface NewsDetailPayload {
   newsDate?:        string;
   sender?:          string;
   category?:        string;
+  importanceCd?:    string;
   naiyo?:           string;
   attachmentFiles?: unknown[];
 }

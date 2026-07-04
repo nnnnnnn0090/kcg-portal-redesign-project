@@ -1,0 +1,230 @@
+{
+  "raw": {
+    "results": [
+      {
+        "calendarId": "_2396_1",
+        "calendarNameLocalizable": { "rawValue": "PC基礎" },
+        "endDate": "2026-06-28T14:59:00.000Z",
+        "itemSourceId": "_173958_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "PC 課題 01"
+      },
+      {
+        "calendarId": "_2396_1",
+        "calendarNameLocalizable": { "rawValue": "PC基礎" },
+        "endDate": "2026-06-29T14:59:00.000Z",
+        "itemSourceId": "_173959_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "PC 課題 02"
+      },
+      {
+        "calendarId": "_2396_1",
+        "calendarNameLocalizable": { "rawValue": "PC基礎" },
+        "endDate": "2026-06-30T14:59:00.000Z",
+        "itemSourceId": "_173960_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "PC 課題 03"
+      },
+      {
+        "calendarId": "_2397_1",
+        "calendarNameLocalizable": { "rawValue": "アルゴリズム" },
+        "endDate": "2026-07-01T14:59:00.000Z",
+        "itemSourceId": "_173961_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 04"
+      },
+      {
+        "calendarId": "_2397_1",
+        "calendarNameLocalizable": { "rawValue": "アルゴリズム" },
+        "endDate": "2026-07-02T14:59:00.000Z",
+        "itemSourceId": "_173962_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 05"
+      },
+      {
+        "calendarId": "_2397_1",
+        "calendarNameLocalizable": { "rawValue": "アルゴリズム" },
+        "endDate": "2026-07-03T14:59:00.000Z",
+        "itemSourceId": "_173963_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 06"
+      },
+      {
+        "calendarId": "_2398_1",
+        "calendarNameLocalizable": { "rawValue": "データベース" },
+        "endDate": "2026-07-04T14:59:00.000Z",
+        "itemSourceId": "_173964_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 07"
+      },
+      {
+        "calendarId": "_2398_1",
+        "calendarNameLocalizable": { "rawValue": "データベース" },
+        "endDate": "2026-07-05T14:59:00.000Z",
+        "itemSourceId": "_173965_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 08"
+      },
+      {
+        "calendarId": "_2398_1",
+        "calendarNameLocalizable": { "rawValue": "データベース" },
+        "endDate": "2026-07-06T14:59:00.000Z",
+        "itemSourceId": "_173966_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 09"
+      },
+      {
+        "calendarId": "_2399_1",
+        "calendarNameLocalizable": { "rawValue": "ネットワーク" },
+        "endDate": "2026-07-07T14:59:00.000Z",
+        "itemSourceId": "_173967_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 10"
+      },
+      {
+        "calendarId": "_2399_1",
+        "calendarNameLocalizable": { "rawValue": "ネットワーク" },
+        "endDate": "2026-07-08T14:59:00.000Z",
+        "itemSourceId": "_173968_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 11"
+      },
+      {
+        "calendarId": "_2399_1",
+        "calendarNameLocalizable": { "rawValue": "ネットワーク" },
+        "endDate": "2026-07-09T14:59:00.000Z",
+        "itemSourceId": "_173969_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 12"
+      },
+      {
+        "calendarId": "_2400_1",
+        "calendarNameLocalizable": { "rawValue": "Web開発" },
+        "endDate": "2026-07-10T14:59:00.000Z",
+        "itemSourceId": "_173970_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 13"
+      },
+      {
+        "calendarId": "_2400_1",
+        "calendarNameLocalizable": { "rawValue": "Web開発" },
+        "endDate": "2026-07-11T14:59:00.000Z",
+        "itemSourceId": "_173971_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 14"
+      },
+      {
+        "calendarId": "_2400_1",
+        "calendarNameLocalizable": { "rawValue": "Web開発" },
+        "endDate": "2026-07-12T14:59:00.000Z",
+        "itemSourceId": "_173972_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 15"
+      },
+      {
+        "calendarId": "_2401_1",
+        "calendarNameLocalizable": { "rawValue": "セキュリティ" },
+        "endDate": "2026-07-13T14:59:00.000Z",
+        "itemSourceId": "_173973_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 16"
+      },
+      {
+        "calendarId": "_2401_1",
+        "calendarNameLocalizable": { "rawValue": "セキュリティ" },
+        "endDate": "2026-07-14T14:59:00.000Z",
+        "itemSourceId": "_173974_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 17"
+      },
+      {
+        "calendarId": "_2401_1",
+        "calendarNameLocalizable": { "rawValue": "セキュリティ" },
+        "endDate": "2026-07-15T14:59:00.000Z",
+        "itemSourceId": "_173975_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 18"
+      },
+      {
+        "calendarId": "_2402_1",
+        "calendarNameLocalizable": { "rawValue": "クラウド" },
+        "endDate": "2026-07-16T14:59:00.000Z",
+        "itemSourceId": "_173976_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 19"
+      },
+      {
+        "calendarId": "_2402_1",
+        "calendarNameLocalizable": { "rawValue": "クラウド" },
+        "endDate": "2026-07-17T14:59:00.000Z",
+        "itemSourceId": "_173977_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 20"
+      },
+      {
+        "calendarId": "_2402_1",
+        "calendarNameLocalizable": { "rawValue": "クラウド" },
+        "endDate": "2026-07-18T14:59:00.000Z",
+        "itemSourceId": "_173978_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 21"
+      },
+      {
+        "calendarId": "_2403_1",
+        "calendarNameLocalizable": { "rawValue": "UI設計" },
+        "endDate": "2026-07-19T14:59:00.000Z",
+        "itemSourceId": "_173979_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 22"
+      },
+      {
+        "calendarId": "_2403_1",
+        "calendarNameLocalizable": { "rawValue": "UI設計" },
+        "endDate": "2026-07-20T14:59:00.000Z",
+        "itemSourceId": "_173980_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 23"
+      },
+      {
+        "calendarId": "_2403_1",
+        "calendarNameLocalizable": { "rawValue": "UI設計" },
+        "endDate": "2026-07-21T14:59:00.000Z",
+        "itemSourceId": "_173981_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 24"
+      },
+      {
+        "calendarId": "_2404_1",
+        "calendarNameLocalizable": { "rawValue": "卒業制作" },
+        "endDate": "2026-07-22T14:59:00.000Z",
+        "itemSourceId": "_173982_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 25"
+      },
+      {
+        "calendarId": "_2404_1",
+        "calendarNameLocalizable": { "rawValue": "卒業制作" },
+        "endDate": "2026-07-23T14:59:00.000Z",
+        "itemSourceId": "_173983_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 26"
+      },
+      {
+        "calendarId": "_2404_1",
+        "calendarNameLocalizable": { "rawValue": "卒業制作" },
+        "endDate": "2026-07-24T14:59:00.000Z",
+        "itemSourceId": "_173984_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 27"
+      },
+      {
+        "calendarId": "_2405_1",
+        "calendarNameLocalizable": { "rawValue": "総合演習" },
+        "endDate": "2026-07-25T14:59:00.000Z",
+        "itemSourceId": "_173985_1",
+        "itemSourceType": "blackboard.platform.gradebook2.GradableItem",
+        "title": "確認課題 28"
+      }
+    ]
+  }
+}

@@ -37,7 +37,6 @@ function runInlineLogoutScript(code: string): boolean {
   if (!trimmed) return false;
   if (tryDoPostBackFromScript(trimmed)) return true;
   try {
-    // eslint-disable-next-line no-new-func -- ページ本体（MAIN）の PostBack 専用。隔離ワールドの click では CSP に阻まれる。
     new Function(trimmed)();
     return true;
   } catch {

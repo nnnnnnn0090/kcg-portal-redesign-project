@@ -84,7 +84,7 @@ export const PORTAL_DOM = {
   headThemeStyle: 'portal-theme-vars',
   overlayRoot: 'portal-overlay',
   overlayCss: 'portal-overlay-css',
-  /** Home2 Mail ログイン画面でホスト側の重複 UI を隠す style タグ */
+  /** Home2 Mail ログイン画面でホスト側の重複 UI を隠す runtime CSS carrier */
   home2HostTweak: 'kcg-portal-home2-host-tweak',
 } as const;
 

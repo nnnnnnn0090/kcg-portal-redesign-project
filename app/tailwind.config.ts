@@ -2,8 +2,7 @@ import type { Config } from 'tailwindcss';
 
 export default {
   content: [
-    './src/features/community/**/*.{ts,tsx}',
-    './src/components/layout/CommunityActivityDrawer.tsx',
+    './src/**/*.{ts,tsx}',
   ],
   important: '#portal-overlay',
   prefix: 'tw-',
@@ -13,6 +12,26 @@ export default {
   theme: {
     extend: {
       colors: {
+        portal: {
+          bg: 'var(--p-bg)',
+          bg2: 'var(--p-bg2)',
+          bg3: 'var(--p-bg3)',
+          hover: 'var(--p-bg-hover)',
+          border: 'var(--p-border)',
+          'border-light': 'var(--p-border-light)',
+          'border-hover': 'var(--p-border-hover)',
+          text: 'var(--p-text)',
+          muted: 'var(--p-text-muted)',
+          dim: 'var(--p-text-dim)',
+          dimmer: 'var(--p-text-dimmer)',
+          bright: 'var(--p-text-bright)',
+          accent: 'var(--p-accent)',
+          'accent-light': 'var(--p-accent-light)',
+          'accent-bg': 'var(--p-accent-bg)',
+          'accent-border': 'var(--p-accent-border)',
+          danger: 'var(--p-danger)',
+          'danger-hover': 'var(--p-danger-hover)',
+        },
         community: {
           bg: 'var(--p-bg)',
           bg2: 'var(--p-bg2)',
@@ -29,13 +48,87 @@ export default {
         },
       },
       fontFamily: {
+        portal: [
+          'Inter',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'sans-serif',
+        ],
         community: ['var(--p-font)'],
       },
+      maxWidth: {
+        portal: '1100px',
+      },
+      width: {
+        'tour-progress-1-12': '8.333333%',
+        'tour-progress-2-12': '16.666667%',
+        'tour-progress-3-12': '25%',
+        'tour-progress-4-12': '33.333333%',
+        'tour-progress-5-12': '41.666667%',
+        'tour-progress-6-12': '50%',
+        'tour-progress-7-12': '58.333333%',
+        'tour-progress-8-12': '66.666667%',
+        'tour-progress-9-12': '75%',
+        'tour-progress-10-12': '83.333333%',
+        'tour-progress-11-12': '91.666667%',
+        'tour-progress-1-14': '7.142857%',
+        'tour-progress-2-14': '14.285714%',
+        'tour-progress-3-14': '21.428571%',
+        'tour-progress-4-14': '28.571429%',
+        'tour-progress-5-14': '35.714286%',
+        'tour-progress-6-14': '42.857143%',
+        'tour-progress-7-14': '50%',
+        'tour-progress-8-14': '57.142857%',
+        'tour-progress-9-14': '64.285714%',
+        'tour-progress-10-14': '71.428571%',
+        'tour-progress-11-14': '78.571429%',
+        'tour-progress-12-14': '85.714286%',
+        'tour-progress-13-14': '92.857143%',
+      },
+      zIndex: {
+        overlay: '2147483647',
+        'boot-cover': '2147483646',
+        'community-root': '2147483300',
+        'community-modal': '2147483500',
+      },
+      borderRadius: {
+        portal: '12px',
+        panel: '16px',
+        modal: '18px',
+      },
       boxShadow: {
+        portal: '0 8px 32px var(--p-shadow)',
+        'portal-strong': '0 24px 80px var(--p-shadow-strong)',
         'community-card': '0 8px 24px color-mix(in srgb, #000 13%, transparent)',
         'community-modal': '0 24px 80px color-mix(in srgb, #000 34%, transparent)',
       },
       keyframes: {
+        'portal-fade-in': {
+          from: { opacity: '0', transform: 'translateY(12px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'portal-scale-in': {
+          from: { opacity: '0', transform: 'scale(.96)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'portal-scale-out': {
+          from: { opacity: '1', transform: 'scale(1)' },
+          to: { opacity: '0', transform: 'scale(.96)' },
+        },
+        'portal-toast-from-top': {
+          from: { opacity: '0', transform: 'translateY(-12px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'portal-toast-out': {
+          from: { opacity: '1', transform: 'scale(1)' },
+          to: { opacity: '0', transform: 'scale(.96)' },
+        },
+        'portal-toast-out-top': {
+          from: { opacity: '1', transform: 'translateY(0)' },
+          to: { opacity: '0', transform: 'translateY(-10px)' },
+        },
         'community-fade-in': { from: { opacity: '0' } },
         'community-fade-out': { to: { opacity: '0' } },
         'community-slide-in': { from: { transform: 'translateX(5%)' } },
@@ -45,6 +138,12 @@ export default {
         },
       },
       animation: {
+        'portal-fade-in': 'portal-fade-in var(--p-enter-dur) var(--p-enter-ease) both',
+        'portal-scale-in': 'portal-scale-in var(--p-pop-dur) var(--p-enter-ease) both',
+        'portal-scale-out': 'portal-scale-out var(--p-pop-dur) var(--p-enter-ease) both',
+        'portal-toast-from-top': 'portal-toast-from-top 180ms ease both',
+        'portal-toast-out': 'portal-toast-out 180ms ease both',
+        'portal-toast-out-top': 'portal-toast-out-top 180ms ease both',
         'community-fade-in': 'community-fade-in 180ms ease both',
         'community-fade-out': 'community-fade-out 280ms ease both',
         'community-slide-in': 'community-slide-in 260ms cubic-bezier(.2,.8,.2,1) both',

@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   isCalendarItemsLoaded,
@@ -7,10 +6,7 @@ import {
 } from './king-lms-calendar-response';
 
 describe('king-lms-calendar-response', () => {
-  const capturePath = path.join(
-    process.cwd(),
-    '.king-lms-api-capture/27-_learn_api_v1_calendars_calendarItems.json',
-  );
+  const capturePath = new URL('./__fixtures__/calendar-items.json', import.meta.url);
 
   it('loads calendarItems fixture from capture', () => {
     expect(fs.existsSync(capturePath)).toBe(true);

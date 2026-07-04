@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { CommunityUser } from '../types';
 import { cn } from '../classNames';
 
@@ -14,6 +15,7 @@ export function Avatar({
 }) {
   const label = user?.displayName || name || '?';
   const source = user?.avatarUrl || url;
+  const [imageBroken, setImageBroken] = useState(false);
   return (
     <span
       className={cn(
@@ -22,13 +24,11 @@ export function Avatar({
       )}
     >
       <span>{label.slice(0, 1).toUpperCase()}</span>
-      {source ? (
+      {source && !imageBroken ? (
         <img
           src={source}
           alt=""
-          onError={(event) => {
-            event.currentTarget.style.display = 'none';
-          }}
+          onError={() => setImageBroken(true)}
         />
       ) : null}
     </span>

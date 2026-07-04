@@ -4,14 +4,13 @@
  */
 
 import { createElement } from 'react';
-import overlayCss from '../../styles/overlay.css?inline';
+import '../../styles/tailwind-overlay.css';
 import { matchPortalRoute } from '../../portal/router';
 import { resolveKingLmsMountToastMessage } from '../../portal/sync-hash';
 import {
   appendPortalOverlayShell,
   ensurePortalBackdrop,
   parseCustomThemeCollection,
-  portalHeadThemeCssByName,
   removePortalBackdrop,
   syncPortalTheme,
   type StoredCustomThemeCollection,
@@ -20,7 +19,6 @@ import storage from '../../lib/storage';
 import {
   PORTAL_BOOT_COVER_RAF_FRAMES,
   PORTAL_CONTENT_SCRIPT_MATCHES,
-  PORTAL_DOM,
   SK,
 } from '../../shared/constants';
 
@@ -58,29 +56,16 @@ export default defineContentScript({
         const themeName = String(themeSnap[SK.theme] ?? '').trim() || 'dark';
         const customThemes = parseCustomThemeCollection(themeSnap[SK.customThemes]);
 
-        const preservedTheme =
-          document.getElementById(PORTAL_DOM.headThemeStyle)?.textContent ?? '';
         const title = document.querySelector('title')?.cloneNode(true) ?? null;
         document.head.replaceChildren();
         if (title) document.head.appendChild(title);
-
-        const themeStyle = document.createElement('style');
-        themeStyle.id = PORTAL_DOM.headThemeStyle;
-        themeStyle.textContent =
-          preservedTheme || portalHeadThemeCssByName(themeName, customThemes);
-        document.head.appendChild(themeStyle);
-
-        const overlayStyle = document.createElement('style');
-        overlayStyle.id = PORTAL_DOM.overlayCss;
-        overlayStyle.textContent = overlayCss;
-        document.head.appendChild(overlayStyle);
 
         const { scroller } = appendPortalOverlayShell();
 
         syncPortalTheme(themeName, customThemes);
 
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.overflow = 'hidden';
+        document.documentElement.classList.add('kcg-portal-surface');
+        document.body?.classList.add('kcg-portal-surface');
 
         const [{ createRoot }, { PortalApp }] = await Promise.all([
           import('react-dom/client'),

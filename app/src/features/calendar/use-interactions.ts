@@ -15,6 +15,7 @@ import { useCalendarOverlayUiRefs } from '../../context/calendarOverlayUi';
 import { usePortalDom } from '../../context/portalDom';
 import { useI18n, type AppLanguage, type I18nMessages } from '../../i18n';
 import { buildKingLmsSamlLoginUrl } from '../../shared/king-lms-url';
+import { setRuntimeElementCss } from '../../lib/runtime-element-style';
 
 /** tooltip 先頭の「コード：」は左ラベルに寄せるため、値から除く */
 function stripLeadingCodeJaPrefix(raw: string): string {
@@ -72,8 +73,7 @@ function attachCalendarTooltipAndContextMenu(
     let top    = r.bottom + pad;
     // 下端を超える場合はアンカー上側に反転（フリップ）
     if (top + ph > window.innerHeight - pad) top = r.top - ph - pad;
-    hoverPopEl.style.left = `${left}px`;
-    hoverPopEl.style.top  = `${Math.max(pad, top)}px`;
+    setRuntimeElementCss(hoverPopEl, 'position', `left:${left}px;top:${Math.max(pad, top)}px`);
   }
 
   function revealTooltip(anchor: Element, revision: number) {
@@ -315,8 +315,7 @@ function attachCalendarTooltipAndContextMenu(
     // カーソル位置を起点に、画面四辺からはみ出ないようにクランプ
     const left = Math.max(pad, Math.min(clientX, window.innerWidth  - menuEl.offsetWidth  - pad));
     const top  = Math.max(pad, Math.min(clientY, window.innerHeight - menuEl.offsetHeight - pad));
-    menuEl.style.left = `${left}px`;
-    menuEl.style.top  = `${top}px`;
+    setRuntimeElementCss(menuEl, 'position', `left:${left}px;top:${top}px`);
   }
 
   function onContextMenu(e: MouseEvent) {

@@ -3,17 +3,17 @@
  */
 
 import { createElement } from 'react';
-import overlayCss from '../../styles/overlay.css?inline';
+import '../../styles/tailwind-overlay.css';
 import {
   appendPortalOverlayShell,
   ensurePortalBackdrop,
   parseCustomThemeCollection,
-  portalHeadThemeCssByName,
   removePortalBackdrop,
   syncPortalTheme,
   type StoredCustomThemeCollection,
 } from '../../themes';
 import storage from '../../lib/storage';
+import { upsertRuntimeCss } from '../../themes/runtime-style';
 import type { Home2MailRoute } from '../../portal/home2-mail-router';
 import {
   HOME2_MAIL_OVERLAY_HEADER_ONLY_CLASS,
@@ -48,32 +48,11 @@ export async function mountHome2MailOverlay(route: Home2MailRoute): Promise<void
     const themeName = String(themeSnap[SK.theme] ?? '').trim() || 'dark';
     const customThemes = parseCustomThemeCollection(themeSnap[SK.customThemes]);
 
-    let themeStyle = document.getElementById(PORTAL_DOM.headThemeStyle) as HTMLStyleElement | null;
-    if (!themeStyle) {
-      themeStyle = document.createElement('style');
-      themeStyle.id = PORTAL_DOM.headThemeStyle;
-      (document.head ?? document.documentElement).appendChild(themeStyle);
-    }
-    themeStyle.textContent = portalHeadThemeCssByName(themeName, customThemes);
-
-    if (!document.getElementById(PORTAL_DOM.overlayCss)) {
-      const overlayStyle = document.createElement('style');
-      overlayStyle.id = PORTAL_DOM.overlayCss;
-      overlayStyle.textContent = overlayCss;
-      document.head.appendChild(overlayStyle);
-    }
-
     const hostTweakCss = hostTweakCssForHome2MailLayout(route.layout);
     if (hostTweakCss) {
-      let hostTweak = document.getElementById(PORTAL_DOM.home2HostTweak);
-      if (!hostTweak) {
-        hostTweak = document.createElement('style');
-        hostTweak.id = PORTAL_DOM.home2HostTweak;
-        document.head.appendChild(hostTweak);
-      }
-      hostTweak.textContent = hostTweakCss;
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
+      upsertRuntimeCss(PORTAL_DOM.home2HostTweak, hostTweakCss);
+      document.documentElement.classList.add('kcg-portal-surface');
+      document.body?.classList.add('kcg-portal-surface');
     }
 
     const { overlay, scroller } = appendPortalOverlayShell();

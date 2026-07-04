@@ -18,6 +18,7 @@ import {
 } from 'react';
 import type { Settings } from '../../../context/settings';
 import { readExtensionVersion } from '../../../lib/extension-version';
+import { clearRuntimeElementCss, setRuntimeElementCss } from '../../../lib/runtime-element-style';
 import { CHANGELOG_JSON_URL, PORTAL_DOM } from '../../../shared/constants';
 import { useExtensionUpdateAvailable } from '../../../hooks/useExtensionUpdateAvailable';
 import { useI18n } from '../../../i18n';
@@ -250,9 +251,9 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       const el = popRef.current;
       if (!el) return;
       function clamp() {
-        el!.style.left = '';
+        clearRuntimeElementCss(el!, 'inline-offset');
         const overflow = el!.getBoundingClientRect().right - (window.innerWidth - 8);
-        if (overflow > 0) el!.style.left = `-${overflow}px`;
+        if (overflow > 0) setRuntimeElementCss(el!, 'inline-offset', `left:-${overflow}px`);
       }
       clamp();
       window.addEventListener('resize', clamp);

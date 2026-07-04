@@ -11,7 +11,8 @@ import {
   useId,
   useMemo,
   useRef,
-  type CSSProperties,
+  type ReactNode,
+  type RefObject,
 } from 'react';
 import { PAGE, SK } from '../../shared/constants';
 import type { PortalRoute } from '../../portal/router';
@@ -23,6 +24,7 @@ import { THEMES, type ThemeTokens } from '../../themes';
 import { LanguagePicker } from './LanguagePicker';
 import type { AppLanguage } from '../../i18n/messages';
 import homeCornerCharacterUrl from '../../assets/914_20260621035718-display.webp';
+import { clearRuntimeElementCss, setRuntimeElementCss } from '../../lib/runtime-element-style';
 
 type TourPhase = 'loading' | 'language' | 'tour' | 'off';
 
@@ -100,6 +102,35 @@ const STEPS: TourStep[] = [
   { kind: 'done', id: 'done' },
 ];
 
+const PROGRESS_WIDTH_CLASS: Record<string, string> = {
+  '1/12': 'tw-w-tour-progress-1-12',
+  '2/12': 'tw-w-tour-progress-2-12',
+  '3/12': 'tw-w-tour-progress-3-12',
+  '4/12': 'tw-w-tour-progress-4-12',
+  '5/12': 'tw-w-tour-progress-5-12',
+  '6/12': 'tw-w-tour-progress-6-12',
+  '7/12': 'tw-w-tour-progress-7-12',
+  '8/12': 'tw-w-tour-progress-8-12',
+  '9/12': 'tw-w-tour-progress-9-12',
+  '10/12': 'tw-w-tour-progress-10-12',
+  '11/12': 'tw-w-tour-progress-11-12',
+  '12/12': 'tw-w-full',
+  '1/14': 'tw-w-tour-progress-1-14',
+  '2/14': 'tw-w-tour-progress-2-14',
+  '3/14': 'tw-w-tour-progress-3-14',
+  '4/14': 'tw-w-tour-progress-4-14',
+  '5/14': 'tw-w-tour-progress-5-14',
+  '6/14': 'tw-w-tour-progress-6-14',
+  '7/14': 'tw-w-tour-progress-7-14',
+  '8/14': 'tw-w-tour-progress-8-14',
+  '9/14': 'tw-w-tour-progress-9-14',
+  '10/14': 'tw-w-tour-progress-10-14',
+  '11/14': 'tw-w-tour-progress-11-14',
+  '12/14': 'tw-w-tour-progress-12-14',
+  '13/14': 'tw-w-tour-progress-13-14',
+  '14/14': 'tw-w-full',
+};
+
 /** 最初に見せる候補。明暗・色味を偏らせず、選びやすい数に絞る。 */
 const RECOMMENDED_THEME_KEYS = ['dark', 'light', 'tokyoNight', 'cherryBlossom'] as const;
 
@@ -134,14 +165,6 @@ function sameHole(a: Hole | null, b: Hole | null): boolean {
   return a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h;
 }
 
-type ThemePreviewStyle = CSSProperties & {
-  '--p-tour-preview-bg': string;
-  '--p-tour-preview-bg2': string;
-  '--p-tour-preview-text': string;
-  '--p-tour-preview-accent': string;
-  '--p-tour-preview-border': string;
-};
-
 function readHole(selector: string, root: Document | HTMLElement): Hole | null {
   const el = root.querySelector(selector);
   if (!(el instanceof HTMLElement)) return null;
@@ -153,6 +176,98 @@ function readHole(selector: string, root: Document | HTMLElement): Hole | null {
     w: r.width + HOLE_PAD * 2,
     h: r.height + HOLE_PAD * 2,
   };
+}
+
+function TourThemeOption({
+  themeKey,
+  meta,
+  name,
+  active,
+  onSelect,
+}: {
+  themeKey: string;
+  meta: ThemeTokens;
+  name: string;
+  active: boolean;
+  onSelect: (key: string) => void;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setRuntimeElementCss(
+      el,
+      'theme-preview',
+      `--p-tour-preview-bg:${meta.bg};--p-tour-preview-bg2:${meta.bgSecondary};` +
+        `--p-tour-preview-text:${meta.textBright};--p-tour-preview-accent:${meta.accent};` +
+        `--p-tour-preview-border:${meta.borderHover}`,
+    );
+    return () => clearRuntimeElementCss(el, 'theme-preview');
+  }, [meta]);
+
+  return (
+    <button
+      ref={ref}
+      key={themeKey}
+      type="button"
+      className={`p-tour-theme-option${active ? ' is-active' : ''}`}
+      aria-label={name}
+      aria-pressed={active}
+      onClick={() => onSelect(themeKey)}
+    >
+      <span className="p-tour-theme-option-preview" aria-hidden>
+        <span className="p-tour-theme-option-window">
+          <span />
+          <span />
+        </span>
+        <span className="p-tour-theme-option-accent" />
+      </span>
+      <span className="p-tour-theme-option-name">{name}</span>
+      {active ? (
+        <span className="p-tour-theme-option-check" aria-hidden>
+          ✓
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
+function SpotlightTourCard({
+  cardRef,
+  positionCss,
+  labelledBy,
+  children,
+}: {
+  cardRef: RefObject<HTMLDivElement | null>;
+  positionCss?: string;
+  labelledBy: string;
+  children: ReactNode;
+}) {
+  const localRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = localRef.current;
+    cardRef.current = el;
+    if (!el || !positionCss) return;
+    setRuntimeElementCss(el, 'spotlight-position', positionCss);
+    return () => {
+      clearRuntimeElementCss(el, 'spotlight-position');
+      if (cardRef.current === el) cardRef.current = null;
+    };
+  }, [cardRef, positionCss]);
+
+  return (
+    <div
+      ref={localRef}
+      className="p-tour-card p-tour-spotlight-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={labelledBy}
+    >
+      {children}
+    </div>
+  );
 }
 
 function readSpotlightHole(
@@ -551,7 +666,7 @@ export function GuidedTour({
   const vw = viewport.w || (typeof window !== 'undefined' ? window.innerWidth : 400);
   const vh = viewport.h || (typeof window !== 'undefined' ? window.innerHeight : 600);
 
-  const spotlightCardStyle: CSSProperties | undefined = (() => {
+  const spotlightCardCss: string | undefined = (() => {
     if (currentStep.kind !== 'spotlight') return undefined;
     const margin = 12;
     const gap = 14;
@@ -568,15 +683,10 @@ export function GuidedTour({
         hole.h >= height + inset * 2
           ? Math.max(margin, Math.min(hole.y + hole.h - height - inset, vh - height - margin))
           : Math.max(margin, vh - height - margin);
-      return { left, top, width: calendarWidth };
+      return `left:${left}px;top:${top}px;width:${calendarWidth}px`;
     }
     if (!hole) {
-      return {
-        left: '50%',
-        bottom: '12%',
-        width,
-        transform: 'translateX(-50%)',
-      };
+      return `left:50%;bottom:12%;width:${width}px;transform:translateX(-50%)`;
     }
     if (currentStep.id === 'shortcuts') {
       const availableLeft = hole.x - gap - margin;
@@ -587,14 +697,14 @@ export function GuidedTour({
           margin,
           Math.min(hole.y + hole.h / 2 - height / 2, vh - height - margin),
         );
-        return { left, top, width: shortcutCardWidth };
+        return `left:${left}px;top:${top}px;width:${shortcutCardWidth}px`;
       }
     }
 
     const below = hole.y + hole.h + gap;
     const top = below + height <= vh - margin ? below : Math.max(margin, hole.y - height - gap);
     const left = Math.max(margin, Math.min(hole.x + hole.w / 2 - width / 2, vw - width - margin));
-    return { left, top, width };
+    return `left:${left}px;top:${top}px;width:${width}px`;
   })();
 
   const showSpotlightSvg = currentStep.kind === 'spotlight' && vw > 0 && vh > 0 && hole !== null;
@@ -607,7 +717,7 @@ export function GuidedTour({
         {steps.length}
       </span>
       <span className="p-tour-progress-track">
-        <span style={{ width: `${((stepIndex + 1) / steps.length) * 100}%` }} />
+        <span className={PROGRESS_WIDTH_CLASS[`${stepIndex + 1}/${steps.length}`] ?? 'tw-w-full'} />
       </span>
     </div>
   );
@@ -667,37 +777,15 @@ export function GuidedTour({
       themes.map(([key, meta]) => {
         const name = themeDisplayName(key, meta.name, language);
         const active = settings.theme === key;
-        const previewStyle: ThemePreviewStyle = {
-          '--p-tour-preview-bg': meta.bg,
-          '--p-tour-preview-bg2': meta.bgSecondary,
-          '--p-tour-preview-text': meta.textBright,
-          '--p-tour-preview-accent': meta.accent,
-          '--p-tour-preview-border': meta.borderHover,
-        };
         return (
-          <button
+          <TourThemeOption
             key={key}
-            type="button"
-            className={`p-tour-theme-option${active ? ' is-active' : ''}`}
-            style={previewStyle}
-            aria-label={name}
-            aria-pressed={active}
-            onClick={() => updateTheme(key)}
-          >
-            <span className="p-tour-theme-option-preview" aria-hidden>
-              <span className="p-tour-theme-option-window">
-                <span />
-                <span />
-              </span>
-              <span className="p-tour-theme-option-accent" />
-            </span>
-            <span className="p-tour-theme-option-name">{name}</span>
-            {active ? (
-              <span className="p-tour-theme-option-check" aria-hidden>
-                ✓
-              </span>
-            ) : null}
-          </button>
+            themeKey={key}
+            meta={meta}
+            name={name}
+            active={active}
+            onSelect={updateTheme}
+          />
         );
       });
 
@@ -999,13 +1087,10 @@ export function GuidedTour({
       ) : null}
 
       {currentStep.kind === 'spotlight' ? (
-        <div
-          ref={cardRef}
-          className="p-tour-card p-tour-spotlight-card"
-          style={spotlightCardStyle}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={`p-tour-h-${currentStep.id}`}
+        <SpotlightTourCard
+          cardRef={cardRef}
+          positionCss={spotlightCardCss}
+          labelledBy={`p-tour-h-${currentStep.id}`}
         >
           <div className="p-tour-card-inner" key={stepIndex}>
             <div className="p-tour-card-topline">
@@ -1016,7 +1101,7 @@ export function GuidedTour({
             <p>{copy?.body}</p>
             {renderActions()}
           </div>
-        </div>
+        </SpotlightTourCard>
       ) : null}
     </div>
   );

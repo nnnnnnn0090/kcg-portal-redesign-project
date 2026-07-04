@@ -16,9 +16,9 @@ export type {
   SocialPlatform,
 } from './contract';
 
-export interface CommunityUser extends ContractUser {}
-export interface CommunityComment extends ContractComment {}
-export interface CommunityNotification extends ContractNotification {}
+export type CommunityUser = ContractUser;
+export type CommunityComment = ContractComment;
+export type CommunityNotification = ContractNotification;
 export interface CommunityPost extends ContractPost {
   /** Authenticated private-image object URL; transient and never persisted. */
   previewUrl?: string;

@@ -39,6 +39,7 @@ import {
   type CalendarWeekStart,
 } from '../../lib/date';
 import { pageFetch } from '../../lib/api';
+import { clearRuntimeElementCss, setRuntimeElementCss } from '../../lib/runtime-element-style';
 import { useSettings } from '../../context/settings';
 import { buildCalendarGridHtml } from './grid';
 import { usePortalMessage, type PortalCapturedMessage } from '../../hooks/usePortalMessage';
@@ -327,7 +328,7 @@ export function useCalendarPanel({
   useEffect(() => {
     if (!demoItems) return;
     const wr = calParamsAfterWeekStartChange(
-      { uKbn: '1', ...weekRangeContaining(toIsoLocal(new Date()), weekStart) },
+      { ...weekRangeContaining(toIsoLocal(new Date()), weekStart), uKbn: '1' },
       weekStart,
       toIsoLocal(new Date()),
     );
@@ -374,9 +375,9 @@ export function useCalendarPanel({
       body.dataset.calMode    = viewModeRef.current;
       if (opts?.lockBodyHeight) {
         const h = Math.round(body.getBoundingClientRect().height);
-        if (h > 64) body.style.minHeight = `${h}px`;
+        if (h > 64) setRuntimeElementCss(body, 'min-height', `min-height:${h}px`);
       } else {
-        body.style.minHeight = '';
+        clearRuntimeElementCss(body, 'min-height');
       }
     }
     pendingEnterAnimRef.current = false;
@@ -519,7 +520,7 @@ export function useCalendarPanel({
       setMonthRef(mr);
 
       if (m.clientDataMode && m.bulkParsed) redrawFromClient({ enterAnim: false });
-      else if (uK) void fetchRange({ uKbn: uK, ...merged });
+      else if (uK) void fetchRange({ ...merged, uKbn: uK });
       return;
     }
 

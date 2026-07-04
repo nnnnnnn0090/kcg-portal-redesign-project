@@ -1,5 +1,6 @@
 import storage from '../../lib/storage';
 import { CPLAN_CONTENT_SCRIPT_MATCHES, PORTAL_DOM, SK } from '../../shared/constants';
+import { syncCplanSurfaceRuntime } from '../../themes';
 
 export default defineContentScript({
   matches: [...CPLAN_CONTENT_SCRIPT_MATCHES],
@@ -17,10 +18,11 @@ export default defineContentScript({
 
     void storage.get(SK.cplanOverlay).then((snap) => {
       if (snap[SK.cplanOverlay] === false || document.documentElement.dataset.cplanOverlayDisabled === 'true') return;
+      syncCplanSurfaceRuntime();
       const cover = document.createElement('div');
       cover.id = PORTAL_DOM.bootCover;
+      cover.className = 'tw-fixed tw-inset-0 tw-z-boot-cover tw-pointer-events-none tw-m-0 tw-h-full tw-w-full tw-border-0 tw-p-0';
       cover.setAttribute('aria-hidden', 'true');
-      cover.style.cssText = 'position:fixed;inset:0;z-index:2147483646;pointer-events:none;background:#111111';
       (document.body ?? document.documentElement).appendChild(cover);
     });
   },
