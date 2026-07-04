@@ -1,11 +1,18 @@
-import { useMemo, useRef, useState } from 'react';
-import { ACADEMIC_GROUPS, activeTagPattern, SOCIAL_PLATFORMS } from '../constants';
+import { useMemo, useRef, useState, type DragEvent } from 'react';
+import {
+  ACADEMIC_GROUPS,
+  activeTagPattern,
+  COMMUNITY_INPUT_LIMITS,
+  SOCIAL_PLATFORMS,
+} from '../constants';
 import type { CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
-import { Busy, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
+import { Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
 import { SocialIcon } from '../components/SocialIcon';
 import type { ModalLayerProps } from './types';
 import { cn } from '../classNames';
+import { dataTransferHasFiles } from '../imageFiles';
+import { SOCIAL_PLATFORM_FORMATS, socialUrlToId } from '../socialLinks';
 
 export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const {
@@ -26,11 +33,33 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
   const profileTagsInput = useRef<HTMLInputElement>(null);
   const [academicGroup, setAcademicGroup] = useState(user.academicGroup ?? '');
   const [department, setDepartment] = useState(user.department ?? '');
+  const [displayName, setDisplayName] = useState(
+    user.pendingProfile?.displayName || user.displayName,
+  );
+  const [bio, setBio] = useState(user.pendingProfile?.bio ?? user.bio);
+  const [websiteUrl, setWebsiteUrl] = useState(
+    user.pendingProfile?.websiteUrl ?? user.websiteUrl ?? '',
+  );
   const [profileTagsValue, setProfileTagsValue] = useState(
     (user.pendingProfile?.profileTags ?? user.profileTags ?? []).map((tag) => `#${tag}`).join(' '),
   );
+  const [socialIds, setSocialIds] = useState(() =>
+    Object.fromEntries(
+      SOCIAL_PLATFORMS.map((platform) => [
+        platform.key,
+        socialUrlToId(
+          platform.key,
+          user.pendingProfile?.socialLinks?.[platform.key] ?? user.socialLinks?.[platform.key],
+        ),
+      ]),
+    ),
+  );
   const [profileTagSearch, setProfileTagSearch] = useState<string | null>(null);
   const [activeProfileTagIndex, setActiveProfileTagIndex] = useState(0);
+  const [headerDropActive, setHeaderDropActive] = useState(false);
+  const [avatarDropActive, setAvatarDropActive] = useState(false);
+  const headerDropDepth = useRef(0);
+  const avatarDropDepth = useRef(0);
 
   const matchingProfileTags = useMemo(() => {
     if (profileTagSearch === null) return [];
@@ -71,10 +100,62 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
     input.click();
   };
 
+  const handleProfileImageDragEnter = (
+    event: DragEvent<HTMLElement>,
+    kind: 'header' | 'avatar',
+  ) => {
+    if (!dataTransferHasFiles(event.dataTransfer)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const depth = kind === 'header' ? headerDropDepth : avatarDropDepth;
+    depth.current += 1;
+    if (kind === 'header') setHeaderDropActive(true);
+    else setAvatarDropActive(true);
+    event.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleProfileImageDragOver = (event: DragEvent<HTMLElement>) => {
+    if (!dataTransferHasFiles(event.dataTransfer)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleProfileImageDragLeave = (
+    event: DragEvent<HTMLElement>,
+    kind: 'header' | 'avatar',
+  ) => {
+    if (!dataTransferHasFiles(event.dataTransfer)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const depth = kind === 'header' ? headerDropDepth : avatarDropDepth;
+    depth.current = Math.max(0, depth.current - 1);
+    if (depth.current !== 0) return;
+    if (kind === 'header') setHeaderDropActive(false);
+    else setAvatarDropActive(false);
+  };
+
+  const handleProfileImageDrop = (
+    event: DragEvent<HTMLElement>,
+    kind: 'header' | 'avatar',
+  ) => {
+    if (!dataTransferHasFiles(event.dataTransfer)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    headerDropDepth.current = 0;
+    avatarDropDepth.current = 0;
+    setHeaderDropActive(false);
+    setAvatarDropActive(false);
+    const file = Array.from(event.dataTransfer.files)[0];
+    if (!file) return;
+    if (kind === 'header') readHeader(file);
+    else readAvatar(file);
+  };
+
   return (
     <form
       className={
-        'community-dialog tw-max-h-[min(90vh,900px)] tw-w-full tw-max-w-[620px] tw-overflow-auto tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[620px]:tw-max-h-[calc(100vh-24px)] max-[620px]:tw-rounded-2xl [&>footer]:tw-flex [&>footer]:tw-justify-end [&>footer]:tw-gap-2 [&>footer]:tw-border-t [&>footer]:tw-border-community-border [&>footer]:tw-bg-community-bg2 [&>footer]:tw-p-4 [&>footer>button]:tw-inline-flex [&>footer>button]:tw-min-h-10 [&>footer>button]:tw-appearance-none [&>footer>button]:tw-items-center [&>footer>button]:tw-justify-center [&>footer>button]:tw-gap-2 [&>footer>button]:tw-rounded-lg [&>footer>button]:tw-border [&>footer>button]:tw-border-community-border [&>footer>button]:tw-bg-community-bg3 [&>footer>button]:tw-px-4 [&>footer>button]:tw-text-sm [&>footer>button]:tw-font-bold [&>footer>button]:tw-text-community-text [&>footer>button]:tw-cursor-pointer [&>footer>button.is-primary]:tw-border-community-accent [&>footer>button.is-primary]:tw-bg-community-accent [&>footer>button.is-primary]:tw-text-community-bg [&_button:disabled]:tw-cursor-not-allowed [&_button:disabled]:tw-opacity-[.55] community-profile-dialog tw-w-full tw-max-w-[780px]'
+        'community-dialog tw-max-h-[min(90vh,900px)] tw-w-full tw-max-w-[620px] tw-overflow-auto tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[620px]:tw-max-h-[calc(100vh-24px)] max-[620px]:tw-rounded-2xl [&>footer]:tw-flex [&>footer]:tw-justify-end [&>footer]:tw-gap-2 [&>footer]:tw-border-t [&>footer]:tw-border-community-border [&>footer]:tw-bg-community-bg2 [&>footer]:tw-p-4 [&>footer>button]:tw-inline-flex [&>footer>button]:tw-min-h-10 [&>footer>button]:tw-appearance-none [&>footer>button]:tw-items-center [&>footer>button]:tw-justify-center [&>footer>button]:tw-gap-2 [&>footer>button]:tw-rounded-lg [&>footer>button]:tw-border [&>footer>button]:tw-border-community-border [&>footer>button]:tw-bg-community-bg3 [&>footer>button]:tw-px-4 [&>footer>button]:tw-text-sm [&>footer>button]:tw-font-bold [&>footer>button]:tw-text-community-text [&>footer>button]:tw-cursor-pointer [&>footer>button.is-primary]:tw-border-community-accent [&>footer>button.is-primary]:tw-bg-community-accent [&>footer>button.is-primary]:tw-text-community-on-accent [&_button:disabled]:tw-cursor-not-allowed [&_button:disabled]:tw-opacity-[.55] community-profile-dialog tw-w-full tw-max-w-[780px]'
       }
       method="post"
       onSubmitCapture={(event) => event.preventDefault()}
@@ -100,9 +181,14 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           <span>{ja ? 'アイコンは2MB、ヘッダー画像は5MBまで' : 'Avatar 2MB · Header 5MB'}</span>
         </div>
         <div
-          className={
-            'community-profile-editor-header tw-relative tw-h-[180px] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-contain [&>.community-profile-editor-header-empty]:tw-h-full [&>.community-profile-editor-header-empty]:tw-w-full [&>button]:tw-absolute [&>button]:tw-bottom-3 [&>button]:tw-right-3 [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-font-bold'
-          }
+          className={cn(
+            'community-profile-editor-header tw-relative tw-h-[180px] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-transition [&.is-file-dragging]:tw-border-community-accent [&.is-file-dragging]:tw-ring-2 [&.is-file-dragging]:tw-ring-community-accent-bg [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-contain [&>.community-profile-editor-header-empty]:tw-h-full [&>.community-profile-editor-header-empty]:tw-w-full [&>button]:tw-absolute [&>button]:tw-bottom-3 [&>button]:tw-right-3 [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-font-bold [&>button]:tw-text-community-text',
+            headerDropActive && 'is-file-dragging',
+          )}
+          onDragEnter={(event) => handleProfileImageDragEnter(event, 'header')}
+          onDragOver={handleProfileImageDragOver}
+          onDragLeave={(event) => handleProfileImageDragLeave(event, 'header')}
+          onDrop={(event) => handleProfileImageDrop(event, 'header')}
         >
           {headerImage || user.headerUrl ? (
             <img src={headerImage || user.headerUrl || undefined} alt="" />
@@ -139,9 +225,14 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           }}
         />
         <div
-          className={
-            'community-profile-editor-identity tw-grid tw-grid-cols-[auto_minmax(0,1fr)_auto] tw-items-center tw-gap-3 max-[620px]:tw-grid-cols-[auto_minmax(0,1fr)] [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-text-community-bright [&_small]:tw-text-community-muted [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 max-[620px]:[&>button]:tw-col-span-full max-[620px]:[&>button]:tw-w-full'
-          }
+          className={cn(
+            'community-profile-editor-identity tw-grid tw-grid-cols-[auto_minmax(0,1fr)_auto] tw-items-center tw-gap-3 tw-rounded-xl tw-transition max-[620px]:tw-grid-cols-[auto_minmax(0,1fr)] [&.is-file-dragging]:tw-bg-community-accent-bg [&.is-file-dragging]:tw-ring-2 [&.is-file-dragging]:tw-ring-community-accent-bg [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-text-community-bright [&_small]:tw-text-community-muted [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 [&>button]:tw-text-community-text max-[620px]:[&>button]:tw-col-span-full max-[620px]:[&>button]:tw-w-full',
+            avatarDropActive && 'is-file-dragging',
+          )}
+          onDragEnter={(event) => handleProfileImageDragEnter(event, 'avatar')}
+          onDragOver={handleProfileImageDragOver}
+          onDragLeave={(event) => handleProfileImageDragLeave(event, 'avatar')}
+          onDrop={(event) => handleProfileImageDrop(event, 'avatar')}
         >
           <Avatar name={user.displayName} url={avatarImage || user.avatarUrl} large />
           <div>
@@ -238,23 +329,41 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
             </Field>
           </div>
         </div>
-        <Field label={ja ? '表示名' : 'Display name'}>
+        <Field
+          label={ja ? '表示名' : 'Display name'}
+          meta={
+            <CharacterCount value={displayName} max={COMMUNITY_INPUT_LIMITS.displayName} />
+          }
+        >
           <input
             name="displayName"
-            defaultValue={user.pendingProfile?.displayName || user.displayName}
-            maxLength={40}
+            value={displayName}
+            onChange={(event) => setDisplayName(event.currentTarget.value)}
+            maxLength={COMMUNITY_INPUT_LIMITS.displayName}
             required
           />
         </Field>
-        <Field label={ja ? '自己紹介' : 'Bio'}>
+        <Field
+          label={ja ? '自己紹介' : 'Bio'}
+          meta={<CharacterCount value={bio} max={COMMUNITY_INPUT_LIMITS.bio} />}
+        >
           <textarea
             name="bio"
-            defaultValue={user.pendingProfile?.bio ?? user.bio}
-            maxLength={160}
+            value={bio}
+            onChange={(event) => setBio(event.currentTarget.value)}
+            maxLength={COMMUNITY_INPUT_LIMITS.bio}
             rows={4}
           />
         </Field>
-        <Field label={ja ? 'プロフィールタグ' : 'Profile tags'}>
+        <Field
+          label={ja ? 'プロフィールタグ' : 'Profile tags'}
+          meta={
+            <CharacterCount
+              value={profileTagsValue}
+              max={COMMUNITY_INPUT_LIMITS.profileTagsText}
+            />
+          }
+        >
           <input
             ref={profileTagsInput}
             name="profileTags"
@@ -292,14 +401,14 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
                   event.currentTarget.selectionStart,
                 );
             }}
-            maxLength={320}
+            maxLength={COMMUNITY_INPUT_LIMITS.profileTagsText}
             placeholder={ja ? '#ゲーム #デザイン #プログラミング' : '#game #design #programming'}
           />
         </Field>
         {profileTagSearch !== null ? (
           <div
             className={
-              'community-tag-suggestions tw-absolute tw-inset-x-0 tw-top-[calc(100%+8px)] tw-z-[3] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card [&.is-profile-tags]:tw-static [&.is-profile-tags]:tw-mt-[-8px] [&_header]:tw-flex [&_header]:tw-justify-between [&_header]:tw-gap-2 [&_header]:tw-border-b [&_header]:tw-border-community-border [&_header]:tw-px-3 [&_header]:tw-py-2 [&_header]:tw-text-xs [&_header]:tw-text-community-muted [&_button]:tw-flex [&_button]:tw-min-h-10 [&_button]:tw-w-full [&_button]:tw-items-center [&_button]:tw-gap-2 [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-3 [&_button]:tw-text-left [&_button]:tw-text-sm [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-accent-bg [&_button.is-active]:tw-bg-community-accent-bg [&_b]:tw-text-community-accent-light is-profile-tags'
+              'community-tag-suggestions tw-absolute tw-inset-x-0 tw-top-[calc(100%+8px)] tw-z-[3] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card [&.is-profile-tags]:tw-static [&.is-profile-tags]:tw-mt-[-8px] [&_header]:tw-flex [&_header]:tw-justify-between [&_header]:tw-gap-2 [&_header]:tw-border-b [&_header]:tw-border-community-border [&_header]:tw-px-3 [&_header]:tw-py-2 [&_header]:tw-text-xs [&_header]:tw-text-community-muted [&_button]:tw-flex [&_button]:tw-min-h-10 [&_button]:tw-w-full [&_button]:tw-items-center [&_button]:tw-gap-2 [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-3 [&_button]:tw-text-left [&_button]:tw-text-sm [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-accent-bg [&_button.is-active]:tw-bg-community-accent-bg [&_b]:tw-text-community-accent-light is-profile-tags'
             }
             role="listbox"
             aria-label={ja ? 'タグ候補' : 'Tag suggestions'}
@@ -342,16 +451,20 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
         ) : null}
         <p className={'community-help tw-m-0 tw-text-[13px] tw-text-community-muted'}>
           {ja
-            ? 'タグはプロフィール審査後に別枠で公開されます。最大10個まで。'
-            : 'Tags are published separately after profile review. Up to 10 tags.'}
+            ? 'タグはプロフィール審査後に別枠で公開されます。最大5個まで。'
+            : 'Tags are published separately after profile review. Up to 5 tags.'}
         </p>
-        <Field label={ja ? 'URL' : 'Website'}>
+        <Field
+          label={ja ? 'URL' : 'Website'}
+          meta={<CharacterCount value={websiteUrl} max={COMMUNITY_INPUT_LIMITS.websiteUrl} />}
+        >
           <input
             name="websiteUrl"
             type="url"
             inputMode="url"
-            defaultValue={user.pendingProfile?.websiteUrl ?? user.websiteUrl ?? ''}
-            maxLength={300}
+            value={websiteUrl}
+            onChange={(event) => setWebsiteUrl(event.currentTarget.value)}
+            maxLength={COMMUNITY_INPUT_LIMITS.websiteUrl}
             placeholder="https://example.com"
           />
         </Field>
@@ -371,25 +484,46 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
             </span>
           </div>
           {SOCIAL_PLATFORMS.map((platform) => (
-            <Field label={platform.label} key={platform.key}>
+            <Field
+              label={platform.label}
+              key={platform.key}
+              meta={
+                <CharacterCount
+                  value={socialIds[platform.key] ?? ''}
+                  max={SOCIAL_PLATFORM_FORMATS[platform.key].maxLength}
+                />
+              }
+            >
               <span
                 className={
                   'community-social-input tw-flex tw-items-center tw-gap-2 [&_input]:tw-min-w-0 [&_input]:tw-flex-1'
                 }
               >
                 <SocialIcon platform={platform.key} />
+                <span
+                  className={
+                    'community-social-url-field tw-flex tw-min-w-0 tw-flex-1 tw-overflow-hidden tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg2 focus-within:tw-border-community-accent focus-within:tw-ring-2 focus-within:tw-ring-community-accent-bg [&_input]:tw-border-0 [&_input]:tw-bg-transparent [&_input]:tw-ring-0 [&>span]:tw-flex [&>span]:tw-items-center [&>span]:tw-bg-community-bg3 [&>span]:tw-px-2.5 [&>span]:tw-text-xs [&>span]:tw-text-community-muted'
+                  }
+                >
+                  <span>{SOCIAL_PLATFORM_FORMATS[platform.key].prefix}</span>
                 <input
                   name={`social_${platform.key}`}
-                  type="url"
-                  inputMode="url"
-                  defaultValue={
-                    user.pendingProfile?.socialLinks?.[platform.key] ??
-                    user.socialLinks?.[platform.key] ??
-                    ''
+                  type="text"
+                  inputMode={SOCIAL_PLATFORM_FORMATS[platform.key].inputMode ?? 'text'}
+                  value={socialIds[platform.key] ?? ''}
+                  onChange={(event) =>
+                    setSocialIds((current) => ({
+                      ...current,
+                      [platform.key]: event.currentTarget.value,
+                    }))
                   }
-                  maxLength={300}
+                  maxLength={SOCIAL_PLATFORM_FORMATS[platform.key].maxLength}
                   placeholder={platform.placeholder}
                 />
+                  {SOCIAL_PLATFORM_FORMATS[platform.key].suffix ? (
+                    <span>{SOCIAL_PLATFORM_FORMATS[platform.key].suffix}</span>
+                  ) : null}
+                </span>
               </span>
             </Field>
           ))}
@@ -402,7 +536,7 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
         </button>
         <button
           className={
-            'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-bg'
+            'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-on-accent hover:tw-translate-y-[-1px] hover:tw-brightness-110 hover:tw-shadow-community-card'
           }
           disabled={busy}
         >

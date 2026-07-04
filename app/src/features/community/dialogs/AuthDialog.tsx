@@ -1,18 +1,42 @@
-import { useState } from 'react';
-import { Busy, ErrorMessage, Field } from '../components/FormUi';
+import { useState, type KeyboardEvent } from 'react';
+import { Busy, CharacterCount, ErrorMessage, Field } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
 import type { ModalLayerProps } from './types';
 import { cn } from '../classNames';
+import { COMMUNITY_INPUT_LIMITS } from '../constants';
 
 export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register' }) {
-  const { mode, ja, busy, error, close, setAuthMode, authenticate, defaultAuthorName } = props;
+  const { mode, ja, busy, error, close, setAuthMode, authenticate } = props;
   const [showPassword, setShowPassword] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const registering = mode === 'register';
+
+  const selectAuthTab = (nextMode: 'login' | 'register', target?: HTMLButtonElement) => {
+    setAuthMode(nextMode);
+    target?.focus();
+  };
+
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const buttons = Array.from(
+      event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? [],
+    );
+    const target = event.key === 'ArrowLeft' || event.key === 'Home' ? buttons[0] : buttons[1];
+    selectAuthTab(target?.dataset.mode === 'register' ? 'register' : 'login', target);
+  };
+
   return (
     <form
-      className={
-        'community-dialog tw-max-h-[min(90vh,900px)] tw-w-full tw-max-w-[620px] tw-overflow-auto tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[620px]:tw-max-h-[calc(100vh-24px)] max-[620px]:tw-rounded-2xl [&>footer]:tw-flex [&>footer]:tw-justify-end [&>footer]:tw-gap-2 [&>footer]:tw-border-t [&>footer]:tw-border-community-border [&>footer]:tw-bg-community-bg2 [&>footer]:tw-p-4 [&>footer>button]:tw-inline-flex [&>footer>button]:tw-min-h-10 [&>footer>button]:tw-appearance-none [&>footer>button]:tw-items-center [&>footer>button]:tw-justify-center [&>footer>button]:tw-gap-2 [&>footer>button]:tw-rounded-lg [&>footer>button]:tw-border [&>footer>button]:tw-border-community-border [&>footer>button]:tw-bg-community-bg3 [&>footer>button]:tw-px-4 [&>footer>button]:tw-text-sm [&>footer>button]:tw-font-bold [&>footer>button]:tw-text-community-text [&>footer>button]:tw-cursor-pointer [&>footer>button.is-primary]:tw-border-community-accent [&>footer>button.is-primary]:tw-bg-community-accent [&>footer>button.is-primary]:tw-text-community-bg [&_button:disabled]:tw-cursor-not-allowed [&_button:disabled]:tw-opacity-[.55] community-auth tw-relative tw-grid tw-w-full tw-max-w-[860px] tw-grid-cols-[minmax(260px,.85fr)_minmax(340px,1fr)] tw-overflow-hidden max-[760px]:tw-grid-cols-1'
-      }
+      className={cn(
+        'community-dialog community-auth tw-relative tw-max-h-[min(92vh,820px)] tw-w-full tw-overflow-hidden tw-rounded-2xl tw-border tw-border-community-border tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[520px]:tw-max-h-[calc(100vh-16px)] max-[520px]:tw-rounded-xl',
+        registering
+          ? 'tw-grid tw-max-w-[760px] tw-grid-cols-[220px_minmax(0,1fr)] max-[720px]:tw-block max-[720px]:tw-max-w-[480px]'
+          : 'tw-max-w-[420px]',
+      )}
       method="post"
       autoComplete="off"
       data-1p-ignore
@@ -23,7 +47,7 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
     >
       <button
         className={
-          'community-auth-close tw-absolute tw-right-4 tw-top-4 tw-z-[5] tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+          'tw-absolute tw-right-3 tw-top-3 tw-z-[5] tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-lg tw-border-0 tw-bg-transparent tw-p-0 tw-text-community-muted tw-cursor-pointer hover:tw-bg-community-bg3 hover:tw-text-community-text focus-visible:tw-bg-community-bg3 focus-visible:tw-text-community-text focus-visible:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-community-accent-bg [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
         }
         type="button"
         onClick={close}
@@ -31,62 +55,50 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
       >
         <Glyph name="close" />
       </button>
+
+      {registering ? (
+        <aside
+          className={
+            'tw-flex tw-min-w-0 tw-flex-col tw-gap-7 tw-border-r tw-border-community-border tw-bg-community-bg2 tw-p-6 max-[720px]:tw-hidden [&_img]:tw-h-10 [&_img]:tw-w-10 [&_img]:tw-object-contain [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright [&_small]:tw-text-[11px] [&_small]:tw-font-bold [&_small]:tw-text-community-accent-light [&_h2]:tw-m-0 [&_h2]:tw-text-xl [&_h2]:tw-leading-snug [&_h2]:tw-text-community-bright [&_p]:tw-m-0 [&_p]:tw-text-[13px] [&_p]:tw-leading-relaxed [&_p]:tw-text-community-muted'
+          }
+        >
+          <div className={'tw-flex tw-items-center tw-gap-3'}>
+            <img src={browser.runtime.getURL('community/activity-icon.png' as never)} alt="" />
+            <strong>{ja ? 'みんなの活動' : 'Campus Community'}</strong>
+          </div>
+          <div className={'tw-grid tw-gap-3'}>
+            <small>CAMPUS COMMUNITY</small>
+            <h2>{ja ? 'キャンパスの日常を、もっと近くに。' : 'Campus life, closer together.'}</h2>
+            <p>
+              {ja
+                ? '学生の活動を見つけて、あなたの活動も共有できます。'
+                : 'Discover student activities and share your own.'}
+            </p>
+          </div>
+        </aside>
+      ) : null}
+
       <section
         className={
-          'community-auth-intro tw-relative tw-flex tw-flex-col tw-gap-8 tw-bg-gradient-to-br tw-from-community-accent-bg tw-to-community-bg3 tw-p-8 max-[760px]:tw-hidden'
+          'tw-max-h-[min(92vh,820px)] tw-min-w-0 tw-overflow-y-auto tw-px-7 tw-pb-7 tw-pt-6 max-[520px]:tw-px-4 max-[520px]:tw-pb-5 max-[520px]:tw-pt-5'
         }
       >
         <div
-          className={
-            'community-auth-brand tw-flex tw-items-center tw-gap-3 [&_img]:tw-h-11 [&_img]:tw-w-11 [&_img]:tw-object-contain [&_strong]:tw-text-base [&_strong]:tw-text-community-bright'
-          }
+          className={cn(
+            'tw-mb-5 tw-flex tw-items-center tw-gap-3 [&_img]:tw-h-9 [&_img]:tw-w-9 [&_img]:tw-object-contain [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright',
+            registering && 'min-[721px]:tw-hidden',
+          )}
         >
           <img src={browser.runtime.getURL('community/activity-icon.png' as never)} alt="" />
           <strong>{ja ? 'みんなの活動' : 'Campus Community'}</strong>
         </div>
-        <div
+
+        <header
           className={
-            'community-auth-intro-copy [&_h2]:tw-mb-3 [&_h2]:tw-mt-0 [&_h2]:tw-text-[26px] [&_h2]:tw-leading-snug [&_h2]:tw-text-community-bright [&_p]:tw-m-0 [&_p]:tw-text-sm [&_p]:tw-text-community-muted'
+            'tw-pr-10 [&_h2]:tw-m-0 [&_h2]:tw-text-2xl [&_h2]:tw-leading-tight [&_h2]:tw-text-community-bright [&_p]:tw-mb-0 [&_p]:tw-mt-2 [&_p]:tw-text-sm [&_p]:tw-text-community-muted'
           }
         >
-          <small>CAMPUS COMMUNITY</small>
-          <h2>{ja ? 'キャンパスの日常を、もっと近くに。' : 'Campus life, closer together.'}</h2>
-          <p>
-            {ja
-              ? '作品やイベント、クラブ活動。学生の「今」を見つけて、あなたの活動も共有できます。'
-              : 'Discover student work, events and clubs—and share what you are doing.'}
-          </p>
-        </div>
-        <p className={'community-auth-view-note tw-m-0 tw-text-[13px] tw-text-community-muted'}>
-          {ja
-            ? '投稿を見るだけならアカウントは必要ありません。'
-            : 'No account is needed to browse posts.'}
-        </p>
-      </section>
-      <section
-        className={
-          'community-auth-panel tw-relative tw-bg-community-bg tw-p-8 max-[620px]:tw-px-4 max-[620px]:tw-py-6 [&>header>small]:tw-text-xs [&>header>small]:tw-font-bold [&>header>small]:tw-tracking-[.06em] [&>header>small]:tw-text-community-accent-light [&>header>h2]:tw-m-0 [&>header>h2]:tw-text-2xl [&>header>h2]:tw-text-community-bright [&>header>p]:tw-mb-6 [&>header>p]:tw-mt-2 [&>header>p]:tw-text-sm [&>header>p]:tw-text-community-muted'
-        }
-      >
-        <header>
-          <small>
-            {registering
-              ? ja
-                ? 'はじめての方'
-                : 'New here'
-              : ja
-                ? 'おかえりなさい'
-                : 'Welcome back'}
-          </small>
-          <h2>
-            {registering
-              ? ja
-                ? 'アカウントを作成'
-                : 'Create an account'
-              : ja
-                ? 'ログイン'
-                : 'Log in'}
-          </h2>
+          <h2>{registering ? (ja ? 'アカウントを作成' : 'Create an account') : ja ? 'ログイン' : 'Log in'}</h2>
           <p>
             {registering
               ? ja
@@ -97,38 +109,53 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
                 : 'Continue with your user ID.'}
           </p>
         </header>
+
         <div
           className={
-            'community-auth-tabs tw-mb-6 tw-mt-11 tw-grid tw-grid-cols-2 tw-gap-1 tw-rounded-[10px] tw-bg-community-bg3 tw-p-1 [&_button]:tw-min-h-10 [&_button]:tw-rounded-lg [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-font-bold [&_button]:tw-text-community-muted [&_button]:tw-cursor-pointer [&_button.is-active]:tw-bg-community-bg2 [&_button.is-active]:tw-text-community-bright [&_button.is-active]:tw-shadow'
+            'tw-mb-5 tw-mt-5 tw-flex tw-gap-5 tw-border-b tw-border-community-border [&_button]:tw-relative [&_button]:tw-min-h-10 [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-0 [&_button]:tw-pb-2 [&_button]:tw-text-sm [&_button]:tw-font-bold [&_button]:tw-text-community-muted [&_button]:tw-cursor-pointer hover:[&_button]:tw-text-community-bright after:[&_button]:tw-absolute after:[&_button]:tw-inset-x-0 after:[&_button]:tw-bottom-[-1px] after:[&_button]:tw-h-0.5 after:[&_button]:tw-scale-x-0 after:[&_button]:tw-bg-community-accent after:[&_button]:tw-transition-transform [&_button.is-active]:tw-text-community-bright after:[&_button.is-active]:tw-scale-x-100 focus-visible:[&_button]:tw-rounded-sm focus-visible:[&_button]:tw-outline-none focus-visible:[&_button]:tw-ring-2 focus-visible:[&_button]:tw-ring-community-accent-bg'
           }
           role="tablist"
+          aria-label={ja ? '認証画面の切り替え' : 'Authentication view'}
         >
           <button
             type="button"
             role="tab"
+            data-mode="register"
             aria-selected={registering}
+            tabIndex={registering ? 0 : -1}
             className={cn(registering && 'is-active')}
-            onClick={() => setAuthMode('register')}
+            onClick={(event) => selectAuthTab('register', event.currentTarget)}
+            onKeyDown={handleTabKeyDown}
           >
             {ja ? '新規登録' : 'Sign up'}
           </button>
           <button
             type="button"
             role="tab"
+            data-mode="login"
             aria-selected={!registering}
+            tabIndex={!registering ? 0 : -1}
             className={cn(!registering && 'is-active')}
-            onClick={() => setAuthMode('login')}
+            onClick={(event) => selectAuthTab('login', event.currentTarget)}
+            onKeyDown={handleTabKeyDown}
           >
             {ja ? 'ログイン' : 'Log in'}
           </button>
         </div>
-        <div className={'community-auth-fields tw-mb-5 tw-grid tw-gap-4'}>
+
+        <div className={'tw-grid tw-gap-4'}>
           {registering ? (
-            <Field label={ja ? '表示名' : 'Display name'}>
+            <Field
+              label={ja ? '表示名' : 'Display name'}
+              meta={
+                <CharacterCount value={displayName} max={COMMUNITY_INPUT_LIMITS.displayName} />
+              }
+            >
               <input
                 name="displayName"
-                defaultValue={defaultAuthorName}
-                maxLength={40}
+                value={displayName}
+                onChange={(event) => setDisplayName(event.currentTarget.value)}
+                maxLength={COMMUNITY_INPUT_LIMITS.displayName}
                 autoComplete="name"
                 data-1p-ignore
                 data-lpignore="true"
@@ -137,25 +164,35 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
               />
             </Field>
           ) : null}
-          <Field label={ja ? 'ユーザーID' : 'User ID'}>
+
+          <Field
+            label={ja ? 'ユーザーID' : 'User ID'}
+            meta={<CharacterCount value={loginId} max={COMMUNITY_INPUT_LIMITS.loginId} />}
+          >
             <input
               name="communityLoginId"
               minLength={4}
-              maxLength={32}
+              maxLength={COMMUNITY_INPUT_LIMITS.loginId}
+              value={loginId}
+              onChange={(event) => setLoginId(event.currentTarget.value)}
               pattern="[A-Za-z0-9_.-]+"
               autoComplete="off"
               data-1p-ignore
               data-lpignore="true"
               data-bwignore="true"
-              placeholder={ja ? '半角英数字・記号で4文字以上' : '4 or more characters'}
+              placeholder={registering ? (ja ? '半角英数字・記号で4〜12文字' : '4-12 characters') : ''}
               autoFocus
               required
             />
           </Field>
-          <Field label={ja ? 'パスワード' : 'Password'}>
+
+          <Field
+            label={ja ? 'パスワード' : 'Password'}
+            meta={<CharacterCount value={password} max={COMMUNITY_INPUT_LIMITS.password} />}
+          >
             <span
               className={
-                'community-password-field tw-relative [&_input]:tw-pr-[52px] [&_button]:tw-absolute [&_button]:tw-bottom-1 [&_button]:tw-right-1 [&_button]:tw-h-8 [&_button]:tw-rounded-md [&_button]:tw-border-0 [&_button]:tw-bg-community-bg3 [&_button]:tw-px-2 [&_button]:tw-text-xs [&_button]:tw-text-community-muted'
+                'tw-relative tw-block [&_input]:tw-pr-[52px] [&_button]:tw-absolute [&_button]:tw-bottom-1 [&_button]:tw-right-1 [&_button]:tw-h-8 [&_button]:tw-rounded-md [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-2 [&_button]:tw-text-xs [&_button]:tw-font-bold [&_button]:tw-text-community-muted [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-bg3 hover:[&_button]:tw-text-community-text'
               }
             >
               <input
@@ -165,7 +202,9 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
                 name="communitySecret"
                 type="text"
                 minLength={8}
-                maxLength={128}
+                maxLength={COMMUNITY_INPUT_LIMITS.password}
+                value={password}
+                onChange={(event) => setPassword(event.currentTarget.value)}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="none"
@@ -173,7 +212,7 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
                 data-1p-ignore
                 data-lpignore="true"
                 data-bwignore="true"
-                placeholder={ja ? '8文字以上' : '8 or more characters'}
+                placeholder={registering ? (ja ? '8〜20文字' : '8-20 characters') : ''}
                 required
               />
               <button type="button" onClick={() => setShowPassword((value) => !value)}>
@@ -181,57 +220,73 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
               </button>
             </span>
           </Field>
+
           {registering ? (
-            <>
-              <Field label={ja ? 'パスワード（確認）' : 'Confirm password'}>
-                <input
-                  className={cn(
-                    !showPassword && 'is-masked [text-security:disc] [-webkit-text-security:disc]',
-                  )}
-                  name="communitySecretConfirmation"
-                  type="text"
-                  minLength={8}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  data-1p-ignore
-                  data-lpignore="true"
-                  data-bwignore="true"
-                  placeholder={ja ? 'もう一度入力' : 'Enter it again'}
-                  required
+            <Field
+              label={ja ? 'パスワード（確認）' : 'Confirm password'}
+              meta={
+                <CharacterCount
+                  value={passwordConfirmation}
+                  max={COMMUNITY_INPUT_LIMITS.password}
                 />
-              </Field>
-              <aside
-                className={
-                  'community-auth-security-note tw-my-4 tw-rounded-lg tw-bg-community-accent-bg tw-p-3 tw-text-[13px] [&_strong]:tw-mb-1 [&_strong]:tw-block [&_strong]:tw-text-community-bright [&_span]:tw-block'
-                }
-              >
-                <strong>
-                  {ja ? '学校の認証情報は使用しないでください' : 'Do not use school credentials'}
-                </strong>
-                <span>
-                  {ja
-                    ? 'このアカウントは学校のアカウントとは無関係です。学校のIDやパスワードと同じものは絶対に設定しないでください。'
-                    : 'This account is separate from your school account. Never reuse your school ID or password.'}
-                </span>
-              </aside>
-            </>
+              }
+            >
+              <input
+                className={cn(
+                  !showPassword && 'is-masked [text-security:disc] [-webkit-text-security:disc]',
+                )}
+                name="communitySecretConfirmation"
+                type="text"
+                minLength={8}
+                maxLength={COMMUNITY_INPUT_LIMITS.password}
+                value={passwordConfirmation}
+                onChange={(event) => setPasswordConfirmation(event.currentTarget.value)}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                data-1p-ignore
+                data-lpignore="true"
+                data-bwignore="true"
+                placeholder={ja ? 'もう一度入力' : 'Enter it again'}
+                required
+              />
+            </Field>
           ) : null}
+
+          {registering ? (
+            <p
+              className={
+                'tw-m-0 tw-rounded-md tw-bg-community-accent-bg tw-px-3 tw-py-2 tw-text-xs tw-leading-relaxed tw-text-community-muted'
+              }
+            >
+              {ja
+                ? '学校のIDやパスワードとは別のものを設定してください。'
+                : 'Use credentials different from your school account.'}
+            </p>
+          ) : null}
+
+          <ErrorMessage text={error} />
+          <button
+            className={
+              'tw-mt-1 tw-inline-flex tw-min-h-11 tw-w-full tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-accent tw-bg-community-accent tw-px-4 tw-font-bold tw-text-community-on-accent tw-cursor-pointer hover:tw-opacity-90 focus-visible:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-community-accent-bg disabled:tw-cursor-not-allowed disabled:tw-opacity-55'
+            }
+            disabled={busy}
+          >
+            {busy ? <Busy /> : null}
+            {registering
+              ? ja
+                ? 'アカウントを作成'
+                : 'Create account'
+              : ja
+                ? 'ログイン'
+                : 'Log in'}
+          </button>
         </div>
-        <ErrorMessage text={error} />
-        <button
-          className={
-            'community-submit tw-mt-5 tw-inline-flex tw-min-h-10 tw-w-full tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-accent tw-bg-community-accent tw-px-4 tw-font-bold tw-text-community-bg tw-cursor-pointer'
-          }
-          disabled={busy}
-        >
-          {busy ? <Busy /> : null}
-          {registering ? (ja ? 'アカウントを作成' : 'Create account') : ja ? 'ログイン' : 'Log in'}
-        </button>
+
         <p
           className={
-            'community-auth-switch tw-mb-0 tw-mt-4 tw-flex tw-justify-center tw-gap-2 tw-text-[13px] tw-text-community-muted [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-p-0 [&_button]:tw-font-bold [&_button]:tw-text-community-accent-light [&_button]:tw-cursor-pointer'
+            'tw-mb-0 tw-mt-4 tw-flex tw-flex-wrap tw-justify-center tw-gap-x-2 tw-gap-y-1 tw-text-center tw-text-[13px] tw-text-community-muted [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-p-0 [&_button]:tw-font-bold [&_button]:tw-text-community-accent-light [&_button]:tw-cursor-pointer hover:[&_button]:tw-underline'
           }
         >
           {registering

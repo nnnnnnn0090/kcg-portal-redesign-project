@@ -26,7 +26,7 @@ export function Sidebar({
     >
       <button
         className={
-          'community-brand tw-mx-[-12px] tw-flex tw-min-h-14 tw-items-center tw-gap-3 tw-border-0 tw-border-b tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg2)_94%,transparent)] tw-px-5 tw-text-left tw-cursor-pointer max-[960px]:tw-mx-[-8px] max-[960px]:tw-justify-center max-[960px]:tw-px-0 [&>img]:tw-h-[30px] [&>img]:tw-w-[30px] [&>img]:tw-flex-none [&>img]:tw-object-contain [&>strong]:tw-overflow-hidden [&>strong]:tw-text-ellipsis [&>strong]:tw-whitespace-nowrap [&>strong]:tw-text-[13px] [&>strong]:tw-text-community-bright max-[960px]:[&>strong]:tw-hidden'
+          'community-brand tw-mx-[-12px] tw-flex tw-min-h-14 tw-items-center tw-gap-3.5 tw-border-0 tw-border-b tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg2)_94%,transparent)] tw-px-5 tw-text-left tw-cursor-pointer max-[960px]:tw-mx-[-8px] max-[960px]:tw-justify-center max-[960px]:tw-px-0 [&>img]:tw-h-9 [&>img]:tw-w-9 [&>img]:tw-flex-none [&>img]:tw-object-contain max-[960px]:[&>img]:tw-h-8 max-[960px]:[&>img]:tw-w-8 [&>strong]:tw-overflow-hidden [&>strong]:tw-text-ellipsis [&>strong]:tw-whitespace-nowrap [&>strong]:tw-text-[15px] [&>strong]:tw-font-bold [&>strong]:tw-text-community-bright max-[960px]:[&>strong]:tw-hidden'
         }
         onClick={() => go('home')}
       >
@@ -53,6 +53,12 @@ export function Sidebar({
           onClick={() => go('following')}
         />
         <NavButton
+          active={page === 'bookmarks'}
+          icon="bookmark"
+          label={ja ? '保存済み' : 'Bookmarks'}
+          onClick={() => go('bookmarks')}
+        />
+        <NavButton
           active={page === 'notifications'}
           icon="bell"
           label={ja ? '通知' : 'Notifications'}
@@ -68,7 +74,7 @@ export function Sidebar({
       </nav>
       <button
         className={
-          'community-create tw-flex tw-min-h-[38px] tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border-0 tw-bg-community-accent tw-px-3 tw-text-sm tw-font-extrabold tw-text-community-bg tw-cursor-pointer tw-transition hover:tw-brightness-105 active:tw-translate-y-px max-[960px]:tw-min-h-11 max-[960px]:tw-px-0 max-[960px]:tw-text-0 [&>svg]:tw-h-[19px] [&>svg]:tw-w-[19px] [&>svg]:tw-stroke-[2.4]'
+          'community-create tw-flex tw-min-h-[38px] tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border-0 tw-bg-community-accent tw-px-3 tw-text-sm tw-font-extrabold tw-text-community-on-accent tw-cursor-pointer tw-transition hover:tw-translate-y-[-1px] hover:tw-brightness-110 hover:tw-shadow-community-card active:tw-translate-y-px max-[960px]:tw-min-h-11 max-[960px]:tw-px-0 max-[960px]:tw-text-0 [&>svg]:tw-h-[19px] [&>svg]:tw-w-[19px] [&>svg]:tw-stroke-[2.4]'
         }
         onClick={() => go('create')}
       >
@@ -83,7 +89,7 @@ export function Sidebar({
         {user ? (
           <button
             className={
-              'community-account-user tw-flex tw-min-h-[50px] tw-w-full tw-items-center tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-p-2 tw-text-left tw-cursor-pointer max-[960px]:tw-justify-center max-[960px]:tw-p-1 [&>span:last-child]:tw-grid [&>span:last-child]:tw-min-w-0 max-[960px]:[&>span:last-child]:tw-hidden [&_strong]:tw-overflow-hidden [&_strong]:tw-text-ellipsis [&_strong]:tw-whitespace-nowrap [&_em]:tw-overflow-hidden [&_em]:tw-text-ellipsis [&_em]:tw-whitespace-nowrap [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-muted'
+              'community-account-user tw-flex tw-min-h-[50px] tw-w-full tw-items-center tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-p-2 tw-text-left tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-shadow-community-card max-[960px]:tw-justify-center max-[960px]:tw-p-1 [&>span:last-child]:tw-grid [&>span:last-child]:tw-min-w-0 max-[960px]:[&>span:last-child]:tw-hidden [&_strong]:tw-overflow-hidden [&_strong]:tw-text-ellipsis [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-community-bright [&_em]:tw-overflow-hidden [&_em]:tw-text-ellipsis [&_em]:tw-whitespace-nowrap [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-muted'
             }
             type="button"
             onClick={() => go('profile')}
@@ -113,7 +119,7 @@ function NavButton({
   onClick,
 }: {
   active: boolean;
-  icon: 'home' | 'search' | 'user' | 'heart' | 'bell';
+  icon: 'home' | 'search' | 'user' | 'heart' | 'bookmark' | 'bell';
   label: string;
   badge?: number;
   onClick: () => void;
@@ -159,7 +165,7 @@ export function MobileNav({
   return (
     <nav
       className={
-        'community-mobile-nav tw-hidden max-[620px]:tw-grid max-[620px]:tw-grid-cols-6 max-[620px]:tw-border-t max-[620px]:tw-border-community-border max-[620px]:tw-bg-community-bg2 [&>button]:tw-relative [&>button]:tw-flex [&>button]:tw-min-w-0 [&>button]:tw-flex-col [&>button]:tw-items-center [&>button]:tw-justify-center [&>button]:tw-gap-[3px] [&>button]:tw-border-0 [&>button]:tw-bg-transparent [&>button]:tw-px-1 [&>button]:tw-text-xs [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer [&>button.is-active]:tw-bg-community-accent-bg [&>button.is-active]:tw-text-community-accent-light [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+        'community-mobile-nav tw-hidden max-[620px]:tw-grid max-[620px]:tw-grid-cols-7 max-[620px]:tw-border-t max-[620px]:tw-border-community-border max-[620px]:tw-bg-community-bg2 [&>button]:tw-relative [&>button]:tw-flex [&>button]:tw-min-w-0 [&>button]:tw-flex-col [&>button]:tw-items-center [&>button]:tw-justify-center [&>button]:tw-gap-[3px] [&>button]:tw-border-0 [&>button]:tw-bg-transparent [&>button]:tw-px-1 [&>button]:tw-text-xs [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer hover:[&>button]:tw-bg-community-accent-bg hover:[&>button]:tw-text-community-accent-light [&>button.is-active]:tw-bg-community-accent-bg [&>button.is-active]:tw-text-community-accent-light [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
       }
     >
       <NavButton
@@ -179,6 +185,12 @@ export function MobileNav({
         icon="heart"
         label={ja ? 'フォロー' : 'Following'}
         onClick={() => go('following')}
+      />
+      <NavButton
+        active={page === 'bookmarks'}
+        icon="bookmark"
+        label={ja ? '保存' : 'Saved'}
+        onClick={() => go('bookmarks')}
       />
       <NavButton
         active={page === 'notifications'}

@@ -17,6 +17,7 @@ export function ProfileScreen({
   onCreate,
   onOpen,
   onLike,
+  onBookmark,
   onFollow,
   onConnections,
   onTagClick,
@@ -30,6 +31,7 @@ export function ProfileScreen({
   onCreate: () => void;
   onOpen: (post: CommunityPost) => void;
   onLike: (post: CommunityPost) => void;
+  onBookmark: (post: CommunityPost) => void;
   onFollow: () => void;
   onConnections: (relation: 'followers' | 'following') => void;
   onTagClick: (tag: string) => void;
@@ -50,7 +52,7 @@ export function ProfileScreen({
       >
         <section
           className={
-            'community-profile tw-mb-5 tw-overflow-hidden tw-rounded-2xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card'
+            'community-profile tw-mb-5 tw-overflow-hidden tw-rounded-2xl tw-border tw-border-community-border tw-bg-community-bg2'
           }
         >
           <div
@@ -91,7 +93,7 @@ export function ProfileScreen({
             </div>
             <div
               className={
-                'community-profile-actions tw-pt-5 max-[620px]:tw-col-span-full max-[620px]:tw-pt-0 [&_button]:tw-min-h-10 [&_button]:tw-min-w-[96px] [&_button]:tw-whitespace-nowrap [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-accent [&_button]:tw-bg-community-accent [&_button]:tw-px-4 [&_button]:tw-font-bold [&_button]:tw-text-community-bg [&_button]:tw-cursor-pointer max-[620px]:[&_button]:tw-w-full [&_button.is-following]:tw-bg-community-bg3 [&_button.is-following]:tw-text-community-accent-light'
+                'community-profile-actions tw-pt-5 max-[620px]:tw-col-span-full max-[620px]:tw-pt-0 [&_button]:tw-min-h-10 [&_button]:tw-min-w-[96px] [&_button]:tw-whitespace-nowrap [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-accent [&_button]:tw-bg-community-accent [&_button]:tw-px-4 [&_button]:tw-font-bold [&_button]:tw-text-community-on-accent [&_button]:tw-cursor-pointer hover:[&_button]:tw-translate-y-[-1px] hover:[&_button]:tw-brightness-110 hover:[&_button]:tw-shadow-community-card max-[620px]:[&_button]:tw-w-full [&_button.is-following]:tw-bg-community-bg3 [&_button.is-following]:tw-text-community-accent-light'
               }
             >
               {isOwn ? (
@@ -172,7 +174,7 @@ export function ProfileScreen({
                         }
                         href={user.websiteUrl}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        rel="noopener noreferrer nofollow ugc"
                       >
                         <span aria-hidden="true">↗</span>
                         {websiteLabel(user.websiteUrl)}
@@ -190,7 +192,7 @@ export function ProfileScreen({
                             key={entry.key}
                             href={entry.url}
                             target="_blank"
-                            rel="noopener noreferrer"
+                            rel="noopener noreferrer nofollow ugc"
                           >
                             <SocialIcon platform={entry.key} />
                             <span>{entry.label}</span>
@@ -290,6 +292,7 @@ export function ProfileScreen({
                   ja={ja}
                   onOpen={() => onOpen(post)}
                   onLike={() => onLike(post)}
+                  onBookmark={() => onBookmark(post)}
                 />
                 <span className={cn(`is-${post.status}`)}>
                   {post.status === 'approved'

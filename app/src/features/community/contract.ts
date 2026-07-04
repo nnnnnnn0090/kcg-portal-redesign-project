@@ -67,6 +67,8 @@ export interface CommunityPost {
   createdAt: string;
   likeCount: number;
   likedByMe: boolean;
+  bookmarkCount: number;
+  bookmarkedByMe: boolean;
   commentCount: number;
   status: PostStatus;
   rejectionReason: string | null;

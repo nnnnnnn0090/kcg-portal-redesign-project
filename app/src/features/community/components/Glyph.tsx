@@ -1,7 +1,17 @@
 export function Glyph({
   name,
 }: {
-  name: 'home' | 'search' | 'plus' | 'user' | 'close' | 'image' | 'heart' | 'refresh' | 'bell';
+  name:
+    | 'home'
+    | 'search'
+    | 'plus'
+    | 'user'
+    | 'close'
+    | 'image'
+    | 'heart'
+    | 'bookmark'
+    | 'refresh'
+    | 'bell';
 }) {
   const paths = {
     home: (
@@ -34,6 +44,7 @@ export function Glyph({
     heart: (
       <path d="M20.4 5.6c-1.8-1.8-4.7-1.8-6.5 0L12 7.5l-1.9-1.9c-1.8-1.8-4.7-1.8-6.5 0s-1.8 4.7 0 6.5L12 20.5l8.4-8.4c1.8-1.8 1.8-4.7 0-6.5Z" />
     ),
+    bookmark: <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3.5L6 21V4.5Z" />,
     refresh: (
       <>
         <path d="M20 7v5h-5" />

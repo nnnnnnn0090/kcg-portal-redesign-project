@@ -27,7 +27,8 @@ export interface ModalLayerProps {
   openTag: (tag: string) => void;
   openProfile: (loginId: string) => void;
   toggleLike: (post: CommunityPost) => void;
-  readPost: (files?: FileList | null) => void;
+  toggleBookmark: (post: CommunityPost) => void;
+  readPost: (files?: FileList | File[] | null) => void;
   readAvatar: (file?: File) => void;
   readHeader: (file?: File) => void;
 }

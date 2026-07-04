@@ -68,7 +68,6 @@ function readAttendance(): CplanAttendanceSnapshot | null {
       seenCourseValues.add(course.value);
       return true;
     });
-  if (courses.length === 0) return null;
 
   const errors = [
     document.getElementById('ucMainHeader_lblErrorMessage')?.textContent,
@@ -496,7 +495,11 @@ function CplanAttendance({ snapshot }: { snapshot: CplanSnapshot }) {
           ) : null}
           <label className="p-cplan-field">
             <span>{ja ? '講義' : 'Course'}</span>
-            <select value={course} onChange={(event) => changeCourse(event.target.value)}>
+            <select
+              value={course}
+              disabled={attendance.courses.length === 0}
+              onChange={(event) => changeCourse(event.target.value)}
+            >
               {attendance.courses.map((item) => (
                 <option value={item.value} key={item.value}>
                   {item.label}

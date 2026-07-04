@@ -15,6 +15,7 @@ import storage from '../../../lib/storage';
 import { SK } from '../../../shared/constants';
 import { communityApi } from '../api';
 import { SOCIAL_PLATFORMS } from '../constants';
+import { communityImageFiles, isCommunityImageFile } from '../imageFiles';
 import type { CommunityPage, CommunityPost, CommunityUser } from '../types';
 import { mergeOwnProfile } from '../utils';
 import { communityReducer, createCommunityState } from './reducer';
@@ -70,6 +71,7 @@ export function CommunityProvider({
   const setPosts = useCommunitySetter(dispatch, 'posts');
   const setOwnPosts = useCommunitySetter(dispatch, 'ownPosts');
   const setFollowingPosts = useCommunitySetter(dispatch, 'followingPosts');
+  const setBookmarkedPosts = useCommunitySetter(dispatch, 'bookmarkedPosts');
   const setKnownTags = useCommunitySetter(dispatch, 'knownTags');
   const setSearchUsers = useCommunitySetter(dispatch, 'searchUsers');
   const setNotifications = useCommunitySetter(dispatch, 'notifications');
@@ -171,6 +173,17 @@ export function CommunityProvider({
     [setFollowingPosts],
   );
 
+  const loadBookmarks = useCallback(
+    async (authToken: string) => {
+      try {
+        setBookmarkedPosts((await communityApi.bookmarkedPosts(authToken)).posts);
+      } catch {
+        setBookmarkedPosts([]);
+      }
+    },
+    [setBookmarkedPosts],
+  );
+
   const hydrateOwnProfileImages = useCallback(
     async (source: CommunityUser, authToken: string) => {
       const next = { ...source };
@@ -234,6 +247,7 @@ export function CommunityProvider({
         void loadFeed(authToken);
         void loadOwn(authToken);
         void loadFollowing(authToken);
+        void loadBookmarks(authToken);
         void loadNotifications(authToken);
       } catch {
         await storage.set({ [SK.communityAuthToken]: '' });
@@ -247,6 +261,7 @@ export function CommunityProvider({
   }, [
     hydrateOwnProfileImages,
     loadFeed,
+    loadBookmarks,
     loadFollowing,
     loadKnownTags,
     loadNotifications,
@@ -303,6 +318,10 @@ export function CommunityProvider({
       setModal({ kind: 'auth', mode: 'login' });
       return;
     }
+    if (next === 'bookmarks' && !user) {
+      setModal({ kind: 'auth', mode: 'login' });
+      return;
+    }
     if (next === 'notifications' && !user) {
       setModal({ kind: 'auth', mode: 'login' });
       return;
@@ -340,6 +359,7 @@ export function CommunityProvider({
       }
     }
     if (next === 'following' && token) void loadFollowing(token);
+    if (next === 'bookmarks' && token) void loadBookmarks(token);
     if (next === 'notifications' && token) {
       void loadNotifications(token).then(() => {
         void communityApi.readNotifications(token).then(() => setUnreadCount(0));
@@ -446,6 +466,7 @@ export function CommunityProvider({
       void loadFeed(result.token);
       void loadOwn(result.token);
       void loadFollowing(result.token);
+      void loadBookmarks(result.token);
       void loadNotifications(result.token);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Authentication failed');
@@ -482,6 +503,7 @@ export function CommunityProvider({
       setPostImages([]);
       setModal({ kind: 'sent' });
       void loadOwn(token);
+      void loadBookmarks(token);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not submit post');
     } finally {
@@ -535,6 +557,7 @@ export function CommunityProvider({
       setPosts((items) => items.filter((item) => item.id !== post.id));
       setProfilePosts((items) => items.filter((item) => item.id !== post.id));
       setFollowingPosts((items) => items.filter((item) => item.id !== post.id));
+      setBookmarkedPosts((items) => items.filter((item) => item.id !== post.id));
       setModal({ kind: 'none' });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not delete post');
@@ -562,6 +585,40 @@ export function CommunityProvider({
     } catch (cause) {
       dispatch({ type: 'restorePost', post });
       setError(cause instanceof Error ? cause.message : 'Could not update like');
+    }
+  };
+
+  const toggleBookmark = async (post: CommunityPost) => {
+    if (!token) {
+      setModal({ kind: 'auth', mode: 'login' });
+      return;
+    }
+    const nextBookmarked = !post.bookmarkedByMe;
+    dispatch({
+      type: 'patchPost',
+      postId: post.id,
+      value: {
+        bookmarkedByMe: nextBookmarked,
+        bookmarkCount: Math.max(0, post.bookmarkCount + (nextBookmarked ? 1 : -1)),
+      },
+    });
+    try {
+      const result = nextBookmarked
+        ? await communityApi.bookmarkPost(token, post.id)
+        : await communityApi.unbookmarkPost(token, post.id);
+      dispatch({ type: 'patchPost', postId: post.id, value: result });
+      if (nextBookmarked) {
+        setBookmarkedPosts((current) =>
+          current.some((item) => item.id === post.id)
+            ? current
+            : [{ ...post, ...result }, ...current],
+        );
+      } else {
+        setBookmarkedPosts((current) => current.filter((item) => item.id !== post.id));
+      }
+    } catch (cause) {
+      dispatch({ type: 'restorePost', post });
+      setError(cause instanceof Error ? cause.message : 'Could not update bookmark');
     }
   };
 
@@ -621,6 +678,11 @@ export function CommunityProvider({
       setter('');
       return;
     }
+    if (!isCommunityImageFile(file)) {
+      setError(ja ? 'JPEG / PNG / WebP 画像を選択してください。' : 'Choose a JPEG, PNG, or WebP image.');
+      if (input) input.value = '';
+      return;
+    }
     if (file.size > limit) {
       setError(
         ja ? `画像は${Math.round(limit / 1048576)}MB以下にしてください。` : 'Image is too large.',
@@ -637,9 +699,14 @@ export function CommunityProvider({
     reader.readAsDataURL(file);
   };
 
-  const readPostFiles = (files?: FileList | null) => {
-    const selected = Array.from(files ?? []).slice(0, 4);
-    if (!selected.length) return;
+  const readPostFiles = (files?: FileList | File[] | null) => {
+    const rawFiles = Array.from(files ?? []);
+    if (!rawFiles.length) return;
+    const selected = communityImageFiles(rawFiles).slice(0, 4);
+    if (!selected.length) {
+      setError(ja ? 'JPEG / PNG / WebP 画像を選択してください。' : 'Choose JPEG, PNG, or WebP images.');
+      return;
+    }
     if (selected.some((file) => file.size > 6 * 1048576)) {
       setError(ja ? '写真は1枚6MBまでです。' : 'Each photo must be 6MB or less.');
       return;
@@ -668,6 +735,8 @@ export function CommunityProvider({
       const refreshData = async () => {
         if (page === 'following' && token) {
           await loadFollowing(token);
+        } else if (page === 'bookmarks' && token) {
+          await loadBookmarks(token);
         } else if (page === 'notifications' && token) {
           await loadNotifications(token);
         } else if (page === 'profile' && profileUser) {
@@ -740,6 +809,7 @@ export function CommunityProvider({
     saveProfile,
     removePost,
     toggleLike,
+    toggleBookmark,
     toggleFollow,
     refreshCurrentPage,
     openLikes,
@@ -788,6 +858,7 @@ export function CommunityProvider({
       saveProfile: (...args) => actionsRef.current.saveProfile(...args),
       removePost: (...args) => actionsRef.current.removePost(...args),
       toggleLike: (...args) => actionsRef.current.toggleLike(...args),
+      toggleBookmark: (...args) => actionsRef.current.toggleBookmark(...args),
       toggleFollow: (...args) => actionsRef.current.toggleFollow(...args),
       refreshCurrentPage: () => actionsRef.current.refreshCurrentPage(),
       openLikes: (...args) => actionsRef.current.openLikes(...args),

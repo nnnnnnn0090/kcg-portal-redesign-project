@@ -30,7 +30,7 @@ const TOKEN_GROUPS: { labelJa: string; labelEn: string; keys: (keyof EditableThe
   {
     labelJa: 'アクセント',
     labelEn: 'Accent',
-    keys: ['accent', 'accentLight', 'accentBg', 'accentBorder'],
+    keys: ['accent', 'onAccent', 'accentLight', 'accentBg', 'accentBorder'],
   },
   { labelJa: '警告・危険', labelEn: 'Danger', keys: ['danger', 'dangerHover'] },
   { labelJa: '影', labelEn: 'Shadows', keys: ['shadow', 'shadowStrong'] },

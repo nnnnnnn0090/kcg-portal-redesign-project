@@ -1,4 +1,4 @@
-import { ALL_TAG } from '../constants';
+import { ALL_TAG, COMMUNITY_INPUT_LIMITS } from '../constants';
 import type { CommunityPost, CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
 import { Empty } from '../components/Empty';
@@ -21,6 +21,7 @@ export function ExploreScreen({
   onOpenProfile,
   onOpen,
   onLike,
+  onBookmark,
 }: {
   posts: CommunityPost[];
   users: CommunityUser[];
@@ -36,6 +37,7 @@ export function ExploreScreen({
   onOpenProfile: (loginId: string) => void;
   onOpen: (post: CommunityPost) => void;
   onLike: (post: CommunityPost) => void;
+  onBookmark: (post: CommunityPost) => void;
 }) {
   return (
     <main
@@ -50,7 +52,7 @@ export function ExploreScreen({
       >
         <header
           className={
-            'community-screen-heading tw-mb-5 tw-flex tw-items-end tw-justify-between tw-gap-6 max-[620px]:tw-items-start max-[620px]:tw-gap-3 max-[420px]:tw-grid [&>div]:tw-min-w-0 [&_h1]:tw-m-0 [&_h1]:tw-text-[clamp(22px,2.5vw,28px)] [&_h1]:tw-font-bold [&_h1]:tw-leading-tight [&_h1]:tw-tracking-[-.02em] [&_h1]:tw-text-community-bright max-[620px]:[&_h1]:tw-text-2xl [&_p]:tw-mb-0 [&_p]:tw-mt-2 [&_p]:tw-max-w-[720px] [&_p]:tw-text-sm [&_p]:tw-text-community-muted [&>button]:tw-inline-flex [&>button]:tw-min-h-10 [&>button]:tw-min-w-[112px] [&>button]:tw-flex-none [&>button]:tw-items-center [&>button]:tw-justify-center [&>button]:tw-gap-2 [&>button]:tw-whitespace-nowrap [&>button]:tw-rounded-lg [&>button]:tw-border-0 [&>button]:tw-bg-community-accent [&>button]:tw-px-4 [&>button]:tw-font-bold [&>button]:tw-text-community-bg [&>button]:tw-cursor-pointer [&>button_svg]:tw-h-4 [&>button_svg]:tw-w-4 max-[420px]:[&>button]:tw-justify-self-start'
+            'community-screen-heading tw-mb-5 tw-flex tw-items-end tw-justify-between tw-gap-6 max-[620px]:tw-items-start max-[620px]:tw-gap-3 max-[420px]:tw-grid [&>div]:tw-min-w-0 [&_h1]:tw-m-0 [&_h1]:tw-text-[clamp(22px,2.5vw,28px)] [&_h1]:tw-font-bold [&_h1]:tw-leading-tight [&_h1]:tw-tracking-[-.02em] [&_h1]:tw-text-community-bright max-[620px]:[&_h1]:tw-text-2xl [&_p]:tw-mb-0 [&_p]:tw-mt-2 [&_p]:tw-max-w-[720px] [&_p]:tw-text-sm [&_p]:tw-text-community-muted [&>button]:tw-inline-flex [&>button]:tw-min-h-10 [&>button]:tw-min-w-[112px] [&>button]:tw-flex-none [&>button]:tw-items-center [&>button]:tw-justify-center [&>button]:tw-gap-2 [&>button]:tw-whitespace-nowrap [&>button]:tw-rounded-lg [&>button]:tw-border-0 [&>button]:tw-bg-community-accent [&>button]:tw-px-4 [&>button]:tw-font-bold [&>button]:tw-text-community-on-accent [&>button]:tw-cursor-pointer [&>button_svg]:tw-h-4 [&>button_svg]:tw-w-4 max-[420px]:[&>button]:tw-justify-self-start'
           }
         >
           <div>
@@ -72,6 +74,7 @@ export function ExploreScreen({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            maxLength={COMMUNITY_INPUT_LIMITS.search}
             placeholder={ja ? '投稿・アカウントを検索' : 'Search posts and accounts'}
           />
         </label>
@@ -140,6 +143,7 @@ export function ExploreScreen({
                 ja={ja}
                 onOpen={() => onOpen(post)}
                 onLike={() => onLike(post)}
+                onBookmark={() => onBookmark(post)}
               />
             ))}
           </div>

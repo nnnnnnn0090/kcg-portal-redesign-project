@@ -60,6 +60,8 @@ export const communityApi = {
   ownPosts: (token: string) => request<{ posts: CommunityPost[] }>('/me/posts', authorized(token)),
   followingPosts: (token: string) =>
     request<{ posts: CommunityPost[] }>('/feed?scope=following', authorized(token)),
+  bookmarkedPosts: (token: string) =>
+    request<{ posts: CommunityPost[] }>('/me/bookmarks', authorized(token)),
   user: (loginId: string, token?: string) =>
     request<{ user: CommunityUser }>(
       `/users/${encodeURIComponent(loginId)}`,
@@ -136,6 +138,16 @@ export const communityApi = {
     request<{ users: CommunityUser[] }>(
       `/posts/${encodeURIComponent(id)}/likes`,
       token ? authorized(token) : undefined,
+    ),
+  bookmarkPost: (token: string, id: string) =>
+    request<{ bookmarkedByMe: boolean; bookmarkCount: number }>(
+      `/posts/${encodeURIComponent(id)}/bookmarks`,
+      authorized(token, { method: 'PUT' }),
+    ),
+  unbookmarkPost: (token: string, id: string) =>
+    request<{ bookmarkedByMe: boolean; bookmarkCount: number }>(
+      `/posts/${encodeURIComponent(id)}/bookmarks`,
+      authorized(token, { method: 'DELETE' }),
     ),
   postComments: (id: string, token?: string) =>
     request<{ comments: CommunityComment[] }>(

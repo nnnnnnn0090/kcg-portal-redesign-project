@@ -22,6 +22,7 @@ export function CommunityShell() {
     modal,
     posts,
     followingPosts,
+    bookmarkedPosts,
     knownTags,
     searchUsers,
     notifications,
@@ -54,6 +55,7 @@ export function CommunityShell() {
     saveProfile,
     removePost,
     toggleLike,
+    toggleBookmark,
     toggleFollow,
     refreshCurrentPage,
     openLikes,
@@ -75,10 +77,18 @@ export function CommunityShell() {
     () => filterPosts(followingPosts, query, tag),
     [followingPosts, query, tag],
   );
+  const visibleBookmarkedPosts = useMemo(
+    () => filterPosts(bookmarkedPosts, query, tag),
+    [bookmarkedPosts, query, tag],
+  );
   const tags = useMemo(() => collectTags(posts, knownTags, locale), [knownTags, locale, posts]);
   const followingTags = useMemo(
     () => collectTags(followingPosts, [], locale),
     [followingPosts, locale],
+  );
+  const bookmarkTags = useMemo(
+    () => collectTags(bookmarkedPosts, [], locale),
+    [bookmarkedPosts, locale],
   );
 
   const pageTitle =
@@ -94,18 +104,22 @@ export function CommunityShell() {
           ? ja
             ? 'フォロー中'
             : 'Following'
-          : page === 'notifications'
+          : page === 'bookmarks'
             ? ja
-              ? '通知'
-              : 'Notifications'
-            : ja
-              ? 'プロフィール'
-              : 'Profile';
+              ? '保存済み'
+              : 'Bookmarks'
+            : page === 'notifications'
+              ? ja
+                ? '通知'
+                : 'Notifications'
+              : ja
+                ? 'プロフィール'
+                : 'Profile';
 
   return (
     <div
       className={cn(
-        'community-root tw-fixed tw-inset-0 tw-z-[2147483300] tw-grid tw-grid-cols-[clamp(44px,6vw,88px)_minmax(0,1fr)] tw-font-community tw-text-sm tw-leading-relaxed tw-text-community-text tw-animate-community-fade-in max-[960px]:tw-grid-cols-[52px_minmax(0,1fr)] max-[620px]:tw-grid-cols-[24px_minmax(0,1fr)] max-[420px]:tw-grid-cols-[12px_minmax(0,1fr)] [&_*]:tw-box-border [&_button]:tw-font-inherit [&_input]:tw-font-inherit [&_textarea]:tw-font-inherit [&_button]:tw-text-inherit [&_button:focus-visible]:tw-outline [&_button:focus-visible]:tw-outline-2 [&_button:focus-visible]:tw-outline-community-accent [&_button:focus-visible]:tw-outline-offset-2 [&_a:focus-visible]:tw-outline [&_a:focus-visible]:tw-outline-2 [&_a:focus-visible]:tw-outline-community-accent [&_a:focus-visible]:tw-outline-offset-2 [&.is-closing]:tw-pointer-events-none [&.is-closing]:tw-animate-community-fade-out motion-reduce:[&_*]:tw-transition-none motion-reduce:[&_*]:tw-animate-none',
+        'community-root tw-fixed tw-inset-0 tw-z-[2147483300] tw-grid tw-grid-cols-[clamp(44px,6vw,88px)_minmax(0,1fr)] tw-font-community tw-text-sm tw-leading-relaxed tw-text-community-text tw-animate-community-fade-in max-[960px]:tw-grid-cols-[52px_minmax(0,1fr)] max-[620px]:tw-grid-cols-[24px_minmax(0,1fr)] max-[420px]:tw-grid-cols-[12px_minmax(0,1fr)] [&_*]:tw-box-border [&_*]:tw-border-0 [&_*]:tw-border-solid [&_.tw-border]:tw-border [&_.tw-border-2]:tw-border-2 [&_.tw-border-y]:tw-border-y [&_.tw-border-b]:tw-border-b [&_.tw-border-l]:tw-border-l [&_.tw-border-r]:tw-border-r [&_.tw-border-t]:tw-border-t [&_.tw-border-dashed]:tw-border-dashed [&_button]:tw-appearance-none [&_button]:tw-font-inherit [&_button]:tw-transition-[background-color,border-color,color,box-shadow,opacity,filter,transform] [&_button]:tw-duration-200 [&_button]:tw-ease-out hover:[&_button:not(:disabled)]:tw-brightness-110 active:[&_button:not(:disabled)]:tw-scale-[.98] [&_input]:tw-font-inherit [&_textarea]:tw-font-inherit [&_button:focus-visible]:tw-outline [&_button:focus-visible]:tw-outline-2 [&_button:focus-visible]:tw-outline-community-accent [&_button:focus-visible]:tw-outline-offset-2 [&_a:focus-visible]:tw-outline [&_a:focus-visible]:tw-outline-2 [&_a:focus-visible]:tw-outline-community-accent [&_a:focus-visible]:tw-outline-offset-2 [&.is-closing]:tw-pointer-events-none [&.is-closing]:tw-animate-community-fade-out motion-reduce:[&_*]:tw-transition-none motion-reduce:[&_*]:tw-animate-none',
         closing && 'is-closing',
       )}
     >
@@ -149,7 +163,7 @@ export function CommunityShell() {
             </div>
             <button
               className={cn(
-                'community-refresh tw-inline-flex tw-h-10 tw-min-w-10 tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-cursor-pointer disabled:tw-cursor-wait disabled:tw-opacity-60 max-[620px]:tw-w-10 max-[620px]:tw-px-0 max-[620px]:[&>span]:tw-hidden [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current',
+                'community-refresh tw-inline-flex tw-h-10 tw-min-w-10 tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light disabled:tw-cursor-wait disabled:tw-opacity-60 max-[620px]:tw-w-10 max-[620px]:tw-px-0 max-[620px]:[&>span]:tw-hidden [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current',
                 refreshing && 'is-refreshing',
               )}
               type="button"
@@ -164,15 +178,18 @@ export function CommunityShell() {
             {!user ? (
               <div
                 className={
-                  'community-auth-actions tw-flex tw-items-center tw-gap-2 [&>button]:tw-h-10 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 [&>button]:tw-font-semibold [&>button]:tw-cursor-pointer max-[620px]:[&>button]:tw-w-10 max-[620px]:[&>button]:tw-overflow-hidden max-[620px]:[&>button]:tw-px-1 max-[620px]:[&>button]:tw-text-xs'
+                  'community-auth-actions tw-flex tw-items-center tw-gap-2 [&>button]:tw-h-10 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 [&>button]:tw-font-semibold [&>button]:tw-cursor-pointer [&>button.is-primary]:tw-border-community-accent [&>button.is-primary]:tw-bg-community-accent [&>button.is-primary]:tw-text-community-on-accent max-[620px]:[&>button]:tw-w-10 max-[620px]:[&>button]:tw-overflow-hidden max-[620px]:[&>button]:tw-px-1 max-[620px]:[&>button]:tw-text-xs'
                 }
               >
-                <button onClick={() => setModal({ kind: 'auth', mode: 'register' })}>
+                <button
+                  className="tw-text-community-text"
+                  onClick={() => setModal({ kind: 'auth', mode: 'register' })}
+                >
                   {ja ? '新規登録' : 'Sign up'}
                 </button>
                 <button
                   className={
-                    'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-bg'
+                    'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-on-accent'
                   }
                   onClick={() => setModal({ kind: 'auth', mode: 'login' })}
                 >
@@ -182,7 +199,7 @@ export function CommunityShell() {
             ) : (
               <button
                 className={
-                  'community-logout tw-inline-flex tw-h-10 tw-min-w-10 tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-cursor-pointer max-[620px]:tw-w-10 max-[620px]:tw-px-1 max-[620px]:tw-text-xs'
+                  'community-logout tw-inline-flex tw-h-10 tw-min-w-10 tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light max-[620px]:tw-w-10 max-[620px]:tw-px-1 max-[620px]:tw-text-xs'
                 }
                 onClick={() => void logout()}
               >
@@ -191,7 +208,7 @@ export function CommunityShell() {
             )}
             <button
               className={
-                'community-close tw-grid tw-h-10 tw-w-10 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+                'community-close tw-grid tw-h-10 tw-w-10 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-text-community-text tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
               }
               type="button"
               onClick={closeDrawer}
@@ -211,6 +228,7 @@ export function CommunityShell() {
               onExplore={() => go('explore')}
               onOpen={(post) => setModal({ kind: 'post', post })}
               onLike={(post) => void toggleLike(post)}
+              onBookmark={(post) => void toggleBookmark(post)}
             />
           ) : null}
           {page === 'explore' ? (
@@ -227,6 +245,7 @@ export function CommunityShell() {
               onOpenProfile={(loginId) => void openProfile(loginId)}
               onOpen={(post) => setModal({ kind: 'post', post })}
               onLike={(post) => void toggleLike(post)}
+              onBookmark={(post) => void toggleBookmark(post)}
             />
           ) : null}
           {page === 'following' ? (
@@ -243,11 +262,35 @@ export function CommunityShell() {
               onOpenProfile={(loginId) => void openProfile(loginId)}
               onOpen={(post) => setModal({ kind: 'post', post })}
               onLike={(post) => void toggleLike(post)}
+              onBookmark={(post) => void toggleBookmark(post)}
               title={ja ? 'フォロー中' : 'Following'}
               description={
                 ja
                   ? 'フォローしているユーザーの投稿だけを表示します。'
                   : 'Posts from people you follow.'
+              }
+            />
+          ) : null}
+          {page === 'bookmarks' ? (
+            <ExploreScreen
+              posts={visibleBookmarkedPosts}
+              loading={loading}
+              query={query}
+              tag={tag}
+              tags={bookmarkTags}
+              users={[]}
+              ja={ja}
+              setQuery={setQuery}
+              setTag={setTag}
+              onOpenProfile={(loginId) => void openProfile(loginId)}
+              onOpen={(post) => setModal({ kind: 'post', post })}
+              onLike={(post) => void toggleLike(post)}
+              onBookmark={(post) => void toggleBookmark(post)}
+              title={ja ? '保存済み' : 'Bookmarks'}
+              description={
+                ja
+                  ? 'あとで見返したい投稿をまとめて確認できます。'
+                  : 'Posts you saved for later.'
               }
             />
           ) : null}
@@ -269,6 +312,7 @@ export function CommunityShell() {
               onCreate={() => go('create')}
               onOpen={(post) => setModal({ kind: 'post', post })}
               onLike={(post) => void toggleLike(post)}
+              onBookmark={(post) => void toggleBookmark(post)}
               onFollow={() => void toggleFollow(profileUser)}
               onConnections={(relation) => void openConnections(profileUser, relation)}
               onTagClick={openTag}
@@ -298,6 +342,7 @@ export function CommunityShell() {
           suggestedTags={tags.filter((item) => item !== ALL_TAG)}
           close={closeModal}
           toggleLike={(post) => void toggleLike(post)}
+          toggleBookmark={(post) => void toggleBookmark(post)}
           setAuthMode={setAuthMode}
           authenticate={authenticate}
           submitPost={submitPost}

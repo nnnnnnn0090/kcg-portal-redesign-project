@@ -41,6 +41,7 @@ export const THEME_TOKEN_KEYS = [
   'textDimmer',
   'textBright',
   'accent',
+  'onAccent',
   'accentLight',
   'accentBg',
   'accentBorder',
@@ -176,73 +177,4 @@ export function parseColor(value: string): Rgb | null {
   if (parts.slice(0, 3).some((part) => part < 0 || part > 255)) return null;
   if (parts.length > 3 && (parts[3] < 0 || parts[3] > 1)) return null;
   return { r: parts[0], g: parts[1], b: parts[2], a: parts[3] ?? 1 };
-}
-
-function blend(fg: Rgb, bg: Rgb): Rgb {
-  return {
-    r: fg.r * fg.a + bg.r * (1 - fg.a),
-    g: fg.g * fg.a + bg.g * (1 - fg.a),
-    b: fg.b * fg.a + bg.b * (1 - fg.a),
-    a: 1,
-  };
-}
-
-function luminance(rgb: Rgb): number {
-  const channel = (n: number) => {
-    const v = n / 255;
-    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-  };
-  return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
-}
-
-export function contrastRatio(foreground: string, background: string): number | null {
-  const fg = parseColor(foreground);
-  const bg = parseColor(background);
-  if (!fg || !bg) return null;
-  const l1 = luminance(blend(fg, bg));
-  const l2 = luminance(bg);
-  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
-}
-
-export const CONTRAST_TARGETS = ['text', 'textMuted', 'accent', 'danger'] as const;
-
-export function themeContrastIssues(
-  tokens: EditableThemeTokens,
-): (typeof CONTRAST_TARGETS)[number][] {
-  return CONTRAST_TARGETS.filter((key) => (contrastRatio(tokens[key], tokens.bg) ?? 99) < 4.5);
-}
-
-export function autoFixThemeContrast(tokens: EditableThemeTokens): EditableThemeTokens {
-  const next = { ...tokens };
-  const bg = parseColor(tokens.bg);
-  if (!bg) return next;
-  const target = luminance(bg) > 0.42 ? 0 : 255;
-  for (const key of themeContrastIssues(tokens)) {
-    const original = parseColor(tokens[key]);
-    if (!original) continue;
-    let low = 0;
-    let high = 1;
-    let candidate = original;
-    for (let i = 0; i < 12; i += 1) {
-      const amount = (low + high) / 2;
-      candidate = {
-        r: original.r + (target - original.r) * amount,
-        g: original.g + (target - original.g) * amount,
-        b: original.b + (target - original.b) * amount,
-        a: 1,
-      };
-      const css = `rgb(${Math.round(candidate.r)},${Math.round(candidate.g)},${Math.round(candidate.b)})`;
-      if ((contrastRatio(css, tokens.bg) ?? 0) >= 4.5) high = amount;
-      else low = amount;
-    }
-    candidate = {
-      r: original.r + (target - original.r) * high,
-      g: original.g + (target - original.g) * high,
-      b: original.b + (target - original.b) * high,
-      a: 1,
-    };
-    next[key] =
-      `rgb(${Math.round(candidate.r)},${Math.round(candidate.g)},${Math.round(candidate.b)})`;
-  }
-  return next;
 }

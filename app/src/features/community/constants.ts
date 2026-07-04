@@ -1,6 +1,22 @@
 import type { SocialPlatform } from './types';
 
 export const ALL_TAG = '__all__';
+export const COMMUNITY_INPUT_LIMITS = {
+  displayName: 12,
+  loginId: 12,
+  password: 20,
+  postTitle: 40,
+  postCaption: 500,
+  comment: 200,
+  reportReason: 200,
+  bio: 100,
+  websiteUrl: 200,
+  profileTag: 15,
+  profileTags: 5,
+  profileTagsText: 100,
+  search: 40,
+  socialId: 20,
+} as const;
 export const TAG_CHARS = 'A-Za-z0-9_\\-\\u3040-\\u30ff\\u3400-\\u9fff\\uac00-\\ud7af';
 export const activeTagPattern = new RegExp(`(?:^|\\s)[#＃]([${TAG_CHARS}]*)$`, 'u');
 
@@ -22,13 +38,13 @@ export const SOCIAL_PLATFORMS: Array<{
   label: string;
   placeholder: string;
 }> = [
-  { key: 'github', label: 'GitHub', placeholder: 'https://github.com/username' },
-  { key: 'x', label: 'X', placeholder: 'https://x.com/username' },
-  { key: 'pixiv', label: 'Pixiv', placeholder: 'https://www.pixiv.net/users/123456' },
-  { key: 'zenn', label: 'Zenn', placeholder: 'https://zenn.dev/username' },
-  { key: 'qiita', label: 'Qiita', placeholder: 'https://qiita.com/username' },
-  { key: 'hatena', label: 'Hatena', placeholder: 'https://username.hatenablog.com' },
-  { key: 'unityroom', label: 'UnityRoom', placeholder: 'https://unityroom.com/users/username' },
+  { key: 'github', label: 'GitHub', placeholder: 'username' },
+  { key: 'x', label: 'X', placeholder: 'username' },
+  { key: 'pixiv', label: 'Pixiv', placeholder: '123456' },
+  { key: 'zenn', label: 'Zenn', placeholder: 'username' },
+  { key: 'qiita', label: 'Qiita', placeholder: 'username' },
+  { key: 'hatena', label: 'Hatena', placeholder: 'username' },
+  { key: 'unityroom', label: 'UnityRoom', placeholder: 'username' },
 ];
 
 export const SOCIAL_ICON_PATHS: Record<Exclude<SocialPlatform, 'unityroom'>, string> = {

@@ -28,6 +28,7 @@ export type CommunityPage =
   | 'home'
   | 'explore'
   | 'following'
+  | 'bookmarks'
   | 'notifications'
   | 'create'
   | 'profile';

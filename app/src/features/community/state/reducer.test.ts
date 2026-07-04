@@ -15,6 +15,8 @@ const post: CommunityPost = {
   createdAt: '2026-07-04T00:00:00Z',
   likeCount: 0,
   likedByMe: false,
+  bookmarkCount: 0,
+  bookmarkedByMe: false,
   commentCount: 0,
   status: 'approved',
   rejectionReason: null,

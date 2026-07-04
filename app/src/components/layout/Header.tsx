@@ -392,6 +392,7 @@ export function Header({
             <button
               type="button"
               className="p-community-activity-entry"
+              aria-label={t.header.communityActivity}
               aria-expanded={activityOpen}
               aria-controls="p-community-activity-drawer"
               onClick={() => void openCommunityActivity()}
@@ -415,7 +416,6 @@ export function Header({
                   strokeLinejoin="round"
                 />
               </svg>
-              <span>{t.header.communityActivity}</span>
             </button>
           ) : null}
 

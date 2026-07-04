@@ -1,15 +1,40 @@
 import { describe, expect, it } from 'vitest';
 import { THEMES } from './definitions';
 import {
-  autoFixThemeContrast,
-  contrastRatio,
   createCustomTheme,
   customThemeRef,
-  editableTokens,
+  parseColor,
   parseCustomThemeCollection,
   resolveThemeTokens,
-  themeContrastIssues,
 } from './custom-themes';
+
+type Rgb = { r: number; g: number; b: number; a: number };
+
+function luminance(rgb: Rgb): number {
+  const channel = (n: number) => {
+    const v = n / 255;
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
+}
+
+function blend(foreground: Rgb, background: Rgb): Rgb {
+  return {
+    r: foreground.r * foreground.a + background.r * (1 - foreground.a),
+    g: foreground.g * foreground.a + background.g * (1 - foreground.a),
+    b: foreground.b * foreground.a + background.b * (1 - foreground.a),
+    a: 1,
+  };
+}
+
+function contrastRatio(foreground: string, background: string): number | null {
+  const fg = parseColor(foreground);
+  const bg = parseColor(background);
+  if (!fg || !bg) return null;
+  const l1 = luminance(blend(fg, bg));
+  const l2 = luminance(bg);
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
 
 describe('custom theme storage', () => {
   it('保存した独自テーマを参照から解決する', () => {
@@ -40,6 +65,7 @@ describe('custom theme storage', () => {
       ],
     });
     expect(parsed.themes[0].tokens.accent).toBe('#abcdef');
+    expect(parsed.themes[0].tokens.onAccent).toBe(THEMES.light.onAccent);
     expect(parsed.themes[0].tokens.bg).toBe(THEMES.light.bg);
     expect(parsed.themes[0].tokens.text).toBe(THEMES.light.text);
   });
@@ -62,15 +88,9 @@ describe('custom theme storage', () => {
 });
 
 describe('theme contrast', () => {
-  it('半透明色を含むコントラスト比を計算する', () => {
-    expect(contrastRatio('#ffffff', '#000000')).toBeCloseTo(21);
-    expect(contrastRatio('rgba(255,255,255,.5)', '#000000')).toBeGreaterThan(5);
-  });
-
-  it('読みにくい主要色を検出して自動補正する', () => {
-    const tokens = editableTokens(THEMES.light);
-    tokens.text = '#fafafa';
-    expect(themeContrastIssues(tokens)).toContain('text');
-    expect(themeContrastIssues(autoFixThemeContrast(tokens))).not.toContain('text');
+  it('全組み込みテーマでアクセント面の前景色がAAコントラストを満たす', () => {
+    for (const tokens of Object.values(THEMES)) {
+      expect(contrastRatio(tokens.onAccent, tokens.accent)).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });

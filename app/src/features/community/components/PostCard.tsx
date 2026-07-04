@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import { useState, type MouseEvent } from 'react';
 import type { CommunityPost } from '../types';
 import { Avatar } from './Avatar';
 import { Glyph } from './Glyph';
@@ -9,15 +9,25 @@ export function PostCard({
   ja,
   onOpen,
   onLike,
+  onBookmark,
 }: {
   post: CommunityPost;
   ja: boolean;
   onOpen: () => void;
   onLike: () => void;
+  onBookmark: () => void;
 }) {
+  const [likeCelebrating, setLikeCelebrating] = useState(false);
+  const [bookmarkCelebrating, setBookmarkCelebrating] = useState(false);
   const like = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
+    if (!post.likedByMe) setLikeCelebrating(true);
     onLike();
+  };
+  const bookmark = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (!post.bookmarkedByMe) setBookmarkCelebrating(true);
+    onBookmark();
   };
   const visibleTags = post.tags.slice(0, 3);
   const postedAt = new Date(post.createdAt);
@@ -88,18 +98,35 @@ export function PostCard({
               ))}
             </div>
           ) : null}
-          <button
-            className={cn(
-              'community-like tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-danger [&.is-active_svg]:tw-fill-current',
-              post.likedByMe && 'is-active',
-            )}
-            type="button"
-            onClick={like}
-            aria-label="いいね"
-          >
-            <Glyph name="heart" />
-            <span>{post.likeCount}</span>
-          </button>
+          <span className={'community-post-card-actions tw-flex tw-flex-none tw-items-center tw-gap-1'}>
+            <button
+              className={cn(
+                'community-bookmark tw-inline-flex tw-h-8 tw-min-w-8 tw-items-center tw-justify-center tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-shadow-community-card [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-accent-light [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
+                post.bookmarkedByMe && 'is-active',
+                bookmarkCelebrating && 'is-celebrating',
+              )}
+              type="button"
+              onClick={bookmark}
+              onAnimationEnd={() => setBookmarkCelebrating(false)}
+              aria-label={ja ? '保存' : 'Bookmark'}
+            >
+              <Glyph name="bookmark" />
+            </button>
+            <button
+              className={cn(
+                'community-like tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-bg-community-danger/10 hover:tw-text-community-danger hover:tw-shadow-community-card [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-danger [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
+                post.likedByMe && 'is-active',
+                likeCelebrating && 'is-celebrating',
+              )}
+              type="button"
+              onClick={like}
+              onAnimationEnd={() => setLikeCelebrating(false)}
+              aria-label={ja ? 'いいね' : 'Like'}
+            >
+              <Glyph name="heart" />
+              <span>{post.likeCount}</span>
+            </button>
+          </span>
         </footer>
       </div>
     </article>

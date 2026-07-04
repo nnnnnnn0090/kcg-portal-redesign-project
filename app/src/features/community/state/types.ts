@@ -26,6 +26,7 @@ export interface CommunityState {
   posts: CommunityPost[];
   ownPosts: CommunityPost[];
   followingPosts: CommunityPost[];
+  bookmarkedPosts: CommunityPost[];
   knownTags: string[];
   searchUsers: CommunityUser[];
   notifications: CommunityNotification[];
@@ -76,6 +77,7 @@ export interface CommunityActions {
   saveProfile: (event: FormEvent<HTMLFormElement>) => Promise<void>;
   removePost: (post: CommunityPost) => Promise<void>;
   toggleLike: (post: CommunityPost) => Promise<void>;
+  toggleBookmark: (post: CommunityPost) => Promise<void>;
   toggleFollow: (target: CommunityUser) => Promise<void>;
   refreshCurrentPage: () => Promise<void>;
   openLikes: (post: CommunityPost) => void;
@@ -86,7 +88,7 @@ export interface CommunityActions {
   setQuery: (query: string) => void;
   setTag: (tag: string) => void;
   setPostImages: (images: SetStateAction<string[]>) => void;
-  readPostFiles: (files?: FileList | null) => void;
+  readPostFiles: (files?: FileList | File[] | null) => void;
   readAvatar: (file?: File) => void;
   readHeader: (file?: File) => void;
   canDeletePost: (post: CommunityPost) => boolean;

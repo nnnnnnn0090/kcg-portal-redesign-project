@@ -5,7 +5,7 @@ export function DialogHeader({ title, close }: { title: string; close: () => voi
   return (
     <header
       className={
-        'community-dialog-header tw-flex tw-min-h-16 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-community-border tw-bg-community-bg2 tw-px-4 tw-py-3 [&_h2]:tw-m-0 [&_h2]:tw-text-xl [&_h2]:tw-text-community-bright [&_button]:tw-grid [&_button]:tw-h-10 [&_button]:tw-w-10 [&_button]:tw-flex-none [&_button]:tw-place-items-center [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-0 [&_button]:tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+        'community-dialog-header tw-flex tw-min-h-16 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-community-border tw-bg-community-bg2 tw-px-4 tw-py-3 [&_h2]:tw-m-0 [&_h2]:tw-text-xl [&_h2]:tw-text-community-bright [&_button]:tw-grid [&_button]:tw-h-10 [&_button]:tw-w-10 [&_button]:tw-flex-none [&_button]:tw-place-items-center [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-0 [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
       }
     >
       <h2>{title}</h2>
@@ -15,14 +15,25 @@ export function DialogHeader({ title, close }: { title: string; close: () => voi
     </header>
   );
 }
-export function Field({ label, children }: { label: string; children: ReactNode }) {
+export function Field({
+  label,
+  meta,
+  children,
+}: {
+  label: string;
+  meta?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <label
       className={
-        'community-field tw-grid tw-gap-2 [&>span]:tw-text-[13px] [&>span]:tw-font-bold [&>span]:tw-text-community-bright [&>label]:tw-text-[13px] [&>label]:tw-font-bold [&>label]:tw-text-community-bright [&_input]:tw-min-h-10 [&_input]:tw-w-full [&_input]:tw-rounded-lg [&_input]:tw-border [&_input]:tw-border-community-border [&_input]:tw-bg-community-bg2 [&_input]:tw-px-3 [&_input]:tw-py-2 [&_input]:tw-text-sm [&_input]:tw-text-community-text [&_input]:tw-outline-none focus:[&_input]:tw-border-community-accent focus:[&_input]:tw-ring-2 focus:[&_input]:tw-ring-community-accent-bg [&_textarea]:tw-min-h-28 [&_textarea]:tw-w-full [&_textarea]:tw-resize-y [&_textarea]:tw-rounded-lg [&_textarea]:tw-border [&_textarea]:tw-border-community-border [&_textarea]:tw-bg-community-bg2 [&_textarea]:tw-px-3 [&_textarea]:tw-py-2 [&_textarea]:tw-text-sm [&_textarea]:tw-leading-relaxed [&_textarea]:tw-text-community-text [&_textarea]:tw-outline-none focus:[&_textarea]:tw-border-community-accent [&_select]:tw-min-h-10 [&_select]:tw-w-full [&_select]:tw-rounded-lg [&_select]:tw-border [&_select]:tw-border-community-border [&_select]:tw-bg-community-bg2 [&_select]:tw-px-3 [&_select]:tw-text-sm [&_select]:tw-text-community-text [&_select]:tw-outline-none'
+        'community-field tw-grid tw-min-w-0 tw-gap-2 [&>.community-field-label]:tw-flex [&>.community-field-label]:tw-min-w-0 [&>.community-field-label]:tw-items-center [&>.community-field-label]:tw-justify-between [&>.community-field-label]:tw-gap-3 [&>.community-field-label]:tw-text-[13px] [&>.community-field-label]:tw-font-bold [&>.community-field-label]:tw-text-community-bright [&>label]:tw-text-[13px] [&>label]:tw-font-bold [&>label]:tw-text-community-bright [&_input]:tw-min-h-10 [&_input]:tw-w-full [&_input]:tw-min-w-0 [&_input]:tw-rounded-lg [&_input]:tw-border [&_input]:tw-border-community-border [&_input]:tw-bg-community-bg2 [&_input]:tw-px-3 [&_input]:tw-py-2 [&_input]:tw-text-sm [&_input]:tw-text-community-text [&_input]:tw-outline-none focus:[&_input]:tw-border-community-accent focus:[&_input]:tw-ring-2 focus:[&_input]:tw-ring-community-accent-bg [&_textarea]:tw-min-h-28 [&_textarea]:tw-w-full [&_textarea]:tw-min-w-0 [&_textarea]:tw-resize-y [&_textarea]:tw-rounded-lg [&_textarea]:tw-border [&_textarea]:tw-border-community-border [&_textarea]:tw-bg-community-bg2 [&_textarea]:tw-px-3 [&_textarea]:tw-py-2 [&_textarea]:tw-text-sm [&_textarea]:tw-leading-relaxed [&_textarea]:tw-text-community-text [&_textarea]:tw-outline-none focus:[&_textarea]:tw-border-community-accent [&_select]:tw-min-h-10 [&_select]:tw-w-full [&_select]:tw-min-w-0 [&_select]:tw-rounded-lg [&_select]:tw-border [&_select]:tw-border-community-border [&_select]:tw-bg-community-bg2 [&_select]:tw-px-3 [&_select]:tw-text-sm [&_select]:tw-text-community-text [&_select]:tw-outline-none'
       }
     >
-      <span>{label}</span>
+      <span className="community-field-label">
+        <span>{label}</span>
+        {meta}
+      </span>
       {children}
     </label>
   );
@@ -38,6 +49,18 @@ export function ErrorMessage({ text }: { text: string }) {
       {text}
     </p>
   ) : null;
+}
+export function CharacterCount({ value, max }: { value: string; max: number }) {
+  return (
+    <small
+      className={
+        'community-character-count tw-justify-self-end tw-text-xs tw-font-bold tw-text-community-muted'
+      }
+      aria-live="polite"
+    >
+      {value.length}/{max}
+    </small>
+  );
 }
 export function Busy() {
   return (

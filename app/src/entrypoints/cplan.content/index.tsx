@@ -5,6 +5,15 @@ import storage from '../../lib/storage';
 import { appendPortalOverlayShell, removePortalBackdrop, syncCplanSurfaceRuntime } from '../../themes';
 import { CPLAN_CONTENT_SCRIPT_MATCHES, SK } from '../../shared/constants';
 
+async function waitForCplanSnapshot() {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const snapshot = readCplanSnapshot();
+    if (snapshot) return snapshot;
+    await new Promise((resolve) => window.setTimeout(resolve, 100));
+  }
+  return readCplanSnapshot();
+}
+
 export default defineContentScript({
   matches: [...CPLAN_CONTENT_SCRIPT_MATCHES],
   runAt: 'document_end',
@@ -17,7 +26,7 @@ export default defineContentScript({
           removePortalBackdrop();
           return;
         }
-        const snapshot = readCplanSnapshot();
+        const snapshot = await waitForCplanSnapshot();
         if (!snapshot) {
           removePortalBackdrop();
           return;

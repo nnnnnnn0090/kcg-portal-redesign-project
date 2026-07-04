@@ -11,6 +11,7 @@ export function createCommunityState(ja: boolean, defaultAuthorName: string): Co
     posts: [],
     ownPosts: [],
     followingPosts: [],
+    bookmarkedPosts: [],
     knownTags: [],
     searchUsers: [],
     notifications: [],
@@ -55,6 +56,7 @@ function updatePostEverywhere(
     ownPosts: updatePostList(state.ownPosts, postId, value),
     profilePosts: updatePostList(state.profilePosts, postId, value),
     followingPosts: updatePostList(state.followingPosts, postId, value),
+    bookmarkedPosts: updatePostList(state.bookmarkedPosts, postId, value),
     modal,
   };
 }
@@ -82,6 +84,7 @@ export function communityReducer(state: CommunityState, action: CommunityAction)
         modal: { kind: 'none' },
         ownPosts: [],
         followingPosts: [],
+        bookmarkedPosts: [],
         notifications: [],
         unreadCount: 0,
         profileUser: null,

@@ -36,7 +36,8 @@ export function getThemeCss(t: ThemeTokens): string {
     `--p-text:${t.text};--p-text-muted:${t.textMuted};--p-text-dim:${t.textDim};` +
     `--p-text-dimmer:${t.textDimmer};--p-text-bright:${t.textBright};` +
     `--p-accent:${t.accent};--p-accent-light:${t.accentLight};` +
-    `--p-accent-bg:${t.accentBg};--p-accent-border:${t.accentBorder};--p-avatar-ring:${avatarRingColor(t.bg)};` +
+    `--p-accent-bg:${t.accentBg};--p-accent-border:${t.accentBorder};` +
+    `--p-on-accent:${t.onAccent};--p-avatar-ring:${avatarRingColor(t.bg)};` +
     `--p-danger:${t.danger};--p-danger-hover:${t.dangerHover};` +
     `--p-shadow:${t.shadow};--p-shadow-strong:${t.shadowStrong};background:${t.bg}}`
   );

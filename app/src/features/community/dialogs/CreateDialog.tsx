@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { activeTagPattern } from '../constants';
+import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
+import { activeTagPattern, COMMUNITY_INPUT_LIMITS } from '../constants';
 import type { CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
-import { Busy, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
+import { Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
 import type { ModalLayerProps } from './types';
 import { cn } from '../classNames';
+import { dataTransferHasFiles } from '../imageFiles';
 
 export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const {
@@ -23,12 +24,15 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const imageInput = useRef<HTMLInputElement>(null);
   const captionInput = useRef<HTMLTextAreaElement>(null);
   const [caption, setCaption] = useState('');
+  const [title, setTitle] = useState('');
   const [tagSearch, setTagSearch] = useState<string | null>(null);
   const [activeTagIndex, setActiveTagIndex] = useState(0);
   const [selectedImage, setSelectedImage] = useState(0);
   const [draggedImage, setDraggedImage] = useState<number | null>(null);
   const [dragTargetImage, setDragTargetImage] = useState<number | null>(null);
+  const [imageDropActive, setImageDropActive] = useState(false);
   const dragPreview = useRef<HTMLDivElement | null>(null);
+  const imageDropDepth = useRef(0);
 
   useEffect(() => {
     if (selectedImage >= postImages.length) setSelectedImage(Math.max(0, postImages.length - 1));
@@ -80,6 +84,47 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
     });
   };
 
+  const acceptsImageDrop = (event: DragEvent<HTMLElement>) =>
+    draggedImage === null && dataTransferHasFiles(event.dataTransfer);
+
+  const resetImageDrop = () => {
+    imageDropDepth.current = 0;
+    setImageDropActive(false);
+  };
+
+  const handleImageDragEnter = (event: DragEvent<HTMLElement>) => {
+    if (!acceptsImageDrop(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    imageDropDepth.current += 1;
+    setImageDropActive(true);
+    event.dataTransfer.dropEffect = postImages.length >= 4 ? 'none' : 'copy';
+  };
+
+  const handleImageDragOver = (event: DragEvent<HTMLElement>) => {
+    if (!acceptsImageDrop(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = postImages.length >= 4 ? 'none' : 'copy';
+  };
+
+  const handleImageDragLeave = (event: DragEvent<HTMLElement>) => {
+    if (!acceptsImageDrop(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    imageDropDepth.current = Math.max(0, imageDropDepth.current - 1);
+    if (imageDropDepth.current === 0) setImageDropActive(false);
+  };
+
+  const handleImageDrop = (event: DragEvent<HTMLElement>) => {
+    if (!acceptsImageDrop(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    resetImageDrop();
+    if (postImages.length >= 4) return;
+    readPost(event.dataTransfer.files);
+  };
+
   const matchingTags = useMemo(() => {
     if (tagSearch === null) return [];
     const needle = tagSearch.toLocaleLowerCase();
@@ -117,7 +162,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   return (
     <form
       className={
-        'community-dialog tw-max-h-[min(90vh,900px)] tw-w-full tw-max-w-[620px] tw-overflow-auto tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[620px]:tw-max-h-[calc(100vh-24px)] max-[620px]:tw-rounded-2xl [&>footer]:tw-flex [&>footer]:tw-justify-end [&>footer]:tw-gap-2 [&>footer]:tw-border-t [&>footer]:tw-border-community-border [&>footer]:tw-bg-community-bg2 [&>footer]:tw-p-4 [&>footer>button]:tw-inline-flex [&>footer>button]:tw-min-h-10 [&>footer>button]:tw-appearance-none [&>footer>button]:tw-items-center [&>footer>button]:tw-justify-center [&>footer>button]:tw-gap-2 [&>footer>button]:tw-rounded-lg [&>footer>button]:tw-border [&>footer>button]:tw-border-community-border [&>footer>button]:tw-bg-community-bg3 [&>footer>button]:tw-px-4 [&>footer>button]:tw-text-sm [&>footer>button]:tw-font-bold [&>footer>button]:tw-text-community-text [&>footer>button]:tw-cursor-pointer [&>footer>button.is-primary]:tw-border-community-accent [&>footer>button.is-primary]:tw-bg-community-accent [&>footer>button.is-primary]:tw-text-community-bg [&_button:disabled]:tw-cursor-not-allowed [&_button:disabled]:tw-opacity-[.55] community-create-dialog tw-w-full tw-max-w-[980px]'
+        'community-dialog tw-max-h-[min(90vh,900px)] tw-w-full tw-max-w-[620px] tw-overflow-auto tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[620px]:tw-max-h-[calc(100vh-24px)] max-[620px]:tw-rounded-2xl [&>footer]:tw-flex [&>footer]:tw-justify-end [&>footer]:tw-gap-2 [&>footer]:tw-border-t [&>footer]:tw-border-community-border [&>footer]:tw-bg-community-bg2 [&>footer]:tw-p-4 [&>footer>button]:tw-inline-flex [&>footer>button]:tw-min-h-10 [&>footer>button]:tw-appearance-none [&>footer>button]:tw-items-center [&>footer>button]:tw-justify-center [&>footer>button]:tw-gap-2 [&>footer>button]:tw-rounded-lg [&>footer>button]:tw-border [&>footer>button]:tw-border-community-border [&>footer>button]:tw-bg-community-bg3 [&>footer>button]:tw-px-4 [&>footer>button]:tw-text-sm [&>footer>button]:tw-font-bold [&>footer>button]:tw-text-community-text [&>footer>button]:tw-cursor-pointer [&>footer>button.is-primary]:tw-border-community-accent [&>footer>button.is-primary]:tw-bg-community-accent [&>footer>button.is-primary]:tw-text-community-on-accent [&_button:disabled]:tw-cursor-not-allowed [&_button:disabled]:tw-opacity-[.55] community-create-dialog tw-w-full tw-max-w-[980px]'
       }
       method="post"
       onSubmitCapture={(event) => event.preventDefault()}
@@ -133,6 +178,10 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
           className={
             'community-image-composer tw-grid tw-min-w-0 tw-content-start tw-gap-3 tw-rounded-xl tw-border tw-border-community-border-light tw-bg-community-bg2 tw-p-3 [&>input]:tw-sr-only'
           }
+          onDragEnter={handleImageDragEnter}
+          onDragOver={handleImageDragOver}
+          onDragLeave={handleImageDragLeave}
+          onDrop={handleImageDrop}
         >
           <header
             className={
@@ -154,8 +203,9 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
           </header>
           <div
             className={cn(
-              'community-composer-stage tw-relative tw-grid tw-aspect-[4/3] tw-min-h-0 tw-place-items-center tw-overflow-hidden tw-rounded-[11px] tw-border tw-border-dashed tw-border-[var(--p-border-hover)] tw-bg-community-bg [&.has-image]:tw-border-solid [&.has-image]:tw-border-community-border [&.has-image]:tw-bg-[#08090d] [&>img]:tw-absolute [&>img]:tw-inset-4 [&>img]:tw-block [&>img]:tw-h-[calc(100%-32px)] [&>img]:tw-w-[calc(100%-32px)] [&>img]:tw-object-contain max-[620px]:[&>img]:tw-inset-2 max-[620px]:[&>img]:tw-h-[calc(100%-16px)] max-[620px]:[&>img]:tw-w-[calc(100%-16px)]',
+              'community-composer-stage tw-relative tw-grid tw-aspect-[4/3] tw-min-h-0 tw-place-items-center tw-overflow-hidden tw-rounded-[11px] tw-border tw-border-dashed tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-transition [&.has-image]:tw-border-solid [&.has-image]:tw-border-community-border [&.has-image]:tw-bg-[#08090d] [&.is-file-dragging]:tw-border-community-accent [&.is-file-dragging]:tw-ring-2 [&.is-file-dragging]:tw-ring-community-accent-bg [&>img]:tw-absolute [&>img]:tw-inset-4 [&>img]:tw-block [&>img]:tw-h-[calc(100%-32px)] [&>img]:tw-w-[calc(100%-32px)] [&>img]:tw-object-contain max-[620px]:[&>img]:tw-inset-2 max-[620px]:[&>img]:tw-h-[calc(100%-16px)] max-[620px]:[&>img]:tw-w-[calc(100%-16px)]',
               postImages.length > 0 && 'has-image',
+              imageDropActive && 'is-file-dragging',
             )}
           >
             {postImages.length ? (
@@ -206,13 +256,20 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                       setDraggedImage(null);
                       setDragTargetImage(null);
                     }}
-                    onDragEnter={() => setDragTargetImage(index)}
+                    onDragEnter={(event) => {
+                      if (dataTransferHasFiles(event.dataTransfer)) return;
+                      setDragTargetImage(index);
+                    }}
                     onDragOver={(event) => {
+                      if (dataTransferHasFiles(event.dataTransfer)) return;
                       event.preventDefault();
+                      event.stopPropagation();
                       event.dataTransfer.dropEffect = 'move';
                     }}
                     onDrop={(event) => {
+                      if (dataTransferHasFiles(event.dataTransfer)) return;
                       event.preventDefault();
+                      event.stopPropagation();
                       const source =
                         draggedImage ?? Number(event.dataTransfer.getData('text/plain'));
                       if (Number.isInteger(source)) moveImage(source, index);
@@ -277,21 +334,29 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
               <small>@{user.loginId}</small>
             </span>
           </div>
-          <Field label={ja ? 'タイトル' : 'Title'}>
+          <Field
+            label={ja ? 'タイトル' : 'Title'}
+            meta={<CharacterCount value={title} max={COMMUNITY_INPUT_LIMITS.postTitle} />}
+          >
             <input
               name="title"
-              maxLength={80}
+              maxLength={COMMUNITY_INPUT_LIMITS.postTitle}
+              value={title}
+              onChange={(event) => setTitle(event.currentTarget.value)}
               placeholder={ja ? '投稿のタイトル' : 'Give your post a title'}
               required
             />
           </Field>
           <div className={'community-caption-field tw-relative'}>
-            <Field label={ja ? '本文' : 'Caption'}>
+            <Field
+              label={ja ? '本文' : 'Caption'}
+              meta={<CharacterCount value={caption} max={COMMUNITY_INPUT_LIMITS.postCaption} />}
+            >
               <textarea
                 ref={captionInput}
                 name="caption"
                 rows={7}
-                maxLength={1000}
+                maxLength={COMMUNITY_INPUT_LIMITS.postCaption}
                 value={caption}
                 placeholder={
                   ja
@@ -332,7 +397,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
             {tagSearch !== null ? (
               <div
                 className={
-                  'community-tag-suggestions tw-absolute tw-inset-x-0 tw-top-[calc(100%+8px)] tw-z-[3] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card [&.is-profile-tags]:tw-static [&.is-profile-tags]:tw-mt-[-8px] [&_header]:tw-flex [&_header]:tw-justify-between [&_header]:tw-gap-2 [&_header]:tw-border-b [&_header]:tw-border-community-border [&_header]:tw-px-3 [&_header]:tw-py-2 [&_header]:tw-text-xs [&_header]:tw-text-community-muted [&_button]:tw-flex [&_button]:tw-min-h-10 [&_button]:tw-w-full [&_button]:tw-items-center [&_button]:tw-gap-2 [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-3 [&_button]:tw-text-left [&_button]:tw-text-sm [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-accent-bg [&_button.is-active]:tw-bg-community-accent-bg [&_b]:tw-text-community-accent-light'
+                  'community-tag-suggestions tw-absolute tw-inset-x-0 tw-top-[calc(100%+8px)] tw-z-[3] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card [&.is-profile-tags]:tw-static [&.is-profile-tags]:tw-mt-[-8px] [&_header]:tw-flex [&_header]:tw-justify-between [&_header]:tw-gap-2 [&_header]:tw-border-b [&_header]:tw-border-community-border [&_header]:tw-px-3 [&_header]:tw-py-2 [&_header]:tw-text-xs [&_header]:tw-text-community-muted [&_button]:tw-flex [&_button]:tw-min-h-10 [&_button]:tw-w-full [&_button]:tw-items-center [&_button]:tw-gap-2 [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-3 [&_button]:tw-text-left [&_button]:tw-text-sm [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-accent-bg [&_button.is-active]:tw-bg-community-accent-bg [&_b]:tw-text-community-accent-light'
                 }
                 role="listbox"
                 aria-label={ja ? 'タグ候補' : 'Tag suggestions'}
@@ -390,7 +455,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
         </button>
         <button
           className={
-            'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-bg'
+            'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-on-accent hover:tw-translate-y-[-1px] hover:tw-brightness-110 hover:tw-shadow-community-card'
           }
           disabled={busy || !postImages.length}
         >
