@@ -197,6 +197,11 @@
     grid-template-columns: auto minmax(0, 1fr);
     padding-inline: var(--community-space-4);
   }
+  #portal-overlay .community-profile-academic,
+  #portal-overlay .community-profile-tag-section,
+  #portal-overlay .community-profile-link-section {
+    grid-template-columns: 1fr;
+  }
   #portal-overlay .community-profile-actions {
     grid-column: 1 / -1;
     padding-top: 0;
@@ -204,12 +209,15 @@
   #portal-overlay .community-profile-actions button {
     width: 100%;
   }
+  #portal-overlay .community-profile-stats {
+    display: flex;
+  }
   #portal-overlay .community-avatar.is-large {
     width: 76px;
     height: 76px;
     flex-basis: 76px;
   }
-  #portal-overlay .community-profile-copy h1 {
+  #portal-overlay .community-profile-identity h1 {
     font-size: 20px;
   }
   #portal-overlay .community-profile-editor-media,
@@ -255,6 +263,7 @@
     align-items: end;
   }
   #portal-overlay .community-profile-stats {
+    grid-template-columns: 1fr 1fr;
     gap: var(--community-space-2);
   }
   #portal-overlay .community-profile-stats > span,
