@@ -12,8 +12,6 @@ interface ImportMetaEnv {
   readonly VITE_MASCOT_ILLUSTRATOR_URL?: string;
   /** 配布パッケージ作成時のみ `1`。お知らせ取得の利用記録を有効にする。 */
   readonly VITE_PORTAL_DISTRIBUTION_BUILD?: '1';
-  /** 「みんなの活動」サーバーの公開オリジン */
-  readonly VITE_COMMUNITY_API_ORIGIN?: string;
 }
 
 interface ImportMeta {
