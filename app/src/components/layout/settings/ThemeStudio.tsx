@@ -241,7 +241,10 @@ export function ThemeStudio({ theme, baseRef, onClose }: ThemeStudioProps) {
                         type="color"
                         value={hexForPicker(tokens[key])}
                         aria-label={`${key} color`}
-                        onChange={(e) => setTokens((prev) => ({ ...prev, [key]: e.target.value }))}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setTokens((prev) => ({ ...prev, [key]: value }));
+                        }}
                       />
                       <input
                         value={tokens[key]}

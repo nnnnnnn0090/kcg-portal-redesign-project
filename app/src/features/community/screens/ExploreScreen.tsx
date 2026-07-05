@@ -22,6 +22,7 @@ export function ExploreScreen({
   onOpen,
   onLike,
   onBookmark,
+  onImpression,
 }: {
   posts: CommunityPost[];
   users: CommunityUser[];
@@ -38,6 +39,7 @@ export function ExploreScreen({
   onOpen: (post: CommunityPost) => void;
   onLike: (post: CommunityPost) => void;
   onBookmark: (post: CommunityPost) => void;
+  onImpression: (post: CommunityPost) => void;
 }) {
   return (
     <main
@@ -144,6 +146,7 @@ export function ExploreScreen({
                 onOpen={() => onOpen(post)}
                 onLike={() => onLike(post)}
                 onBookmark={() => onBookmark(post)}
+                onImpression={() => onImpression(post)}
               />
             ))}
           </div>

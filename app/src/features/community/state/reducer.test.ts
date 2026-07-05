@@ -18,6 +18,7 @@ const post: CommunityPost = {
   bookmarkCount: 0,
   bookmarkedByMe: false,
   commentCount: 0,
+  impressionCount: 0,
   status: 'approved',
   rejectionReason: null,
 };

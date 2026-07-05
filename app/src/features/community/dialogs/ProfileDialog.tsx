@@ -402,6 +402,10 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
                 );
             }}
             maxLength={COMMUNITY_INPUT_LIMITS.profileTagsText}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
             placeholder={ja ? '#ゲーム #デザイン #プログラミング' : '#game #design #programming'}
           />
         </Field>
@@ -511,12 +515,13 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
                   type="text"
                   inputMode={SOCIAL_PLATFORM_FORMATS[platform.key].inputMode ?? 'text'}
                   value={socialIds[platform.key] ?? ''}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value;
                     setSocialIds((current) => ({
                       ...current,
-                      [platform.key]: event.currentTarget.value,
-                    }))
-                  }
+                      [platform.key]: value,
+                    }));
+                  }}
                   maxLength={SOCIAL_PLATFORM_FORMATS[platform.key].maxLength}
                   placeholder={platform.placeholder}
                 />

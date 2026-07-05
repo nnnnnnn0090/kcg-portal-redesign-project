@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { CommunityPost } from '../types';
 import { Avatar } from './Avatar';
 import { Glyph } from './Glyph';
@@ -10,13 +10,16 @@ export function PostCard({
   onOpen,
   onLike,
   onBookmark,
+  onImpression,
 }: {
   post: CommunityPost;
   ja: boolean;
   onOpen: () => void;
   onLike: () => void;
   onBookmark: () => void;
+  onImpression: () => void;
 }) {
+  const cardRef = useRef<HTMLElement | null>(null);
   const [likeCelebrating, setLikeCelebrating] = useState(false);
   const [bookmarkCelebrating, setBookmarkCelebrating] = useState(false);
   const like = (event: MouseEvent<HTMLButtonElement>) => {
@@ -37,8 +40,28 @@ export function PostCard({
         month: 'short',
         day: 'numeric',
       });
+  useEffect(() => {
+    const element = cardRef.current;
+    if (!element) return;
+    if (!('IntersectionObserver' in window)) {
+      onImpression();
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          onImpression();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.45 },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [onImpression]);
   return (
     <article
+      ref={cardRef}
       className={
         'community-post tw-min-w-0 tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card tw-cursor-pointer tw-transition hover:tw-translate-y-[-2px] hover:tw-border-community-accent hover:tw-shadow-lg focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-community-accent'
       }
@@ -99,9 +122,27 @@ export function PostCard({
             </div>
           ) : null}
           <span className={'community-post-card-actions tw-flex tw-flex-none tw-items-center tw-gap-1'}>
+            <span
+              className={
+                'community-impression-count tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-bg-community-bg3 tw-px-2 tw-text-xs tw-text-community-muted [&_svg]:tw-h-4 [&_svg]:tw-w-4'
+              }
+              aria-label={ja ? `表示 ${post.impressionCount}件` : `${post.impressionCount} views`}
+            >
+              <Glyph name="impression" />
+              <span>{post.impressionCount}</span>
+            </span>
+            <span
+              className={
+                'community-comment-count tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-bg-community-bg3 tw-px-2 tw-text-xs tw-text-community-muted [&_svg]:tw-h-4 [&_svg]:tw-w-4'
+              }
+              aria-label={ja ? `コメント ${post.commentCount}件` : `${post.commentCount} comments`}
+            >
+              <Glyph name="comment" />
+              <span>{post.commentCount}</span>
+            </span>
             <button
               className={cn(
-                'community-bookmark tw-inline-flex tw-h-8 tw-min-w-8 tw-items-center tw-justify-center tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-shadow-community-card [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-accent-light [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
+                'community-bookmark tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-shadow-community-card [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-accent-light [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
                 post.bookmarkedByMe && 'is-active',
                 bookmarkCelebrating && 'is-celebrating',
               )}
@@ -111,6 +152,7 @@ export function PostCard({
               aria-label={ja ? '保存' : 'Bookmark'}
             >
               <Glyph name="bookmark" />
+              <span>{post.bookmarkCount}</span>
             </button>
             <button
               className={cn(

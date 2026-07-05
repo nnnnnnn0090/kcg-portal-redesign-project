@@ -18,6 +18,7 @@ export function ProfileScreen({
   onOpen,
   onLike,
   onBookmark,
+  onImpression,
   onFollow,
   onConnections,
   onTagClick,
@@ -32,6 +33,7 @@ export function ProfileScreen({
   onOpen: (post: CommunityPost) => void;
   onLike: (post: CommunityPost) => void;
   onBookmark: (post: CommunityPost) => void;
+  onImpression: (post: CommunityPost) => void;
   onFollow: () => void;
   onConnections: (relation: 'followers' | 'following') => void;
   onTagClick: (tag: string) => void;
@@ -39,6 +41,9 @@ export function ProfileScreen({
   const [filter, setFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
   const [headerBroken, setHeaderBroken] = useState(false);
   const shown = !isOwn || filter === 'all' ? posts : posts.filter((post) => post.status === filter);
+  const profileTags = user.profileTags ?? [];
+  const userSocialEntries = socialEntries(user.socialLinks);
+  const unsetText = ja ? '未設定' : 'Not set';
   return (
     <main
       className={
@@ -57,7 +62,7 @@ export function ProfileScreen({
         >
           <div
             className={
-              'community-profile-banner tw-h-[clamp(170px,22vw,260px)] tw-overflow-hidden tw-bg-gradient-to-br tw-from-community-accent-bg tw-to-community-bg3 [&>img]:tw-block [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-cover'
+              'community-profile-banner tw-relative tw-h-[clamp(170px,22vw,260px)] tw-overflow-hidden tw-bg-community-accent-bg [&>img]:tw-relative [&>img]:tw-z-10 [&>img]:tw-block [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-cover'
             }
           >
             {user.headerUrl && !headerBroken ? (
@@ -66,11 +71,25 @@ export function ProfileScreen({
                 alt=""
                 onError={() => setHeaderBroken(true)}
               />
-            ) : null}
+            ) : (
+              <>
+                <div className={'tw-absolute tw-inset-0 tw-bg-community-accent tw-opacity-[0.08]'} />
+                <div
+                  className={
+                    'tw-absolute tw-inset-y-0 tw-left-0 tw-w-[34%] tw-skew-x-[-16deg] tw-bg-community-accent tw-opacity-[0.10]'
+                  }
+                />
+                <div
+                  className={
+                    'tw-absolute tw-inset-y-0 tw-right-[-8%] tw-w-[42%] tw-skew-x-[-16deg] tw-bg-community-accent-light tw-opacity-[0.12]'
+                  }
+                />
+              </>
+            )}
           </div>
           <div
             className={
-              'community-profile-info tw-relative tw-grid tw-grid-cols-[auto_minmax(0,1fr)_auto] tw-items-start tw-gap-5 tw-px-6 tw-pb-5 max-[620px]:tw-grid-cols-[auto_minmax(0,1fr)] max-[620px]:tw-gap-3 max-[620px]:tw-px-4 [&>.community-avatar]:tw-mt-[-42px] [&>.community-avatar]:tw-shadow-[0_0_0_5px_var(--p-bg2)]'
+              'community-profile-info tw-relative tw-z-20 tw-grid tw-grid-cols-[auto_minmax(0,1fr)_auto] tw-items-start tw-gap-5 tw-px-6 tw-pb-5 max-[620px]:tw-grid-cols-[auto_minmax(0,1fr)] max-[620px]:tw-gap-3 max-[620px]:tw-px-4 [&>.community-avatar]:tw-relative [&>.community-avatar]:tw-z-30 [&>.community-avatar]:tw-mt-[-42px] [&>.community-avatar]:tw-shadow-[0_0_0_5px_var(--p-bg2)]'
             }
           >
             <Avatar user={user} large />
@@ -125,49 +144,56 @@ export function ProfileScreen({
                 'community-profile-details tw-grid tw-content-start tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg3)_38%,transparent)] [&>section]:tw-max-w-none [&>section]:tw-border-0 [&>section]:tw-border-b [&>section]:tw-border-community-border-light [&>section]:tw-bg-transparent [&>section]:tw-px-4 [&>section]:tw-py-3.5 [&>section:last-child]:tw-border-b-0'
               }
             >
-              {user.academicGroup && user.department ? (
-                <section
-                  className={
-                    'community-profile-academic tw-grid tw-max-w-[640px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-center tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-min-w-0 [&>div]:tw-gap-0.5 [&_strong]:tw-break-words [&_strong]:tw-text-base [&_strong]:tw-text-community-bright [&_small]:tw-break-words [&_small]:tw-text-[13px] [&_small]:tw-text-community-accent-light'
-                  }
-                >
-                  <span>{ja ? '所属' : 'Program'}</span>
-                  <div>
-                    <strong>{user.academicGroup}</strong>
-                    <small>{user.department}</small>
-                  </div>
-                </section>
-              ) : null}
-              {(user.profileTags ?? []).length ? (
-                <section
-                  className={
-                    'community-profile-tag-section tw-grid tw-max-w-[820px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-center tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted'
-                  }
-                >
-                  <span>{ja ? 'プロフィールタグ' : 'Profile tags'}</span>
+              <section
+                className={
+                  'community-profile-academic tw-grid tw-max-w-[640px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-center tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-min-w-0 [&>div]:tw-gap-0.5 [&_strong]:tw-break-words [&_strong]:tw-text-base [&_strong]:tw-text-community-bright [&_small]:tw-break-words [&_small]:tw-text-[13px] [&_small]:tw-text-community-accent-light'
+                }
+              >
+                <span>{ja ? '所属' : 'Program'}</span>
+                <div>
+                  {user.academicGroup && user.department ? (
+                    <>
+                      <strong>{user.academicGroup}</strong>
+                      <small>{user.department}</small>
+                    </>
+                  ) : (
+                    <small>{unsetText}</small>
+                  )}
+                </div>
+              </section>
+              <section
+                className={
+                  'community-profile-tag-section tw-grid tw-max-w-[820px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-center tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted'
+                }
+              >
+                <span>{ja ? 'プロフィールタグ' : 'Profile tags'}</span>
+                {profileTags.length ? (
                   <div
                     className={
                       'community-profile-tags tw-flex tw-flex-wrap tw-gap-[7px] [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-accent-bg [&>button]:tw-px-2.5 [&>button]:tw-py-1 [&>button]:tw-text-xs [&>button]:tw-font-bold [&>button]:tw-text-community-accent-light [&>button]:tw-cursor-pointer hover:[&>button]:tw-border-community-accent'
                     }
                     aria-label={ja ? 'プロフィールタグ' : 'Profile tags'}
                   >
-                    {(user.profileTags ?? []).map((tag) => (
+                    {profileTags.map((tag) => (
                       <button type="button" key={tag} onClick={() => onTagClick(tag)}>
                         #{tag}
                       </button>
                     ))}
                   </div>
-                </section>
-              ) : null}
-              {user.websiteUrl || socialEntries(user.socialLinks).length ? (
-                <section
-                  className={
-                    'community-profile-link-section tw-grid tw-max-w-[820px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-start tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-pt-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-min-w-0 [&>div]:tw-gap-2'
-                  }
-                >
-                  <span>{ja ? 'リンク' : 'Links'}</span>
-                  <div>
-                    {user.websiteUrl ? (
+                ) : (
+                  <p className={'tw-m-0 tw-text-[13px] tw-text-community-muted'}>{unsetText}</p>
+                )}
+              </section>
+              <section
+                className={
+                  'community-profile-link-section tw-grid tw-max-w-[820px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-start tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-pt-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-min-w-0 [&>div]:tw-gap-2'
+                }
+              >
+                <span>{ja ? 'リンク' : 'Links'}</span>
+                <div>
+                  {user.websiteUrl || userSocialEntries.length ? (
+                    <>
+                      {user.websiteUrl ? (
                       <a
                         className={
                           'community-profile-link tw-inline-flex tw-items-center tw-gap-1 tw-break-words tw-text-[13px] tw-text-community-accent-light tw-no-underline'
@@ -179,15 +205,15 @@ export function ProfileScreen({
                         <span aria-hidden="true">↗</span>
                         {websiteLabel(user.websiteUrl)}
                       </a>
-                    ) : null}
-                    {socialEntries(user.socialLinks).length ? (
+                      ) : null}
+                      {userSocialEntries.length ? (
                       <div
                         className={
                           'community-profile-socials tw-flex tw-flex-wrap tw-gap-2 [&>a]:tw-inline-flex [&>a]:tw-min-h-[34px] [&>a]:tw-items-center [&>a]:tw-gap-2 [&>a]:tw-rounded-full [&>a]:tw-border [&>a]:tw-border-community-border [&>a]:tw-bg-community-bg3 [&>a]:tw-py-0 [&>a]:tw-pl-2 [&>a]:tw-pr-3 [&>a]:tw-text-[13px] [&>a]:tw-font-bold [&>a]:tw-text-community-text [&>a]:tw-no-underline hover:[&>a]:tw-border-community-accent hover:[&>a]:tw-text-community-accent-light'
                         }
                         aria-label={ja ? '外部リンク' : 'Social links'}
                       >
-                        {socialEntries(user.socialLinks).map((entry) => (
+                        {userSocialEntries.map((entry) => (
                           <a
                             key={entry.key}
                             href={entry.url}
@@ -199,10 +225,13 @@ export function ProfileScreen({
                           </a>
                         ))}
                       </div>
-                    ) : null}
-                  </div>
-                </section>
-              ) : null}
+                      ) : null}
+                    </>
+                  ) : (
+                    <p className={'tw-m-0 tw-text-[13px] tw-text-community-muted'}>{unsetText}</p>
+                  )}
+                </div>
+              </section>
             </div>
             <aside
               className={
@@ -293,6 +322,7 @@ export function ProfileScreen({
                   onOpen={() => onOpen(post)}
                   onLike={() => onLike(post)}
                   onBookmark={() => onBookmark(post)}
+                  onImpression={() => onImpression(post)}
                 />
                 <span className={cn(`is-${post.status}`)}>
                   {post.status === 'approved'

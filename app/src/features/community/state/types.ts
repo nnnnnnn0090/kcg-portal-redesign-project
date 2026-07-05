@@ -69,6 +69,7 @@ export interface CommunityActions {
   loadFeed: (authToken?: string, silent?: boolean) => Promise<void>;
   go: (page: CommunityPage) => void;
   openProfile: (loginId: string) => Promise<void>;
+  openPost: (post: CommunityPost) => void;
   openTag: (tag: string) => void;
   openConnections: (profile: CommunityUser, relation: 'followers' | 'following') => Promise<void>;
   authenticate: (event: FormEvent<HTMLFormElement>, mode: 'login' | 'register') => Promise<void>;
@@ -78,6 +79,7 @@ export interface CommunityActions {
   removePost: (post: CommunityPost) => Promise<void>;
   toggleLike: (post: CommunityPost) => Promise<void>;
   toggleBookmark: (post: CommunityPost) => Promise<void>;
+  recordImpression: (post: CommunityPost) => void;
   toggleFollow: (target: CommunityUser) => Promise<void>;
   refreshCurrentPage: () => Promise<void>;
   openLikes: (post: CommunityPost) => void;

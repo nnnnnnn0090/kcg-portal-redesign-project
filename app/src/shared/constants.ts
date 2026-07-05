@@ -193,23 +193,6 @@ export {
 /** 拡張紹介ページ・開発者お知らせ JSON のオリジン（host_permissions と URL 生成用） */
 export const EXTENSION_PROMO_ORIGIN = 'https://kcg-portal-redesign-project-web.vercel.app' as const;
 
-function communityApiOrigin(): string {
-  const raw = import.meta.env.VITE_COMMUNITY_API_ORIGIN?.trim() || 'http://127.0.0.1:8787';
-  try {
-    const url = new URL(raw);
-    if (url.hostname === '0.0.0.0') url.hostname = '127.0.0.1';
-    if (url.protocol === 'https:' && ['0.0.0.0', '127.0.0.1', 'localhost'].includes(url.hostname)) {
-      url.protocol = 'http:';
-    }
-    return url.origin;
-  } catch {
-    return 'http://127.0.0.1:8787';
-  }
-}
-
-/** 「みんなの活動」ローカルサーバー。トンネル利用時は環境変数で差し替える。 */
-export const COMMUNITY_API_ORIGIN = communityApiOrigin();
-
 /** 拡張機能紹介ページ */
 export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;
 
@@ -255,7 +238,10 @@ export const EXTENSION_AUTHOR_CREDIT_TEXT = 'nnnnnnn0090' as const;
 function vitePrivateUrl(
   key: 'VITE_PORTAL_DISCORD_INVITE_URL' | 'VITE_EXTENSION_FEEDBACK_FORM_URL',
 ): string {
-  const raw = import.meta.env[key];
+  const raw =
+    key === 'VITE_PORTAL_DISCORD_INVITE_URL'
+      ? import.meta.env.VITE_PORTAL_DISCORD_INVITE_URL
+      : import.meta.env.VITE_EXTENSION_FEEDBACK_FORM_URL;
   return typeof raw === 'string' ? raw.trim() : '';
 }
 

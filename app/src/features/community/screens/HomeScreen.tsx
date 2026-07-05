@@ -14,6 +14,7 @@ export function HomeScreen({
   onOpen,
   onLike,
   onBookmark,
+  onImpression,
 }: {
   posts: CommunityPost[];
   loading: boolean;
@@ -25,6 +26,7 @@ export function HomeScreen({
   onOpen: (post: CommunityPost) => void;
   onLike: (post: CommunityPost) => void;
   onBookmark: (post: CommunityPost) => void;
+  onImpression: (post: CommunityPost) => void;
 }) {
   return (
     <main
@@ -97,6 +99,7 @@ export function HomeScreen({
                   onOpen={() => onOpen(post)}
                   onLike={() => onLike(post)}
                   onBookmark={() => onBookmark(post)}
+                  onImpression={() => onImpression(post)}
                 />
               ))}
             </div>

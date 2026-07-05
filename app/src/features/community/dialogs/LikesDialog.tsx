@@ -32,7 +32,7 @@ export function LikesDialog({
       ) : modal.users.length ? (
         <div
           className={
-            'community-connections-list tw-grid tw-gap-2 tw-p-4 [&>button]:tw-grid [&>button]:tw-grid-cols-[auto_minmax(0,1fr)_auto] [&>button]:tw-items-center [&>button]:tw-gap-3 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-p-3 [&>button]:tw-text-left [&>button]:tw-cursor-pointer hover:[&>button]:tw-border-community-accent max-[420px]:[&>button]:tw-grid-cols-[auto_minmax(0,1fr)] [&_span]:tw-grid [&_span]:tw-min-w-0 [&_small]:tw-text-xs [&_small]:tw-text-community-muted [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-accent-light max-[420px]:[&_em]:tw-hidden'
+            'community-connections-list tw-grid tw-gap-2 tw-p-4 [&>button]:tw-grid [&>button]:tw-grid-cols-[auto_minmax(0,1fr)_auto] [&>button]:tw-items-center [&>button]:tw-gap-3 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-p-3 [&>button]:tw-text-left [&>button]:tw-text-community-text [&>button]:tw-cursor-pointer hover:[&>button]:tw-border-community-accent max-[420px]:[&>button]:tw-grid-cols-[auto_minmax(0,1fr)] [&_span]:tw-grid [&_span]:tw-min-w-0 [&_strong]:tw-text-community-bright [&_small]:tw-text-xs [&_small]:tw-text-community-muted [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-accent-light max-[420px]:[&_em]:tw-hidden'
           }
         >
           {modal.users.map((item) => (

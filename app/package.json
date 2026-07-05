@@ -1,6 +1,6 @@
 {
   "name": "kcg-portal-redesign-project",
-  "version": "6.2.2",
+  "version": "6.2.3",
   "private": true,
   "scripts": {
     "dev": "wxt",

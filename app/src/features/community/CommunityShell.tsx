@@ -47,6 +47,7 @@ export function CommunityShell() {
     loadFeed,
     go,
     openProfile,
+    openPost,
     openTag,
     openConnections,
     authenticate,
@@ -56,6 +57,7 @@ export function CommunityShell() {
     removePost,
     toggleLike,
     toggleBookmark,
+    recordImpression,
     toggleFollow,
     refreshCurrentPage,
     openLikes,
@@ -226,9 +228,10 @@ export function CommunityShell() {
               onRetry={loadFeed}
               onCreate={() => go('create')}
               onExplore={() => go('explore')}
-              onOpen={(post) => setModal({ kind: 'post', post })}
+              onOpen={openPost}
               onLike={(post) => void toggleLike(post)}
               onBookmark={(post) => void toggleBookmark(post)}
+              onImpression={recordImpression}
             />
           ) : null}
           {page === 'explore' ? (
@@ -243,9 +246,10 @@ export function CommunityShell() {
               setQuery={setQuery}
               setTag={setTag}
               onOpenProfile={(loginId) => void openProfile(loginId)}
-              onOpen={(post) => setModal({ kind: 'post', post })}
+              onOpen={openPost}
               onLike={(post) => void toggleLike(post)}
               onBookmark={(post) => void toggleBookmark(post)}
+              onImpression={recordImpression}
             />
           ) : null}
           {page === 'following' ? (
@@ -260,9 +264,10 @@ export function CommunityShell() {
               setQuery={setQuery}
               setTag={setTag}
               onOpenProfile={(loginId) => void openProfile(loginId)}
-              onOpen={(post) => setModal({ kind: 'post', post })}
+              onOpen={openPost}
               onLike={(post) => void toggleLike(post)}
               onBookmark={(post) => void toggleBookmark(post)}
+              onImpression={recordImpression}
               title={ja ? 'フォロー中' : 'Following'}
               description={
                 ja
@@ -283,9 +288,10 @@ export function CommunityShell() {
               setQuery={setQuery}
               setTag={setTag}
               onOpenProfile={(loginId) => void openProfile(loginId)}
-              onOpen={(post) => setModal({ kind: 'post', post })}
+              onOpen={openPost}
               onLike={(post) => void toggleLike(post)}
               onBookmark={(post) => void toggleBookmark(post)}
+              onImpression={recordImpression}
               title={ja ? '保存済み' : 'Bookmarks'}
               description={
                 ja
@@ -310,9 +316,10 @@ export function CommunityShell() {
               isOwn={Boolean(user && profileUser.loginId === user.loginId)}
               onEdit={openProfileEditor}
               onCreate={() => go('create')}
-              onOpen={(post) => setModal({ kind: 'post', post })}
+              onOpen={openPost}
               onLike={(post) => void toggleLike(post)}
               onBookmark={(post) => void toggleBookmark(post)}
+              onImpression={recordImpression}
               onFollow={() => void toggleFollow(profileUser)}
               onConnections={(relation) => void openConnections(profileUser, relation)}
               onTagClick={openTag}

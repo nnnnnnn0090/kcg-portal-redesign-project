@@ -1,5 +1,4 @@
 import type { ApiEnvelope, ApiProblem } from './contract';
-import { COMMUNITY_API_ORIGIN } from '../../shared/constants';
 import { CLIENT_USER_ID_HEADER } from '../../shared/constants';
 import { getOrCreateClientUserId } from '../../lib/client-user-id';
 import type {
@@ -10,7 +9,30 @@ import type {
 } from './types';
 
 const COMMUNITY_LOGIN_ID_HEADER = 'X-KCG-Community-Login-Id';
+const COMMUNITY_MEDIA_URL_KEYS = new Set([
+  'avatarUrl',
+  'headerUrl',
+  'authorAvatarUrl',
+  'imageUrl',
+  'imageUrls',
+]);
+let communityApiOrigin = '';
 let requestLoginId = '';
+
+export function setCommunityApiOrigin(origin: string) {
+  const raw = origin.trim();
+  if (!raw) {
+    communityApiOrigin = '';
+    return;
+  }
+  const url = new URL(raw);
+  communityApiOrigin = url.origin;
+}
+
+function getCommunityApiOrigin(): string {
+  if (!communityApiOrigin) throw new Error('みんなの活動の接続先が未設定です');
+  return communityApiOrigin;
+}
 
 export function setCommunityRequestLoginId(loginId: string | null | undefined) {
   requestLoginId = loginId?.trim() ?? '';
@@ -24,7 +46,8 @@ async function withRequestIdentity(init?: RequestInit): Promise<RequestInit> {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${COMMUNITY_API_ORIGIN}/api${path}`, {
+  const origin = getCommunityApiOrigin();
+  const response = await fetch(`${origin}/api${path}`, {
     cache: 'no-store',
     ...(await withRequestIdentity(init)),
   });
@@ -35,15 +58,31 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(problem?.detail || `HTTP ${response.status}`);
   }
   if (!body || !('data' in body)) throw new Error(`HTTP ${response.status}`);
-  return resolveApiUrls(body.data);
+  return resolveApiUrls(body.data, origin);
 }
-function resolveApiUrls<T>(value: T): T {
+
+export function rebaseCommunityMediaUrl(value: string, origin: string): string {
+  try {
+    const url = new URL(value, origin);
+    if (!url.pathname.startsWith('/api/')) return value;
+    return new URL(`${url.pathname}${url.search}${url.hash}`, origin).toString();
+  } catch {
+    return value;
+  }
+}
+
+function resolveApiUrls<T>(value: T, origin: string, key?: string): T {
   if (typeof value === 'string')
-    return (value.startsWith('/api/') ? `${COMMUNITY_API_ORIGIN}${value}` : value) as T;
-  if (Array.isArray(value)) return value.map(resolveApiUrls) as T;
+    return (
+      key && COMMUNITY_MEDIA_URL_KEYS.has(key) ? rebaseCommunityMediaUrl(value, origin) : value
+    ) as T;
+  if (Array.isArray(value)) return value.map((item) => resolveApiUrls(item, origin, key)) as T;
   if (value && typeof value === 'object')
     return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, resolveApiUrls(item)]),
+      Object.entries(value).map(([itemKey, item]) => [
+        itemKey,
+        resolveApiUrls(item, origin, itemKey),
+      ]),
     ) as T;
   return value;
 }
@@ -69,6 +108,11 @@ async function imageForm(imageDataUrl: string): Promise<FormData> {
 export const communityApi = {
   posts: (token?: string) =>
     request<{ posts: CommunityPost[] }>('/posts', token ? authorized(token) : undefined),
+  post: (id: string, token?: string) =>
+    request<{ post: CommunityPost }>(
+      `/posts/${encodeURIComponent(id)}`,
+      token ? authorized(token) : undefined,
+    ),
   session: (token: string) => request<{ user: CommunityUser }>('/session', authorized(token)),
   authenticate: (mode: 'register' | 'login', body: object) =>
     request<{ token: string; user: CommunityUser }>(`/auth/${mode}`, json('POST', body)),
@@ -90,7 +134,7 @@ export const communityApi = {
     ),
   ownPostImage: async (token: string, id: string, position = 0) => {
     const response = await fetch(
-      `${COMMUNITY_API_ORIGIN}/api/posts/${encodeURIComponent(id)}/images/${position}`,
+      `${getCommunityApiOrigin()}/api/posts/${encodeURIComponent(id)}/images/${position}`,
       await withRequestIdentity(authorized(token)),
     );
     if (!response.ok) throw new Error('画像を読み込めませんでした');
@@ -98,7 +142,7 @@ export const communityApi = {
   },
   ownProfileImage: async (token: string, kind: 'avatar' | 'header') => {
     const response = await fetch(
-      `${COMMUNITY_API_ORIGIN}/api/me/profile-submission/images/${kind}`,
+      `${getCommunityApiOrigin()}/api/me/profile-submission/images/${kind}`,
       await withRequestIdentity(authorized(token)),
     );
     if (!response.ok) throw new Error('画像を読み込めませんでした');
@@ -169,6 +213,11 @@ export const communityApi = {
     request<{ comments: CommunityComment[] }>(
       `/posts/${encodeURIComponent(id)}/comments`,
       token ? authorized(token) : undefined,
+    ),
+  recordImpression: (id: string, token?: string) =>
+    request<{ impressionCount: number }>(
+      `/posts/${encodeURIComponent(id)}/impressions`,
+      token ? authorized(token, { method: 'POST' }) : { method: 'POST' },
     ),
   createComment: (token: string, id: string, content: string) =>
     request<{ comment: CommunityComment }>(

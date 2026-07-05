@@ -32,7 +32,7 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
   return (
     <form
       className={cn(
-        'community-dialog community-auth tw-relative tw-max-h-[min(92vh,820px)] tw-w-full tw-overflow-hidden tw-rounded-2xl tw-border tw-border-community-border tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[520px]:tw-max-h-[calc(100vh-16px)] max-[520px]:tw-rounded-xl',
+        'community-dialog community-auth tw-relative tw-max-h-[min(92vh,820px)] tw-w-full tw-overflow-hidden tw-rounded-2xl tw-border-2 tw-border-community-border tw-bg-community-bg tw-shadow-[0_0_0_1px_color-mix(in_srgb,var(--p-accent)_18%,transparent),0_22px_80px_color-mix(in_srgb,#000_34%,transparent)] tw-animate-community-dialog-in max-[520px]:tw-max-h-[calc(100vh-16px)] max-[520px]:tw-rounded-xl',
         registering
           ? 'tw-grid tw-max-w-[760px] tw-grid-cols-[220px_minmax(0,1fr)] max-[720px]:tw-block max-[720px]:tw-max-w-[480px]'
           : 'tw-max-w-[420px]',

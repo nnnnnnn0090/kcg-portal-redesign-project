@@ -13,7 +13,7 @@ import {
 import type { AppLanguage } from '../../../i18n/messages';
 import storage from '../../../lib/storage';
 import { SK } from '../../../shared/constants';
-import { communityApi, setCommunityRequestLoginId } from '../api';
+import { communityApi, setCommunityApiOrigin, setCommunityRequestLoginId } from '../api';
 import { SOCIAL_PLATFORMS } from '../constants';
 import { communityImageFiles, isCommunityImageFile } from '../imageFiles';
 import type { CommunityPage, CommunityPost, CommunityUser } from '../types';
@@ -38,11 +38,13 @@ function useCommunitySetter<Key extends keyof CommunityState>(
 export function CommunityProvider({
   language,
   defaultAuthorName,
+  apiOrigin,
   onClose,
   children,
 }: {
   language: AppLanguage;
   defaultAuthorName: string;
+  apiOrigin: string;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -89,9 +91,15 @@ export function CommunityProvider({
   const setPostImages = useCommunitySetter(dispatch, 'postImages');
   const setAvatarImage = useCommunitySetter(dispatch, 'avatarImage');
   const setHeaderImage = useCommunitySetter(dispatch, 'headerImage');
+
+  useEffect(() => {
+    setCommunityApiOrigin(apiOrigin);
+    return () => setCommunityApiOrigin('');
+  }, [apiOrigin]);
   const setClosing = useCommunitySetter(dispatch, 'closing');
   const objectUrls = useObjectUrlRegistry();
   const profileObjectUrls = useObjectUrlRegistry();
+  const recordedImpressions = useRef<Set<string>>(new Set());
   const closeTimer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -100,6 +108,10 @@ export function CommunityProvider({
       value: { ja: language === 'ja', defaultAuthorName },
     });
   }, [defaultAuthorName, language]);
+
+  useEffect(() => {
+    recordedImpressions.current.clear();
+  }, [token]);
 
   useEffect(() => {
     setCommunityRequestLoginId(user?.loginId);
@@ -410,6 +422,16 @@ export function CommunityProvider({
     }
   };
 
+  const openPost = (post: CommunityPost) => {
+    setModal({ kind: 'post', post });
+    communityApi
+      .post(post.id, token || undefined)
+      .then((result) => {
+        dispatch({ type: 'patchPost', postId: post.id, value: result.post });
+      })
+      .catch(() => undefined);
+  };
+
   const openTag = (nextTag: string) => {
     setTag(nextTag);
     setQuery(`#${nextTag}`);
@@ -631,6 +653,23 @@ export function CommunityProvider({
     }
   };
 
+  const recordImpression = (post: CommunityPost) => {
+    if (recordedImpressions.current.has(post.id)) return;
+    recordedImpressions.current.add(post.id);
+    communityApi
+      .recordImpression(post.id, token || undefined)
+      .then((result) => {
+        dispatch({
+          type: 'patchPost',
+          postId: post.id,
+          value: { impressionCount: result.impressionCount },
+        });
+      })
+      .catch(() => {
+        recordedImpressions.current.delete(post.id);
+      });
+  };
+
   const toggleFollow = async (target: CommunityUser) => {
     if (!token) {
       setModal({ kind: 'auth', mode: 'login' });
@@ -810,6 +849,7 @@ export function CommunityProvider({
     loadFeed,
     go,
     openProfile,
+    openPost,
     openTag,
     openConnections,
     authenticate,
@@ -819,6 +859,7 @@ export function CommunityProvider({
     removePost,
     toggleLike,
     toggleBookmark,
+    recordImpression,
     toggleFollow,
     refreshCurrentPage,
     openLikes,
@@ -859,6 +900,7 @@ export function CommunityProvider({
       loadFeed: (...args) => actionsRef.current.loadFeed(...args),
       go: (...args) => actionsRef.current.go(...args),
       openProfile: (...args) => actionsRef.current.openProfile(...args),
+      openPost: (...args) => actionsRef.current.openPost(...args),
       openTag: (...args) => actionsRef.current.openTag(...args),
       openConnections: (...args) => actionsRef.current.openConnections(...args),
       authenticate: (...args) => actionsRef.current.authenticate(...args),
@@ -868,6 +910,7 @@ export function CommunityProvider({
       removePost: (...args) => actionsRef.current.removePost(...args),
       toggleLike: (...args) => actionsRef.current.toggleLike(...args),
       toggleBookmark: (...args) => actionsRef.current.toggleBookmark(...args),
+      recordImpression: (...args) => actionsRef.current.recordImpression(...args),
       toggleFollow: (...args) => actionsRef.current.toggleFollow(...args),
       refreshCurrentPage: () => actionsRef.current.refreshCurrentPage(),
       openLikes: (...args) => actionsRef.current.openLikes(...args),

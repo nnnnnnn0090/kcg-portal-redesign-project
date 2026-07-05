@@ -6,14 +6,21 @@ import '../../styles/tailwind-overlay.css';
 export function CommunityActivityDrawer({
   language,
   defaultAuthorName,
+  apiOrigin,
   onClose,
 }: {
   language: AppLanguage;
   defaultAuthorName: string;
+  apiOrigin: string;
   onClose: () => void;
 }) {
   return (
-    <CommunityProvider language={language} defaultAuthorName={defaultAuthorName} onClose={onClose}>
+    <CommunityProvider
+      language={language}
+      defaultAuthorName={defaultAuthorName}
+      apiOrigin={apiOrigin}
+      onClose={onClose}
+    >
       <CommunityShell />
     </CommunityProvider>
   );

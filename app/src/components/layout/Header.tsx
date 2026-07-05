@@ -41,6 +41,7 @@ interface NavGroup {
 }
 
 type NavItem = NavLink | NavGroup;
+type CommunityAccessResponse = { enabled?: unknown; apiOrigin?: unknown };
 
 // ─── DOM 解析 ─────────────────────────────────────────────────────────────
 
@@ -49,6 +50,17 @@ function resolveHref(href: string): string {
     return new URL(href, location.origin).href;
   } catch {
     return href;
+  }
+}
+
+function normalizeCommunityApiOrigin(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    return url.origin;
+  } catch {
+    return '';
   }
 }
 
@@ -275,6 +287,7 @@ export function Header({
   const [activityOpen, setActivityOpen] = useState(false);
   const [activityConsentOpen, setActivityConsentOpen] = useState(false);
   const [communityEnabled, setCommunityEnabled] = useState(false);
+  const [communityApiOrigin, setCommunityApiOrigin] = useState('');
   const profile = usePortalProfile(t.header.profileTitle);
 
   const navItems = useMemo(() => {
@@ -311,6 +324,7 @@ export function Header({
   useEffect(() => {
     if (navSource !== 'portal') {
       setCommunityEnabled(false);
+      setCommunityApiOrigin('');
       return;
     }
     const controller = new AbortController();
@@ -323,9 +337,16 @@ export function Header({
         }),
       )
       .then((response) => (response.ok ? response.json() : Promise.reject(new Error())))
-      .then((result: { enabled?: unknown }) => setCommunityEnabled(result.enabled === true))
+      .then((result: CommunityAccessResponse) => {
+        const apiOrigin = normalizeCommunityApiOrigin(result.apiOrigin);
+        setCommunityApiOrigin(result.enabled === true ? apiOrigin : '');
+        setCommunityEnabled(result.enabled === true && apiOrigin.length > 0);
+      })
       .catch(() => {
-        if (!controller.signal.aborted) setCommunityEnabled(false);
+        if (!controller.signal.aborted) {
+          setCommunityEnabled(false);
+          setCommunityApiOrigin('');
+        }
       });
     return () => controller.abort();
   }, [navSource]);
@@ -368,6 +389,7 @@ export function Header({
   const navLabel = navSource === 'home2-mail' ? t.header.home2Menu : t.header.portalMenu;
 
   async function openCommunityActivity() {
+    if (!communityApiOrigin) return;
     const accepted = await storage
       .get(SK.communityDisclaimerAccepted)
       .then((value) => value[SK.communityDisclaimerAccepted] === true)
@@ -417,31 +439,19 @@ export function Header({
           {navSource === 'portal' && language === 'ja' && communityEnabled ? (
             <button
               type="button"
-              className="p-community-activity-entry"
+              className="p-community-activity-entry inline-flex items-center gap-2 whitespace-nowrap"
               aria-label={t.header.communityActivity}
               aria-expanded={activityOpen}
               aria-controls="p-community-activity-drawer"
               onClick={() => void openCommunityActivity()}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect
-                  x="3"
-                  y="4"
-                  width="18"
-                  height="16"
-                  rx="4"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                />
-                <circle cx="9" cy="10" r="2" fill="currentColor" />
-                <path
-                  d="m5.5 17 4.2-4 3.1 2.7 2.7-2.5 3 3.8"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <img
+                src={browser.runtime.getURL('community/activity-icon.png' as never)}
+                width={22}
+                height={22}
+                alt=""
+              />
+              <span>{t.header.communityActivity}</span>
             </button>
           ) : null}
 
@@ -504,6 +514,7 @@ export function Header({
             <CommunityActivityDrawer
               language={language}
               defaultAuthorName={profile?.name ?? ''}
+              apiOrigin={communityApiOrigin}
               onClose={() => setActivityOpen(false)}
             />,
             document.getElementById(PORTAL_DOM.overlayRoot) ?? document.body,

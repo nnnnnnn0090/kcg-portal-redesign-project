@@ -36,7 +36,12 @@ export function PostDialog({
   token: string;
   viewerLoginId?: string;
 }) {
-  const images = post.imageUrls?.length ? post.imageUrls : [post.previewUrl || post.imageUrl];
+  const images =
+    post.status !== 'approved' && post.previewUrl
+      ? [post.previewUrl]
+      : post.imageUrls?.length
+        ? post.imageUrls
+        : [post.previewUrl || post.imageUrl];
   const [imageIndex, setImageIndex] = useState(0);
   const imageTrackRef = useRef<HTMLDivElement>(null);
   const [comments, setComments] = useState<CommunityComment[]>([]);
@@ -49,6 +54,8 @@ export function PostDialog({
   const [reportReason, setReportReason] = useState('');
   const [likeCelebrating, setLikeCelebrating] = useState(false);
   const [bookmarkCelebrating, setBookmarkCelebrating] = useState(false);
+  const [pendingDeleteComment, setPendingDeleteComment] = useState<CommunityComment | null>(null);
+  const [deletingCommentId, setDeletingCommentId] = useState('');
   useEffect(() => {
     let active = true;
     setCommentsLoading(true);
@@ -98,13 +105,15 @@ export function PostDialog({
       setCommentBusy(false);
     }
   };
-  const deleteComment = async (comment: CommunityComment) => {
-    if (!token || !window.confirm(ja ? 'このコメントを削除しますか？' : 'Delete this comment?'))
-      return;
+  const deleteComment = async () => {
+    const comment = pendingDeleteComment;
+    if (!token || !comment || deletingCommentId) return;
+    setDeletingCommentId(comment.id);
     setCommentError('');
     try {
       await communityApi.deleteComment(token, post.id, comment.id);
       setComments((current) => current.filter((item) => item.id !== comment.id));
+      setPendingDeleteComment(null);
     } catch (deleteError) {
       setCommentError(
         deleteError instanceof Error
@@ -113,6 +122,8 @@ export function PostDialog({
             ? '削除できませんでした。'
             : 'Could not delete comment.',
       );
+    } finally {
+      setDeletingCommentId('');
     }
   };
   const submitReport = async (event: FormEvent) => {
@@ -324,17 +335,17 @@ export function PostDialog({
         ) : null}
         <div
           className={
-            'community-post-actions tw-mx-5 tw-flex tw-items-center tw-justify-between tw-gap-3 tw-border-y tw-border-community-border tw-py-3'
+            'community-post-actions tw-mx-5 tw-grid tw-gap-3 tw-border-y tw-border-community-border tw-py-4'
           }
         >
           <div
             className={
-              'community-post-primary-actions tw-flex tw-min-w-0 tw-flex-nowrap tw-gap-2'
+              'community-post-primary-actions tw-flex tw-min-w-0 tw-flex-wrap tw-gap-3'
             }
           >
             <button
               className={cn(
-                'community-detail-like tw-flex tw-items-center tw-gap-2 tw-rounded-full tw-border tw-border-community-border tw-bg-community-bg3 tw-p-1.5 tw-pr-4 tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-border-community-danger hover:tw-bg-community-danger/10 hover:tw-text-community-danger hover:tw-shadow-community-card [&.is-active]:tw-border-community-danger [&.is-active]:tw-text-community-danger',
+                'community-detail-like tw-flex tw-min-h-[58px] tw-min-w-[148px] tw-flex-[1_1_148px] tw-items-center tw-gap-2.5 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-py-2.5 tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-border-community-danger hover:tw-bg-[color-mix(in_srgb,var(--p-danger,#e54867)_10%,var(--p-bg3))] hover:tw-text-community-danger hover:tw-shadow-community-card [&.is-active]:tw-border-community-danger [&.is-active]:tw-bg-[color-mix(in_srgb,var(--p-danger,#e54867)_20%,var(--p-bg3))] [&.is-active]:tw-text-community-danger [&.is-active]:tw-shadow-[0_0_0_1px_color-mix(in_srgb,var(--p-danger,#e54867)_22%,transparent)]',
                 post.likedByMe && 'is-active',
                 likeCelebrating && 'is-celebrating',
               )}
@@ -348,14 +359,14 @@ export function PostDialog({
             >
               <span
                 className={
-                  'community-like-icon tw-grid tw-h-9 tw-w-9 tw-place-items-center tw-rounded-full tw-bg-community-bg2 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [.is-active_&]:tw-bg-[color-mix(in_srgb,var(--p-danger,#e54867)_12%,var(--p-bg2))] [.is-active_&_svg]:tw-fill-current [.is-celebrating_&_svg]:tw-animate-community-action-pop'
+                  'community-like-icon tw-grid tw-h-8 tw-w-8 tw-flex-none tw-place-items-center tw-rounded-full tw-bg-community-bg2 tw-text-community-muted [&_svg]:tw-h-5 [&_svg]:tw-w-5 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [.is-active_&]:tw-bg-community-danger [.is-active_&]:tw-text-white [.is-active_&_svg]:tw-fill-current [.is-celebrating_&_svg]:tw-animate-community-action-pop'
                 }
               >
                 <Glyph name="heart" />
               </span>
               <span
                 className={
-                  'community-like-copy tw-grid tw-whitespace-nowrap tw-text-left [&_strong]:tw-text-sm [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
+                  'community-like-copy tw-grid tw-min-w-0 tw-gap-0.5 tw-text-left [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-font-bold [&_small]:tw-whitespace-nowrap [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
                 }
               >
                 <strong>
@@ -368,7 +379,7 @@ export function PostDialog({
             </button>
             <button
               className={cn(
-                'community-detail-bookmark tw-flex tw-items-center tw-gap-2 tw-rounded-full tw-border tw-border-community-border tw-bg-community-bg3 tw-p-1.5 tw-pr-4 tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-shadow-community-card [&.is-active]:tw-border-community-accent [&.is-active]:tw-text-community-accent-light',
+                'community-detail-bookmark tw-flex tw-min-h-[58px] tw-min-w-[148px] tw-flex-[1_1_148px] tw-items-center tw-gap-2.5 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-py-2.5 tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-[color-mix(in_srgb,var(--p-accent)_10%,var(--p-bg3))] hover:tw-text-community-accent-light hover:tw-shadow-community-card [&.is-active]:tw-border-community-accent [&.is-active]:tw-bg-[color-mix(in_srgb,var(--p-accent)_20%,var(--p-bg3))] [&.is-active]:tw-text-community-accent-light [&.is-active]:tw-shadow-[0_0_0_1px_color-mix(in_srgb,var(--p-accent)_22%,transparent)]',
                 post.bookmarkedByMe && 'is-active',
                 bookmarkCelebrating && 'is-celebrating',
               )}
@@ -382,14 +393,14 @@ export function PostDialog({
             >
               <span
                 className={
-                  'community-bookmark-icon tw-grid tw-h-9 tw-w-9 tw-place-items-center tw-rounded-full tw-bg-community-bg2 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [.is-active_&_svg]:tw-fill-current [.is-celebrating_&_svg]:tw-animate-community-action-pop'
+                  'community-bookmark-icon tw-grid tw-h-8 tw-w-8 tw-flex-none tw-place-items-center tw-rounded-full tw-bg-community-bg2 tw-text-community-muted [&_svg]:tw-h-5 [&_svg]:tw-w-5 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [.is-active_&]:tw-bg-community-accent [.is-active_&]:tw-text-community-on-accent [.is-active_&_svg]:tw-fill-current [.is-celebrating_&_svg]:tw-animate-community-action-pop'
                 }
               >
                 <Glyph name="bookmark" />
               </span>
               <span
                 className={
-                  'community-bookmark-copy tw-grid tw-whitespace-nowrap tw-text-left [&_strong]:tw-text-sm [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
+                  'community-bookmark-copy tw-grid tw-min-w-0 tw-gap-0.5 tw-text-left [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-font-bold [&_small]:tw-whitespace-nowrap [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
                 }
               >
                 <strong>
@@ -401,16 +412,30 @@ export function PostDialog({
               </span>
             </button>
           </div>
-          <button
-            className={
-              'community-post-likes-list tw-flex-none tw-whitespace-nowrap tw-rounded-lg tw-border-0 tw-bg-transparent tw-p-2 tw-text-[13px] tw-text-community-accent-light tw-cursor-pointer hover:tw-bg-community-accent-bg'
-            }
-            type="button"
-            onClick={openLikes}
-          >
-            <span>{ja ? 'いいねした人' : 'People who liked this'}</span>
-            <span aria-hidden>›</span>
-          </button>
+          <div className={'tw-flex tw-items-center tw-justify-end tw-gap-3 max-[420px]:tw-justify-between'}>
+            <span
+              className={
+                'community-detail-impressions tw-inline-flex tw-items-center tw-gap-1.5 tw-text-xs tw-text-community-muted [&_svg]:tw-h-4 [&_svg]:tw-w-4'
+              }
+              aria-label={ja ? `表示 ${post.impressionCount}件` : `${post.impressionCount} views`}
+            >
+              <Glyph name="impression" />
+              <span>
+                {ja ? '表示' : 'Views'} {post.impressionCount.toLocaleString()}
+                {ja ? '件' : ''}
+              </span>
+            </span>
+            <button
+              className={
+                'community-post-likes-list tw-whitespace-nowrap tw-rounded-lg tw-border-0 tw-bg-transparent tw-px-2 tw-py-1 tw-text-[13px] tw-text-community-accent-light tw-cursor-pointer hover:tw-bg-community-accent-bg'
+              }
+              type="button"
+              onClick={openLikes}
+            >
+              <span>{ja ? 'いいねした人' : 'People who liked this'}</span>
+              <span aria-hidden>›</span>
+            </button>
+          </div>
         </div>
         <div className={'community-comments tw-border-t tw-border-community-border tw-p-5'}>
           <div
@@ -421,6 +446,39 @@ export function PostDialog({
             <strong>{ja ? 'コメント' : 'Comments'}</strong>
             <span>{comments.length}</span>
           </div>
+          {pendingDeleteComment ? (
+            <div
+              className={
+                'community-comment-delete-confirm tw-mb-4 tw-grid tw-gap-3 tw-rounded-xl tw-border tw-border-community-danger/50 tw-bg-community-danger/10 tw-p-3 [&_strong]:tw-text-sm [&_strong]:tw-text-community-danger [&_p]:tw-m-0 [&_p]:tw-text-[13px] [&_p]:tw-text-community-text [&_footer]:tw-flex [&_footer]:tw-justify-end [&_footer]:tw-gap-2 [&_button]:tw-inline-flex [&_button]:tw-min-h-9 [&_button]:tw-items-center [&_button]:tw-justify-center [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-px-3 [&_button]:tw-text-[13px] [&_button]:tw-font-bold [&_button]:tw-cursor-pointer [&_button:disabled]:tw-cursor-wait [&_button:disabled]:tw-opacity-60'
+              }
+            >
+              <strong>{ja ? 'コメントを削除しますか？' : 'Delete this comment?'}</strong>
+              <p>
+                {ja
+                  ? 'この操作は取り消せません。'
+                  : 'This action cannot be undone.'}
+              </p>
+              <footer>
+                <button
+                  className={'tw-border-community-border tw-bg-community-bg3 tw-text-community-text'}
+                  type="button"
+                  disabled={Boolean(deletingCommentId)}
+                  onClick={() => setPendingDeleteComment(null)}
+                >
+                  {ja ? 'キャンセル' : 'Cancel'}
+                </button>
+                <button
+                  className={'tw-border-community-danger tw-bg-community-danger tw-text-white'}
+                  type="button"
+                  disabled={Boolean(deletingCommentId)}
+                  onClick={() => void deleteComment()}
+                >
+                  {deletingCommentId ? <Busy /> : null}
+                  {ja ? '削除' : 'Delete'}
+                </button>
+              </footer>
+            </div>
+          ) : null}
           <div
             className={
               'community-comment-list tw-grid tw-gap-3 [&>p]:tw-m-0 [&>p]:tw-text-[13px] [&>p]:tw-text-community-muted'
@@ -485,9 +543,9 @@ export function PostDialog({
                         {viewerLoginId?.toLocaleLowerCase() ===
                         comment.authorLoginId.toLocaleLowerCase() ? (
                           <button
-                            className="tw-rounded-md tw-px-2 tw-py-1 tw-text-community-danger hover:tw-bg-community-danger hover:tw-text-white"
+                            className="tw-inline-flex tw-min-h-7 tw-items-center tw-rounded-md tw-border tw-border-community-danger/50 tw-bg-transparent tw-px-2 tw-py-1 tw-text-xs tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white"
                             type="button"
-                            onClick={() => void deleteComment(comment)}
+                            onClick={() => setPendingDeleteComment(comment)}
                           >
                             {ja ? '削除' : 'Delete'}
                           </button>

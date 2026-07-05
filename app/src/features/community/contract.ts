@@ -70,6 +70,7 @@ export interface CommunityPost {
   bookmarkCount: number;
   bookmarkedByMe: boolean;
   commentCount: number;
+  impressionCount: number;
   status: PostStatus;
   rejectionReason: string | null;
 }
