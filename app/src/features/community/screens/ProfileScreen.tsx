@@ -5,7 +5,7 @@ import { PostCard } from '../components/PostCard';
 import { SocialIcon } from '../components/SocialIcon';
 import type { CommunityPost, CommunityUser } from '../types';
 import { socialEntries, websiteLabel } from '../utils';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 
 export function ProfileScreen({
   user,
@@ -66,14 +66,12 @@ export function ProfileScreen({
             }
           >
             {user.headerUrl && !headerBroken ? (
-              <img
-                src={user.headerUrl}
-                alt=""
-                onError={() => setHeaderBroken(true)}
-              />
+              <img src={user.headerUrl} alt="" onError={() => setHeaderBroken(true)} />
             ) : (
               <>
-                <div className={'tw-absolute tw-inset-0 tw-bg-community-accent tw-opacity-[0.08]'} />
+                <div
+                  className={'tw-absolute tw-inset-0 tw-bg-community-accent tw-opacity-[0.08]'}
+                />
                 <div
                   className={
                     'tw-absolute tw-inset-y-0 tw-left-0 tw-w-[34%] tw-skew-x-[-16deg] tw-bg-community-accent tw-opacity-[0.10]'
@@ -194,37 +192,37 @@ export function ProfileScreen({
                   {user.websiteUrl || userSocialEntries.length ? (
                     <>
                       {user.websiteUrl ? (
-                      <a
-                        className={
-                          'community-profile-link tw-inline-flex tw-items-center tw-gap-1 tw-break-words tw-text-[13px] tw-text-community-accent-light tw-no-underline'
-                        }
-                        href={user.websiteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer nofollow ugc"
-                      >
-                        <span aria-hidden="true">↗</span>
-                        {websiteLabel(user.websiteUrl)}
-                      </a>
+                        <a
+                          className={
+                            'community-profile-link tw-inline-flex tw-items-center tw-gap-1 tw-break-words tw-text-[13px] tw-text-community-accent-light tw-no-underline'
+                          }
+                          href={user.websiteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer nofollow ugc"
+                        >
+                          <span aria-hidden="true">↗</span>
+                          {websiteLabel(user.websiteUrl)}
+                        </a>
                       ) : null}
                       {userSocialEntries.length ? (
-                      <div
-                        className={
-                          'community-profile-socials tw-flex tw-flex-wrap tw-gap-2 [&>a]:tw-inline-flex [&>a]:tw-min-h-[34px] [&>a]:tw-items-center [&>a]:tw-gap-2 [&>a]:tw-rounded-full [&>a]:tw-border [&>a]:tw-border-community-border [&>a]:tw-bg-community-bg3 [&>a]:tw-py-0 [&>a]:tw-pl-2 [&>a]:tw-pr-3 [&>a]:tw-text-[13px] [&>a]:tw-font-bold [&>a]:tw-text-community-text [&>a]:tw-no-underline hover:[&>a]:tw-border-community-accent hover:[&>a]:tw-text-community-accent-light'
-                        }
-                        aria-label={ja ? '外部リンク' : 'Social links'}
-                      >
-                        {userSocialEntries.map((entry) => (
-                          <a
-                            key={entry.key}
-                            href={entry.url}
-                            target="_blank"
-                            rel="noopener noreferrer nofollow ugc"
-                          >
-                            <SocialIcon platform={entry.key} />
-                            <span>{entry.label}</span>
-                          </a>
-                        ))}
-                      </div>
+                        <div
+                          className={
+                            'community-profile-socials tw-flex tw-flex-wrap tw-gap-2 [&>a]:tw-inline-flex [&>a]:tw-min-h-[34px] [&>a]:tw-items-center [&>a]:tw-gap-2 [&>a]:tw-rounded-full [&>a]:tw-border [&>a]:tw-border-community-border [&>a]:tw-bg-community-bg3 [&>a]:tw-py-0 [&>a]:tw-pl-2 [&>a]:tw-pr-3 [&>a]:tw-text-[13px] [&>a]:tw-font-bold [&>a]:tw-text-community-text [&>a]:tw-no-underline hover:[&>a]:tw-border-community-accent hover:[&>a]:tw-text-community-accent-light'
+                          }
+                          aria-label={ja ? '外部リンク' : 'Social links'}
+                        >
+                          {userSocialEntries.map((entry) => (
+                            <a
+                              key={entry.key}
+                              href={entry.url}
+                              target="_blank"
+                              rel="noopener noreferrer nofollow ugc"
+                            >
+                              <SocialIcon platform={entry.key} />
+                              <span>{entry.label}</span>
+                            </a>
+                          ))}
+                        </div>
                       ) : null}
                     </>
                   ) : (

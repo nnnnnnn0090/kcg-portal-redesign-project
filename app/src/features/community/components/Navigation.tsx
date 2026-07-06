@@ -1,7 +1,7 @@
 import type { CommunityPage, CommunityUser } from '../types';
 import { Avatar } from './Avatar';
 import { Glyph } from './Glyph';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 
 export function Sidebar({
   page,
@@ -30,7 +30,7 @@ export function Sidebar({
         }
         onClick={() => go('home')}
       >
-        <img src={browser.runtime.getURL('community/activity-icon.png' as never)} alt="" />
+        <img src={browser.runtime.getURL('/community/activity-icon.png')} alt="" />
         <strong>{ja ? 'みんなの活動' : 'Community'}</strong>
       </button>
       <nav>

@@ -1,6 +1,6 @@
 import { SOCIAL_ICON_PATHS } from '../constants';
 import type { SocialPlatform } from '../types';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 
 export function SocialIcon({ platform }: { platform: SocialPlatform }) {
   if (platform === 'unityroom') {

@@ -2,10 +2,9 @@ import { ALL_TAG } from '../constants';
 import type { CommunityPost } from '../types';
 import type { CommunityAction, CommunityState } from './types';
 
-export function createCommunityState(ja: boolean, defaultAuthorName: string): CommunityState {
+export function createCommunityState(ja: boolean): CommunityState {
   return {
     ja,
-    defaultAuthorName,
     page: 'home',
     modal: { kind: 'none' },
     posts: [],
@@ -39,6 +38,10 @@ function updatePostList(
   value: Partial<CommunityPost>,
 ): CommunityPost[] {
   return posts.map((post) => (post.id === postId ? { ...post, ...value } : post));
+}
+
+function removePostFromList(posts: CommunityPost[], postId: string): CommunityPost[] {
+  return posts.filter((post) => post.id !== postId);
 }
 
 function updatePostEverywhere(
@@ -77,6 +80,15 @@ export function communityReducer(state: CommunityState, action: CommunityAction)
       return updatePostEverywhere(state, action.postId, action.value);
     case 'restorePost':
       return updatePostEverywhere(state, action.post.id, action.post);
+    case 'removePost':
+      return {
+        ...state,
+        posts: removePostFromList(state.posts, action.postId),
+        ownPosts: removePostFromList(state.ownPosts, action.postId),
+        profilePosts: removePostFromList(state.profilePosts, action.postId),
+        followingPosts: removePostFromList(state.followingPosts, action.postId),
+        bookmarkedPosts: removePostFromList(state.bookmarkedPosts, action.postId),
+      };
     case 'resetSession':
       return {
         ...state,

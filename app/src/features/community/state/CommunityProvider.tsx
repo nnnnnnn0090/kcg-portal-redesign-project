@@ -3,7 +3,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useReducer,
   useRef,
   type FormEvent,
@@ -13,13 +12,16 @@ import {
 import type { AppLanguage } from '../../../i18n/messages';
 import storage from '../../../lib/storage';
 import { SK } from '../../../shared/constants';
-import { communityApi, setCommunityApiOrigin, setCommunityRequestLoginId } from '../api';
+import { communityApi } from '../api';
+import { setCommunityApiOrigin, setCommunityRequestLoginId } from '../api/runtime';
 import { SOCIAL_PLATFORMS } from '../constants';
-import { communityImageFiles, isCommunityImageFile } from '../imageFiles';
+import { formString, optionalFormString } from '../forms/formData';
+import { COMMUNITY_TIMING } from '../timing';
 import type { CommunityPage, CommunityPost, CommunityUser } from '../types';
-import { mergeOwnProfile } from '../utils';
 import { communityReducer, createCommunityState } from './reducer';
 import type { CommunityActions, CommunityState, CommunityStateDispatch } from './types';
+import { useCommunityImageInputs } from './useCommunityImageInputs';
+import { useCommunityLoaders } from './useCommunityLoaders';
 import { useObjectUrlRegistry } from './useObjectUrlRegistry';
 
 const CommunityStateContext = createContext<CommunityState | null>(null);
@@ -37,21 +39,16 @@ function useCommunitySetter<Key extends keyof CommunityState>(
 
 export function CommunityProvider({
   language,
-  defaultAuthorName,
   apiOrigin,
   onClose,
   children,
 }: {
   language: AppLanguage;
-  defaultAuthorName: string;
   apiOrigin: string;
   onClose: () => void;
   children: ReactNode;
 }) {
-  const [state, dispatch] = useReducer(
-    communityReducer,
-    createCommunityState(language === 'ja', defaultAuthorName),
-  );
+  const [state, dispatch] = useReducer(communityReducer, createCommunityState(language === 'ja'));
   const {
     ja,
     page,
@@ -91,6 +88,13 @@ export function CommunityProvider({
   const setPostImages = useCommunitySetter(dispatch, 'postImages');
   const setAvatarImage = useCommunitySetter(dispatch, 'avatarImage');
   const setHeaderImage = useCommunitySetter(dispatch, 'headerImage');
+  const { readPostFiles, readAvatar, readHeader } = useCommunityImageInputs({
+    ja,
+    setError,
+    setPostImages,
+    setAvatarImage,
+    setHeaderImage,
+  });
 
   useEffect(() => {
     setCommunityApiOrigin(apiOrigin);
@@ -99,15 +103,41 @@ export function CommunityProvider({
   const setClosing = useCommunitySetter(dispatch, 'closing');
   const objectUrls = useObjectUrlRegistry();
   const profileObjectUrls = useObjectUrlRegistry();
+  const {
+    loadFeed,
+    loadOwn,
+    loadFollowing,
+    loadBookmarks,
+    hydrateOwnProfileImages,
+    refreshOwnProfile,
+    loadNotifications,
+    loadKnownTags,
+  } = useCommunityLoaders({
+    ja,
+    objectUrls,
+    profileObjectUrls,
+    setPosts,
+    setOwnPosts,
+    setFollowingPosts,
+    setBookmarkedPosts,
+    setKnownTags,
+    setNotifications,
+    setUnreadCount,
+    setProfileUser,
+    setProfilePosts,
+    setUser,
+    setLoading,
+    setError,
+  });
   const recordedImpressions = useRef<Set<string>>(new Set());
   const closeTimer = useRef<number | null>(null);
 
   useEffect(() => {
     dispatch({
       type: 'patch',
-      value: { ja: language === 'ja', defaultAuthorName },
+      value: { ja: language === 'ja' },
     });
-  }, [defaultAuthorName, language]);
+  }, [language]);
 
   useEffect(() => {
     recordedImpressions.current.clear();
@@ -121,131 +151,8 @@ export function CommunityProvider({
   const closeDrawer = useCallback(() => {
     if (closing) return;
     setClosing(true);
-    closeTimer.current = window.setTimeout(onClose, 360);
+    closeTimer.current = window.setTimeout(onClose, COMMUNITY_TIMING.drawerCloseMs);
   }, [closing, onClose, setClosing]);
-
-  const loadFeed = useCallback(
-    async (authToken?: string, silent = false) => {
-      if (!silent) setLoading(true);
-      setError('');
-      try {
-        setPosts((await communityApi.posts(authToken)).posts);
-      } catch {
-        setError(
-          ja
-            ? 'コミュニティサーバーに接続できません。'
-            : 'Could not connect to the community server.',
-        );
-      } finally {
-        if (!silent) setLoading(false);
-      }
-    },
-    [ja, setError, setLoading, setPosts],
-  );
-
-  const loadOwn = useCallback(
-    async (authToken: string) => {
-      objectUrls.current.forEach(URL.revokeObjectURL);
-      objectUrls.current = [];
-      try {
-        const result = await communityApi.ownPosts(authToken);
-        const hydrated = await Promise.all(
-          result.posts.map(async (post) => {
-            try {
-              const count = Math.max(1, post.imageUrls?.length ?? 1);
-              const imageUrls = await Promise.all(
-                Array.from({ length: count }, (_, index) =>
-                  count === 1
-                    ? communityApi.ownPostImage(authToken, post.id)
-                    : communityApi.ownPostImage(authToken, post.id, index),
-                ),
-              );
-              return { ...post, previewUrl: imageUrls[0], imageUrls };
-            } catch {
-              return post;
-            }
-          }),
-        );
-        objectUrls.current = hydrated.flatMap(
-          (post) => post.imageUrls ?? (post.previewUrl ? [post.previewUrl] : []),
-        );
-        setOwnPosts(hydrated);
-        return hydrated;
-      } catch {
-        setOwnPosts([]);
-        return [];
-      }
-    },
-    [objectUrls, setOwnPosts],
-  );
-
-  const loadFollowing = useCallback(
-    async (authToken: string) => {
-      try {
-        setFollowingPosts((await communityApi.followingPosts(authToken)).posts);
-      } catch {
-        setFollowingPosts([]);
-      }
-    },
-    [setFollowingPosts],
-  );
-
-  const loadBookmarks = useCallback(
-    async (authToken: string) => {
-      try {
-        setBookmarkedPosts((await communityApi.bookmarkedPosts(authToken)).posts);
-      } catch {
-        setBookmarkedPosts([]);
-      }
-    },
-    [setBookmarkedPosts],
-  );
-
-  const hydrateOwnProfileImages = useCallback(
-    async (source: CommunityUser, authToken: string) => {
-      const next = { ...source };
-      const urls: string[] = [];
-      try {
-        const avatarUrl = await communityApi.ownProfileImage(authToken, 'avatar');
-        next.avatarUrl = avatarUrl;
-        urls.push(avatarUrl);
-      } catch {
-        // 画像未設定なら通常の公開URLまたはプレースホルダーを使う。
-      }
-      try {
-        const headerUrl = await communityApi.ownProfileImage(authToken, 'header');
-        next.headerUrl = headerUrl;
-        urls.push(headerUrl);
-      } catch {
-        // 画像未設定なら通常の公開URLまたは空状態を使う。
-      }
-      profileObjectUrls.current.forEach(URL.revokeObjectURL);
-      profileObjectUrls.current = urls;
-      return next;
-    },
-    [profileObjectUrls],
-  );
-
-  const loadNotifications = useCallback(
-    async (authToken: string) => {
-      try {
-        const result = await communityApi.notifications(authToken);
-        setNotifications(result.notifications);
-        setUnreadCount(result.unreadCount);
-      } catch {
-        setNotifications([]);
-      }
-    },
-    [setNotifications, setUnreadCount],
-  );
-
-  const loadKnownTags = useCallback(async () => {
-    try {
-      setKnownTags((await communityApi.tags()).tags);
-    } catch {
-      setKnownTags([]);
-    }
-  }, [setKnownTags]);
 
   useEffect(() => {
     void loadFeed();
@@ -274,8 +181,6 @@ export function CommunityProvider({
     })();
     return () => {
       if (closeTimer.current) window.clearTimeout(closeTimer.current);
-      objectUrls.current.forEach(URL.revokeObjectURL);
-      profileObjectUrls.current.forEach(URL.revokeObjectURL);
     };
   }, [
     hydrateOwnProfileImages,
@@ -285,8 +190,7 @@ export function CommunityProvider({
     loadKnownTags,
     loadNotifications,
     loadOwn,
-    objectUrls,
-    profileObjectUrls,
+    refreshOwnProfile,
     setProfileUser,
     setToken,
     setUser,
@@ -309,7 +213,7 @@ export function CommunityProvider({
           if (!cancelled) setSearchUsers([]);
         },
       );
-    }, 180);
+    }, COMMUNITY_TIMING.searchDebounceMs);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
@@ -318,7 +222,10 @@ export function CommunityProvider({
 
   useEffect(() => {
     if (!token) return;
-    const timer = window.setInterval(() => void loadNotifications(token), 30_000);
+    const timer = window.setInterval(
+      () => void loadNotifications(token),
+      COMMUNITY_TIMING.notificationPollMs,
+    );
     return () => window.clearInterval(timer);
   }, [loadNotifications, token]);
 
@@ -360,21 +267,7 @@ export function CommunityProvider({
       setProfileUser(user);
       setProfilePosts(ownPosts);
       if (token) {
-        void Promise.all([
-          communityApi.session(token),
-          communityApi.user(user.loginId, token),
-          loadOwn(token),
-        ])
-          .then(async ([session, profile, refreshedPosts]) => {
-            const refreshedUser = await hydrateOwnProfileImages(
-              mergeOwnProfile(session.user, profile.user),
-              token,
-            );
-            setUser(refreshedUser);
-            setProfileUser(refreshedUser);
-            setProfilePosts(refreshedPosts);
-          })
-          .catch(() => undefined);
+        void refreshOwnProfile(user.loginId, token).catch(() => undefined);
       }
     }
     if (next === 'following' && token) void loadFollowing(token);
@@ -393,18 +286,7 @@ export function CommunityProvider({
     setError('');
     try {
       if (user && normalized.toLowerCase() === user.loginId.toLowerCase()) {
-        const [session, profile, refreshedPosts] = await Promise.all([
-          communityApi.session(token),
-          communityApi.user(normalized, token),
-          loadOwn(token),
-        ]);
-        const refreshedUser = await hydrateOwnProfileImages(
-          mergeOwnProfile(session.user, profile.user),
-          token,
-        );
-        setUser(refreshedUser);
-        setProfileUser(refreshedUser);
-        setProfilePosts(refreshedPosts);
+        await refreshOwnProfile(normalized, token);
       } else {
         const [profile, profileFeed] = await Promise.all([
           communityApi.user(normalized, token || undefined),
@@ -482,9 +364,9 @@ export function CommunityProvider({
     setError('');
     try {
       const result = await communityApi.authenticate(mode, {
-        loginId: form.get('communityLoginId'),
-        displayName: form.get('displayName'),
-        password: form.get('communitySecret'),
+        loginId: formString(form, 'communityLoginId'),
+        displayName: optionalFormString(form, 'displayName'),
+        password: formString(form, 'communitySecret'),
       });
       await storage.set({ [SK.communityAuthToken]: result.token });
       setCommunityRequestLoginId(result.user.loginId);
@@ -525,11 +407,13 @@ export function CommunityProvider({
     try {
       await Promise.all([
         communityApi.createPost(token, {
-          title: form.get('title'),
-          caption: form.get('caption'),
+          title: formString(form, 'title'),
+          caption: formString(form, 'caption'),
           imageDataUrls: postImages,
         }),
-        new Promise((resolve) => window.setTimeout(resolve, 1200)),
+        new Promise((resolve) =>
+          window.setTimeout(resolve, COMMUNITY_TIMING.postSubmitMinimumBusyMs),
+        ),
       ]);
       setPostImages([]);
       setModal({ kind: 'sent' });
@@ -551,16 +435,19 @@ export function CommunityProvider({
     try {
       await communityApi.updateAcademicProfile(
         token,
-        String(form.get('academicGroup') ?? ''),
-        String(form.get('department') ?? ''),
+        formString(form, 'academicGroup'),
+        formString(form, 'department'),
       );
       const result = await communityApi.updateProfile(token, {
-        displayName: form.get('displayName'),
-        bio: form.get('bio'),
-        websiteUrl: form.get('websiteUrl'),
-        profileTags: String(form.get('profileTags') ?? ''),
+        displayName: formString(form, 'displayName'),
+        bio: formString(form, 'bio'),
+        websiteUrl: formString(form, 'websiteUrl'),
+        profileTags: formString(form, 'profileTags'),
         socialLinks: Object.fromEntries(
-          SOCIAL_PLATFORMS.map((platform) => [platform.key, form.get(`social_${platform.key}`)]),
+          SOCIAL_PLATFORMS.map((platform) => [
+            platform.key,
+            formString(form, `social_${platform.key}`),
+          ]),
         ),
       });
       if (avatarImage) await communityApi.submitAvatar(token, avatarImage);
@@ -584,11 +471,7 @@ export function CommunityProvider({
     setError('');
     try {
       await communityApi.deletePost(token, post.id);
-      setOwnPosts((items) => items.filter((item) => item.id !== post.id));
-      setPosts((items) => items.filter((item) => item.id !== post.id));
-      setProfilePosts((items) => items.filter((item) => item.id !== post.id));
-      setFollowingPosts((items) => items.filter((item) => item.id !== post.id));
-      setBookmarkedPosts((items) => items.filter((item) => item.id !== post.id));
+      dispatch({ type: 'removePost', postId: post.id });
       setModal({ kind: 'none' });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not delete post');
@@ -715,66 +598,6 @@ export function CommunityProvider({
     }
   };
 
-  const readFile = (
-    file: File | undefined,
-    limit: number,
-    setter: (value: string) => void,
-    input?: HTMLInputElement | null,
-  ) => {
-    if (!file) {
-      if (input) input.value = '';
-      setter('');
-      return;
-    }
-    if (!isCommunityImageFile(file)) {
-      setError(ja ? 'JPEG / PNG / WebP 画像を選択してください。' : 'Choose a JPEG, PNG, or WebP image.');
-      if (input) input.value = '';
-      return;
-    }
-    if (file.size > limit) {
-      setError(
-        ja ? `画像は${Math.round(limit / 1048576)}MB以下にしてください。` : 'Image is too large.',
-      );
-      if (input) input.value = '';
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setter(String(reader.result || ''));
-      setError('');
-      if (input) input.value = '';
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const readPostFiles = (files?: FileList | File[] | null) => {
-    const rawFiles = Array.from(files ?? []);
-    if (!rawFiles.length) return;
-    const selected = communityImageFiles(rawFiles).slice(0, 4);
-    if (!selected.length) {
-      setError(ja ? 'JPEG / PNG / WebP 画像を選択してください。' : 'Choose JPEG, PNG, or WebP images.');
-      return;
-    }
-    if (selected.some((file) => file.size > 6 * 1048576)) {
-      setError(ja ? '写真は1枚6MBまでです。' : 'Each photo must be 6MB or less.');
-      return;
-    }
-    setError('');
-    void Promise.all(
-      selected.map(
-        (file) =>
-          new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result ?? ''));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(file);
-          }),
-      ),
-    )
-      .then((images) => setPostImages((current) => [...current, ...images].slice(0, 4)))
-      .catch(() => setError(ja ? '写真を読み込めませんでした。' : 'Could not read photos.'));
-  };
-
   const refreshCurrentPage = async () => {
     if (refreshing) return;
     setRefreshing(true);
@@ -792,18 +615,7 @@ export function CommunityProvider({
             user &&
             profileUser.loginId.toLocaleLowerCase() === user.loginId.toLocaleLowerCase()
           ) {
-            const [session, profile, refreshedPosts] = await Promise.all([
-              communityApi.session(token),
-              communityApi.user(profileUser.loginId, token),
-              loadOwn(token),
-            ]);
-            const refreshedUser = await hydrateOwnProfileImages(
-              mergeOwnProfile(session.user, profile.user),
-              token,
-            );
-            setUser(refreshedUser);
-            setProfileUser(refreshedUser);
-            setProfilePosts(refreshedPosts);
+            await refreshOwnProfile(profileUser.loginId, token);
           } else {
             await openProfile(profileUser.loginId);
           }
@@ -813,7 +625,9 @@ export function CommunityProvider({
       };
       await Promise.all([
         refreshData(),
-        new Promise<void>((resolve) => window.setTimeout(resolve, 1000)),
+        new Promise<void>((resolve) =>
+          window.setTimeout(resolve, COMMUNITY_TIMING.refreshMinimumBusyMs),
+        ),
       ]);
     } catch (cause) {
       setError(
@@ -844,7 +658,7 @@ export function CommunityProvider({
       );
   };
 
-  const currentActions: CommunityActions = {
+  const actions: CommunityActions = {
     closeDrawer,
     loadFeed,
     go,
@@ -883,8 +697,8 @@ export function CommunityProvider({
     setTag,
     setPostImages,
     readPostFiles,
-    readAvatar: (file) => readFile(file, 2 * 1048576, setAvatarImage),
-    readHeader: (file) => readFile(file, 5 * 1048576, setHeaderImage),
+    readAvatar,
+    readHeader,
     canDeletePost: (post) =>
       Boolean(
         user &&
@@ -892,43 +706,6 @@ export function CommunityProvider({
             ownPosts.some((owned) => owned.id === post.id)),
       ),
   };
-  const actionsRef = useRef<CommunityActions>(currentActions);
-  actionsRef.current = currentActions;
-  const actions = useMemo<CommunityActions>(
-    () => ({
-      closeDrawer: () => actionsRef.current.closeDrawer(),
-      loadFeed: (...args) => actionsRef.current.loadFeed(...args),
-      go: (...args) => actionsRef.current.go(...args),
-      openProfile: (...args) => actionsRef.current.openProfile(...args),
-      openPost: (...args) => actionsRef.current.openPost(...args),
-      openTag: (...args) => actionsRef.current.openTag(...args),
-      openConnections: (...args) => actionsRef.current.openConnections(...args),
-      authenticate: (...args) => actionsRef.current.authenticate(...args),
-      logout: () => actionsRef.current.logout(),
-      submitPost: (...args) => actionsRef.current.submitPost(...args),
-      saveProfile: (...args) => actionsRef.current.saveProfile(...args),
-      removePost: (...args) => actionsRef.current.removePost(...args),
-      toggleLike: (...args) => actionsRef.current.toggleLike(...args),
-      toggleBookmark: (...args) => actionsRef.current.toggleBookmark(...args),
-      recordImpression: (...args) => actionsRef.current.recordImpression(...args),
-      toggleFollow: (...args) => actionsRef.current.toggleFollow(...args),
-      refreshCurrentPage: () => actionsRef.current.refreshCurrentPage(),
-      openLikes: (...args) => actionsRef.current.openLikes(...args),
-      openProfileEditor: () => actionsRef.current.openProfileEditor(),
-      closeModal: () => actionsRef.current.closeModal(),
-      setAuthMode: (...args) => actionsRef.current.setAuthMode(...args),
-      setModal: (...args) => actionsRef.current.setModal(...args),
-      setQuery: (...args) => actionsRef.current.setQuery(...args),
-      setTag: (...args) => actionsRef.current.setTag(...args),
-      setPostImages: (...args) => actionsRef.current.setPostImages(...args),
-      readPostFiles: (...args) => actionsRef.current.readPostFiles(...args),
-      readAvatar: (...args) => actionsRef.current.readAvatar(...args),
-      readHeader: (...args) => actionsRef.current.readHeader(...args),
-      canDeletePost: (...args) => actionsRef.current.canDeletePost(...args),
-    }),
-    [],
-  );
-
   return (
     <CommunityActionsContext.Provider value={actions}>
       <CommunityStateContext.Provider value={state}>{children}</CommunityStateContext.Provider>

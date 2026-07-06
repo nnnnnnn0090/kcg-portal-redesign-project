@@ -2,7 +2,7 @@ import { useState, type KeyboardEvent } from 'react';
 import { Busy, CharacterCount, ErrorMessage, Field } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
 import type { ModalLayerProps } from './types';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 import { COMMUNITY_INPUT_LIMITS } from '../constants';
 
 export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register' }) {
@@ -63,7 +63,7 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
           }
         >
           <div className={'tw-flex tw-items-center tw-gap-3'}>
-            <img src={browser.runtime.getURL('community/activity-icon.png' as never)} alt="" />
+            <img src={browser.runtime.getURL('/community/activity-icon.png')} alt="" />
             <strong>{ja ? 'みんなの活動' : 'Campus Community'}</strong>
           </div>
           <div className={'tw-grid tw-gap-3'}>
@@ -89,7 +89,7 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
             registering && 'min-[721px]:tw-hidden',
           )}
         >
-          <img src={browser.runtime.getURL('community/activity-icon.png' as never)} alt="" />
+          <img src={browser.runtime.getURL('/community/activity-icon.png')} alt="" />
           <strong>{ja ? 'みんなの活動' : 'Campus Community'}</strong>
         </div>
 
@@ -98,7 +98,15 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
             'tw-pr-10 [&_h2]:tw-m-0 [&_h2]:tw-text-2xl [&_h2]:tw-leading-tight [&_h2]:tw-text-community-bright [&_p]:tw-mb-0 [&_p]:tw-mt-2 [&_p]:tw-text-sm [&_p]:tw-text-community-muted'
           }
         >
-          <h2>{registering ? (ja ? 'アカウントを作成' : 'Create an account') : ja ? 'ログイン' : 'Log in'}</h2>
+          <h2>
+            {registering
+              ? ja
+                ? 'アカウントを作成'
+                : 'Create an account'
+              : ja
+                ? 'ログイン'
+                : 'Log in'}
+          </h2>
           <p>
             {registering
               ? ja
@@ -147,9 +155,7 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
           {registering ? (
             <Field
               label={ja ? '表示名' : 'Display name'}
-              meta={
-                <CharacterCount value={displayName} max={COMMUNITY_INPUT_LIMITS.displayName} />
-              }
+              meta={<CharacterCount value={displayName} max={COMMUNITY_INPUT_LIMITS.displayName} />}
             >
               <input
                 name="displayName"
@@ -180,7 +186,9 @@ export function AuthDialog(props: ModalLayerProps & { mode: 'login' | 'register'
               data-1p-ignore
               data-lpignore="true"
               data-bwignore="true"
-              placeholder={registering ? (ja ? '半角英数字・記号で4〜12文字' : '4-12 characters') : ''}
+              placeholder={
+                registering ? (ja ? '半角英数字・記号で4〜12文字' : '4-12 characters') : ''
+              }
               autoFocus
               required
             />

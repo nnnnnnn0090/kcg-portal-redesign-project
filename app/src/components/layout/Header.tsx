@@ -3,7 +3,7 @@
  * ホスト DOM からナビ・プロフィール・ログアウトを取り込み、設定ポップオーバーを差し込む。
  */
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { Settings } from '../../context/settings';
 import {
@@ -446,7 +446,7 @@ export function Header({
               onClick={() => void openCommunityActivity()}
             >
               <img
-                src={browser.runtime.getURL('community/activity-icon.png' as never)}
+                src={browser.runtime.getURL('/community/activity-icon.png')}
                 width={22}
                 height={22}
                 alt=""
@@ -513,7 +513,6 @@ export function Header({
         ? createPortal(
             <CommunityActivityDrawer
               language={language}
-              defaultAuthorName={profile?.name ?? ''}
               apiOrigin={communityApiOrigin}
               onClose={() => setActivityOpen(false)}
             />,
@@ -604,248 +603,6 @@ function CommunityConsentDialog({
             {ja ? '同意して開く' : 'Agree and continue'}
           </button>
         </footer>
-      </section>
-    </div>
-  );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function LegacyCommunityActivityPlaceholder({
-  language,
-  onClose,
-}: {
-  language: AppLanguage;
-  onClose: () => void;
-}) {
-  const closeRef = useRef<HTMLButtonElement>(null);
-  const ja = language === 'ja';
-
-  useEffect(() => {
-    closeRef.current?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      event.preventDefault();
-      onClose();
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
-
-  const posts = ja
-    ? [
-        {
-          author: '映像制作サークル',
-          initials: '映',
-          title: '新歓映像の撮影日でした',
-          tag: '作品制作',
-          time: '12分前',
-          likes: 38,
-        },
-        {
-          author: 'ゲーム開発部',
-          initials: 'G',
-          title: '学内ゲームジャム、制作中',
-          tag: 'クラブ活動',
-          time: '45分前',
-          likes: 64,
-        },
-        {
-          author: 'デザイン学科 2年',
-          initials: 'D',
-          title: '今日の課題作品を共有します',
-          tag: '学生作品',
-          time: '2時間前',
-          likes: 27,
-        },
-        {
-          author: '学生会',
-          initials: '学',
-          title: '七夕イベントを準備しています',
-          tag: 'イベント',
-          time: '3時間前',
-          likes: 91,
-        },
-      ]
-    : [
-        {
-          author: 'Film club',
-          initials: 'F',
-          title: 'Filming our welcome video',
-          tag: 'Creative work',
-          time: '12 min',
-          likes: 38,
-        },
-        {
-          author: 'Game dev club',
-          initials: 'G',
-          title: 'Campus game jam in progress',
-          tag: 'Club activity',
-          time: '45 min',
-          likes: 64,
-        },
-        {
-          author: 'Design student',
-          initials: 'D',
-          title: "Sharing today's assignment",
-          tag: 'Student work',
-          time: '2 hr',
-          likes: 27,
-        },
-        {
-          author: 'Student council',
-          initials: 'S',
-          title: 'Preparing the Tanabata event',
-          tag: 'Events',
-          time: '3 hr',
-          likes: 91,
-        },
-      ];
-
-  return (
-    <div className="p-community-activity-root">
-      <button
-        type="button"
-        className="p-community-activity-dismiss"
-        aria-label={ja ? 'みんなの活動を閉じる' : 'Close community activities'}
-        onClick={onClose}
-      />
-      <section
-        className="p-community-activity-drawer"
-        id="p-community-activity-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="p-community-activity-title"
-      >
-        <header className="p-community-activity-head">
-          <div>
-            <span>{ja ? 'CAMPUS COMMUNITY' : 'CAMPUS COMMUNITY'}</span>
-            <h2 id="p-community-activity-title">{ja ? 'みんなの活動' : "Everyone's activities"}</h2>
-          </div>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            aria-label={ja ? '閉じる' : 'Close'}
-          >
-            ×
-          </button>
-        </header>
-        <div className="p-community-activity-body">
-          <div className="p-community-activity-toolbar">
-            <div
-              className="p-community-feed-tabs"
-              role="tablist"
-              aria-label={ja ? '投稿の表示順' : 'Feed order'}
-            >
-              <button type="button" className="is-active" role="tab" aria-selected="true">
-                {ja ? 'おすすめ' : 'For you'}
-              </button>
-              <button type="button" role="tab" aria-selected="false">
-                {ja ? '新着' : 'Latest'}
-              </button>
-            </div>
-            <label className="p-community-search">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-4-4" />
-              </svg>
-              <input
-                type="search"
-                placeholder={ja ? '活動やタグを検索' : 'Search activities or tags'}
-              />
-            </label>
-            <button type="button" className="p-community-create-post">
-              ＋ {ja ? '投稿する' : 'Create post'}
-            </button>
-          </div>
-          <div className="p-community-activity-layout">
-            <main
-              className="p-community-activity-feed"
-              aria-label={ja ? '投稿一覧のプレビュー' : 'Feed preview'}
-            >
-              {posts.map((post, index) => (
-                <article className="p-community-post" key={post.title}>
-                  <div className="p-community-post-head">
-                    <span className={`p-community-avatar p-community-avatar--${index + 1}`}>
-                      {post.initials}
-                    </span>
-                    <div>
-                      <strong>{post.author}</strong>
-                      <span>{post.time}</span>
-                    </div>
-                    <button type="button" aria-label={ja ? '投稿メニュー' : 'Post menu'}>
-                      •••
-                    </button>
-                  </div>
-                  <div className={`p-community-post-image p-community-post-image--${index + 1}`}>
-                    <span className="p-community-post-tag">#{post.tag}</span>
-                    <div className="p-community-photo-mark" aria-hidden>
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                  </div>
-                  <div className="p-community-post-actions">
-                    <button type="button" aria-label={ja ? 'いいね' : 'Like'}>
-                      <span aria-hidden>♡</span> {post.likes}
-                    </button>
-                    <button type="button" aria-label={ja ? 'コメント' : 'Comment'}>
-                      <span aria-hidden>○</span> {index + 2}
-                    </button>
-                    <button
-                      type="button"
-                      className="p-community-post-save"
-                      aria-label={ja ? '保存' : 'Save'}
-                    >
-                      ◇
-                    </button>
-                  </div>
-                  <p>
-                    <strong>{post.author}</strong> {post.title}
-                  </p>
-                </article>
-              ))}
-            </main>
-            <aside className="p-community-activity-aside">
-              <section className="p-community-welcome-card">
-                <span className="p-community-welcome-icon" aria-hidden>
-                  ✦
-                </span>
-                <h3>{ja ? 'キャンパスの今を共有' : 'Share campus life'}</h3>
-                <p>
-                  {ja
-                    ? '作品、イベント、サークル活動。学生同士で新しい発見を共有できる場所です。'
-                    : 'A place to share projects, events, clubs, and everyday discoveries.'}
-                </p>
-                <button type="button">{ja ? '最初の投稿を作る' : 'Create your first post'}</button>
-              </section>
-              <section className="p-community-trends">
-                <div>
-                  <h3>{ja ? '注目のタグ' : 'Trending tags'}</h3>
-                  <button type="button">{ja ? 'すべて見る' : 'View all'}</button>
-                </div>
-                {['学生作品', 'クラブ活動', 'イベント', 'キャンパスの日常'].map((tag, index) => (
-                  <button type="button" key={tag}>
-                    <span>
-                      #{ja ? tag : ['student-work', 'clubs', 'events', 'campus-life'][index]}
-                    </span>
-                    <small>
-                      {[24, 18, 13, 9][index]} {ja ? '件' : 'posts'}
-                    </small>
-                  </button>
-                ))}
-              </section>
-            </aside>
-          </div>
-        </div>
       </section>
     </div>
   );

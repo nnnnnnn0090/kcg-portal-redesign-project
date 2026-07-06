@@ -20,7 +20,6 @@ export type CommunityModal =
 
 export interface CommunityState {
   ja: boolean;
-  defaultAuthorName: string;
   page: CommunityPage;
   modal: CommunityModal;
   posts: CommunityPost[];
@@ -60,6 +59,7 @@ export type CommunityAction =
   | { type: 'patch'; value: Partial<CommunityState> }
   | { type: 'patchPost'; postId: string; value: Partial<CommunityPost> }
   | { type: 'restorePost'; post: CommunityPost }
+  | { type: 'removePost'; postId: string }
   | { type: 'resetSession' };
 
 export type CommunityStateDispatch = Dispatch<CommunityAction>;

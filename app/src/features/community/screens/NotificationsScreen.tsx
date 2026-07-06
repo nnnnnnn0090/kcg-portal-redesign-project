@@ -1,7 +1,7 @@
 import type { CommunityNotification } from '../types';
 import { Avatar } from '../components/Avatar';
 import { Glyph } from '../components/Glyph';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 
 export function NotificationsScreen({
   notifications,

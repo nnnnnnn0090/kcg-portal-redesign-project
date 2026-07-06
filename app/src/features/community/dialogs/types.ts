@@ -9,7 +9,6 @@ export interface ModalLayerProps {
   ja: boolean;
   busy: boolean;
   error: string;
-  defaultAuthorName: string;
   postImages: string[];
   updatePostImages: (images: string[]) => void;
   avatarImage: string;

@@ -5,8 +5,9 @@ import { Avatar } from '../components/Avatar';
 import { Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
 import type { ModalLayerProps } from './types';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 import { dataTransferHasFiles } from '../imageFiles';
+import { COMMUNITY_DIALOG_SURFACE_CLASS } from './dialogStyles';
 
 export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const {
@@ -161,9 +162,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
 
   return (
     <form
-      className={
-        'community-dialog tw-max-h-[min(90vh,900px)] tw-w-full tw-max-w-[620px] tw-overflow-auto tw-rounded-[18px] tw-border tw-border-[var(--p-border-hover)] tw-bg-community-bg tw-shadow-community-modal tw-animate-community-dialog-in max-[620px]:tw-max-h-[calc(100vh-24px)] max-[620px]:tw-rounded-2xl [&>footer]:tw-flex [&>footer]:tw-justify-end [&>footer]:tw-gap-2 [&>footer]:tw-border-t [&>footer]:tw-border-community-border [&>footer]:tw-bg-community-bg2 [&>footer]:tw-p-4 [&>footer>button]:tw-inline-flex [&>footer>button]:tw-min-h-10 [&>footer>button]:tw-appearance-none [&>footer>button]:tw-items-center [&>footer>button]:tw-justify-center [&>footer>button]:tw-gap-2 [&>footer>button]:tw-rounded-lg [&>footer>button]:tw-border [&>footer>button]:tw-border-community-border [&>footer>button]:tw-bg-community-bg3 [&>footer>button]:tw-px-4 [&>footer>button]:tw-text-sm [&>footer>button]:tw-font-bold [&>footer>button]:tw-text-community-text [&>footer>button]:tw-cursor-pointer [&>footer>button.is-primary]:tw-border-community-accent [&>footer>button.is-primary]:tw-bg-community-accent [&>footer>button.is-primary]:tw-text-community-on-accent [&_button:disabled]:tw-cursor-not-allowed [&_button:disabled]:tw-opacity-[.55] community-create-dialog tw-w-full tw-max-w-[980px]'
-      }
+      className={`${COMMUNITY_DIALOG_SURFACE_CLASS} community-create-dialog tw-w-full tw-max-w-[980px]`}
       method="post"
       onSubmitCapture={(event) => event.preventDefault()}
       onSubmit={submitPost}

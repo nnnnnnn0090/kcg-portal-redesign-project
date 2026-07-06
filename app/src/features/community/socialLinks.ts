@@ -1,4 +1,4 @@
-import type { SocialLinks, SocialPlatform } from './types';
+import type { SocialPlatform } from './types';
 
 export const SOCIAL_PLATFORM_FORMATS: Record<
   SocialPlatform,
@@ -13,11 +13,6 @@ export const SOCIAL_PLATFORM_FORMATS: Record<
   unityroom: { prefix: 'https://unityroom.com/users/', maxLength: 20 },
 };
 
-export function socialIdToUrl(platform: SocialPlatform, id: string): string {
-  const format = SOCIAL_PLATFORM_FORMATS[platform];
-  return `${format.prefix}${id}${format.suffix ?? ''}`;
-}
-
 export function socialUrlToId(platform: SocialPlatform, value: string | undefined): string {
   const trimmed = (value ?? '').trim();
   if (!trimmed) return '';
@@ -29,10 +24,4 @@ export function socialUrlToId(platform: SocialPlatform, value: string | undefine
       .trim();
   }
   return trimmed.replace(/^@/, '');
-}
-
-export function socialEntries(links: SocialLinks | null | undefined) {
-  return Object.entries(links ?? {}).flatMap(([platform, value]) =>
-    value ? [{ platform: platform as SocialPlatform, url: value }] : [],
-  );
 }

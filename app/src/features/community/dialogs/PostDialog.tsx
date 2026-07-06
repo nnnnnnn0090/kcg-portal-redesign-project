@@ -5,7 +5,7 @@ import { Avatar } from '../components/Avatar';
 import { renderCaptionWithTags } from '../components/CaptionTags';
 import { Busy, CharacterCount, ErrorMessage } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 import { clearRuntimeElementCss, setRuntimeElementCss } from '../../../lib/runtime-element-style';
 import { COMMUNITY_INPUT_LIMITS } from '../constants';
 
@@ -298,10 +298,7 @@ export function PostDialog({
             <label>
               <span className="tw-flex tw-items-center tw-justify-between tw-gap-3">
                 <span>{ja ? '通報理由' : 'Report reason'}</span>
-                <CharacterCount
-                  value={reportReason}
-                  max={COMMUNITY_INPUT_LIMITS.reportReason}
-                />
+                <CharacterCount value={reportReason} max={COMMUNITY_INPUT_LIMITS.reportReason} />
               </span>
               <textarea
                 value={reportReason}
@@ -314,7 +311,9 @@ export function PostDialog({
             </label>
             <div>
               <button
-                className={'tw-border tw-border-community-border tw-bg-community-bg3 tw-text-community-text'}
+                className={
+                  'tw-border tw-border-community-border tw-bg-community-bg3 tw-text-community-text'
+                }
                 type="button"
                 onClick={() => {
                   setReportOpen(false);
@@ -324,7 +323,9 @@ export function PostDialog({
                 {ja ? 'キャンセル' : 'Cancel'}
               </button>
               <button
-                className={'tw-border tw-border-community-danger tw-bg-community-danger tw-text-white'}
+                className={
+                  'tw-border tw-border-community-danger tw-bg-community-danger tw-text-white'
+                }
                 disabled={reportBusy || !reportReason.trim()}
               >
                 {reportBusy ? <Busy /> : null}
@@ -339,9 +340,7 @@ export function PostDialog({
           }
         >
           <div
-            className={
-              'community-post-primary-actions tw-flex tw-min-w-0 tw-flex-wrap tw-gap-3'
-            }
+            className={'community-post-primary-actions tw-flex tw-min-w-0 tw-flex-wrap tw-gap-3'}
           >
             <button
               className={cn(
@@ -412,7 +411,11 @@ export function PostDialog({
               </span>
             </button>
           </div>
-          <div className={'tw-flex tw-items-center tw-justify-end tw-gap-3 max-[420px]:tw-justify-between'}>
+          <div
+            className={
+              'tw-flex tw-items-center tw-justify-end tw-gap-3 max-[420px]:tw-justify-between'
+            }
+          >
             <span
               className={
                 'community-detail-impressions tw-inline-flex tw-items-center tw-gap-1.5 tw-text-xs tw-text-community-muted [&_svg]:tw-h-4 [&_svg]:tw-w-4'
@@ -453,14 +456,12 @@ export function PostDialog({
               }
             >
               <strong>{ja ? 'コメントを削除しますか？' : 'Delete this comment?'}</strong>
-              <p>
-                {ja
-                  ? 'この操作は取り消せません。'
-                  : 'This action cannot be undone.'}
-              </p>
+              <p>{ja ? 'この操作は取り消せません。' : 'This action cannot be undone.'}</p>
               <footer>
                 <button
-                  className={'tw-border-community-border tw-bg-community-bg3 tw-text-community-text'}
+                  className={
+                    'tw-border-community-border tw-bg-community-bg3 tw-text-community-text'
+                  }
                   type="button"
                   disabled={Boolean(deletingCommentId)}
                   onClick={() => setPendingDeleteComment(null)}
@@ -543,7 +544,7 @@ export function PostDialog({
                         {viewerLoginId?.toLocaleLowerCase() ===
                         comment.authorLoginId.toLocaleLowerCase() ? (
                           <button
-                            className="tw-inline-flex tw-min-h-7 tw-items-center tw-rounded-md tw-border tw-border-community-danger/50 tw-bg-transparent tw-px-2 tw-py-1 tw-text-xs tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white"
+                            className="tw-inline-flex tw-items-center tw-border-0 tw-bg-transparent tw-p-0 tw-text-xs tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-text-community-bright"
                             type="button"
                             onClick={() => setPendingDeleteComment(comment)}
                           >

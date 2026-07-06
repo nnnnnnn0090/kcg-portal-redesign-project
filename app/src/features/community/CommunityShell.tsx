@@ -10,14 +10,13 @@ import { HomeScreen } from './screens/HomeScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { useCommunityActions, useCommunityState } from './state/CommunityProvider';
-import { cn } from './classNames';
+import { cn } from '../../lib/cn';
 
 export function CommunityShell() {
   const state = useCommunityState();
   const actions = useCommunityActions();
   const {
     ja,
-    defaultAuthorName,
     page,
     modal,
     posts,
@@ -134,6 +133,7 @@ export function CommunityShell() {
         aria-label={ja ? '閉じる' : 'Close'}
       />
       <section
+        id="p-community-activity-drawer"
         className={
           'community-app tw-grid tw-h-full tw-min-w-0 tw-grid-cols-[224px_minmax(0,1fr)] tw-overflow-hidden tw-bg-community-bg tw-shadow-[-18px_0_60px_color-mix(in_srgb,#000_30%,transparent)] tw-animate-community-slide-in max-[960px]:tw-grid-cols-[76px_minmax(0,1fr)] max-[620px]:tw-block [.is-closing_&]:tw-animate-community-slide-out'
         }
@@ -294,9 +294,7 @@ export function CommunityShell() {
               onImpression={recordImpression}
               title={ja ? '保存済み' : 'Bookmarks'}
               description={
-                ja
-                  ? 'あとで見返したい投稿をまとめて確認できます。'
-                  : 'Posts you saved for later.'
+                ja ? 'あとで見返したい投稿をまとめて確認できます。' : 'Posts you saved for later.'
               }
             />
           ) : null}
@@ -341,7 +339,6 @@ export function CommunityShell() {
           ja={ja}
           busy={busy}
           error={error}
-          defaultAuthorName={defaultAuthorName}
           postImages={postImages}
           updatePostImages={setPostImages}
           avatarImage={avatarImage}

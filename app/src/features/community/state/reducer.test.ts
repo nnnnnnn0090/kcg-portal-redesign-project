@@ -25,14 +25,13 @@ const post: CommunityPost = {
 
 describe('communityReducer', () => {
   it('creates the initial state', () => {
-    const state = createCommunityState(true, 'Student');
+    const state = createCommunityState(true);
     expect(state.page).toBe('home');
     expect(state.ja).toBe(true);
-    expect(state.defaultAuthorName).toBe('Student');
   });
 
   it('changes the current page', () => {
-    const state = createCommunityState(true, 'Student');
+    const state = createCommunityState(true);
     expect(communityReducer(state, { type: 'set', key: 'page', value: 'explore' }).page).toBe(
       'explore',
     );
@@ -40,7 +39,7 @@ describe('communityReducer', () => {
 
   it('patches a post in every collection and an open post dialog', () => {
     const state = {
-      ...createCommunityState(true, 'Student'),
+      ...createCommunityState(true),
       posts: [post],
       ownPosts: [post],
       profilePosts: [post],
@@ -61,13 +60,30 @@ describe('communityReducer', () => {
 
   it('restores an optimistic post update', () => {
     const optimistic = { ...post, likedByMe: true, likeCount: 1 };
-    const state = { ...createCommunityState(true, 'Student'), posts: [optimistic] };
+    const state = { ...createCommunityState(true), posts: [optimistic] };
     expect(communityReducer(state, { type: 'restorePost', post }).posts[0]).toEqual(post);
+  });
+
+  it('removes a deleted post from every collection', () => {
+    const state = {
+      ...createCommunityState(true),
+      posts: [post],
+      ownPosts: [post],
+      profilePosts: [post],
+      followingPosts: [post],
+      bookmarkedPosts: [post],
+    };
+    const updated = communityReducer(state, { type: 'removePost', postId: post.id });
+    expect(updated.posts).toEqual([]);
+    expect(updated.ownPosts).toEqual([]);
+    expect(updated.profilePosts).toEqual([]);
+    expect(updated.followingPosts).toEqual([]);
+    expect(updated.bookmarkedPosts).toEqual([]);
   });
 
   it('clears session-owned state on logout without discarding the public feed', () => {
     const state = {
-      ...createCommunityState(true, 'Student'),
+      ...createCommunityState(true),
       posts: [post],
       ownPosts: [post],
       token: 'token',

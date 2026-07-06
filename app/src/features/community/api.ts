@@ -1,6 +1,13 @@
-import type { ApiEnvelope, ApiProblem } from './contract';
-import { CLIENT_USER_ID_HEADER } from '../../shared/constants';
-import { getOrCreateClientUserId } from '../../lib/client-user-id';
+import type { ReportStatus, SocialLinks } from './contract';
+import {
+  authorizedRequest,
+  communityRequest,
+  dataUrlBlob,
+  imageForm,
+  jsonRequest,
+  withCommunityRequestIdentity,
+} from './api/http';
+import { getCommunityApiOrigin } from './api/runtime';
 import type {
   CommunityComment,
   CommunityNotification,
@@ -8,134 +15,66 @@ import type {
   CommunityUser,
 } from './types';
 
-const COMMUNITY_LOGIN_ID_HEADER = 'X-KCG-Community-Login-Id';
-const COMMUNITY_MEDIA_URL_KEYS = new Set([
-  'avatarUrl',
-  'headerUrl',
-  'authorAvatarUrl',
-  'imageUrl',
-  'imageUrls',
-]);
-let communityApiOrigin = '';
-let requestLoginId = '';
-
-export function setCommunityApiOrigin(origin: string) {
-  const raw = origin.trim();
-  if (!raw) {
-    communityApiOrigin = '';
-    return;
-  }
-  const url = new URL(raw);
-  communityApiOrigin = url.origin;
+export interface AuthenticateInput {
+  loginId: string;
+  displayName: string | null;
+  password: string;
 }
 
-function getCommunityApiOrigin(): string {
-  if (!communityApiOrigin) throw new Error('みんなの活動の接続先が未設定です');
-  return communityApiOrigin;
+export interface CreatePostInput {
+  title: string;
+  caption: string;
+  imageDataUrls: string[];
 }
 
-export function setCommunityRequestLoginId(loginId: string | null | undefined) {
-  requestLoginId = loginId?.trim() ?? '';
-}
-
-async function withRequestIdentity(init?: RequestInit): Promise<RequestInit> {
-  const headers = new Headers(init?.headers);
-  headers.set(CLIENT_USER_ID_HEADER, await getOrCreateClientUserId());
-  if (requestLoginId) headers.set(COMMUNITY_LOGIN_ID_HEADER, requestLoginId);
-  return { ...init, headers };
-}
-
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const origin = getCommunityApiOrigin();
-  const response = await fetch(`${origin}/api${path}`, {
-    cache: 'no-store',
-    ...(await withRequestIdentity(init)),
-  });
-  if (response.status === 204) return null as T;
-  const body = (await response.json().catch(() => null)) as ApiEnvelope<T> | ApiProblem | null;
-  if (!response.ok) {
-    const problem = body as ApiProblem | null;
-    throw new Error(problem?.detail || `HTTP ${response.status}`);
-  }
-  if (!body || !('data' in body)) throw new Error(`HTTP ${response.status}`);
-  return resolveApiUrls(body.data, origin);
-}
-
-export function rebaseCommunityMediaUrl(value: string, origin: string): string {
-  try {
-    const url = new URL(value, origin);
-    if (!url.pathname.startsWith('/api/')) return value;
-    return new URL(`${url.pathname}${url.search}${url.hash}`, origin).toString();
-  } catch {
-    return value;
-  }
-}
-
-function resolveApiUrls<T>(value: T, origin: string, key?: string): T {
-  if (typeof value === 'string')
-    return (
-      key && COMMUNITY_MEDIA_URL_KEYS.has(key) ? rebaseCommunityMediaUrl(value, origin) : value
-    ) as T;
-  if (Array.isArray(value)) return value.map((item) => resolveApiUrls(item, origin, key)) as T;
-  if (value && typeof value === 'object')
-    return Object.fromEntries(
-      Object.entries(value).map(([itemKey, item]) => [
-        itemKey,
-        resolveApiUrls(item, origin, itemKey),
-      ]),
-    ) as T;
-  return value;
-}
-const authorized = (token: string, init: RequestInit = {}): RequestInit => ({
-  ...init,
-  headers: { ...init.headers, authorization: `Bearer ${token}` },
-});
-const json = (method: string, body?: object): RequestInit => ({
-  method,
-  headers: { 'content-type': 'application/json' },
-  ...(body ? { body: JSON.stringify(body) } : {}),
-});
-async function dataUrlBlob(value: string): Promise<Blob> {
-  return (await fetch(value)).blob();
-}
-async function imageForm(imageDataUrl: string): Promise<FormData> {
-  const form = new FormData();
-  const blob = await dataUrlBlob(imageDataUrl);
-  form.append('image', blob, `image.${blob.type.split('/')[1] || 'png'}`);
-  return form;
+export interface UpdateProfileInput {
+  displayName: string;
+  bio: string;
+  websiteUrl: string;
+  profileTags: string;
+  socialLinks: SocialLinks;
 }
 
 export const communityApi = {
   posts: (token?: string) =>
-    request<{ posts: CommunityPost[] }>('/posts', token ? authorized(token) : undefined),
-  post: (id: string, token?: string) =>
-    request<{ post: CommunityPost }>(
-      `/posts/${encodeURIComponent(id)}`,
-      token ? authorized(token) : undefined,
+    communityRequest<{ posts: CommunityPost[] }>(
+      '/posts',
+      token ? authorizedRequest(token) : undefined,
     ),
-  session: (token: string) => request<{ user: CommunityUser }>('/session', authorized(token)),
-  authenticate: (mode: 'register' | 'login', body: object) =>
-    request<{ token: string; user: CommunityUser }>(`/auth/${mode}`, json('POST', body)),
-  logout: (token: string) => request<null>('/session', authorized(token, { method: 'DELETE' })),
-  ownPosts: (token: string) => request<{ posts: CommunityPost[] }>('/me/posts', authorized(token)),
+  post: (id: string, token?: string) =>
+    communityRequest<{ post: CommunityPost }>(
+      `/posts/${encodeURIComponent(id)}`,
+      token ? authorizedRequest(token) : undefined,
+    ),
+  session: (token: string) =>
+    communityRequest<{ user: CommunityUser }>('/session', authorizedRequest(token)),
+  authenticate: (mode: 'register' | 'login', body: AuthenticateInput) =>
+    communityRequest<{ token: string; user: CommunityUser }>(
+      `/auth/${mode}`,
+      jsonRequest('POST', body),
+    ),
+  logout: (token: string) =>
+    communityRequest<null>('/session', authorizedRequest(token, { method: 'DELETE' })),
+  ownPosts: (token: string) =>
+    communityRequest<{ posts: CommunityPost[] }>('/me/posts', authorizedRequest(token)),
   followingPosts: (token: string) =>
-    request<{ posts: CommunityPost[] }>('/feed?scope=following', authorized(token)),
+    communityRequest<{ posts: CommunityPost[] }>('/feed?scope=following', authorizedRequest(token)),
   bookmarkedPosts: (token: string) =>
-    request<{ posts: CommunityPost[] }>('/me/bookmarks', authorized(token)),
+    communityRequest<{ posts: CommunityPost[] }>('/me/bookmarks', authorizedRequest(token)),
   user: (loginId: string, token?: string) =>
-    request<{ user: CommunityUser }>(
+    communityRequest<{ user: CommunityUser }>(
       `/users/${encodeURIComponent(loginId)}`,
-      token ? authorized(token) : undefined,
+      token ? authorizedRequest(token) : undefined,
     ),
   userPosts: (loginId: string, token?: string) =>
-    request<{ posts: CommunityPost[] }>(
+    communityRequest<{ posts: CommunityPost[] }>(
       `/users/${encodeURIComponent(loginId)}/posts`,
-      token ? authorized(token) : undefined,
+      token ? authorizedRequest(token) : undefined,
     ),
   ownPostImage: async (token: string, id: string, position = 0) => {
     const response = await fetch(
       `${getCommunityApiOrigin()}/api/posts/${encodeURIComponent(id)}/images/${position}`,
-      await withRequestIdentity(authorized(token)),
+      await withCommunityRequestIdentity(authorizedRequest(token)),
     );
     if (!response.ok) throw new Error('画像を読み込めませんでした');
     return URL.createObjectURL(await response.blob());
@@ -143,91 +82,89 @@ export const communityApi = {
   ownProfileImage: async (token: string, kind: 'avatar' | 'header') => {
     const response = await fetch(
       `${getCommunityApiOrigin()}/api/me/profile-submission/images/${kind}`,
-      await withRequestIdentity(authorized(token)),
+      await withCommunityRequestIdentity(authorizedRequest(token)),
     );
     if (!response.ok) throw new Error('画像を読み込めませんでした');
     return URL.createObjectURL(await response.blob());
   },
   followers: (loginId: string, token?: string) =>
-    request<{ users: CommunityUser[] }>(
+    communityRequest<{ users: CommunityUser[] }>(
       `/users/${encodeURIComponent(loginId)}/followers`,
-      token ? authorized(token) : undefined,
+      token ? authorizedRequest(token) : undefined,
     ),
   following: (loginId: string, token?: string) =>
-    request<{ users: CommunityUser[] }>(
+    communityRequest<{ users: CommunityUser[] }>(
       `/users/${encodeURIComponent(loginId)}/following`,
-      token ? authorized(token) : undefined,
+      token ? authorizedRequest(token) : undefined,
     ),
   searchUsers: (query: string, token?: string) =>
-    request<{ users: CommunityUser[] }>(
+    communityRequest<{ users: CommunityUser[] }>(
       `/users?q=${encodeURIComponent(query)}`,
-      token ? authorized(token) : undefined,
+      token ? authorizedRequest(token) : undefined,
     ),
-  tags: () => request<{ tags: string[] }>('/tags'),
-  createPost: async (token: string, body: Record<string, unknown>) => {
+  tags: () => communityRequest<{ tags: string[] }>('/tags'),
+  createPost: async (token: string, body: CreatePostInput) => {
     const form = new FormData();
     form.append('title', String(body.title || ''));
     form.append('caption', String(body.caption || ''));
-    for (const image of (body.imageDataUrls as string[]) || []) {
+    for (const image of body.imageDataUrls) {
       const blob = await dataUrlBlob(image);
       form.append('images', blob, `image.${blob.type.split('/')[1] || 'png'}`);
     }
-    return request<{ id: string; status: 'pending' }>(
+    return communityRequest<{ id: string; status: 'pending' }>(
       '/posts',
-      authorized(token, { method: 'POST', body: form }),
+      authorizedRequest(token, { method: 'POST', body: form }),
     );
   },
-  updatePost: (token: string, id: string, body: object) =>
-    request<{ post: CommunityPost }>(
-      `/posts/${encodeURIComponent(id)}`,
-      authorized(token, json('PATCH', body)),
-    ),
   deletePost: (token: string, id: string) =>
-    request<null>(`/posts/${encodeURIComponent(id)}`, authorized(token, { method: 'DELETE' })),
+    communityRequest<null>(
+      `/posts/${encodeURIComponent(id)}`,
+      authorizedRequest(token, { method: 'DELETE' }),
+    ),
   likePost: (token: string, id: string) =>
-    request<{ likedByMe: boolean; likeCount: number }>(
+    communityRequest<{ likedByMe: boolean; likeCount: number }>(
       `/posts/${encodeURIComponent(id)}/likes`,
-      authorized(token, { method: 'PUT' }),
+      authorizedRequest(token, { method: 'PUT' }),
     ),
   unlikePost: (token: string, id: string) =>
-    request<{ likedByMe: boolean; likeCount: number }>(
+    communityRequest<{ likedByMe: boolean; likeCount: number }>(
       `/posts/${encodeURIComponent(id)}/likes`,
-      authorized(token, { method: 'DELETE' }),
+      authorizedRequest(token, { method: 'DELETE' }),
     ),
   postLikes: (id: string, token?: string) =>
-    request<{ users: CommunityUser[] }>(
+    communityRequest<{ users: CommunityUser[] }>(
       `/posts/${encodeURIComponent(id)}/likes`,
-      token ? authorized(token) : undefined,
+      token ? authorizedRequest(token) : undefined,
     ),
   bookmarkPost: (token: string, id: string) =>
-    request<{ bookmarkedByMe: boolean; bookmarkCount: number }>(
+    communityRequest<{ bookmarkedByMe: boolean; bookmarkCount: number }>(
       `/posts/${encodeURIComponent(id)}/bookmarks`,
-      authorized(token, { method: 'PUT' }),
+      authorizedRequest(token, { method: 'PUT' }),
     ),
   unbookmarkPost: (token: string, id: string) =>
-    request<{ bookmarkedByMe: boolean; bookmarkCount: number }>(
+    communityRequest<{ bookmarkedByMe: boolean; bookmarkCount: number }>(
       `/posts/${encodeURIComponent(id)}/bookmarks`,
-      authorized(token, { method: 'DELETE' }),
+      authorizedRequest(token, { method: 'DELETE' }),
     ),
   postComments: (id: string, token?: string) =>
-    request<{ comments: CommunityComment[] }>(
+    communityRequest<{ comments: CommunityComment[] }>(
       `/posts/${encodeURIComponent(id)}/comments`,
-      token ? authorized(token) : undefined,
+      token ? authorizedRequest(token) : undefined,
     ),
   recordImpression: (id: string, token?: string) =>
-    request<{ impressionCount: number }>(
+    communityRequest<{ impressionCount: number }>(
       `/posts/${encodeURIComponent(id)}/impressions`,
-      token ? authorized(token, { method: 'POST' }) : { method: 'POST' },
+      token ? authorizedRequest(token, { method: 'POST' }) : { method: 'POST' },
     ),
   createComment: (token: string, id: string, content: string) =>
-    request<{ comment: CommunityComment }>(
+    communityRequest<{ comment: CommunityComment }>(
       `/posts/${encodeURIComponent(id)}/comments`,
-      authorized(token, json('POST', { content })),
+      authorizedRequest(token, jsonRequest('POST', { content })),
     ),
   deleteComment: (token: string, postId: string, commentId: string) =>
-    request<null>(
+    communityRequest<null>(
       `/posts/${encodeURIComponent(postId)}/comments/${encodeURIComponent(commentId)}`,
-      authorized(token, { method: 'DELETE' }),
+      authorizedRequest(token, { method: 'DELETE' }),
     ),
   report: (
     token: string,
@@ -235,48 +172,48 @@ export const communityApi = {
     targetId: string,
     reason: string,
   ) =>
-    request<{ status: string }>(
+    communityRequest<{ status: ReportStatus }>(
       '/reports',
-      authorized(token, json('POST', { targetType, targetId, reason })),
+      authorizedRequest(token, jsonRequest('POST', { targetType, targetId, reason })),
     ),
   notifications: (token: string) =>
-    request<{ notifications: CommunityNotification[]; unreadCount: number }>(
+    communityRequest<{ notifications: CommunityNotification[]; unreadCount: number }>(
       '/me/notifications',
-      authorized(token),
+      authorizedRequest(token),
     ),
   readNotifications: (token: string) =>
-    request<{ unreadCount: number }>(
+    communityRequest<{ unreadCount: number }>(
       '/me/notifications/read',
-      authorized(token, { method: 'POST' }),
+      authorizedRequest(token, { method: 'POST' }),
     ),
   followUser: (token: string, loginId: string) =>
-    request<CommunityUser>(
+    communityRequest<CommunityUser>(
       `/users/${encodeURIComponent(loginId)}/follow`,
-      authorized(token, { method: 'PUT' }),
+      authorizedRequest(token, { method: 'PUT' }),
     ),
   unfollowUser: (token: string, loginId: string) =>
-    request<CommunityUser>(
+    communityRequest<CommunityUser>(
       `/users/${encodeURIComponent(loginId)}/follow`,
-      authorized(token, { method: 'DELETE' }),
+      authorizedRequest(token, { method: 'DELETE' }),
     ),
-  updateProfile: (token: string, body: object) =>
-    request<{ user: CommunityUser }>(
+  updateProfile: (token: string, body: UpdateProfileInput) =>
+    communityRequest<{ user: CommunityUser }>(
       '/me/profile-submission',
-      authorized(token, json('PUT', body)),
+      authorizedRequest(token, jsonRequest('PUT', body)),
     ),
   updateAcademicProfile: (token: string, academicGroup: string, department: string) =>
-    request<{ user: CommunityUser }>(
+    communityRequest<{ user: CommunityUser }>(
       '/me/academic',
-      authorized(token, json('PATCH', { academicGroup, department })),
+      authorizedRequest(token, jsonRequest('PATCH', { academicGroup, department })),
     ),
   submitAvatar: async (token: string, imageDataUrl: string) =>
-    request<{ status: 'pending' }>(
+    communityRequest<{ status: 'pending' }>(
       '/me/profile-submission/images/avatar',
-      authorized(token, { method: 'PUT', body: await imageForm(imageDataUrl) }),
+      authorizedRequest(token, { method: 'PUT', body: await imageForm(imageDataUrl) }),
     ),
   submitHeader: async (token: string, imageDataUrl: string) =>
-    request<{ status: 'pending' }>(
+    communityRequest<{ status: 'pending' }>(
       '/me/profile-submission/images/header',
-      authorized(token, { method: 'PUT', body: await imageForm(imageDataUrl) }),
+      authorizedRequest(token, { method: 'PUT', body: await imageForm(imageDataUrl) }),
     ),
 };

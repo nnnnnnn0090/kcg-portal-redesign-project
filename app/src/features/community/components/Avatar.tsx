@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { CommunityUser } from '../types';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 
 export function Avatar({
   user,
@@ -25,11 +25,7 @@ export function Avatar({
     >
       <span>{label.slice(0, 1).toUpperCase()}</span>
       {source && !imageBroken ? (
-        <img
-          src={source}
-          alt=""
-          onError={() => setImageBroken(true)}
-        />
+        <img src={source} alt="" onError={() => setImageBroken(true)} />
       ) : null}
     </span>
   );

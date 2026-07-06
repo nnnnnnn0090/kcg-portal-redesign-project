@@ -4,7 +4,7 @@ import { Avatar } from '../components/Avatar';
 import { Empty } from '../components/Empty';
 import { Glyph } from '../components/Glyph';
 import { PostCard } from '../components/PostCard';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 
 export function ExploreScreen({
   posts,
@@ -106,7 +106,7 @@ export function ExploreScreen({
         {users.length ? (
           <section
             className={
-              'community-account-results tw-mb-4 tw-grid tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-p-3 [&>header]:tw-flex [&>header]:tw-justify-between [&>header]:tw-text-[13px] [&>header]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-grid-cols-[repeat(auto-fill,minmax(220px,1fr))] [&>div]:tw-gap-2 [&_button]:tw-flex [&_button]:tw-min-w-0 [&_button]:tw-items-center [&_button]:tw-gap-3 [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-3 [&_button]:tw-text-left [&_button]:tw-cursor-pointer hover:[&_button]:tw-border-community-accent [&_button>span]:tw-grid [&_button>span]:tw-min-w-0 [&_button>span]:tw-gap-0.5 [&_small]:tw-text-community-muted [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-accent-light'
+              'community-account-results tw-mb-4 tw-grid tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-p-3 [&>header]:tw-flex [&>header]:tw-justify-between [&>header]:tw-text-[13px] [&>header]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-grid-cols-[repeat(auto-fill,minmax(220px,1fr))] [&>div]:tw-gap-2 [&_button]:tw-flex [&_button]:tw-min-w-0 [&_button]:tw-items-center [&_button]:tw-gap-3 [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-3 [&_button]:tw-text-left [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer hover:[&_button]:tw-border-community-accent [&_button>span]:tw-grid [&_button>span]:tw-min-w-0 [&_button>span]:tw-gap-0.5 [&_strong]:tw-text-community-bright [&_small]:tw-text-community-muted [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-accent-light'
             }
           >
             <header>

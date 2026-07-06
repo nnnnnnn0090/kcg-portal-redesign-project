@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { CommunityPost } from '../types';
 import { Avatar } from './Avatar';
 import { Glyph } from './Glyph';
-import { cn } from '../classNames';
+import { cn } from '../../../lib/cn';
 
 export function PostCard({
   post,
@@ -121,7 +121,9 @@ export function PostCard({
               ))}
             </div>
           ) : null}
-          <span className={'community-post-card-actions tw-flex tw-flex-none tw-items-center tw-gap-1'}>
+          <span
+            className={'community-post-card-actions tw-flex tw-flex-none tw-items-center tw-gap-1'}
+          >
             <span
               className={
                 'community-impression-count tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-bg-community-bg3 tw-px-2 tw-text-xs tw-text-community-muted [&_svg]:tw-h-4 [&_svg]:tw-w-4'
