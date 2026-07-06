@@ -9,6 +9,11 @@ mkdir -p "$OUT"
 
 cd "$APP"
 
+if [[ ! -d node_modules ]] || [[ ! -f node_modules/.package-lock.json ]]; then
+  echo "Installing dependencies..."
+  npm ci
+fi
+
 # Chrome / Edge
 npm run zip
 
