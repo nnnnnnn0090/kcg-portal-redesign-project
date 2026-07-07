@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import type { CommunityPost } from '../types';
+import { renderCaptionWithTags } from './CaptionTags';
 import { Avatar } from './Avatar';
 import { Glyph } from './Glyph';
 import { cn } from '../../../lib/cn';
@@ -89,7 +90,7 @@ export function PostCard({
       </div>
       <div
         className={
-          'community-post-card-body tw-px-3 tw-py-2 [&>p]:tw-mb-0 [&>p]:tw-mt-0.5 [&>p]:tw-overflow-hidden [&>p]:tw-text-ellipsis [&>p]:tw-whitespace-nowrap [&>p]:tw-text-[13px] [&>p]:tw-text-community-muted [&>footer]:tw-mt-2 [&>footer]:tw-flex [&>footer]:tw-items-center [&>footer]:tw-justify-between [&>footer]:tw-gap-2'
+          'community-post-card-body tw-px-3 tw-py-2 [&>p]:tw-mb-0 [&>p]:tw-mt-0.5 [&>p]:tw-line-clamp-3 [&>p]:tw-whitespace-pre-wrap [&>p]:tw-break-words [&>p]:tw-text-[13px] [&>p]:tw-leading-relaxed [&>p]:tw-text-community-muted [&>footer]:tw-mt-2 [&>footer]:tw-flex [&>footer]:tw-items-center [&>footer]:tw-justify-between [&>footer]:tw-gap-2'
         }
       >
         <div
@@ -100,7 +101,7 @@ export function PostCard({
           <h2>{post.title}</h2>
           {postedLabel ? <time>{postedLabel}</time> : null}
         </div>
-        <p>{post.caption}</p>
+        <p>{renderCaptionWithTags(post.caption, { linkifyUrls: false })}</p>
         <footer>
           <div
             className={

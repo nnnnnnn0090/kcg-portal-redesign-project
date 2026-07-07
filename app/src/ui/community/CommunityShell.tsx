@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { ALL_TAG } from './constants';
 import { collectTags, filterPosts } from './utils';
+import { CommunityNotificationToast } from './components/CommunityNotificationToast';
+import { CommunityStreamReconnect } from './components/CommunityStreamReconnect';
 import { Glyph } from './components/Glyph';
 import { MobileNav, Sidebar } from './components/Navigation';
 import { ModalLayer } from './dialogs/ModalLayer';
@@ -8,12 +10,25 @@ import { ExploreScreen } from './screens/ExploreScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
-import { useCommunityActions, useCommunityState } from './state/CommunityProvider';
+import {
+  useCommunityActions,
+  useCommunityState,
+  useCommunityStreamUi,
+} from './state/CommunityProvider';
 import { cn } from '../../lib/cn';
 
 export function CommunityShell() {
   const state = useCommunityState();
   const actions = useCommunityActions();
+  const {
+    streamDisconnected,
+    streamConnecting,
+    reconnectStream,
+    notificationToast,
+    notificationToastClosing,
+    dismissNotificationToast,
+    handleNotificationToastAnimationEnd,
+  } = useCommunityStreamUi();
   const {
     ja,
     page,
@@ -353,6 +368,23 @@ export function CommunityShell() {
           readPost={readPostFiles}
           readAvatar={readAvatar}
           readHeader={readHeader}
+        />
+        <CommunityNotificationToast
+          notification={notificationToast}
+          closing={notificationToastClosing}
+          ja={ja}
+          onOpen={() => {
+            dismissNotificationToast();
+            go('notifications');
+          }}
+          onDismiss={dismissNotificationToast}
+          onAnimationEnd={handleNotificationToastAnimationEnd}
+        />
+        <CommunityStreamReconnect
+          visible={streamDisconnected}
+          connecting={streamConnecting}
+          ja={ja}
+          onReconnect={reconnectStream}
         />
       </section>
     </div>

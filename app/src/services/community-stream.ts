@@ -14,7 +14,15 @@ export type CommunityStreamingHandlers = {
     impressionCount?: number;
   }) => void;
   onNotificationFlushed: () => void;
+  onStatusChange?: (status: CommunityStreamStatus) => void;
   onOpen?: () => void;
+};
+
+export type CommunityStreamStatus = 'connected' | 'disconnected' | 'connecting';
+
+export type CommunityStreamingConnection = {
+  disconnect: () => void;
+  reconnect: () => void;
 };
 
 function streamingUrl(origin: string, token?: string): string {
@@ -41,11 +49,15 @@ function connectChannel(ws: WebSocket, channel: 'homeTimeline' | 'main', id: str
 
 export function connectCommunityStreaming(
   options: CommunityStreamingHandlers & { token?: string },
-): () => void {
+): CommunityStreamingConnection {
   let ws: WebSocket | null = null;
   let closed = false;
   let retryTimer: number | undefined;
   let retryIndex = 0;
+
+  const setStatus = (status: CommunityStreamStatus) => {
+    options.onStatusChange?.(status);
+  };
 
   const scheduleReconnect = () => {
     if (closed) return;
@@ -60,15 +72,18 @@ export function connectCommunityStreaming(
     if (closed) return;
     const origin = getCommunityApiOrigin();
     if (!origin) {
+      setStatus('disconnected');
       scheduleReconnect();
       return;
     }
 
+    setStatus('connecting');
     ws = new WebSocket(streamingUrl(origin, options.token));
     ws.onopen = () => {
       retryIndex = 0;
       connectChannel(ws!, 'homeTimeline', 'home');
       if (options.token) connectChannel(ws!, 'main', 'main');
+      setStatus('connected');
       options.onOpen?.();
     };
     ws.onmessage = (event) => {
@@ -118,16 +133,30 @@ export function connectCommunityStreaming(
     };
     ws.onclose = () => {
       ws = null;
-      if (!closed) scheduleReconnect();
+      if (!closed) {
+        setStatus('disconnected');
+        scheduleReconnect();
+      }
     };
     ws.onerror = () => ws?.close();
   };
 
+  const reconnect = () => {
+    if (closed) return;
+    if (retryTimer) window.clearTimeout(retryTimer);
+    retryIndex = 0;
+    ws?.close();
+    connect();
+  };
+
   connect();
 
-  return () => {
-    closed = true;
-    if (retryTimer) window.clearTimeout(retryTimer);
-    ws?.close();
+  return {
+    disconnect: () => {
+      closed = true;
+      if (retryTimer) window.clearTimeout(retryTimer);
+      ws?.close();
+    },
+    reconnect,
   };
 }

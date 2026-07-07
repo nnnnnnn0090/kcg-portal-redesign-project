@@ -365,7 +365,7 @@ export function PostDialog({
                 'community-post-caption tw-whitespace-pre-wrap tw-break-words [&_p]:tw-m-0 [&_p]:tw-leading-7'
               }
             >
-              <p>{renderCaptionWithTags(post.caption, onTagClick)}</p>
+              <p>{renderCaptionWithTags(post.caption, { onTagClick })}</p>
             </div>
           ) : null}
         </section>

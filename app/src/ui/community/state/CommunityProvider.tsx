@@ -8,6 +8,7 @@ import {
   type FormEvent,
   type ReactNode,
   type SetStateAction,
+  type AnimationEvent,
 } from 'react';
 import type { AppLanguage } from '../../../i18n/messages';
 import storage from '../../../lib/storage';
@@ -17,7 +18,7 @@ import { setCommunityApiOrigin, setCommunityRequestLoginId } from '../api/runtim
 import { SOCIAL_PLATFORMS } from '../constants';
 import { formString, optionalFormString } from '../forms/formData';
 import { COMMUNITY_TIMING } from '../timing';
-import type { CommunityComment, CommunityPage, CommunityPost, CommunityUser } from '../types';
+import type { CommunityComment, CommunityNotification, CommunityPage, CommunityPost, CommunityUser } from '../types';
 import { communityReducer, createCommunityState } from './reducer';
 import type { CommunityActions, CommunityState, CommunityStateDispatch } from './types';
 import { useCommunityImageInputs } from './useCommunityImageInputs';
@@ -27,6 +28,18 @@ import { useObjectUrlRegistry } from './useObjectUrlRegistry';
 
 const CommunityStateContext = createContext<CommunityState | null>(null);
 const CommunityActionsContext = createContext<CommunityActions | null>(null);
+
+type CommunityStreamUiContextValue = {
+  streamDisconnected: boolean;
+  streamConnecting: boolean;
+  reconnectStream: () => void;
+  notificationToast: CommunityNotification | null;
+  notificationToastClosing: boolean;
+  dismissNotificationToast: () => void;
+  handleNotificationToastAnimationEnd: (event: AnimationEvent<HTMLDivElement>) => void;
+};
+
+const CommunityStreamUiContext = createContext<CommunityStreamUiContextValue | null>(null);
 
 function useCommunitySetter<Key extends keyof CommunityState>(
   dispatch: CommunityStateDispatch,
@@ -59,12 +72,14 @@ export function CommunityProvider({
     user,
     token,
     query,
+    tag,
     refreshing,
     busy,
     postImages,
     avatarImage,
     headerImage,
     closing,
+    notifications,
   } = state;
   const setPage = useCommunitySetter(dispatch, 'page');
   const setModal = useCommunitySetter(dispatch, 'modal');
@@ -130,11 +145,20 @@ export function CommunityProvider({
     setLoading,
     setError,
   });
-  useCommunityTimelineStream({
+  const {
+    streamDisconnected,
+    streamConnecting,
+    reconnectStream,
+    notificationToast,
+    notificationToastClosing,
+    dismissNotificationToast,
+    handleNotificationToastAnimationEnd,
+  } = useCommunityTimelineStream({
     token,
     page,
     query,
     tag,
+    notifications,
     dispatch,
     loadNotifications,
     loadFollowing,
@@ -153,6 +177,12 @@ export function CommunityProvider({
   useEffect(() => {
     recordedImpressions.current.clear();
   }, [token]);
+
+  useEffect(() => {
+    if (page !== 'profile' || !user || !profileUser) return;
+    if (profileUser.loginId.toLowerCase() !== user.loginId.toLowerCase()) return;
+    setProfilePosts(ownPosts);
+  }, [ownPosts, page, profileUser, setProfilePosts, user]);
 
   useEffect(() => {
     setCommunityRequestLoginId(user?.loginId);
@@ -418,7 +448,7 @@ export function CommunityProvider({
       ]);
       setPostImages([]);
       setModal({ kind: 'sent' });
-      void loadOwn(token);
+      await loadOwn(token);
       void loadBookmarks(token);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not submit post');
@@ -718,7 +748,21 @@ export function CommunityProvider({
   };
   return (
     <CommunityActionsContext.Provider value={actions}>
-      <CommunityStateContext.Provider value={state}>{children}</CommunityStateContext.Provider>
+      <CommunityStateContext.Provider value={state}>
+        <CommunityStreamUiContext.Provider
+          value={{
+            streamDisconnected,
+            streamConnecting,
+            reconnectStream,
+            notificationToast,
+            notificationToastClosing,
+            dismissNotificationToast,
+            handleNotificationToastAnimationEnd,
+          }}
+        >
+          {children}
+        </CommunityStreamUiContext.Provider>
+      </CommunityStateContext.Provider>
     </CommunityActionsContext.Provider>
   );
 }
@@ -732,5 +776,11 @@ export function useCommunityState(): CommunityState {
 export function useCommunityActions(): CommunityActions {
   const context = useContext(CommunityActionsContext);
   if (!context) throw new Error('useCommunityActions must be used inside CommunityProvider');
+  return context;
+}
+
+export function useCommunityStreamUi(): CommunityStreamUiContextValue {
+  const context = useContext(CommunityStreamUiContext);
+  if (!context) throw new Error('useCommunityStreamUi must be used inside CommunityProvider');
   return context;
 }

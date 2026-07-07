@@ -145,6 +145,14 @@ export default {
           '78%': { transform: 'scale(.92)' },
           '100%': { transform: 'scale(1)' },
         },
+        'community-toast-from-right': {
+          from: { opacity: '0', transform: 'translateX(18px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        'community-toast-out-right': {
+          from: { opacity: '1', transform: 'translateX(0)' },
+          to: { opacity: '0', transform: 'translateX(14px)' },
+        },
       },
       animation: {
         'portal-fade-in': 'portal-fade-in var(--p-enter-dur) var(--p-enter-ease) both',
@@ -159,6 +167,8 @@ export default {
         'community-slide-out': 'community-slide-out 280ms ease both',
         'community-dialog-in': 'community-dialog-in 180ms ease both',
         'community-action-pop': 'community-action-pop 520ms cubic-bezier(.2,.9,.25,1.25) both',
+        'community-toast-from-right': 'community-toast-from-right 220ms cubic-bezier(.2,.8,.2,1) both',
+        'community-toast-out-right': 'community-toast-out-right 180ms ease both',
       },
     },
   },
