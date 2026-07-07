@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildTelemetryCanonicalString, signTelemetryRequest } from '../contract/telemetry-auth';
 
-const TEST_SECRET = 'kcg-kpl-telm-sec-v1-2026-07-portal-redesign';
+const TEST_SECRET = 'test-telemetry-hmac-secret-for-unit-tests';
 
 async function verifyWithSecret(
   secret: string,
@@ -32,10 +32,5 @@ describe('telemetry-auth', () => {
     const signed = await signTelemetryRequest(TEST_SECRET, 'POST', '/survey-response', 1_710_000_000_000);
     const canonical = buildTelemetryCanonicalString(signed.timestamp, 'POST', '/survey-response');
     await expect(verifyWithSecret(TEST_SECRET, signed.signature, canonical)).resolves.toBe(true);
-  });
-
-  it('uses the embedded distribution secret constant', () => {
-    const secret = atob('a2NnLWtwbC10ZWxtLXNlYy12') + atob('MS0yMDI2LTA3LXBvcnRhbC1yZWRlc2lnbg==');
-    expect(secret).toBe(TEST_SECRET);
   });
 });

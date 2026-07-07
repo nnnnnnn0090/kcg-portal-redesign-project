@@ -1,123 +1,111 @@
 /**
  * ホームページのショートカットリンクの表示・編集コンポーネント。
- * ドラッグ＆ドロップによる並べ替え、非表示設定、カスタムリンクの追加に対応する。
+ * リンク本体はポータル API。並び順・非表示は storage 経由でポータル同期。
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { SK, HOME_SHORTCUT_EXTRAS, HOME2_MAIL_DIRECTORY_URL } from '../../../shared/constants';
-import type { LinkConfig } from '../../../shared/types';
-import storage from '../../../lib/storage';
+import { HOME2_MAIL_DIRECTORY_URL } from '../../../shared/constants';
 import { useI18n } from '../../../i18n';
-
-export type { LinkConfig, CustomLink } from '../../../shared/types';
-
-interface ApiLink {
-  midashi: string;
-  url:     string;
-  biko?:   string;
-}
-
-interface Row {
-  key:       string;
-  midashi:   string;
-  url:       string;
-  biko:      string;
-  isCustom:  boolean;
-  customId?: string;
-}
-
-// ─── ヘルパー ─────────────────────────────────────────────────────────────
-
-/** URL の末尾スラッシュを除いたものをキーとして使う */
-function linkKey(url: string): string { return String(url ?? '').replace(/\/+$/, ''); }
-
-const EXTRAS: ApiLink[] = HOME_SHORTCUT_EXTRAS.map((e) => ({ midashi: e.midashi, url: e.url }));
-
-/** API リンク・固定リンク・カスタムリンクを統合して重複除去・順序適用する */
-function buildRows(items: ApiLink[], extras: ApiLink[], config: LinkConfig): Row[] {
-  const extraUrls = new Set(extras.filter((i) => i.midashi && i.url).map((i) => linkKey(i.url)));
-  const fromApi   = items.filter((i) => i.midashi && i.url && !extraUrls.has(linkKey(i.url)));
-  const customRows = (config.custom ?? []).filter((c) => c.midashi && c.url);
-
-  const allRaw: Row[] = [
-    ...extras.filter((i) => i.midashi && i.url).map((r) => ({ key: linkKey(r.url), midashi: r.midashi, url: r.url, biko: r.biko ?? '', isCustom: false })),
-    ...fromApi.map((r) => ({ key: linkKey(r.url), midashi: r.midashi, url: r.url, biko: r.biko ?? '', isCustom: false })),
-    ...customRows.map((r) => ({ key: linkKey(r.url), midashi: r.midashi, url: r.url, biko: '', isCustom: true, customId: r.id })),
-  ];
-
-  // 重複除去
-  const seen = new Set<string>();
-  const deduped = allRaw.filter((r) => { if (seen.has(r.key)) return false; seen.add(r.key); return true; });
-
-  // 保存済み順序を適用
-  const orderMap = new Map<string, number>();
-  (config.order ?? []).forEach((k, i) => orderMap.set(k, i));
-  return deduped.sort((a, b) => (orderMap.get(a.key) ?? 99999) - (orderMap.get(b.key) ?? 99999));
-}
-
-// ─── コンポーネント ────────────────────────────────────────────────────────
+import type { PortalUserLink } from '../../../services/user-html-link';
+import {
+  addPortalUserLink,
+  deletePortalUserLink,
+} from '../../../services/user-html-link';
+import {
+  readShortcutLayout,
+  saveShortcutLayout,
+} from '../../../services/shortcut-layout';
+import {
+  buildLinkEditorRows,
+  linkKey,
+  LINK_EDITOR_EXTRAS,
+  orderLinkEditorRows,
+  type ApiLink,
+  type LinkEditorRow,
+} from './link-editor-rows';
 
 interface LinkEditorProps {
-  items:          ApiLink[];
-  config:         LinkConfig;
-  onConfigChange: (cfg: LinkConfig) => void;
-  editing:        boolean;
+  items:     ApiLink[];
+  userLinks: PortalUserLink[];
+  editing:   boolean;
 }
 
-export function LinkEditor({ items, config, onConfigChange, editing }: LinkEditorProps) {
+export function LinkEditor({ items, userLinks, editing }: LinkEditorProps) {
   const { t } = useI18n();
-  const [localCfg, setLocalCfg] = useState<LinkConfig>(config);
-  const [addName,  setAddName]  = useState('');
-  const [addUrl,   setAddUrl]   = useState('');
-  const [rows,     setRows]     = useState<Row[]>(() => buildRows(items, EXTRAS, config));
-  /** ドラッグ中の見た目（CSS .is-dragging / .is-drag-over） */
-  const [dragUi, setDragUi]     = useState<{ from: number; over: number | null } | null>(null);
-  const dragSrcIdx    = useRef(-1);
-  const wasEditingRef = useRef(false);
+  const [addName, setAddName] = useState('');
+  const [addUrl, setAddUrl] = useState('');
+  const [rows, setRows] = useState<LinkEditorRow[]>([]);
+  const [hiddenKeys, setHiddenKeys] = useState<string[]>([]);
+  const [layoutReady, setLayoutReady] = useState(false);
+  const [dragUi, setDragUi] = useState<{ from: number; over: number | null } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const dragSrcIdx = useRef(-1);
+  const layoutRef = useRef({ order: [] as string[], hidden: [] as string[] });
 
-  const save = useCallback((newRows: Row[], newCfg: LinkConfig): void => {
-    const merged = { ...newCfg, order: newRows.map((r) => r.key) };
-    setLocalCfg(merged);
-    onConfigChange(merged);
-    void storage.set({ [SK.shortcutConfig]: merged });
-  }, [onConfigChange]);
+  const rebuildRows = useCallback(
+    (order: string[]) => {
+      const built = buildLinkEditorRows(items, LINK_EDITOR_EXTRAS, userLinks);
+      setRows(orderLinkEditorRows(built, order));
+    },
+    [items, userLinks],
+  );
 
-  // 編集モードが終了したとき保存する
   useEffect(() => {
-    if (wasEditingRef.current && !editing) save(rows, localCfg);
-    wasEditingRef.current = editing;
-  }, [editing, rows, localCfg, save]);
+    let cancelled = false;
+    void readShortcutLayout().then((layout) => {
+      if (cancelled) return;
+      layoutRef.current = layout;
+      setHiddenKeys(layout.hidden);
+      rebuildRows(layout.order);
+      setLayoutReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [rebuildRows]);
 
-  // config が外部から変わった場合は同期する（編集中は無視）
-  useEffect(() => { if (!editing) setLocalCfg(config); }, [config, editing]);
+  useEffect(() => {
+    if (!layoutReady) return;
+    rebuildRows(layoutRef.current.order);
+  }, [items, userLinks, layoutReady, rebuildRows]);
 
-  // items または localCfg が変わったら行を再構築する
-  useEffect(() => { setRows(buildRows(items, EXTRAS, localCfg)); }, [items, localCfg]);
+  const persistLayout = useCallback(async (nextRows: LinkEditorRow[], hidden: string[]) => {
+    const order = nextRows.map((row) => row.key);
+    layoutRef.current = { order, hidden };
+    await saveShortcutLayout({ order, hidden });
+  }, []);
 
   function toggleHidden(key: string): void {
-    const hidden = localCfg.hidden.includes(key)
-      ? localCfg.hidden.filter((k) => k !== key)
-      : [...localCfg.hidden, key];
-    save(rows, { ...localCfg, hidden });
+    setHiddenKeys((prev) => {
+      const hidden = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      void persistLayout(rows, hidden);
+      return hidden;
+    });
   }
 
-  function deleteCustom(customId: string): void {
-    const newRows = rows.filter((r) => !(r.isCustom && r.customId === customId));
-    save(newRows, { ...localCfg, custom: localCfg.custom.filter((c) => c.id !== customId) });
-    setRows(newRows);
+  async function deleteCustom(portalId: string): Promise<void> {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await deletePortalUserLink(userLinks, portalId);
+    } finally {
+      setBusy(false);
+    }
   }
 
-  function addCustomLink(): void {
+  async function addCustomLink(): Promise<void> {
     const name = addName.trim();
-    const url  = addUrl.trim();
-    if (!name || !url) return;
-    try { new URL(url); } catch { return; } // URL 形式バリデーション
-    const id      = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-    const newRows = [...rows, { key: linkKey(url), midashi: name, url, biko: '', isCustom: true, customId: id }];
-    save(newRows, { ...localCfg, custom: [...(localCfg.custom ?? []), { id, midashi: name, url }] });
-    setRows(newRows);
-    setAddName('');
-    setAddUrl('');
+    const url = addUrl.trim();
+    if (!name || !url || busy) return;
+    try { new URL(url); } catch { return; }
+    setBusy(true);
+    try {
+      await addPortalUserLink(userLinks, name, url);
+      setAddName('');
+      setAddUrl('');
+    } finally {
+      setBusy(false);
+    }
   }
 
   function onDragStart(e: React.DragEvent, idx: number): void {
@@ -153,20 +141,23 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
     dragSrcIdx.current = -1;
     setDragUi(null);
     setRows(newRows);
-    save(newRows, localCfg);
+    void persistLayout(newRows, hiddenKeys);
   }
 
-  const isHidden = (key: string) => localCfg.hidden.includes(key);
-  const visible  = rows.filter((r) => !isHidden(r.key));
+  if (!layoutReady) {
+    return <p className="p-empty">{t.linkEditor.empty}</p>;
+  }
 
-  // ── 表示モード ──────────────────────────────────────────────────────────
+  const hidden = new Set(hiddenKeys);
+  const visible = rows.filter((r) => !hidden.has(r.key));
+
   if (!editing) {
     return visible.length === 0
       ? <p className="p-empty">{t.linkEditor.empty}</p>
       : (
         <div className="p-link-list">
           {visible.map((r) => (
-            <article key={r.key} className="p-shortcut">
+            <article key={r.portalId ?? r.key} className="p-shortcut">
               <a
                 className="p-shortcut-link"
                 href={r.url}
@@ -189,14 +180,13 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
       );
   }
 
-  // ── 編集モード ──────────────────────────────────────────────────────────
   return (
     <>
       <div className="p-link-edit-list">
         {rows.map((r, i) => (
           <div
-            key={r.key}
-            className={`p-link-edit-item${isHidden(r.key) ? ' is-hidden' : ''}${
+            key={r.portalId ?? r.key}
+            className={`p-link-edit-item${hidden.has(r.key) ? ' is-hidden' : ''}${
               dragUi?.from === i ? ' is-dragging' : ''
             }${dragUi?.over === i ? ' is-drag-over' : ''}`}
             draggable
@@ -210,28 +200,29 @@ export function LinkEditor({ items, config, onConfigChange, editing }: LinkEdito
             <button
               type="button"
               className="p-link-edit-vis"
-              title={isHidden(r.key) ? t.linkEditor.showOnHome : t.linkEditor.hideOnHome}
+              title={hidden.has(r.key) ? t.linkEditor.showOnHome : t.linkEditor.hideOnHome}
               onClick={() => toggleHidden(r.key)}
             >
-              {isHidden(r.key) ? t.common.show : t.common.hide}
+              {hidden.has(r.key) ? t.common.show : t.common.hide}
             </button>
-            {r.isCustom && (
+            {r.isCustom && r.portalId ? (
               <button
                 type="button"
                 className="p-link-edit-del"
                 title={t.common.delete}
-                onClick={() => deleteCustom(r.customId!)}
+                disabled={busy}
+                onClick={() => void deleteCustom(r.portalId!)}
               >
                 ×
               </button>
-            )}
+            ) : null}
           </div>
         ))}
       </div>
       <div className="p-link-add-form">
-        <input type="text"  className="p-link-add-input" placeholder={t.linkEditor.linkNamePlaceholder} autoComplete="off" value={addName} onChange={(e) => setAddName(e.target.value)} />
-        <input type="url"   className="p-link-add-input" placeholder={t.linkEditor.urlPlaceholder} autoComplete="off" value={addUrl}  onChange={(e) => setAddUrl(e.target.value)} />
-        <button type="button" className="p-link-add-btn" onClick={addCustomLink}>{t.common.add}</button>
+        <input type="text" className="p-link-add-input" placeholder={t.linkEditor.linkNamePlaceholder} autoComplete="off" value={addName} onChange={(e) => setAddName(e.target.value)} disabled={busy} />
+        <input type="url" className="p-link-add-input" placeholder={t.linkEditor.urlPlaceholder} autoComplete="off" value={addUrl} onChange={(e) => setAddUrl(e.target.value)} disabled={busy} />
+        <button type="button" className="p-link-add-btn" onClick={() => void addCustomLink()} disabled={busy}>{t.common.add}</button>
       </div>
     </>
   );

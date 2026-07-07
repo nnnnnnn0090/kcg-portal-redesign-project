@@ -23,7 +23,12 @@ export function pathOf(u: string): string {
 }
 
 const isNewTopics       = (u: string) => pathIncludesPortalApiSegment(u, PORTAL_API.newTopics);
-const isUserHtmlLink    = (u: string) => pathIncludesPortalApiSegment(u, PORTAL_API.userHtmlLink);
+const isUserHtmlLinkMe = (u: string) => {
+  const p = pathOf(u);
+  return p.endsWith('/api/UserHtmlLink/Me');
+};
+const isUserHtmlLink    = (u: string) =>
+  pathIncludesPortalApiSegment(u, PORTAL_API.userHtmlLink) && !isUserHtmlLinkMe(u);
 const isKogiCalendar    = (u: string) => pathIncludesPortalApiSegment(u, PORTAL_API.kogiCalendar);
 const isHoshuCalendar   = (u: string) => pathIncludesPortalApiSegment(u, PORTAL_API.hoshuCalendar);
 const isCampusCalendar  = (u: string) => pathIncludesPortalApiSegment(u, PORTAL_API.campusCalendar);
@@ -44,7 +49,7 @@ function isDeliveredDetail(u: string): boolean {
 }
 
 export function shouldHook(u: string): boolean {
-  return isNewTopics(u) || isUserHtmlLink(u) ||
+  return isNewTopics(u) || isUserHtmlLink(u) || isUserHtmlLinkMe(u) ||
          isKogiCalendar(u) || isHoshuCalendar(u) || isCampusCalendar(u) ||
          isKogiNews(u) || isKinoMessage(u) ||
          isDeliveredNendo(u) || isDeliveredDetail(u) ||
@@ -55,6 +60,7 @@ export function shouldHook(u: string): boolean {
 export {
   isNewTopics,
   isUserHtmlLink,
+  isUserHtmlLinkMe,
   isKogiCalendar,
   isHoshuCalendar,
   isCampusCalendar,

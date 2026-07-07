@@ -1,0 +1,212 @@
+import { describe, expect, it } from 'vitest';
+import { SK } from '../contract/storage-keys';
+import type { Settings } from '../domain/settings';
+import {
+  createCustomTheme,
+  EMPTY_CUSTOM_THEMES,
+} from '../domain/themes/custom-themes';
+import { THEMES } from '../domain/themes/definitions';
+import {
+  applyPortalExtensionMarkers,
+  decodePortalExtensionSnapshot,
+  decodePortalSettingsSnapshot,
+  isPortalSettingsMarkerLink,
+  PORTAL_SETTINGS_BIKO_MAX,
+  PORTAL_SETTINGS_CHUNK_MAX,
+} from './portal-settings-sync';
+import type { PortalUserLink } from './user-html-link';
+
+const BASE_SETTINGS: Settings = {
+  theme: 'dark',
+  hideProfileName: false,
+  showKogiCalMascot: true,
+  showHomeCornerCharacter: false,
+  hideAssignmentCalendar: false,
+  home2WebMailOverlay: true,
+  cplanOverlay: false,
+  calendarWeekStart: 'sunday',
+  language: 'ja',
+};
+
+function extensionSnapshot(
+  settings: Settings,
+  extra: Record<string, unknown> = {},
+  updatedAt = 1_700_000_000_000,
+) {
+  return {
+    updatedAt,
+    storage: {
+      [SK.theme]: settings.theme,
+      [SK.hideProfileName]: settings.hideProfileName,
+      [SK.showKogiCalMascot]: settings.showKogiCalMascot,
+      [SK.showHomeCornerCharacter]: settings.showHomeCornerCharacter,
+      [SK.hideAssignmentCalendar]: settings.hideAssignmentCalendar,
+      [SK.home2WebMailOverlay]: settings.home2WebMailOverlay,
+      [SK.cplanOverlay]: settings.cplanOverlay,
+      [SK.calendarWeekStart]: settings.calendarWeekStart,
+      [SK.language]: settings.language,
+      [SK.customThemes]: EMPTY_CUSTOM_THEMES,
+      ...extra,
+    },
+  };
+}
+
+describe('portal-settings-sync', () => {
+  it('detects settings marker links', () => {
+    expect(isPortalSettingsMarkerLink({ midashi: '__KCGLMS::0', url: 'https://example.com' })).toBe(true);
+    expect(isPortalSettingsMarkerLink({ midashi: 'My Link', url: 'https://home.kcg.ac.jp/portal/_kcglms/0' })).toBe(true);
+    expect(isPortalSettingsMarkerLink({ midashi: 'My Link', url: 'https://example.com' })).toBe(false);
+  });
+
+  it('round-trips extension storage through marker links', () => {
+    const links = applyPortalExtensionMarkers([], extensionSnapshot(BASE_SETTINGS));
+    const decoded = decodePortalExtensionSnapshot(links);
+    expect(decoded?.storage[SK.theme]).toBe('dark');
+    expect(decoded?.storage[SK.showKogiCalMascot]).toBe(true);
+    expect(decoded?.updatedAt).toBe(1_700_000_000_000);
+    const joined = links.map((link) => link.biko).join('');
+    expect(joined).toContain('"version":3');
+    expect(joined).toContain('"portalThemeColorTheme"');
+  });
+
+  it('round-trips onboarding flags in v3 storage', () => {
+    const links = applyPortalExtensionMarkers(
+      [],
+      extensionSnapshot(BASE_SETTINGS, {
+        [SK.portalGuidedTourDone]: true,
+        [SK.portalLanguagePickerDone]: true,
+      }),
+    );
+    const decoded = decodePortalExtensionSnapshot(links);
+    expect(decoded?.storage[SK.portalGuidedTourDone]).toBe(true);
+    expect(decoded?.storage[SK.portalLanguagePickerDone]).toBe(true);
+  });
+
+  it('reads legacy v1 compact keys', () => {
+    const legacy = JSON.stringify({
+      v: 1,
+      u: 42,
+      s: {
+        t: 'dark',
+        h: 1,
+        k: 0,
+        c: 0,
+        a: 0,
+        w2: 1,
+        cp: 1,
+        w: 'monday',
+        l: 'ja',
+      },
+      ct: EMPTY_CUSTOM_THEMES,
+    });
+    const links: PortalUserLink[] = [{
+      id: 'm0',
+      version: 1,
+      linkNo: 99,
+      midashi: '__KCGLMS::0',
+      url: 'https://home.kcg.ac.jp/portal/_kcglms/0',
+      biko: legacy,
+      order: 0,
+      delFlg: false,
+    }];
+    const decoded = decodePortalSettingsSnapshot(links);
+    expect(decoded?.updatedAt).toBe(42);
+    expect(decoded?.settings.hideProfileName).toBe(true);
+    expect(decoded?.settings.showKogiCalMascot).toBe(false);
+  });
+
+  it('preserves user links when saving settings markers', () => {
+    const userLink: PortalUserLink = {
+      id: 'u1',
+      version: 1,
+      linkNo: 7,
+      midashi: 'Example',
+      url: 'https://example.com',
+      biko: '',
+      order: 0,
+      delFlg: false,
+    };
+    const next = applyPortalExtensionMarkers([userLink], extensionSnapshot(BASE_SETTINGS, {}, 123));
+    expect(next.some((link) => link.id === 'u1' && link.linkNo === 7)).toBe(true);
+    expect(next.some((link) => isPortalSettingsMarkerLink(link))).toBe(true);
+  });
+
+  it('assigns unique linkNo to new marker chunks without renumbering existing links', () => {
+    const userLink: PortalUserLink = {
+      id: 'u1',
+      version: 1,
+      linkNo: 3,
+      midashi: 'Example',
+      url: 'https://example.com',
+      biko: '',
+      order: 0,
+      delFlg: false,
+    };
+    const next = applyPortalExtensionMarkers([userLink], extensionSnapshot(BASE_SETTINGS, {}, 123));
+    const markers = next.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
+    expect(markers.every((link) => link.linkNo !== 3)).toBe(true);
+    expect(new Set(markers.map((link) => link.linkNo)).size).toBe(markers.length);
+    expect(next.find((link) => link.id === 'u1')?.linkNo).toBe(3);
+  });
+
+  it('splits default settings across biko chunks within portal limit', () => {
+    const links = applyPortalExtensionMarkers([], extensionSnapshot(BASE_SETTINGS, {}, 999));
+    const markers = links.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
+    expect(markers.length).toBeGreaterThan(1);
+    for (const chunk of markers) {
+      expect(chunk.biko.length).toBeLessThanOrEqual(PORTAL_SETTINGS_BIKO_MAX);
+      expect(chunk.biko.length).toBeLessThanOrEqual(PORTAL_SETTINGS_CHUNK_MAX);
+    }
+  });
+
+  it('splits large payloads across multiple biko chunks', () => {
+    const themes = Array.from({ length: 8 }, (_, index) =>
+      createCustomTheme(`Theme ${index}`, 'dark', THEMES.dark),
+    );
+    const next = applyPortalExtensionMarkers([], {
+      updatedAt: 999,
+      storage: {
+        ...extensionSnapshot(BASE_SETTINGS).storage,
+        [SK.customThemes]: { schemaVersion: 1, themes },
+      },
+    });
+    const markers = next.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
+    expect(markers.length).toBeGreaterThan(1);
+    for (const chunk of markers) {
+      expect(chunk.biko.length).toBeLessThanOrEqual(PORTAL_SETTINGS_BIKO_MAX);
+    }
+    const decoded = decodePortalExtensionSnapshot(next);
+    expect(parseCustomThemes(decoded)).toHaveLength(8);
+  });
+
+  it('soft-deletes obsolete marker chunks', () => {
+    const themes = Array.from({ length: 8 }, (_, index) =>
+      createCustomTheme(`Theme ${index}`, 'dark', THEMES.dark),
+    );
+    const initial = applyPortalExtensionMarkers([], {
+      updatedAt: 1,
+      storage: {
+        ...extensionSnapshot(BASE_SETTINGS).storage,
+        [SK.customThemes]: { schemaVersion: 1, themes },
+      },
+    });
+    expect(
+      initial.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg).length,
+    ).toBeGreaterThan(1);
+
+    const shrunk = applyPortalExtensionMarkers(initial, extensionSnapshot(BASE_SETTINGS, {}, 2));
+    const shrunkActive = shrunk.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
+    const initialActive = initial.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
+    expect(shrunkActive.length).toBeLessThan(initialActive.length);
+    expect(shrunk.some((link) => isPortalSettingsMarkerLink(link) && link.delFlg)).toBe(true);
+  });
+});
+
+function parseCustomThemes(
+  decoded: ReturnType<typeof decodePortalExtensionSnapshot>,
+): unknown[] {
+  const raw = decoded?.storage[SK.customThemes];
+  if (!raw || typeof raw !== 'object') return [];
+  const themes = (raw as { themes?: unknown[] }).themes;
+  return Array.isArray(themes) ? themes : [];
+}

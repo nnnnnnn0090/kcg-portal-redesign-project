@@ -4,6 +4,7 @@
 
 import { MSG } from '../shared/constants';
 import type { NewsListItem, PortalCapturedMessage } from '../shared/types';
+import { parsePortalUserLink } from '../services/user-html-link';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,18 @@ export interface UserHtmlLinkItem {
   midashi: string;
   url:     string;
   biko?:   string;
+  kubun?:  number;
+}
+
+export interface PortalUserLinkRecord {
+  id: string;
+  version: number | string;
+  linkNo: number;
+  midashi: string;
+  url: string;
+  biko: string;
+  order: number;
+  delFlg: boolean;
 }
 
 export interface HomePortalInboxState {
@@ -23,6 +36,7 @@ export interface HomePortalInboxState {
   kogiNews:       NewsListItem[];
   newTopicsItems: NewsListItem[];
   linkItems:      UserHtmlLinkItem[];
+  userLinkRecords: PortalUserLinkRecord[];
 }
 
 // ─── 型ガード ─────────────────────────────────────────────────────────────
@@ -51,7 +65,16 @@ export function isNewsListItem(x: unknown): x is NewsListItem {
 }
 
 function narrowUserHtmlLinkItems(items: unknown[]): UserHtmlLinkItem[] {
-  return items.filter(isUserHtmlLinkItem);
+  return items.filter(isUserHtmlLinkItem).map((item) => ({
+    midashi: item.midashi,
+    url: item.url,
+    biko: typeof item.biko === 'string' ? item.biko : undefined,
+    kubun: typeof item.kubun === 'number' ? item.kubun : undefined,
+  }));
+}
+
+function narrowPortalUserLinkRecords(items: unknown[]): PortalUserLinkRecord[] {
+  return items.map(parsePortalUserLink).filter((x): x is PortalUserLinkRecord => x !== null);
 }
 
 // ─── reducer ─────────────────────────────────────────────────────────────
@@ -82,6 +105,12 @@ export function applyHomePortalMessage(
     case MSG.userHtmlLink:
       if (Array.isArray(msg.items)) {
         return { ...prev, linkItems: narrowUserHtmlLinkItems(msg.items) };
+      }
+      return prev;
+
+    case MSG.userHtmlLinkMe:
+      if (Array.isArray(msg.items)) {
+        return { ...prev, userLinkRecords: narrowPortalUserLinkRecords(msg.items) };
       }
       return prev;
 

@@ -1,61 +1,69 @@
 /**
- * `browser.storage.local` の Promise ラッパー。
- * Chrome (MV3) と Firefox (MV2) の両方に対応する。
+ * 拡張 storage クライアント。
+ * 設定系はメモリ＋マイリンク API。ハンドオフ・インストール ID は chrome.storage.local。
  */
+
+import { usesExtensionMemory } from '../../contract/storage-routing';
+import { chromeStorageClient } from './chrome-storage-client';
+import {
+  getPortalExtensionStoreValues,
+  removePortalExtensionStoreValues,
+  setPortalExtensionStoreValues,
+  subscribePortalExtensionStore,
+} from './portal-extension-store';
+
+function normalizeKeys(keys: string | string[]): string[] {
+  return Array.isArray(keys) ? keys : [keys];
+}
+
+function splitKeys(keys: readonly string[]): { memory: string[]; chrome: string[] } {
+  const memory: string[] = [];
+  const chrome: string[] = [];
+  for (const key of keys) {
+    if (usesExtensionMemory(key)) memory.push(key);
+    else chrome.push(key);
+  }
+  return { memory, chrome };
+}
+
+function splitObject(obj: Record<string, unknown>): {
+  memory: Record<string, unknown>;
+  chrome: Record<string, unknown>;
+} {
+  const memory: Record<string, unknown> = {};
+  const chrome: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (usesExtensionMemory(key)) memory[key] = value;
+    else chrome[key] = value;
+  }
+  return { memory, chrome };
+}
 
 export const storageClient = {
   get(keys: string | string[]): Promise<Record<string, unknown>> {
-    return new Promise((resolve) => {
-      try {
-        if (typeof browser !== 'undefined' && browser.storage?.local) {
-          browser.storage.local.get(keys).then(resolve).catch(() => resolve({}));
-          return;
-        }
-      } catch { /* ignore */ }
-      try {
-        if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-          chrome.storage.local.get(keys, (r) => resolve(r ?? {}));
-          return;
-        }
-      } catch { /* ignore */ }
-      resolve({});
-    });
+    const keyList = normalizeKeys(keys);
+    const { memory, chrome } = splitKeys(keyList);
+    return Promise.all([
+      chrome.length > 0 ? chromeStorageClient.get(chrome) : Promise.resolve({}),
+      Promise.resolve(memory.length > 0 ? getPortalExtensionStoreValues(memory) : {}),
+    ]).then(([chromeValues, memoryValues]) => ({ ...chromeValues, ...memoryValues }));
   },
 
   set(obj: Record<string, unknown>): Promise<void> {
-    return new Promise((resolve) => {
-      try {
-        if (typeof browser !== 'undefined' && browser.storage?.local) {
-          browser.storage.local.set(obj).then(resolve).catch(resolve);
-          return;
-        }
-      } catch { /* ignore */ }
-      try {
-        if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-          chrome.storage.local.set(obj, resolve);
-          return;
-        }
-      } catch { /* ignore */ }
-      resolve();
-    });
+    const { memory, chrome } = splitObject(obj);
+    if (Object.keys(memory).length > 0) setPortalExtensionStoreValues(memory);
+    if (Object.keys(chrome).length > 0) {
+      return chromeStorageClient.set(chrome);
+    }
+    return Promise.resolve();
   },
 
   remove(keys: string | string[]): Promise<void> {
-    return new Promise((resolve) => {
-      try {
-        if (typeof browser !== 'undefined' && browser.storage?.local) {
-          browser.storage.local.remove(keys).then(resolve).catch(resolve);
-          return;
-        }
-      } catch { /* ignore */ }
-      try {
-        if (typeof chrome !== 'undefined' && chrome.storage?.local) {
-          chrome.storage.local.remove(keys, resolve);
-          return;
-        }
-      } catch { /* ignore */ }
-      resolve();
-    });
+    const keyList = normalizeKeys(keys);
+    const { memory, chrome } = splitKeys(keyList);
+    if (memory.length > 0) removePortalExtensionStoreValues(memory);
+    if (chrome.length > 0) return chromeStorageClient.remove(chrome);
+    return Promise.resolve();
   },
 
   onChanged(
@@ -64,19 +72,17 @@ export const storageClient = {
       areaName: string,
     ) => void,
   ): () => void {
-    try {
-      if (typeof browser !== 'undefined' && browser.storage?.onChanged) {
-        browser.storage.onChanged.addListener(listener);
-        return () => browser.storage.onChanged.removeListener(listener);
-      }
-    } catch { /* ignore */ }
-    try {
-      if (typeof chrome !== 'undefined' && chrome.storage?.onChanged) {
-        chrome.storage.onChanged.addListener(listener);
-        return () => chrome.storage.onChanged.removeListener(listener);
-      }
-    } catch { /* ignore */ }
-    return () => undefined;
+    const unsubChrome = chromeStorageClient.onChanged((changes, area) => {
+      if (area !== 'local') return;
+      listener(changes, area);
+    });
+    const unsubMemory = subscribePortalExtensionStore((changes, area) => {
+      listener(changes, area);
+    });
+    return () => {
+      unsubChrome();
+      unsubMemory();
+    };
   },
 };
 

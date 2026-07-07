@@ -16,9 +16,9 @@ import {
   type RefObject,
   type Ref,
 } from 'react';
+import { createPortal } from 'react-dom';
 import type { Settings } from '../../../../context/settings';
 import { readExtensionVersion } from '../../../../lib/extension-version';
-import { clearRuntimeElementCss, setRuntimeElementCss } from '../../../../lib/runtime-element-style';
 import { CHANGELOG_JSON_URL, PORTAL_DOM } from '../../../../shared/constants';
 import { useExtensionUpdateAvailable } from '../../../../hooks/useExtensionUpdateAvailable';
 import { useI18n } from '../../../../i18n';
@@ -34,6 +34,10 @@ import {
   SettingsThemeSection,
   SettingsWebMailSection,
 } from './SettingsPanelSections';
+import {
+  clearSettingsPopoverLayout,
+  layoutSettingsPopover,
+} from './settings-popover-layout';
 
 const extensionVersion = readExtensionVersion();
 type SettingsTab = 'appearance' | 'connections' | 'support';
@@ -243,28 +247,37 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       if (!isOpen) setClosing(false);
     }, [isOpen]);
 
-    // パネルが開いている間、右端が viewport からはみ出していれば left を補正する。
-    // ウィンドウリサイズだけでなく、ヘッダー内の profile 名の表示/非表示で
-    // 設定ボタン位置が変わった場合も ResizeObserver で検知して再計算する。
+    // 設定ボタン基準で viewport 内に収める（#portal-overlay .p-settings-pop の left:0 より CSS 変数を優先）。
     useLayoutEffect(() => {
       if (!isOpen) return;
       const el = popRef.current;
       if (!el) return;
+      const dialog = el.querySelector('.p-settings-dialog') as HTMLElement | null;
+
       function clamp() {
-        clearRuntimeElementCss(el!, 'inline-offset');
-        const overflow = el!.getBoundingClientRect().right - (window.innerWidth - 8);
-        if (overflow > 0) setRuntimeElementCss(el!, 'inline-offset', `left:-${overflow}px`);
+        const anchor = document.getElementById('p-open-settings');
+        if (!anchor) return;
+        layoutSettingsPopover(el!, anchor, dialog);
       }
+
       clamp();
+      const raf = window.requestAnimationFrame(clamp);
       window.addEventListener('resize', clamp);
-      const headerActions = el.closest('.p-header-actions');
-      const ro = headerActions ? new ResizeObserver(clamp) : null;
-      ro?.observe(headerActions!);
+      window.addEventListener('scroll', clamp, true);
+      const headerActions = document.querySelector('#portal-overlay .p-header-actions');
+      const roHeader = headerActions instanceof HTMLElement ? new ResizeObserver(clamp) : null;
+      roHeader?.observe(headerActions);
+      const roDialog = dialog ? new ResizeObserver(clamp) : null;
+      roDialog?.observe(dialog);
       return () => {
+        window.cancelAnimationFrame(raf);
         window.removeEventListener('resize', clamp);
-        ro?.disconnect();
+        window.removeEventListener('scroll', clamp, true);
+        roHeader?.disconnect();
+        roDialog?.disconnect();
+        clearSettingsPopoverLayout(el, dialog);
       };
-    }, [isOpen]);
+    }, [isOpen, activeTab, updateAvailable, latestVersion, variant]);
 
     // 閉じるアニメーション終了後に親へ通知
     useEffect(() => {
@@ -413,23 +426,21 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       </div>
     );
 
-    return (
-      <>
+    const settingsPop = (isOpen || closing) ? (
+      <div
+        ref={assignPopSurface}
+        className={`p-settings-pop${closing ? ' is-closing' : ''}`}
+        id="p-settings-pop"
+        aria-hidden={!isOpen}
+      >
         <div
-          ref={assignPopSurface}
-          className={`p-settings-pop${closing ? ' is-closing' : ''}`}
-          id="p-settings-pop"
-          hidden={!isOpen && !closing}
-          aria-hidden={!isOpen}
+          className="p-settings-dialog"
+          id="p-settings-dialog"
+          role="dialog"
+          aria-modal={false}
+          aria-labelledby="p-settings-heading"
+          tabIndex={-1}
         >
-          <div
-            className="p-settings-dialog"
-            id="p-settings-dialog"
-            role="dialog"
-            aria-modal={false}
-            aria-labelledby="p-settings-heading"
-            tabIndex={-1}
-          >
             <div className="p-settings-nav">
               <h2 id="p-settings-heading">{t.settings.title}</h2>
               {variant === 'portal' ? (
@@ -571,6 +582,11 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
             ) : null}
           </div>
         </div>
+    ) : null;
+
+    return (
+      <>
+        {settingsPop && overlayEl ? createPortal(settingsPop, overlayEl) : null}
         {changelogModal}
         {licensesModal}
       </>

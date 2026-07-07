@@ -78,6 +78,15 @@ export const urls = {
 
   questionnaireInfo: () =>
     new URL(`/portal/api/${PORTAL_API.questionnaireInfo}`, location.origin).href,
+
+  /** ホーム表示用（kubun=0 公式 + kubun=1 ユーザー） */
+  userHtmlLink: () => new URL('/portal/api/UserHtmlLink/', location.origin).href,
+
+  /** プロフィール「マイリンク」一覧（id / version 付き） */
+  userHtmlLinkMe: () => new URL('/portal/api/UserHtmlLink/Me/', location.origin).href,
+
+  /** プロフィール画面と同じ保存 API */
+  updateUserHtmlLink: () => new URL('/portal/api/UserProfile/UpUserLink/', location.origin).href,
 };
 
 // ─── カレンダー URL パース ─────────────────────────────────────────────────

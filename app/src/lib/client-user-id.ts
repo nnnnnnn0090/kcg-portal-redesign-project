@@ -1,9 +1,13 @@
 /**
- * 拡張機能インストールごとに1つ発行する匿名ユーザー ID。
- * chrome.storage.local に永続化し、外部 JSON 取得時の識別ヘッダーに使う。
+ * 匿名ユーザー ID。マイリンク同期 JSON にのみ保存する。
  */
 
+import { PORTAL_HOSTNAME } from '../contract/origins';
 import { SK } from '../shared/constants';
+import {
+  fetchPortalExtensionSnapshot,
+  savePortalExtensionSyncNow,
+} from '../services/portal-settings-sync';
 import storage from './storage';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -27,15 +31,33 @@ function normalizeClientUserId(v: unknown): string | null {
   return UUID_RE.test(s) ? s : null;
 }
 
-/** 保存済み ID を返す。無ければ生成して storage に保存する */
+function onPortalHostname(): boolean {
+  return typeof location !== 'undefined' && location.hostname === PORTAL_HOSTNAME;
+}
+
+/** マイリンク上の ID を返す。無ければ新規発行して即保存する */
 export function getOrCreateClientUserId(): Promise<string> {
   if (!loadPromise) {
     loadPromise = (async () => {
-      const data = await storage.get(SK.clientUserId);
-      const existing = normalizeClientUserId(data[SK.clientUserId]);
-      if (existing) return existing;
+      const cached = normalizeClientUserId((await storage.get(SK.clientUserId))[SK.clientUserId]);
+      if (cached) return cached;
+
+      if (onPortalHostname()) {
+        try {
+          const portal = await fetchPortalExtensionSnapshot();
+          const fromLinks = normalizeClientUserId(portal?.storage[SK.clientUserId]);
+          if (fromLinks) {
+            await storage.set({ [SK.clientUserId]: fromLinks });
+            return fromLinks;
+          }
+        } catch {
+          /* 未ログイン等 */
+        }
+      }
+
       const id = generateClientUserId();
       await storage.set({ [SK.clientUserId]: id });
+      await savePortalExtensionSyncNow();
       return id;
     })();
   }

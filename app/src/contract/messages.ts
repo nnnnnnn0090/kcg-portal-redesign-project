@@ -14,6 +14,7 @@ export const MSG = {
   newTopics: 'portalThemeNewTopicsCaptured',
   kogiNews: 'portalThemeKogiNewsCaptured',
   userHtmlLink: 'portalThemeUserHtmlLinkCaptured',
+  userHtmlLinkMe: 'portalThemeUserHtmlLinkMeCaptured',
 } as const;
 
 export type MsgType = (typeof MSG)[keyof typeof MSG];
@@ -25,6 +26,10 @@ export const FETCH_HOOK = {
   replayRequest: 'portalThemeReplayIntercepted',
   /** pageFetch 依頼 */
   pageFetch: 'portalThemePageFetchRequest',
+  /** 認証付き API 呼び出し（GET/POST） */
+  portalApiRequest: 'portalThemePortalApiRequest',
+  /** portalApiRequest の応答 */
+  portalApiResponse: 'portalThemePortalApiResponse',
   /** 学ポータル本体 `li.logoff` のログアウト（MAIN ワールドで実行） */
   logoffTrigger: 'portalThemeLogoffTrigger',
 } as const;

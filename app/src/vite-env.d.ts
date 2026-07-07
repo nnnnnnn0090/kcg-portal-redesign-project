@@ -12,6 +12,8 @@ interface ImportMetaEnv {
   readonly VITE_MASCOT_ILLUSTRATOR_URL?: string;
   /** 配布 zip（`npm run zip`）のみ `1`。dev zip / wxt dev では未設定。 */
   readonly VITE_PORTAL_DISTRIBUTION_BUILD?: '1';
+  /** テレメトリ署名（Web の TELEMETRY_HMAC_SECRET と同一。`app/.env.local` に設定） */
+  readonly VITE_TELEMETRY_HMAC_SECRET?: string;
 }
 
 interface ImportMeta {

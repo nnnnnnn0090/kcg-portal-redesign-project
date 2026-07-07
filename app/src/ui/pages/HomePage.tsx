@@ -10,7 +10,6 @@ import { urls } from '../../lib/api';
 import type { Settings } from '../../context/settings';
 import { useCourses } from '../../context/courses';
 import { usePortalDom } from '../../context/portalDom';
-import type { LinkConfig } from '../../shared/types';
 import { useHomeStorageBootstrap } from '../../hooks/useHomeStorageBootstrap';
 import { useHomePortalInbox } from '../../hooks/useHomePortalInbox';
 import { useLastLogin } from '../../hooks/useLastLogin';
@@ -70,7 +69,7 @@ export function HomePage({ settings }: HomePageProps) {
   const { courses, setCourses } = useCourses();
   const { overlayRoot } = usePortalDom();
 
-  const { kinoData, kogiNews, newTopicsItems, linkItems } = useHomePortalInbox();
+  const { kinoData, kogiNews, newTopicsItems, linkItems, userLinkRecords } = useHomePortalInbox();
   const demoKogiCalendar = useMemo(
     () => PROMOTION_DEMO_MODE ? createPromotionDemoKogiCalendar() : undefined,
     [],
@@ -82,7 +81,6 @@ export function HomePage({ settings }: HomePageProps) {
   const demoTodayIso = PROMOTION_DEMO_MODE ? promotionDemoTodayIso() : undefined;
   const displayedNews = PROMOTION_DEMO_MODE ? PROMOTION_DEMO_NEWS : newTopicsItems;
 
-  const [linkConfig,        setLinkConfig]        = useState<LinkConfig>({ order: [], hidden: [], custom: [] });
   const [assignmentPayload, setAssignmentPayload] = useState<DuePayload | null>(null);
   const [linksEditing,      setLinksEditing]      = useState(false);
   const [newsTab,           setNewsTab]           = useState<NewsTab>('general');
@@ -91,7 +89,7 @@ export function HomePage({ settings }: HomePageProps) {
     newsTab === 'lostProperty' ? isLostPropertyNews(item) : !isLostPropertyNews(item),
   );
 
-  useHomeStorageBootstrap({ setLinkConfig, setAssignmentPayload, setCourses });
+  useHomeStorageBootstrap({ setAssignmentPayload, setCourses });
 
   // King LMS 課題同期でホームへ戻った直後、課題カレンダーへスクロール（bridge が立てたフラグ）
   useEffect(() => {
@@ -269,8 +267,7 @@ export function HomePage({ settings }: HomePageProps) {
             <div className={`p-panel-body${linksEditing ? ' is-editing' : ''}`} id="p-links">
               <LinkEditor
                 items={linkItems}
-                config={linkConfig}
-                onConfigChange={setLinkConfig}
+                userLinks={userLinkRecords}
                 editing={linksEditing}
               />
             </div>

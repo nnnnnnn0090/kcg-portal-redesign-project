@@ -80,6 +80,7 @@ const initialHomeInbox: HomePortalInboxState = {
   kogiNews:       [],
   newTopicsItems: [],
   linkItems:      [],
+  userLinkRecords: [],
 };
 
 let homeInboxState = initialHomeInbox;
@@ -114,4 +115,14 @@ export function getHomePortalInboxSnapshot(): HomePortalInboxState {
 
 export function useHomePortalInbox(): HomePortalInboxState {
   return useSyncExternalStore(subscribeHomePortalInbox, getHomePortalInboxSnapshot);
+}
+
+/** pageFetch / replay 以外からホーム受信箱へ反映する（ショートカット再取得など） */
+export function pushHomePortalMessage(msg: PortalCapturedMessage): void {
+  ensureHomeInboxSubscription();
+  const next = applyHomePortalMessage(homeInboxState, msg);
+  if (next !== homeInboxState) {
+    homeInboxState = next;
+    notifyHomeInboxListeners();
+  }
 }

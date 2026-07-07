@@ -17,6 +17,7 @@ import {
   isNewTopics,
   isQuestionnaireInfo,
   isUserHtmlLink,
+  isUserHtmlLinkMe,
   toAbs,
 } from './portal-hook-paths';
 
@@ -55,7 +56,8 @@ export function dispatch(url: string, json: unknown): void {
   }
   if (!Array.isArray(json)) return;
   if (isNewTopics(url))          post(MSG.newTopics,          { items: json });
-  if (isUserHtmlLink(url))       post(MSG.userHtmlLink,       { items: json });
+  if (isUserHtmlLinkMe(url))     post(MSG.userHtmlLinkMe,     { items: json });
+  else if (isUserHtmlLink(url))  post(MSG.userHtmlLink,       { items: json });
   if (isKogiCalendar(url))       postWithUrl(MSG.kogiCalendar,       url, json);
   if (isHoshuCalendar(url))      postWithUrl(MSG.hoshuCalendar,      url, json);
   if (isCampusCalendar(url))     postWithUrl(MSG.campusCalendar,     url, json);

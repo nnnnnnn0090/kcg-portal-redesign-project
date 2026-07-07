@@ -21,6 +21,21 @@ export function postPageFetchRequest(url: string): void {
   postPageMessage({ type: FETCH_HOOK.pageFetch, url });
 }
 
+export function postPortalApiRequest(req: {
+  id: string;
+  method: 'GET' | 'POST';
+  url: string;
+  body?: string;
+}): void {
+  postPageMessage({
+    type: FETCH_HOOK.portalApiRequest,
+    id: req.id,
+    method: req.method,
+    url: req.url,
+    body: req.body,
+  });
+}
+
 export function postLogoffTrigger(): void {
   postPageMessage({ type: FETCH_HOOK.logoffTrigger });
 }

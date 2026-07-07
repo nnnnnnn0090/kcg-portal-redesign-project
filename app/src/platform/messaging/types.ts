@@ -20,6 +20,25 @@ export type PageFetchRequestMessage = {
   url: string;
 };
 
+/** オーバーレイ → フック（認証付き API） */
+export type PortalApiRequestMessage = {
+  type: typeof FETCH_HOOK.portalApiRequest;
+  id: string;
+  method: 'GET' | 'POST';
+  url: string;
+  body?: string;
+};
+
+/** フック → オーバーレイ（portalApiRequest 応答） */
+export type PortalApiResponseMessage = {
+  type: typeof FETCH_HOOK.portalApiResponse;
+  source: typeof FETCH_HOOK.source;
+  id: string;
+  ok: boolean;
+  status: number;
+  json: unknown;
+};
+
 /** オーバーレイ → フック（logoff） */
 export type LogoffTriggerMessage = {
   type: typeof FETCH_HOOK.logoffTrigger;
@@ -53,6 +72,7 @@ export type PageMessage =
   | CapturedPortalMessage
   | ReplayRequestMessage
   | PageFetchRequestMessage
+  | PortalApiRequestMessage
   | LogoffTriggerMessage
   | KingLmsCoursesMessage
   | KingLmsAssignmentDueMessage
@@ -62,6 +82,7 @@ const MSG_TYPES = new Set<string>(Object.values(MSG));
 const FETCH_TO_HOOK = new Set<string>([
   FETCH_HOOK.replayRequest,
   FETCH_HOOK.pageFetch,
+  FETCH_HOOK.portalApiRequest,
   FETCH_HOOK.logoffTrigger,
 ]);
 const KING_LMS_TYPES = new Set<string>([
@@ -81,6 +102,9 @@ export function isPageMessage(data: unknown): data is PageMessage {
   }
   if (FETCH_TO_HOOK.has(type)) {
     if (type === FETCH_HOOK.pageFetch) return typeof msg.url === 'string';
+    if (type === FETCH_HOOK.portalApiRequest) {
+      return typeof msg.id === 'string' && typeof msg.url === 'string';
+    }
     return true;
   }
   if (KING_LMS_TYPES.has(type)) {

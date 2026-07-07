@@ -1,5 +1,5 @@
 /**
- * ホーム初回マウント時に KogiNews の先読みと、storage からのショートカット・課題・コース一覧読み込みをまとめる。
+ * ホーム初回マウント時に KogiNews の先読みと、storage からの課題・コース一覧読み込みをまとめる。
  */
 
 import { useEffect } from 'react';
@@ -7,23 +7,8 @@ import { SK } from '../shared/constants';
 import storage from '../lib/storage';
 import { pageFetch, urls } from '../lib/api';
 import { isCourseRowArray, type CourseRow } from '../context/courses';
-import type { CustomLink, LinkConfig } from '../shared/types';
 import type { DuePayload } from '../ui/calendar';
-
-function isCustomLink(x: unknown): x is CustomLink {
-  if (!x || typeof x !== 'object') return false;
-  const o = x as Record<string, unknown>;
-  return typeof o.id === 'string' && typeof o.midashi === 'string' && typeof o.url === 'string';
-}
-
-function isLinkConfig(x: unknown): x is LinkConfig {
-  if (!x || typeof x !== 'object') return false;
-  const o = x as Record<string, unknown>;
-  if (!Array.isArray(o.order) || !o.order.every((e): e is string => typeof e === 'string')) return false;
-  if (!Array.isArray(o.hidden) || !o.hidden.every((e): e is string => typeof e === 'string')) return false;
-  if (!Array.isArray(o.custom) || !o.custom.every(isCustomLink)) return false;
-  return true;
-}
+import { migrateLocalCustomLinks, refreshPortalUserLinks } from '../services/user-html-link';
 
 function isDuePayload(x: unknown): x is DuePayload {
   if (!x || typeof x !== 'object') return false;
@@ -31,22 +16,45 @@ function isDuePayload(x: unknown): x is DuePayload {
   return Array.isArray(o.items) && typeof o.capturedAt === 'number';
 }
 
+function readLegacyCustomLinks(raw: unknown): Array<{ midashi: string; url: string }> {
+  if (!raw || typeof raw !== 'object') return [];
+  const custom = (raw as Record<string, unknown>).custom;
+  if (!Array.isArray(custom)) return [];
+  const out: Array<{ midashi: string; url: string }> = [];
+  for (const entry of custom) {
+    if (!entry || typeof entry !== 'object') continue;
+    const row = entry as Record<string, unknown>;
+    if (typeof row.midashi === 'string' && typeof row.url === 'string') {
+      out.push({ midashi: row.midashi, url: row.url });
+    }
+  }
+  return out;
+}
+
 export interface HomeStorageBootstrapParams {
-  setLinkConfig:        (cfg: LinkConfig) => void;
   setAssignmentPayload: (p: DuePayload | null) => void;
   setCourses:           (rows: CourseRow[]) => void;
 }
 
 export function useHomeStorageBootstrap({
-  setLinkConfig,
   setAssignmentPayload,
   setCourses,
 }: HomeStorageBootstrapParams): void {
   useEffect(() => {
+    refreshPortalUserLinks();
     void pageFetch(urls.kogiNews());
-    void storage.get([SK.shortcutConfig, SK.kingLmsAssignmentDue, SK.kingLmsCourses]).then((data) => {
-      const cfg = data[SK.shortcutConfig];
-      if (isLinkConfig(cfg)) setLinkConfig(cfg);
+    void storage.get([SK.shortcutConfig, SK.kingLmsAssignmentDue, SK.kingLmsCourses]).then(async (data) => {
+      const legacyCustom = readLegacyCustomLinks(data[SK.shortcutConfig]);
+      if (legacyCustom.length > 0) {
+        try {
+          await migrateLocalCustomLinks(legacyCustom);
+        } catch {
+          /* ポータル未ログイン等は無視 */
+        }
+      }
+      if (data[SK.shortcutConfig] !== undefined) {
+        await storage.remove(SK.shortcutConfig);
+      }
 
       const due = data[SK.kingLmsAssignmentDue];
       if (isDuePayload(due)) setAssignmentPayload(due);
@@ -54,5 +62,5 @@ export function useHomeStorageBootstrap({
       const c = data[SK.kingLmsCourses];
       if (isCourseRowArray(c)) setCourses(c);
     });
-  }, [setLinkConfig, setAssignmentPayload, setCourses]);
+  }, [setAssignmentPayload, setCourses]);
 }

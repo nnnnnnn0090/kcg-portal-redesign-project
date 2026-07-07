@@ -22,6 +22,7 @@ export type PortalCapturedMessage =
   | (WithSource & { type: typeof MSG.newTopics;           items: unknown[] })
   | (WithSource & { type: typeof MSG.kogiNews;            items: unknown[] })
   | (WithSource & { type: typeof MSG.userHtmlLink;        items: unknown[] })
+  | (WithSource & { type: typeof MSG.userHtmlLinkMe;    items: unknown[] })
   | UnknownPortalCaptured;
 
 /** 将来の type 追加やフック拡張用フォールバック */

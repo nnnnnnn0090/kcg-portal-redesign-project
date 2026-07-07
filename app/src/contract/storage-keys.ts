@@ -37,7 +37,7 @@ export const SK = {
   developerNoticeLang: 'portalThemeDeveloperNoticeLang',
   /** 開発者アンケートの回答済み状態（`surveyId:revision` の配列） */
   developerSurveyAnswered: 'portalThemeDeveloperSurveyAnswered',
-  /** 拡張機能インストールごとに1つ発行する匿名ユーザー ID（notice.json 等の識別用） */
+  /** 匿名ユーザー ID（マイリンク同期 JSON のみ。notice.json 等の識別用） */
   clientUserId: 'portalThemeClientUserId',
   /** 拡張の初回記録日時（ISO 8601） */
   clientInstallAt: 'portalThemeClientInstallAt',

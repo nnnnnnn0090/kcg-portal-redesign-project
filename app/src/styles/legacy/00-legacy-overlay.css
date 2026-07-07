@@ -872,8 +872,22 @@
   z-index: 70;
   width: min(24rem, calc(100vw - 2rem));
   animation: p-scale-in var(--p-pop-dur) var(--p-enter-ease) both;
+  transform-origin: top left;
   user-select: none;
   -webkit-user-select: none;
+}
+#portal-overlay .p-settings-pop.is-viewport-docked {
+  position: fixed;
+  top: var(--p-settings-pop-top, auto);
+  bottom: var(--p-settings-pop-bottom, auto);
+  left: var(--p-settings-pop-left, 0);
+  width: var(--p-settings-pop-width, min(24rem, calc(100vw - 2rem)));
+  right: auto;
+  z-index: 80;
+  overflow: hidden;
+}
+#portal-overlay .p-settings-pop.is-viewport-docked.is-flipped {
+  transform-origin: bottom left;
 }
 #portal-overlay .p-settings-pop.is-closing {
   animation: p-scale-out var(--p-pop-dur) var(--p-enter-ease) forwards;
@@ -895,8 +909,7 @@
   border-radius: 14px;
   box-shadow: 0 16px 48px var(--p-shadow-strong);
   padding: 1.1rem 1.15rem;
-  max-height: min(46rem, calc(100vh - 4rem));
-  max-height: min(46rem, calc(100dvh - 4rem));
+  max-height: min(46rem, var(--p-settings-max-height, calc(100dvh - 5rem)));
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
@@ -1872,7 +1885,8 @@
   justify-content: center;
   gap: 0.3rem;
   flex: 1 1 calc(50% - 0.2rem);
-  min-width: 4.75rem;
+  min-width: 0;
+  max-width: calc(50% - 0.2rem);
   padding: 0.4rem 0.5rem 0.45rem;
   border-radius: 8px;
   border: 2px solid var(--p-border);
