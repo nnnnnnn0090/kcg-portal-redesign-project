@@ -2,7 +2,7 @@
  * 拡張機能の状態をポータル「マイリンク」の biko フィールドへ保存する。
  *
  * マーカーリンク（midashi: __KCGLMS::{n}）は UI から非表示。
- * biko は 200 文字制限のため、JSON をチャンク分割して複数行に載せる。
+ * biko は 200 文字制限のため、暗号化済みペイロードをチャンク分割して複数行に載せる。
  */
 
 import type { Settings } from '../domain/settings';
@@ -13,17 +13,10 @@ import {
   PORTAL_SYNCED_STORAGE_KEYS,
 } from '../contract/portal-synced-storage';
 import {
-  CROSS_CONTEXT_HANDOFF_STORAGE_KEYS,
-  isCrossContextHandoffStorageKey,
-  pickCrossContextHandoffStorage,
-} from '../contract/cross-context-handoff-storage';
-import { chromeStorageClient } from '../platform/storage/chrome-storage-client';
-import {
   getPortalExtensionMemorySnapshot,
   hydratePortalExtensionStore,
   registerPortalExtensionStoreMutator,
   setPortalExtensionStoreUpdatedAt,
-  setPortalExtensionStoreValues,
 } from '../platform/storage/portal-extension-store';
 import {
   EMPTY_CUSTOM_THEMES,
@@ -37,6 +30,16 @@ import {
   normalizeLanguage,
   type AppLanguage,
 } from '../i18n/messages';
+import {
+  decodePortalSyncCompactPayload,
+  encodePortalSyncCompactPayload,
+} from '../lib/portal-sync-compact';
+import {
+  decryptPortalSyncPayload,
+  encryptPortalSyncPayload,
+  isEncryptedPortalSyncWire,
+} from '../lib/portal-sync-crypto';
+import { ensureClientUserIdInMemory } from '../lib/client-user-id';
 import {
   fetchPortalUserLinks,
   nextPortalLinkNo,
@@ -105,16 +108,9 @@ interface PortalSettingsPayloadLegacyV1 {
 let suppressPortalSync = false;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let listenerInstalled = false;
-let handoffListenerInstalled = false;
+let bootstrapPromise: Promise<void> | null = null;
 
 const PORTAL_EXTENSION_SAVE_DELAY_MS = 800;
-
-async function mirrorHandoffStorageFromSnapshot(snapshot: PortalExtensionSnapshot): Promise<void> {
-  const handoff = pickCrossContextHandoffStorage(snapshot.storage);
-  if (Object.keys(handoff).length > 0) {
-    await chromeStorageClient.set(handoff);
-  }
-}
 
 export function isPortalSettingsMarkerLink(
   link: Pick<PortalUserLink, 'midashi' | 'url'>,
@@ -150,40 +146,13 @@ function markerIndex(link: PortalUserLink): number {
   return Number.isFinite(parsedUrl) && parsedUrl >= 0 ? parsedUrl : 0;
 }
 
-async function mergeHandoffStorageIntoExtensionMemory(): Promise<boolean> {
-  const handoff = await chromeStorageClient.get([...CROSS_CONTEXT_HANDOFF_STORAGE_KEYS]);
-  const picked = pickCrossContextHandoffStorage(handoff);
-  if (Object.keys(picked).length === 0) return false;
-
-  suppressPortalSync = true;
-  try {
-    setPortalExtensionStoreValues(picked);
-  } finally {
-    suppressPortalSync = false;
-  }
-  return true;
-}
-
-function installHandoffStorageListener(): void {
-  if (!canSyncPortalExtension() || handoffListenerInstalled) return;
-  handoffListenerInstalled = true;
-  chromeStorageClient.onChanged((changes, area) => {
-    if (area !== 'local' || suppressPortalSync) return;
-    for (const key of Object.keys(changes)) {
-      if (!isCrossContextHandoffStorageKey(key)) continue;
-      void mergeHandoffStorageIntoExtensionMemory().then((merged) => {
-        if (merged) schedulePortalExtensionSync();
-      });
-      return;
-    }
-  });
-}
-
 export async function writeSyncedLocalStorage(snapshot: PortalExtensionSnapshot): Promise<void> {
   suppressPortalSync = true;
   try {
-    hydratePortalExtensionStore(snapshot);
-    await mirrorHandoffStorageFromSnapshot(snapshot);
+    hydratePortalExtensionStore({
+      updatedAt: snapshot.updatedAt,
+      storage: pickPortalSyncedStorage(snapshot.storage),
+    });
   } finally {
     suppressPortalSync = false;
   }
@@ -268,6 +237,14 @@ function decodeSettingsPayloadV2(raw: PortalSettingsPayloadV2): PortalExtensionS
 }
 
 function decodePayload(json: string): PortalExtensionSnapshot | null {
+  const compact = decodePortalSyncCompactPayload(json);
+  if (compact) {
+    return {
+      updatedAt: compact.updatedAt,
+      storage: pickPortalSyncedStorage(compact.storage),
+    };
+  }
+
   try {
     const raw = JSON.parse(json) as
       | PortalExtensionPayloadV3
@@ -299,13 +276,26 @@ function decodePayload(json: string): PortalExtensionSnapshot | null {
   }
 }
 
-function encodePayload(snapshot: PortalExtensionSnapshot): string {
-  const payload: PortalExtensionPayloadV3 = {
-    version: PORTAL_EXTENSION_PAYLOAD_VERSION,
-    updatedAt: snapshot.updatedAt,
-    storage: snapshot.storage,
-  };
-  return JSON.stringify(payload);
+function encodePayloadJson(snapshot: PortalExtensionSnapshot): string {
+  return encodePortalSyncCompactPayload(
+    snapshot.updatedAt,
+    pickPortalSyncedStorage(snapshot.storage),
+  );
+}
+
+async function encodePayloadWire(snapshot: PortalExtensionSnapshot): Promise<string> {
+  const json = encodePayloadJson(snapshot);
+  const encrypted = await encryptPortalSyncPayload(json);
+  return encrypted ?? json;
+}
+
+async function decodePayloadWire(wire: string): Promise<PortalExtensionSnapshot | null> {
+  if (isEncryptedPortalSyncWire(wire)) {
+    const json = await decryptPortalSyncPayload(wire);
+    if (!json) return null;
+    return decodePayload(json);
+  }
+  return decodePayload(wire);
 }
 
 function splitIntoChunks(text: string): string[] {
@@ -317,9 +307,9 @@ function splitIntoChunks(text: string): string[] {
   return chunks;
 }
 
-export function decodePortalExtensionSnapshot(
+export async function decodePortalExtensionSnapshot(
   links: readonly PortalUserLink[],
-): PortalExtensionSnapshot | null {
+): Promise<PortalExtensionSnapshot | null> {
   const markers = links
     .filter((link) => !link.delFlg && isPortalSettingsMarkerLink(link))
     .sort((a, b) => markerIndex(a) - markerIndex(b));
@@ -327,14 +317,14 @@ export function decodePortalExtensionSnapshot(
   for (const marker of markers) {
     if (marker.biko.length > PORTAL_SETTINGS_BIKO_MAX) return null;
   }
-  return decodePayload(markers.map((marker) => marker.biko).join(''));
+  return decodePayloadWire(markers.map((marker) => marker.biko).join(''));
 }
 
 /** @deprecated PortalSettingsSnapshot 互換 */
-export function decodePortalSettingsSnapshot(
+export async function decodePortalSettingsSnapshot(
   links: readonly PortalUserLink[],
-): PortalSettingsSnapshot | null {
-  const snapshot = decodePortalExtensionSnapshot(links);
+): Promise<PortalSettingsSnapshot | null> {
+  const snapshot = await decodePortalExtensionSnapshot(links);
   if (!snapshot) return null;
   return {
     updatedAt: snapshot.updatedAt,
@@ -343,11 +333,11 @@ export function decodePortalSettingsSnapshot(
   };
 }
 
-export function applyPortalExtensionMarkers(
+export async function applyPortalExtensionMarkers(
   links: readonly PortalUserLink[],
   snapshot: PortalExtensionSnapshot,
-): PortalUserLink[] {
-  const chunks = splitIntoChunks(encodePayload(snapshot));
+): Promise<PortalUserLink[]> {
+  const chunks = splitIntoChunks(await encodePayloadWire(snapshot));
   const nonMarkers = links.filter((link) => !isPortalSettingsMarkerLink(link));
   const allMarkers = links.filter((link) => isPortalSettingsMarkerLink(link));
   const activeMarkers = allMarkers.filter((link) => !link.delFlg);
@@ -393,7 +383,7 @@ export async function fetchPortalExtensionSnapshot(): Promise<PortalExtensionSna
 
 export async function savePortalExtensionSnapshot(snapshot: PortalExtensionSnapshot): Promise<void> {
   const links = await fetchPortalUserLinks();
-  const next = applyPortalExtensionMarkers(links, snapshot);
+  const next = await applyPortalExtensionMarkers(links, snapshot);
   await savePortalUserLinks(next);
 }
 
@@ -401,11 +391,9 @@ async function snapshotFromSyncedLocalStorage(
   updatedAt = Date.now(),
 ): Promise<PortalExtensionSnapshot> {
   const memory = getPortalExtensionMemorySnapshot();
-  const handoffRaw = await chromeStorageClient.get([...CROSS_CONTEXT_HANDOFF_STORAGE_KEYS]);
-  const handoff = pickCrossContextHandoffStorage(handoffRaw);
   return {
     updatedAt: updatedAt || memory.updatedAt || Date.now(),
-    storage: { ...memory.storage, ...handoff },
+    storage: pickPortalSyncedStorage(memory.storage),
   };
 }
 
@@ -442,32 +430,72 @@ export function installPortalExtensionSyncListener(): () => void {
   });
 }
 
-/** 起動時: ポータルとメモリを updatedAt で突き合わせ、新しい方を採用する */
-export async function bootstrapPortalExtensionSync(): Promise<void> {
-  installPortalExtensionSyncListener();
-  installHandoffStorageListener();
+/** 起動時に1回だけ: マイリンク復元 → clientUserId 確定 → 必要なら保存 */
+export function ensurePortalExtensionBootstrapped(): Promise<void> {
+  if (!bootstrapPromise) {
+    bootstrapPromise = runPortalExtensionBootstrap();
+  }
+  return bootstrapPromise;
+}
 
-  const memory = getPortalExtensionMemorySnapshot();
+/** @deprecated ensurePortalExtensionBootstrapped を使用 */
+export async function bootstrapPortalExtensionSync(): Promise<void> {
+  await ensurePortalExtensionBootstrapped();
+}
+
+async function runPortalExtensionBootstrap(): Promise<void> {
+  installPortalExtensionSyncListener();
+
+  let portal: PortalExtensionSnapshot | null = null;
   if (canSyncPortalExtension()) {
     try {
-      const portal = await fetchPortalExtensionSnapshot();
-      if (portal && portal.updatedAt >= memory.updatedAt) {
-        await writeSyncedLocalStorage(portal);
-      } else if (Object.keys(memory.storage).length > 0 || !portal) {
-        const toUpload: PortalExtensionSnapshot = {
-          updatedAt: Date.now(),
-          storage: memory.storage,
-        };
-        await savePortalExtensionSnapshot(toUpload);
-        setPortalExtensionStoreUpdatedAt(toUpload.updatedAt);
-      }
+      portal = await fetchPortalExtensionSnapshot();
     } catch {
-      /* 未ログイン等 */
+      portal = null;
     }
   }
 
-  const merged = await mergeHandoffStorageIntoExtensionMemory();
-  if (merged) schedulePortalExtensionSync();
+  const memory = getPortalExtensionMemorySnapshot();
+  if (portal && portal.updatedAt >= memory.updatedAt) {
+    await writeSyncedLocalStorage(portal);
+  } else if (
+    Object.keys(memory.storage).length > 0
+    && (!portal || memory.updatedAt > portal.updatedAt)
+  ) {
+    const toUpload: PortalExtensionSnapshot = {
+      updatedAt: Date.now(),
+      storage: memory.storage,
+    };
+    suppressPortalSync = true;
+    try {
+      await savePortalExtensionSnapshot(toUpload);
+      setPortalExtensionStoreUpdatedAt(toUpload.updatedAt);
+    } finally {
+      suppressPortalSync = false;
+    }
+  }
+
+  await ensureClientUserIdInMemory();
+
+  if (!canSyncPortalExtension()) return;
+
+  const after = getPortalExtensionMemorySnapshot();
+  const portalHadId = Boolean(portal?.storage[SK.clientUserId]);
+  const shouldPersist = !portal
+    || after.updatedAt > (portal?.updatedAt ?? 0)
+    || !portalHadId;
+  if (!shouldPersist) return;
+
+  suppressPortalSync = true;
+  try {
+    const snapshot = await snapshotFromSyncedLocalStorage(Date.now());
+    await savePortalExtensionSnapshot(snapshot);
+    setPortalExtensionStoreUpdatedAt(snapshot.updatedAt);
+  } catch {
+    /* 未ログイン等 */
+  } finally {
+    suppressPortalSync = false;
+  }
 }
 
 export function parseSettingsFromExtensionStorage(

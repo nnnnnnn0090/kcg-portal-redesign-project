@@ -1,12 +1,12 @@
 /**
- * ホーム初回マウント時に KogiNews の先読みと、storage からの課題・コース一覧読み込みをまとめる。
+ * ホーム初回マウント時に KogiNews の先読みと、storage からの課題読み込みをまとめる。
+ * マイリンク復元完了後（settingsReady）にだけ走る。
  */
 
 import { useEffect } from 'react';
 import { SK } from '../shared/constants';
 import storage from '../lib/storage';
 import { pageFetch, urls } from '../lib/api';
-import { isCourseRowArray, type CourseRow } from '../context/courses';
 import type { DuePayload } from '../ui/calendar';
 import { migrateLocalCustomLinks, refreshPortalUserLinks } from '../services/user-html-link';
 
@@ -32,18 +32,20 @@ function readLegacyCustomLinks(raw: unknown): Array<{ midashi: string; url: stri
 }
 
 export interface HomeStorageBootstrapParams {
+  settingsReady: boolean;
   setAssignmentPayload: (p: DuePayload | null) => void;
-  setCourses:           (rows: CourseRow[]) => void;
 }
 
 export function useHomeStorageBootstrap({
+  settingsReady,
   setAssignmentPayload,
-  setCourses,
 }: HomeStorageBootstrapParams): void {
   useEffect(() => {
+    if (!settingsReady) return;
+
     refreshPortalUserLinks();
     void pageFetch(urls.kogiNews());
-    void storage.get([SK.shortcutConfig, SK.kingLmsAssignmentDue, SK.kingLmsCourses]).then(async (data) => {
+    void storage.get([SK.shortcutConfig, SK.kingLmsAssignmentDue]).then(async (data) => {
       const legacyCustom = readLegacyCustomLinks(data[SK.shortcutConfig]);
       if (legacyCustom.length > 0) {
         try {
@@ -58,9 +60,6 @@ export function useHomeStorageBootstrap({
 
       const due = data[SK.kingLmsAssignmentDue];
       if (isDuePayload(due)) setAssignmentPayload(due);
-
-      const c = data[SK.kingLmsCourses];
-      if (isCourseRowArray(c)) setCourses(c);
     });
-  }, [setAssignmentPayload, setCourses]);
+  }, [settingsReady, setAssignmentPayload]);
 }

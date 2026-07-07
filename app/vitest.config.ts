@@ -5,6 +5,9 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts'],
     reporters: process.env.CI ? ['default'] : ['verbose'],
+    env: {
+      VITE_TELEMETRY_HMAC_SECRET: 'vitest-portal-sync-secret-key',
+    },
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],

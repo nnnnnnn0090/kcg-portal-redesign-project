@@ -6,6 +6,7 @@ import {
   EMPTY_CUSTOM_THEMES,
 } from '../domain/themes/custom-themes';
 import { THEMES } from '../domain/themes/definitions';
+import { PORTAL_SYNC_WIRE_PREFIX } from '../lib/portal-sync-crypto';
 import {
   applyPortalExtensionMarkers,
   decodePortalExtensionSnapshot,
@@ -58,31 +59,31 @@ describe('portal-settings-sync', () => {
     expect(isPortalSettingsMarkerLink({ midashi: 'My Link', url: 'https://example.com' })).toBe(false);
   });
 
-  it('round-trips extension storage through marker links', () => {
-    const links = applyPortalExtensionMarkers([], extensionSnapshot(BASE_SETTINGS));
-    const decoded = decodePortalExtensionSnapshot(links);
+  it('round-trips extension storage through encrypted marker links', async () => {
+    const links = await applyPortalExtensionMarkers([], extensionSnapshot(BASE_SETTINGS));
+    const decoded = await decodePortalExtensionSnapshot(links);
     expect(decoded?.storage[SK.theme]).toBe('dark');
     expect(decoded?.storage[SK.showKogiCalMascot]).toBe(true);
     expect(decoded?.updatedAt).toBe(1_700_000_000_000);
     const joined = links.map((link) => link.biko).join('');
-    expect(joined).toContain('"version":3');
-    expect(joined).toContain('"portalThemeColorTheme"');
+    expect(joined.startsWith(PORTAL_SYNC_WIRE_PREFIX)).toBe(true);
+    expect(joined).not.toContain('"portalThemeColorTheme"');
   });
 
-  it('round-trips onboarding flags in v3 storage', () => {
-    const links = applyPortalExtensionMarkers(
+  it('round-trips onboarding flags in v3 storage', async () => {
+    const links = await applyPortalExtensionMarkers(
       [],
       extensionSnapshot(BASE_SETTINGS, {
         [SK.portalGuidedTourDone]: true,
         [SK.portalLanguagePickerDone]: true,
       }),
     );
-    const decoded = decodePortalExtensionSnapshot(links);
+    const decoded = await decodePortalExtensionSnapshot(links);
     expect(decoded?.storage[SK.portalGuidedTourDone]).toBe(true);
     expect(decoded?.storage[SK.portalLanguagePickerDone]).toBe(true);
   });
 
-  it('reads legacy v1 compact keys', () => {
+  it('reads legacy v1 compact keys', async () => {
     const legacy = JSON.stringify({
       v: 1,
       u: 42,
@@ -109,13 +110,13 @@ describe('portal-settings-sync', () => {
       order: 0,
       delFlg: false,
     }];
-    const decoded = decodePortalSettingsSnapshot(links);
+    const decoded = await decodePortalSettingsSnapshot(links);
     expect(decoded?.updatedAt).toBe(42);
     expect(decoded?.settings.hideProfileName).toBe(true);
     expect(decoded?.settings.showKogiCalMascot).toBe(false);
   });
 
-  it('preserves user links when saving settings markers', () => {
+  it('preserves user links when saving settings markers', async () => {
     const userLink: PortalUserLink = {
       id: 'u1',
       version: 1,
@@ -126,12 +127,12 @@ describe('portal-settings-sync', () => {
       order: 0,
       delFlg: false,
     };
-    const next = applyPortalExtensionMarkers([userLink], extensionSnapshot(BASE_SETTINGS, {}, 123));
+    const next = await applyPortalExtensionMarkers([userLink], extensionSnapshot(BASE_SETTINGS, {}, 123));
     expect(next.some((link) => link.id === 'u1' && link.linkNo === 7)).toBe(true);
     expect(next.some((link) => isPortalSettingsMarkerLink(link))).toBe(true);
   });
 
-  it('assigns unique linkNo to new marker chunks without renumbering existing links', () => {
+  it('assigns unique linkNo to new marker chunks without renumbering existing links', async () => {
     const userLink: PortalUserLink = {
       id: 'u1',
       version: 1,
@@ -142,28 +143,28 @@ describe('portal-settings-sync', () => {
       order: 0,
       delFlg: false,
     };
-    const next = applyPortalExtensionMarkers([userLink], extensionSnapshot(BASE_SETTINGS, {}, 123));
+    const next = await applyPortalExtensionMarkers([userLink], extensionSnapshot(BASE_SETTINGS, {}, 123));
     const markers = next.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
     expect(markers.every((link) => link.linkNo !== 3)).toBe(true);
     expect(new Set(markers.map((link) => link.linkNo)).size).toBe(markers.length);
     expect(next.find((link) => link.id === 'u1')?.linkNo).toBe(3);
   });
 
-  it('splits default settings across biko chunks within portal limit', () => {
-    const links = applyPortalExtensionMarkers([], extensionSnapshot(BASE_SETTINGS, {}, 999));
+  it('splits default settings across biko chunks within portal limit', async () => {
+    const links = await applyPortalExtensionMarkers([], extensionSnapshot(BASE_SETTINGS, {}, 999));
     const markers = links.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
-    expect(markers.length).toBeGreaterThan(1);
+    expect(markers.length).toBe(1);
     for (const chunk of markers) {
       expect(chunk.biko.length).toBeLessThanOrEqual(PORTAL_SETTINGS_BIKO_MAX);
       expect(chunk.biko.length).toBeLessThanOrEqual(PORTAL_SETTINGS_CHUNK_MAX);
     }
   });
 
-  it('splits large payloads across multiple biko chunks', () => {
+  it('splits large payloads across multiple biko chunks', async () => {
     const themes = Array.from({ length: 8 }, (_, index) =>
       createCustomTheme(`Theme ${index}`, 'dark', THEMES.dark),
     );
-    const next = applyPortalExtensionMarkers([], {
+    const next = await applyPortalExtensionMarkers([], {
       updatedAt: 999,
       storage: {
         ...extensionSnapshot(BASE_SETTINGS).storage,
@@ -175,15 +176,15 @@ describe('portal-settings-sync', () => {
     for (const chunk of markers) {
       expect(chunk.biko.length).toBeLessThanOrEqual(PORTAL_SETTINGS_BIKO_MAX);
     }
-    const decoded = decodePortalExtensionSnapshot(next);
+    const decoded = await decodePortalExtensionSnapshot(next);
     expect(parseCustomThemes(decoded)).toHaveLength(8);
   });
 
-  it('soft-deletes obsolete marker chunks', () => {
+  it('soft-deletes obsolete marker chunks', async () => {
     const themes = Array.from({ length: 8 }, (_, index) =>
       createCustomTheme(`Theme ${index}`, 'dark', THEMES.dark),
     );
-    const initial = applyPortalExtensionMarkers([], {
+    const initial = await applyPortalExtensionMarkers([], {
       updatedAt: 1,
       storage: {
         ...extensionSnapshot(BASE_SETTINGS).storage,
@@ -194,7 +195,7 @@ describe('portal-settings-sync', () => {
       initial.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg).length,
     ).toBeGreaterThan(1);
 
-    const shrunk = applyPortalExtensionMarkers(initial, extensionSnapshot(BASE_SETTINGS, {}, 2));
+    const shrunk = await applyPortalExtensionMarkers(initial, extensionSnapshot(BASE_SETTINGS, {}, 2));
     const shrunkActive = shrunk.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
     const initialActive = initial.filter((link) => isPortalSettingsMarkerLink(link) && !link.delFlg);
     expect(shrunkActive.length).toBeLessThan(initialActive.length);
@@ -203,7 +204,7 @@ describe('portal-settings-sync', () => {
 });
 
 function parseCustomThemes(
-  decoded: ReturnType<typeof decodePortalExtensionSnapshot>,
+  decoded: Awaited<ReturnType<typeof decodePortalExtensionSnapshot>>,
 ): unknown[] {
   const raw = decoded?.storage[SK.customThemes];
   if (!raw || typeof raw !== 'object') return [];

@@ -8,6 +8,7 @@ import { MSG, SK } from '../../shared/constants';
 import storage from '../../lib/storage';
 import { urls } from '../../lib/api';
 import type { Settings } from '../../context/settings';
+import { useSettings } from '../../context/settings';
 import { useCourses } from '../../context/courses';
 import { usePortalDom } from '../../context/portalDom';
 import { useHomeStorageBootstrap } from '../../hooks/useHomeStorageBootstrap';
@@ -66,7 +67,8 @@ function scrollElementToVerticalCenter(
 
 export function HomePage({ settings }: HomePageProps) {
   const { language, t } = useI18n();
-  const { courses, setCourses } = useCourses();
+  const { settingsReady } = useSettings();
+  const { courses } = useCourses();
   const { overlayRoot } = usePortalDom();
 
   const { kinoData, kogiNews, newTopicsItems, linkItems, userLinkRecords } = useHomePortalInbox();
@@ -89,7 +91,7 @@ export function HomePage({ settings }: HomePageProps) {
     newsTab === 'lostProperty' ? isLostPropertyNews(item) : !isLostPropertyNews(item),
   );
 
-  useHomeStorageBootstrap({ setAssignmentPayload, setCourses });
+  useHomeStorageBootstrap({ settingsReady, setAssignmentPayload });
 
   // King LMS 課題同期でホームへ戻った直後、課題カレンダーへスクロール（bridge が立てたフラグ）
   useEffect(() => {

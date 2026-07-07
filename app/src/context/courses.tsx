@@ -5,6 +5,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { SK } from '../shared/constants';
+import { useSettings } from './settings';
 import storage from '../lib/storage';
 
 export type CourseRow = { displayName?: string; externalAccessUrl?: string };
@@ -35,15 +36,17 @@ interface CoursesContextValue {
 const CoursesContext = createContext<CoursesContextValue | null>(null);
 
 export function CoursesProvider({ children }: { children: ReactNode }) {
+  const { settingsReady } = useSettings();
   const [courses, setCourses] = useState<CourseRow[]>([]);
 
   useEffect(() => {
+    if (!settingsReady) return;
     let cancelled = false;
     void readStoredCourses().then((rows) => {
       if (!cancelled && rows.length > 0) setCourses(rows);
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [settingsReady]);
 
   const value = useMemo(() => ({ courses, setCourses }), [courses]);
   return <CoursesContext.Provider value={value}>{children}</CoursesContext.Provider>;

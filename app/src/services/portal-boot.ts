@@ -11,6 +11,7 @@ import {
   type StoredCustomThemeCollection,
 } from '../domain/themes';
 import { resolveKingLmsMountToastMessage } from './sync-hash';
+import { ensurePortalExtensionBootstrapped } from './portal-settings-sync';
 import {
   isExtensionBlockedByRemoteKillSwitch,
   startExtensionOperationalWatch,
@@ -43,6 +44,8 @@ export async function bootPortalContent(): Promise<void> {
   }
 
   try {
+    await ensurePortalExtensionBootstrapped();
+
     const [syncToastMsg, themeName, customThemesRaw] = await Promise.all([
       resolveKingLmsMountToastMessage(),
       storageRepo.getTheme(),

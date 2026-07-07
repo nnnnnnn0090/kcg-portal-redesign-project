@@ -25,10 +25,9 @@ import {
   DEFAULT_LANGUAGE,
   type AppLanguage,
 } from '../i18n/messages';
-import { getOrCreateClientUserId } from '../lib/client-user-id';
 import { getPortalExtensionMemorySnapshot } from '../platform/storage/portal-extension-store';
 import {
-  bootstrapPortalExtensionSync,
+  ensurePortalExtensionBootstrapped,
   parseCustomThemesFromExtensionStorage,
   parseSettingsFromExtensionStorage,
   schedulePortalExtensionSync,
@@ -121,11 +120,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     void (async () => {
-      await bootstrapPortalExtensionSync();
+      await ensurePortalExtensionBootstrapped();
       if (cancelled) return;
 
-      await getOrCreateClientUserId();
-      if (!cancelled) applyStorageToUi(getPortalExtensionMemorySnapshot().storage);
+      applyStorageToUi(getPortalExtensionMemorySnapshot().storage);
 
       if (!cancelled) setSettingsReady(true);
     })();

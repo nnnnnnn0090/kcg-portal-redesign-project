@@ -1,8 +1,11 @@
 /**
  * 拡張 storage クライアント。
- * 設定系はメモリ＋マイリンク API。ハンドオフ・インストール ID は chrome.storage.local。
+ * 設定系はメモリ＋マイリンク API。LMS データ・同期ハンドオフは chrome.storage.local。
  */
 
+import {
+  CHROME_MIRROR_STORAGE_KEYS,
+} from '../../contract/cross-context-handoff-storage';
 import { usesExtensionMemory } from '../../contract/storage-routing';
 import { chromeStorageClient } from './chrome-storage-client';
 import {
@@ -35,6 +38,9 @@ function splitObject(obj: Record<string, unknown>): {
   for (const [key, value] of Object.entries(obj)) {
     if (usesExtensionMemory(key)) memory[key] = value;
     else chrome[key] = value;
+  }
+  for (const key of CHROME_MIRROR_STORAGE_KEYS) {
+    if (memory[key] !== undefined) chrome[key] = memory[key];
   }
   return { memory, chrome };
 }
