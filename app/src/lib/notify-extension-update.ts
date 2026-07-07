@@ -10,6 +10,24 @@ import {
 } from '../shared/constants';
 
 /** 通知失敗はユーザー操作に影響させない */
+export async function notifyExtensionInstallToWeb(currentVersion: string): Promise<void> {
+  if (!currentVersion) return;
+
+  try {
+    const headers = await buildClientTelemetryHeaders('GET', '/extension-update');
+    headers[EXTENSION_VERSION_HEADER] = currentVersion;
+
+    await fetch(`${EXTENSION_UPDATE_NOTIFY_URL}?_=${Date.now()}`, {
+      method: 'GET',
+      cache: 'no-store',
+      headers,
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
+/** 通知失敗はユーザー操作に影響させない */
 export async function notifyExtensionUpdateToWeb(
   previousVersion: string,
   currentVersion: string,

@@ -1,10 +1,10 @@
 /**
  * 拡張の manifest バージョンが前回より上がったときだけ一度だけ返すメッセージ（トースト用）。
- * 初回（記録なし）は記録のみ。ダウングレード時は記録を上書きしメッセージは返さない。
+ * 初回（記録なし）は Web へインストール通知し記録のみ。ダウングレード時は記録を上書きしメッセージは返さない。
  */
 
 import { readExtensionVersion } from '../lib/extension-version';
-import { notifyExtensionUpdateToWeb } from '../lib/notify-extension-update';
+import { notifyExtensionInstallToWeb, notifyExtensionUpdateToWeb } from '../lib/notify-extension-update';
 import { semverGreater } from '../lib/semver';
 import storage from '../lib/storage';
 import { SK } from '../contract/storage-keys';
@@ -22,6 +22,7 @@ async function runConsume(language: AppLanguage): Promise<string> {
 
   if (!seen) {
     await storage.set({ [SK.extensionVersionSeen]: current });
+    void notifyExtensionInstallToWeb(current);
     return '';
   }
   if (seen === current) return '';

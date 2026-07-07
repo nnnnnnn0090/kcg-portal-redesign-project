@@ -33,7 +33,7 @@ export default defineConfig({
     name: 'KCGLMS+',
     version,
     description:
-      '京都コンピュータ学院の学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',
+      'KCGの学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',
     author: 'nnnnnnn0090' as unknown as { email: string },
     icons: {
       16: 'icon/16.png',

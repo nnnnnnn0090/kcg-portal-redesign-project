@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from 'react';
 import { communityApi } from '../api';
 import type { CommunityComment, CommunityPost } from '../types';
+import { groupCommentsByParent } from './comment-threads';
 import { Avatar } from '../components/Avatar';
 import { renderCaptionWithTags } from '../components/CaptionTags';
 import { Busy, CharacterCount, ErrorMessage } from '../components/FormUi';
@@ -49,7 +50,9 @@ export function PostDialog({
   const [comments, setComments] = useState<CommunityComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<CommunityComment | null>(null);
   const [commentBusy, setCommentBusy] = useState(false);
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
   const [commentError, setCommentError] = useState('');
   const [reportBusy, setReportBusy] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -76,6 +79,109 @@ export function PostDialog({
     };
   }, [ja, post.id, token]);
 
+  const commentGroups = useMemo(() => groupCommentsByParent(comments), [comments]);
+
+  useEffect(() => {
+    if (!replyingTo) return;
+    commentInputRef.current?.focus();
+  }, [replyingTo]);
+
+  const renderComment = (comment: CommunityComment, depth = 0): ReactElement => {
+    const replies = commentGroups.get(comment.id) ?? [];
+    return (
+      <div className="tw-grid tw-gap-3" key={comment.id}>
+        <article
+          className={cn(
+            'community-comment tw-grid tw-grid-cols-[36px_minmax(0,1fr)] tw-items-start tw-gap-3',
+            `is-${comment.status}`,
+            depth > 0 && 'tw-ml-8',
+          )}
+        >
+          <button
+            className={
+              'community-comment-author tw-rounded-full tw-border-0 tw-bg-transparent tw-p-0 tw-cursor-pointer'
+            }
+            type="button"
+            onClick={() => onCommentAuthorClick(comment.authorLoginId)}
+            aria-label={`${comment.authorName}のプロフィールを開く`}
+          >
+            <Avatar name={comment.authorName} url={comment.authorAvatarUrl} />
+          </button>
+          <div
+            className={
+              'community-comment-card tw-min-w-0 tw-rounded-xl tw-bg-community-bg2 tw-p-3 [.is-pending_&]:tw-border [.is-pending_&]:tw-border-[#e7a92f] [.is-rejected_&]:tw-border [.is-rejected_&]:tw-border-community-danger [&>header]:tw-flex [&>header]:tw-items-start [&>header]:tw-justify-between [&>header]:tw-gap-2 [&>p]:tw-mb-0 [&>p]:tw-mt-2 [&>p]:tw-whitespace-pre-wrap [&>p]:tw-break-words [&>small]:tw-mt-2 [&>small]:tw-block [&>small]:tw-text-xs [&>small]:tw-text-community-muted'
+            }
+          >
+            <header>
+              <button
+                className={
+                  'community-comment-author-name tw-border-0 tw-bg-transparent tw-p-0 tw-text-left tw-cursor-pointer [&_strong]:tw-text-[13px] [&_strong]:tw-text-community-bright [&_span]:tw-ml-2 [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
+                }
+                type="button"
+                onClick={() => onCommentAuthorClick(comment.authorLoginId)}
+              >
+                <strong>{comment.authorName}</strong>
+                <span>@{comment.authorLoginId}</span>
+              </button>
+              <div
+                className={
+                  'community-comment-meta-actions tw-flex tw-flex-wrap tw-items-center tw-justify-end tw-gap-2 [&_time]:tw-text-xs [&_time]:tw-text-community-muted [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-p-0 [&_button]:tw-text-xs [&_button]:tw-cursor-pointer [&_button.is-reply]:tw-text-community-accent-light hover:[&_button.is-reply]:tw-text-community-bright [&_button.is-danger]:tw-text-community-danger [&_em]:tw-rounded-full [&_em]:tw-bg-[#e7a92f]/10 [&_em]:tw-px-2 [&_em]:tw-py-0.5 [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-[#e7a92f] [&_em.is-rejected]:tw-bg-community-danger/10 [&_em.is-rejected]:tw-text-community-danger'
+                }
+              >
+                {comment.status !== 'approved' ? (
+                  <em className={cn(`is-${comment.status}`)}>
+                    {comment.status === 'pending'
+                      ? ja
+                        ? '審査中'
+                        : 'Pending'
+                      : ja
+                        ? '却下'
+                        : 'Rejected'}
+                  </em>
+                ) : null}
+                <time>
+                  {new Date(comment.createdAt).toLocaleDateString(ja ? 'ja-JP' : 'en-US')}
+                </time>
+                {token ? (
+                  <button
+                    className="is-reply tw-font-bold"
+                    type="button"
+                    onClick={() => setReplyingTo(comment)}
+                  >
+                    {ja ? '返信' : 'Reply'}
+                  </button>
+                ) : null}
+                {viewerLoginId?.toLocaleLowerCase() ===
+                comment.authorLoginId.toLocaleLowerCase() ? (
+                  <button
+                    className="is-danger tw-inline-flex tw-items-center tw-font-bold hover:tw-text-community-bright"
+                    type="button"
+                    onClick={() => onDeleteComment?.(comment)}
+                  >
+                    {ja ? '削除' : 'Delete'}
+                  </button>
+                ) : null}
+              </div>
+            </header>
+            {comment.replyToAuthorLoginId ? (
+              <small className="tw-mt-2 tw-block tw-text-xs tw-text-community-muted">
+                {ja ? '返信先' : 'Reply to'} @{comment.replyToAuthorLoginId}
+              </small>
+            ) : null}
+            <p>{comment.content}</p>
+            {comment.rejectionReason ? (
+              <small>
+                <b>{ja ? '却下理由' : 'Reason'}</b>
+                {comment.rejectionReason}
+              </small>
+            ) : null}
+          </div>
+        </article>
+        {replies.map((reply) => renderComment(reply, depth + 1))}
+      </div>
+    );
+  };
+
   useEffect(() => {
     const track = imageTrackRef.current;
     if (!track) return;
@@ -87,12 +193,14 @@ export function PostDialog({
     event.preventDefault();
     const content = commentText.trim();
     if (!content || !token || commentBusy) return;
+    const parentId = replyingTo?.id;
     setCommentBusy(true);
     setCommentError('');
     try {
-      const result = await communityApi.createComment(token, post.id, content);
+      const result = await communityApi.createComment(token, post.id, content, parentId);
       setComments((current) => [...current, result.comment]);
       setCommentText('');
+      setReplyingTo(null);
     } catch (submitError) {
       setCommentError(
         submitError instanceof Error
@@ -436,81 +544,7 @@ export function PostDialog({
             {commentsLoading ? (
               <p>{ja ? '読み込み中…' : 'Loading…'}</p>
             ) : comments.length ? (
-              comments.map((comment) => (
-                <article
-                  className={cn(
-                    'community-comment tw-grid tw-grid-cols-[36px_minmax(0,1fr)] tw-items-start tw-gap-3',
-                    `is-${comment.status}`,
-                  )}
-                  key={comment.id}
-                >
-                  <button
-                    className={
-                      'community-comment-author tw-rounded-full tw-border-0 tw-bg-transparent tw-p-0 tw-cursor-pointer'
-                    }
-                    type="button"
-                    onClick={() => onCommentAuthorClick(comment.authorLoginId)}
-                    aria-label={`${comment.authorName}のプロフィールを開く`}
-                  >
-                    <Avatar name={comment.authorName} url={comment.authorAvatarUrl} />
-                  </button>
-                  <div
-                    className={
-                      'community-comment-card tw-min-w-0 tw-rounded-xl tw-bg-community-bg2 tw-p-3 [.is-pending_&]:tw-border [.is-pending_&]:tw-border-[#e7a92f] [.is-rejected_&]:tw-border [.is-rejected_&]:tw-border-community-danger [&>header]:tw-flex [&>header]:tw-items-start [&>header]:tw-justify-between [&>header]:tw-gap-2 [&>p]:tw-mb-0 [&>p]:tw-mt-2 [&>p]:tw-whitespace-pre-wrap [&>p]:tw-break-words [&>small]:tw-mt-2 [&>small]:tw-block [&>small]:tw-text-xs [&>small]:tw-text-community-muted'
-                    }
-                  >
-                    <header>
-                      <button
-                        className={
-                          'community-comment-author-name tw-border-0 tw-bg-transparent tw-p-0 tw-text-left tw-cursor-pointer [&_strong]:tw-text-[13px] [&_strong]:tw-text-community-bright [&_span]:tw-ml-2 [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
-                        }
-                        type="button"
-                        onClick={() => onCommentAuthorClick(comment.authorLoginId)}
-                      >
-                        <strong>{comment.authorName}</strong>
-                        <span>@{comment.authorLoginId}</span>
-                      </button>
-                      <div
-                        className={
-                          'community-comment-meta-actions tw-flex tw-flex-wrap tw-items-center tw-justify-end tw-gap-2 [&_time]:tw-text-xs [&_time]:tw-text-community-muted [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-p-0 [&_button]:tw-text-xs [&_button]:tw-text-community-danger [&_em]:tw-rounded-full [&_em]:tw-bg-[#e7a92f]/10 [&_em]:tw-px-2 [&_em]:tw-py-0.5 [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-[#e7a92f] [&_em.is-rejected]:tw-bg-community-danger/10 [&_em.is-rejected]:tw-text-community-danger'
-                        }
-                      >
-                        {comment.status !== 'approved' ? (
-                          <em className={cn(`is-${comment.status}`)}>
-                            {comment.status === 'pending'
-                              ? ja
-                                ? '審査中'
-                                : 'Pending'
-                              : ja
-                                ? '却下'
-                                : 'Rejected'}
-                          </em>
-                        ) : null}
-                        <time>
-                          {new Date(comment.createdAt).toLocaleDateString(ja ? 'ja-JP' : 'en-US')}
-                        </time>
-                        {viewerLoginId?.toLocaleLowerCase() ===
-                        comment.authorLoginId.toLocaleLowerCase() ? (
-                          <button
-                            className="tw-inline-flex tw-items-center tw-border-0 tw-bg-transparent tw-p-0 tw-text-xs tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-text-community-bright"
-                            type="button"
-                            onClick={() => onDeleteComment?.(comment)}
-                          >
-                            {ja ? '削除' : 'Delete'}
-                          </button>
-                        ) : null}
-                      </div>
-                    </header>
-                    <p>{comment.content}</p>
-                    {comment.rejectionReason ? (
-                      <small>
-                        <b>{ja ? '却下理由' : 'Reason'}</b>
-                        {comment.rejectionReason}
-                      </small>
-                    ) : null}
-                  </div>
-                </article>
-              ))
+              (commentGroups.get(null) ?? []).map((comment) => renderComment(comment))
             ) : (
               <p>{ja ? 'まだコメントはありません。' : 'No comments yet.'}</p>
             )}
@@ -522,18 +556,41 @@ export function PostDialog({
               }
               onSubmit={submitComment}
             >
+              {replyingTo ? (
+                <div className="tw-flex tw-items-center tw-justify-between tw-gap-3 tw-rounded-lg tw-bg-community-bg2 tw-px-3 tw-py-2 tw-text-[13px] tw-text-community-muted">
+                  <span>
+                    {ja ? '返信先' : 'Replying to'} @{replyingTo.authorLoginId}
+                  </span>
+                  <button
+                    className="tw-border-0 tw-bg-transparent tw-p-0 tw-text-xs tw-font-bold tw-text-community-accent-light tw-cursor-pointer hover:tw-text-community-bright"
+                    type="button"
+                    onClick={() => setReplyingTo(null)}
+                  >
+                    {ja ? 'キャンセル' : 'Cancel'}
+                  </button>
+                </div>
+              ) : null}
               <div className="tw-flex tw-items-center tw-justify-between tw-gap-3">
                 <span className="tw-text-[13px] tw-font-bold tw-text-community-bright">
-                  {ja ? 'コメント' : 'Comment'}
+                  {replyingTo ? (ja ? '返信' : 'Reply') : ja ? 'コメント' : 'Comment'}
                 </span>
                 <CharacterCount value={commentText} max={COMMUNITY_INPUT_LIMITS.comment} />
               </div>
               <textarea
+                ref={commentInputRef}
                 value={commentText}
                 onChange={(event) => setCommentText(event.target.value)}
                 maxLength={COMMUNITY_INPUT_LIMITS.comment}
                 rows={3}
-                placeholder={ja ? 'コメントを書く' : 'Write a comment'}
+                placeholder={
+                  replyingTo
+                    ? ja
+                      ? `@${replyingTo.authorLoginId} への返信`
+                      : `Reply to @${replyingTo.authorLoginId}`
+                    : ja
+                      ? 'コメントを書く'
+                      : 'Write a comment'
+                }
               />
               <div>
                 <small>

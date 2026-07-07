@@ -1,4 +1,5 @@
 import type { CommunityPost } from '../types';
+import { CommunityActivityIntroPanel } from '../components/CommunityActivityIntroContent';
 import { Empty } from '../components/Empty';
 import { Glyph } from '../components/Glyph';
 import { PostCard } from '../components/PostCard';
@@ -48,8 +49,8 @@ export function HomeScreen({
             <h1>{ja ? 'みんなの活動' : 'Campus Community'}</h1>
             <p>
               {ja
-                ? '作品やイベント、クラブ活動など、キャンパスのみんなが共有した投稿です。'
-                : 'Student work, events, clubs and everyday moments from around campus.'}
+                ? 'キャンパスの投稿を見たり、自分の活動を載せたりできます。'
+                : 'Browse campus posts or share your own activity.'}
             </p>
           </div>
           <button onClick={onCreate}>
@@ -57,6 +58,11 @@ export function HomeScreen({
             {ja ? '投稿する' : 'Create post'}
           </button>
         </header>
+        <CommunityActivityIntroPanel
+          id="community-activity-guide"
+          ja={ja}
+          className="tw-mb-5"
+        />
         {error ? (
           <div
             className={

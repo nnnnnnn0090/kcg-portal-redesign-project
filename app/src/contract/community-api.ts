@@ -77,6 +77,9 @@ export interface CommunityPost {
 export interface CommunityComment {
   id: string;
   postId: string;
+  parentId: string | null;
+  replyToAuthorName: string | null;
+  replyToAuthorLoginId: string | null;
   authorName: string;
   authorLoginId: string;
   authorAvatarUrl: string | null;

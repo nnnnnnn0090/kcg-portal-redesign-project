@@ -136,7 +136,7 @@ export function CommunityShell() {
       <section
         id="p-community-activity-drawer"
         className={
-          'community-app tw-grid tw-h-full tw-min-w-0 tw-grid-cols-[224px_minmax(0,1fr)] tw-overflow-hidden tw-bg-community-bg tw-shadow-[-18px_0_60px_color-mix(in_srgb,#000_30%,transparent)] tw-animate-community-slide-in max-[960px]:tw-grid-cols-[76px_minmax(0,1fr)] max-[620px]:tw-block [.is-closing_&]:tw-animate-community-slide-out'
+          'community-app tw-relative tw-grid tw-h-full tw-min-w-0 tw-grid-cols-[224px_minmax(0,1fr)] tw-overflow-hidden tw-bg-community-bg tw-shadow-[-18px_0_60px_color-mix(in_srgb,#000_30%,transparent)] tw-animate-community-slide-in max-[960px]:tw-grid-cols-[76px_minmax(0,1fr)] max-[620px]:tw-block [.is-closing_&]:tw-animate-community-slide-out'
         }
         role="dialog"
         aria-modal="true"

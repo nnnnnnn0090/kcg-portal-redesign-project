@@ -9,7 +9,7 @@ test.describe('FL-13 extension update', () => {
   test('version bump → update toast + extensionVersionSeen', async ({ extensionHandle, worker }) => {
     test.setTimeout(180_000);
     await seedOnboardingDone(worker);
-    await writeExtensionStorage(worker, { [SK.extensionVersionSeen]: '6.2.4' });
+    await writeExtensionStorage(worker, { [SK.extensionVersionSeen]: '6.2.5' });
 
     const page = await acquireTestPage(extensionHandle.context);
     await page.goto(PORTAL_HOME_URL, { waitUntil: 'domcontentloaded', timeout: 120_000 });
@@ -17,6 +17,6 @@ test.describe('FL-13 extension update', () => {
     await expect(page.locator('#p-toast')).toBeVisible({ timeout: 60_000 });
 
     const storage = await readExtensionStorage(worker, [SK.extensionVersionSeen]);
-    expect(storage[SK.extensionVersionSeen]).toBe('6.2.5');
+    expect(storage[SK.extensionVersionSeen]).toBe('7.0.0');
   });
 });

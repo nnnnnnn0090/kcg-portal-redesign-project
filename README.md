@@ -1,6 +1,6 @@
 # KCGLMS+
 
-京都コンピュータ学院（KCG）の学生向けポータル（`https://home.kcg.ac.jp`）向けの**非公式**ブラウザ拡張です。公式ページの表示を読みやすい UI に差し替えます。
+KCGの学生向けポータル（`https://home.kcg.ac.jp`）向けの**非公式**ブラウザ拡張です。公式ページの表示を読みやすい UI に差し替えます。
 
 - **スタック**: [WXT](https://wxt.dev/) · React 19 · TypeScript · Manifest V3  
 - **バージョン**: `app/version.json`（単一ソース。`package.json` / manifest と同期）

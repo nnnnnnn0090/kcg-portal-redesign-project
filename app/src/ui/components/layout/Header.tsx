@@ -541,7 +541,7 @@ function CommunityConsentDialog({
         </h2>
         <p>
           {ja
-            ? 'この機能は本拡張機能が独自に提供するコミュニティ機能です。京都コンピュータ学院・京都情報大学院大学および学校関係者は、運営・審査・サポートに関与していません。'
+            ? 'この機能は本拡張機能が独自に提供するコミュニティ機能です。KCGおよび学校関係者は、運営・審査・サポートに関与していません。'
             : 'This community is independently provided by this extension. The school and its staff do not operate, review, endorse, or support it.'}
         </p>
         <ul>

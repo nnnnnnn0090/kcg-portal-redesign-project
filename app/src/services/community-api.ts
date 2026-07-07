@@ -212,10 +212,13 @@ export const communityApi = {
       `/posts/${encodeURIComponent(id)}/impressions`,
       token ? authorizedRequest(token, { method: 'POST' }) : { method: 'POST' },
     ),
-  createComment: (token: string, id: string, content: string) =>
+  createComment: (token: string, id: string, content: string, parentId?: string) =>
     communityRequest<{ comment: CommunityComment }>(
       `/posts/${encodeURIComponent(id)}/comments`,
-      authorizedRequest(token, jsonRequest('POST', { content })),
+      authorizedRequest(
+        token,
+        jsonRequest('POST', parentId ? { content, parentId } : { content }),
+      ),
     ),
   deleteComment: (token: string, postId: string, commentId: string) =>
     communityRequest<null>(
