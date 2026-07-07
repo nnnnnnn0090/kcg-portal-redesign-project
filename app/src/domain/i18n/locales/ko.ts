@@ -79,6 +79,11 @@ export const koMessages: typeof jaMessages = {
     discordHint: 'Discord에서도 버그 신고와 기능 요청을 받습니다.',
     discordServer: 'Discord 서버 열기',
     version: (version: string) => `버전 ${version}`,
+    clientUserIdLabel: '익명 사용자 ID',
+    clientUserIdHint: '버그 신고나 문의 시 이 ID를 함께 알려 주세요.',
+    clientUserIdCopy: '복사',
+    clientUserIdCopyHint: '클릭하여 복사',
+    clientUserIdCopied: '복사됨',
     updateAvailableTitle: '새 버전이 있습니다',
     updateAvailableBody: (current: string, latest: string) =>
       `현재 v${current}입니다. 최신은 v${latest}입니다.`,

@@ -79,6 +79,11 @@ export const thMessages: typeof jaMessages = {
     discordHint: 'รับรายงานบั๊กและขอฟีเจอร์ทาง Discord ด้วย',
     discordServer: 'เปิดเซิร์ฟเวอร์ Discord',
     version: (version: string) => `เวอร์ชัน ${version}`,
+    clientUserIdLabel: 'ID ผู้ใช้แบบไม่ระบุตัวตน',
+    clientUserIdHint: 'โปรดแนบ ID นี้เมื่อรายงานข้อบกพร่องหรือติดต่อฝ่ายสนับสนุน',
+    clientUserIdCopy: 'คัดลอก',
+    clientUserIdCopyHint: 'คลิกเพื่อคัดลอก',
+    clientUserIdCopied: 'คัดลอกแล้ว',
     updateAvailableTitle: 'มีเวอร์ชันใหม่',
     updateAvailableBody: (current: string, latest: string) =>
       `คุณใช้ v${current} อยู่ เวอร์ชันล่าสุดคือ v${latest}`,

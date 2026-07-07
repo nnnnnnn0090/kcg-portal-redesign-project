@@ -4,7 +4,10 @@
  */
 
 import { KING_LMS_ORIGIN } from '../../contract/origins';
-import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
+import {
+  isExtensionBlockedByRemoteKillSwitch,
+  startExtensionOperationalWatch,
+} from '../../services/extension-runtime';
 import { isLoginRedirectPage, isSamlLoginPage } from './bridge-urls';
 import { cancelPendingForLoginRedirect, maybeShowOverlayFromStorage } from './bridge-storage-sync';
 import { installMessageListener } from './bridge-message-listener';
@@ -14,11 +17,10 @@ export default defineContentScript({
   runAt: 'document_start',
 
   main() {
-    void (async () => {
-      if (!(await ensureExtensionOperationallyEnabled())) return;
-      scheduleInit();
-      installMessageListener();
-    })();
+    startExtensionOperationalWatch();
+    if (isExtensionBlockedByRemoteKillSwitch()) return;
+    scheduleInit();
+    installMessageListener();
   },
 });
 

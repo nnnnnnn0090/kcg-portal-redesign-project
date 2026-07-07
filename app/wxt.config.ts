@@ -22,6 +22,13 @@ export default defineConfig({
   srcDir: 'src',
   manifestVersion: 3,
   modules: ['@wxt-dev/module-react'],
+  zip: {
+    zipSources: false,
+    artifactTemplate:
+      process.env.VITE_PORTAL_DISTRIBUTION_BUILD === '1'
+        ? '{{name}}-{{version}}-{{browser}}.zip'
+        : '{{name}}-{{version}}-dev-{{browser}}.zip',
+  },
   manifest: {
     name: 'KCGLMS+',
     version,

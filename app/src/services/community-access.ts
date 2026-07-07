@@ -2,9 +2,9 @@
  * 「みんなの活動」入口の公開可否確認（F-045）。
  */
 
-import { CLIENT_USER_ID_HEADER, COMMUNITY_ACCESS_URL } from '../contract/origins';
+import { COMMUNITY_ACCESS_URL } from '../contract/origins';
 import { storageRepo } from '../platform/storage/repo';
-import { getOrCreateClientUserId } from './client-identity';
+import { buildClientTelemetryHeaders } from './client-identity';
 
 export interface CommunityAccessResult {
   enabled: boolean;
@@ -40,10 +40,10 @@ export async function acceptCommunityDisclaimer(): Promise<void> {
 
 /** 匿名 UUID で community-access を問い合わせる */
 export async function fetchCommunityAccess(signal?: AbortSignal): Promise<CommunityAccessResult> {
-  const userId = await getOrCreateClientUserId();
+  const headers = await buildClientTelemetryHeaders('GET', '/community-access');
   const response = await fetch(COMMUNITY_ACCESS_URL, {
     cache: 'no-store',
-    headers: { [CLIENT_USER_ID_HEADER]: userId },
+    headers,
     signal,
   });
   if (!response.ok) throw new Error(String(response.status));

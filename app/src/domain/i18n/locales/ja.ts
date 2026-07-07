@@ -76,6 +76,11 @@ export const jaMessages = {
     discordHint: 'Discord からもバグ報告・機能リクエストを受け付けています。',
     discordServer: 'Discord サーバーへ',
     version: (version: string) => `バージョン ${version}`,
+    clientUserIdLabel: '匿名ユーザー ID',
+    clientUserIdHint: 'バグ報告やお問い合わせの際に、この ID を添えてください。',
+    clientUserIdCopy: 'コピー',
+    clientUserIdCopyHint: 'クリックでコピー',
+    clientUserIdCopied: 'コピーしました',
     updateAvailableTitle: '新しいバージョンがあります',
     updateAvailableBody: (current: string, latest: string) =>
       `現在 v${current} です。最新は v${latest} です。`,

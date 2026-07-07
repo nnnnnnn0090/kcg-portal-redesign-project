@@ -5,7 +5,10 @@ import { CPLAN_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
 import { TIMING } from '../../contract/timing';
 import { readCplanSnapshot } from '../../domain/cplan/snapshot';
 import { appendPortalOverlayShell, removePortalBackdrop, syncCplanSurfaceRuntime } from '../../domain/themes';
-import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
+import {
+  isExtensionBlockedByRemoteKillSwitch,
+  startExtensionOperationalWatch,
+} from '../../services/extension-runtime';
 import { storageRepo } from '../../platform/storage/repo';
 
 async function waitForCplanSnapshot() {
@@ -23,7 +26,8 @@ export default defineContentScript({
   main() {
     void (async () => {
       try {
-        if (!(await ensureExtensionOperationallyEnabled())) {
+        startExtensionOperationalWatch();
+        if (isExtensionBlockedByRemoteKillSwitch()) {
           removePortalBackdrop();
           return;
         }

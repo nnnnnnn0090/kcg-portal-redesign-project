@@ -3,7 +3,10 @@
  */
 
 import { HOME2_MAIL_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
-import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
+import {
+  isExtensionBlockedByRemoteKillSwitch,
+  startExtensionOperationalWatch,
+} from '../../services/extension-runtime';
 import {
   resolveHome2MailRoute,
   teardownHome2Overlay,
@@ -15,18 +18,18 @@ export default defineContentScript({
   runAt: 'document_end',
 
   main() {
-    void (async () => {
-      if (!(await ensureExtensionOperationallyEnabled())) {
-        teardownHome2Overlay();
-        return;
-      }
-      const route = resolveHome2MailRoute();
-      if (!route) {
-        teardownHome2Overlay();
-        return;
-      }
+    startExtensionOperationalWatch();
+    if (isExtensionBlockedByRemoteKillSwitch()) {
+      teardownHome2Overlay();
+      return;
+    }
 
-      void mountHome2MailOverlay(route);
-    })();
+    const route = resolveHome2MailRoute();
+    if (!route) {
+      teardownHome2Overlay();
+      return;
+    }
+
+    void mountHome2MailOverlay(route);
   },
 });

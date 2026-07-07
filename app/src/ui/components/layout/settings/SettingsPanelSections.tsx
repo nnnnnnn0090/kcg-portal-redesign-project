@@ -21,6 +21,7 @@ import { MascotDecorationSetting } from './MascotDecorationSetting';
 import { SettingsSwitch } from './SettingsSwitch';
 import { ThemeStudio, downloadTheme } from './ThemeStudio';
 import { ColorSwatch } from '../../ui/ColorSwatch';
+import { SettingsClientUserIdBlock } from './SettingsClientUserId';
 
 interface SettingsLanguageSectionProps {
   settings: Settings;
@@ -326,15 +327,14 @@ export function SettingsFeedbackSection() {
   const discordInviteUrl = PORTAL_COMMUNITY_DISCORD_INVITE_URL;
   const hasFeedbackForm = feedbackFormUrl.length > 0;
   const hasDiscordCommunity = discordInviteUrl.length > 0;
-  const showFeedbackSection = hasFeedbackForm || hasDiscordCommunity;
   const feedbackSectionTitle =
     hasFeedbackForm && hasDiscordCommunity
       ? t.settings.feedbackCommunity
       : hasFeedbackForm
         ? t.settings.feedback
-        : t.settings.community;
-
-  if (!showFeedbackSection) return null;
+        : hasDiscordCommunity
+          ? t.settings.community
+          : t.settings.support;
 
   return (
     <div className="p-settings-section p-settings-section--feedback">
@@ -381,6 +381,7 @@ export function SettingsFeedbackSection() {
           </div>
         </>
       ) : null}
+      <SettingsClientUserIdBlock />
     </div>
   );
 }

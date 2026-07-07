@@ -79,6 +79,11 @@ export const viMessages: typeof jaMessages = {
     discordHint: 'Cũng chấp nhận báo lỗi và yêu cầu tính năng trên Discord.',
     discordServer: 'Mở máy chủ Discord',
     version: (version: string) => `Phiên bản ${version}`,
+    clientUserIdLabel: 'ID người dùng ẩn danh',
+    clientUserIdHint: 'Hãy kèm ID này khi báo lỗi hoặc liên hệ hỗ trợ.',
+    clientUserIdCopy: 'Sao chép',
+    clientUserIdCopyHint: 'Nhấn để sao chép',
+    clientUserIdCopied: 'Đã sao chép',
     updateAvailableTitle: 'Có phiên bản mới',
     updateAvailableBody: (current: string, latest: string) =>
       `Bạn đang dùng v${current}. Phiên bản mới nhất là v${latest}.`,

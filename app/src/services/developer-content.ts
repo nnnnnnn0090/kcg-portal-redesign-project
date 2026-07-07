@@ -9,6 +9,7 @@ import {
   DEVELOPER_SURVEY_RESPONSE_URL,
 } from '../contract/origins';
 import { buildClientTelemetryHeaders } from './client-identity';
+import { isPortalDistributionBuild } from '../contract/distribution-build';
 
 /** JSON の接尾辞と一致（`title_zh_TW` / `message_zh_TW` など） */
 export const DEVELOPER_NOTICE_LANG_IDS = [
@@ -104,21 +105,16 @@ export function preferredNoticeLang(
 export async function fetchDeveloperNoticeJson(): Promise<Response> {
   const url = new URL(DEVELOPER_NOTICE_JSON_URL);
   url.searchParams.set('_', String(Date.now()));
-  const headers: Record<string, string> = {
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    Pragma: 'no-cache',
-  };
 
-  if (import.meta.env.VITE_PORTAL_DISTRIBUTION_BUILD === '1') {
-    Object.assign(headers, await buildClientTelemetryHeaders());
-  } else {
+  if (!isPortalDistributionBuild()) {
     url.searchParams.set('contentOnly', '1');
+    return fetch(url.toString(), { method: 'GET', cache: 'no-store' });
   }
 
   return fetch(url.toString(), {
     method: 'GET',
     cache: 'no-store',
-    headers,
+    headers: await buildClientTelemetryHeaders('GET', '/notice_md.json'),
   });
 }
 
@@ -298,7 +294,7 @@ export function developerSurveyKey(survey: DeveloperSurvey): string {
 }
 
 export async function fetchDeveloperSurveyJson(): Promise<Response> {
-  const headers = await buildClientTelemetryHeaders();
+  const headers = await buildClientTelemetryHeaders('GET', '/survey.json');
   headers['Content-Type'] = 'application/json';
   return fetch(`${DEVELOPER_SURVEY_JSON_URL}?_=${Date.now()}`, {
     method: 'GET',
@@ -312,7 +308,7 @@ export async function submitDeveloperSurveyResponse(
   revision: string,
   answers: DeveloperSurveyAnswers,
 ): Promise<Response> {
-  const headers = await buildClientTelemetryHeaders();
+  const headers = await buildClientTelemetryHeaders('POST', '/survey-response');
   headers['Content-Type'] = 'application/json';
   return fetch(`${DEVELOPER_SURVEY_RESPONSE_URL}?_=${Date.now()}`, {
     method: 'POST',

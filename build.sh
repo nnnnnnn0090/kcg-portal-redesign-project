@@ -14,18 +14,20 @@ if [[ ! -d node_modules ]] || [[ ! -f node_modules/.package-lock.json ]]; then
   npm ci
 fi
 
-# Chrome / Edge
-npm run zip
+npm run zip:all
 
-# Firefox
-npm run zip:firefox
-
-# app/.output/ の *.zip を build/ にコピー
-find "$APP/.output" -name "*.zip" | while read -r f; do
-  cp "$f" "$OUT/"
-  echo "  $(basename "$f")"
+VERSION="$(node -p "require('./version.json').version")"
+NAME="kcg-portal-redesign-project-${VERSION}"
+for zip in \
+  "${NAME}-dev-chrome.zip" \
+  "${NAME}-dev-firefox.zip" \
+  "${NAME}-chrome.zip" \
+  "${NAME}-firefox.zip"
+do
+  cp "$APP/.output/$zip" "$OUT/"
+  echo "  $zip"
 done
 
 echo ""
 echo "Built in $OUT"
-ls -lh "$OUT/"*.zip 2>/dev/null | awk '{print "  " $5 "  " $9}'
+ls -lh "$OUT/"*.zip | awk '{print "  " $5 "  " $9}'

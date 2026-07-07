@@ -79,6 +79,11 @@ export const zhTWMessages: typeof jaMessages = {
     discordHint: '也可在 Discord 上提交錯誤回報與功能請求。',
     discordServer: '開啟 Discord 伺服器',
     version: (version: string) => `版本 ${version}`,
+    clientUserIdLabel: '匿名使用者 ID',
+    clientUserIdHint: '回報錯誤或聯絡支援時，請附上此 ID。',
+    clientUserIdCopy: '複製',
+    clientUserIdCopyHint: '點擊複製',
+    clientUserIdCopied: '已複製',
     updateAvailableTitle: '有新版本',
     updateAvailableBody: (current: string, latest: string) =>
       `目前為 v${current}，最新為 v${latest}。`,

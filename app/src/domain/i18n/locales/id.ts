@@ -79,6 +79,11 @@ export const idMessages: typeof jaMessages = {
     discordHint: 'Laporan bug dan permintaan fitur juga diterima di Discord.',
     discordServer: 'Buka server Discord',
     version: (version: string) => `Versi ${version}`,
+    clientUserIdLabel: 'ID pengguna anonim',
+    clientUserIdHint: 'Sertakan ID ini saat melaporkan bug atau menghubungi dukungan.',
+    clientUserIdCopy: 'Salin',
+    clientUserIdCopyHint: 'Klik untuk menyalin',
+    clientUserIdCopied: 'Disalin',
     updateAvailableTitle: 'Versi baru tersedia',
     updateAvailableBody: (current: string, latest: string) =>
       `Anda memakai v${current}. Terbaru v${latest}.`,

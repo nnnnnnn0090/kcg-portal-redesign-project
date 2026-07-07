@@ -79,6 +79,11 @@ export const neMessages: typeof jaMessages = {
     discordHint: 'Discord मा पनि बग रिपोर्ट र सुविधा अनुरोध स्वीकार गरिन्छ।',
     discordServer: 'Discord सर्भर खोल्नुहोस्',
     version: (version: string) => `संस्करण ${version}`,
+    clientUserIdLabel: 'अज्ञात प्रयोगकर्ता ID',
+    clientUserIdHint: 'बग रिपोर्ट वा सम्पर्क गर्दा यो ID संलग्न गर्नुहोस्।',
+    clientUserIdCopy: 'प्रतिलिपि',
+    clientUserIdCopyHint: 'प्रतिलिपि गर्न क्लिक गर्नुहोस्',
+    clientUserIdCopied: 'प्रतिलिपि भयो',
     updateAvailableTitle: 'नयाँ संस्करण उपलब्ध छ',
     updateAvailableBody: (current: string, latest: string) =>
       `हाल v${current} हो। नवीनतम v${latest} हो।`,

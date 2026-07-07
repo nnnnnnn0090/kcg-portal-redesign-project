@@ -11,7 +11,10 @@ import {
   type StoredCustomThemeCollection,
 } from '../domain/themes';
 import { resolveKingLmsMountToastMessage } from './sync-hash';
-import { ensureExtensionOperationallyEnabled } from './extension-runtime';
+import {
+  isExtensionBlockedByRemoteKillSwitch,
+  startExtensionOperationalWatch,
+} from './extension-runtime';
 import { storageRepo } from '../platform/storage/repo';
 
 function retainPortalBackdropAfterFrames(
@@ -30,7 +33,8 @@ function retainPortalBackdropAfterFrames(
 
 /** portal.content ブート（F-003） */
 export async function bootPortalContent(): Promise<void> {
-  if (!(await ensureExtensionOperationallyEnabled())) return;
+  startExtensionOperationalWatch();
+  if (isExtensionBlockedByRemoteKillSwitch()) return;
 
   const route = matchPortalRoute();
   if (!route) {

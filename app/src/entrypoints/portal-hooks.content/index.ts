@@ -4,7 +4,10 @@
  */
 
 import { PORTAL_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
-import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
+import {
+  isExtensionBlockedByRemoteKillSwitch,
+  startExtensionOperationalWatch,
+} from '../../services/extension-runtime';
 import { installFetchHook } from './portal-fetch-hook';
 import { installLogoffBridge } from './portal-logoff-bridge';
 import { installFetchBridge } from './portal-page-fetch-bridge';
@@ -16,12 +19,11 @@ export default defineContentScript({
   world: 'MAIN',
 
   main() {
-    void (async () => {
-      if (!(await ensureExtensionOperationallyEnabled())) return;
-      installFetchHook();
-      installXhrHook();
-      installFetchBridge();
-      installLogoffBridge();
-    })();
+    startExtensionOperationalWatch();
+    if (isExtensionBlockedByRemoteKillSwitch()) return;
+    installFetchHook();
+    installXhrHook();
+    installFetchBridge();
+    installLogoffBridge();
   },
 });

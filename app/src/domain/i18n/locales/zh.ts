@@ -79,6 +79,11 @@ export const zhMessages: typeof jaMessages = {
     discordHint: '也可在 Discord 上提交错误报告和功能请求。',
     discordServer: '打开 Discord 服务器',
     version: (version: string) => `版本 ${version}`,
+    clientUserIdLabel: '匿名用户 ID',
+    clientUserIdHint: '报告错误或联系支持时，请附上此 ID。',
+    clientUserIdCopy: '复制',
+    clientUserIdCopyHint: '点击复制',
+    clientUserIdCopied: '已复制',
     updateAvailableTitle: '有新版本',
     updateAvailableBody: (current: string, latest: string) =>
       `当前为 v${current}，最新为 v${latest}。`,

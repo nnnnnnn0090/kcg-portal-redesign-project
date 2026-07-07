@@ -3,7 +3,10 @@
  */
 
 import { PORTAL_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
-import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
+import {
+  isExtensionBlockedByRemoteKillSwitch,
+  startExtensionOperationalWatch,
+} from '../../services/extension-runtime';
 import { applyPortalEarlyBootCover } from '../../services/boot-cover';
 
 export default defineContentScript({
@@ -11,9 +14,8 @@ export default defineContentScript({
   runAt: 'document_start',
 
   main() {
-    void (async () => {
-      if (!(await ensureExtensionOperationallyEnabled())) return;
-      applyPortalEarlyBootCover();
-    })();
+    startExtensionOperationalWatch();
+    if (isExtensionBlockedByRemoteKillSwitch()) return;
+    applyPortalEarlyBootCover();
   },
 });

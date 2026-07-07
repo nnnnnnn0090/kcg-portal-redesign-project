@@ -2,13 +2,9 @@
  * 拡張の manifest バージョンが上がったとき、Web API へ通知する（Web 側で Discord へ転送）。
  */
 
-import { getOrCreateClientUserId } from '../services/client-identity';
-import { getClientLifecycleTimestamps } from './extension-client-lifecycle';
+import { buildClientTelemetryHeaders } from '../services/client-identity';
 import {
-  CLIENT_INSTALL_AT_HEADER,
-  CLIENT_LAST_UPDATED_AT_HEADER,
   CLIENT_PREVIOUS_VERSION_HEADER,
-  CLIENT_USER_ID_HEADER,
   EXTENSION_UPDATE_NOTIFY_URL,
   EXTENSION_VERSION_HEADER,
 } from '../shared/constants';
@@ -21,21 +17,14 @@ export async function notifyExtensionUpdateToWeb(
   if (!previousVersion || !currentVersion || previousVersion === currentVersion) return;
 
   try {
-    const [userId, lifecycle] = await Promise.all([
-      getOrCreateClientUserId(),
-      getClientLifecycleTimestamps(),
-    ]);
+    const headers = await buildClientTelemetryHeaders('GET', '/extension-update');
+    headers[EXTENSION_VERSION_HEADER] = currentVersion;
+    headers[CLIENT_PREVIOUS_VERSION_HEADER] = previousVersion;
 
     await fetch(`${EXTENSION_UPDATE_NOTIFY_URL}?_=${Date.now()}`, {
       method: 'GET',
       cache: 'no-store',
-      headers: {
-        [CLIENT_USER_ID_HEADER]: userId,
-        [EXTENSION_VERSION_HEADER]: currentVersion,
-        [CLIENT_PREVIOUS_VERSION_HEADER]: previousVersion,
-        [CLIENT_INSTALL_AT_HEADER]: lifecycle.installAt,
-        [CLIENT_LAST_UPDATED_AT_HEADER]: lifecycle.lastUpdatedAt,
-      },
+      headers,
     });
   } catch {
     /* ignore */

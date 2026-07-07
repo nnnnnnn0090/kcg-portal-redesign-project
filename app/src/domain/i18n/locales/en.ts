@@ -79,6 +79,11 @@ export const enMessages: typeof jaMessages = {
     discordHint: 'Bug reports and feature requests are also accepted on Discord.',
     discordServer: 'Open Discord server',
     version: (version: string) => `Version ${version}`,
+    clientUserIdLabel: 'Anonymous user ID',
+    clientUserIdHint: 'Include this ID when reporting bugs or contacting support.',
+    clientUserIdCopy: 'Copy',
+    clientUserIdCopyHint: 'Click to copy',
+    clientUserIdCopied: 'Copied',
     updateAvailableTitle: 'Update available',
     updateAvailableBody: (current: string, latest: string) =>
       `You are on v${current}. The latest is v${latest}.`,
