@@ -70,7 +70,16 @@ export async function saveCourses(courses: unknown[]): Promise<void> {
   if (!syncPending && hadAwait && data[SK.kingLmsSyncReturnUrl] && isCoursePage()) syncPending = true;
   if (syncPending) mountSyncOverlay(language);
   const toSet: Record<string, unknown> = { [SK.kingLmsCourses]: courses };
-  if (syncPending && hadAwait) { toSet[SK.kingLmsSyncAwaitCourse] = false; toSet[SK.kingLmsSyncPending] = true; }
+  if (hadAwait && isCoursePage()) {
+    toSet[SK.kingLmsSyncAwaitCourse] = false;
+    if (data[SK.kingLmsSyncReturnUrl]) {
+      toSet[SK.kingLmsSyncPending] = true;
+      syncPending = true;
+    }
+  } else if (syncPending && hadAwait) {
+    toSet[SK.kingLmsSyncAwaitCourse] = false;
+    toSet[SK.kingLmsSyncPending] = true;
+  }
   await storage.set(toSet);
   if (syncPending) await redirectAfterCourse(SYNC_HASH.courseDone);
 }

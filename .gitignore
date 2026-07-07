@@ -1,23 +1,36 @@
+# OS
 .DS_Store
-/build
-/app/.output
-/app/.wxt
-/app/node_modules
-/app/.chrome-dev-profile
-/app/.chrome-e2e-profile
-/app/.king-lms-api-capture
-/community-server/data
-/community-server/node_modules
-/community-server/.env
 
-# 非公開 URL（Discord 招待・フォーム等）用。`app/.env.example` を参照。
+# Extension build output
+/app/.output/
+/app/.wxt/
+/build/
+
+# Dependencies
+/app/node_modules/
+
+# Environment (never commit secrets)
 /app/.env
 /app/.env.local
 /app/.env.*.local
 
-# ブラウザで保存したページ参照用（リポジトリに含めない）
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Unit / integration test output
+/app/coverage/
+
+# Playwright E2E (reports, cache, traces)
+/app/test-results/
+/app/playwright-report/
+/app/blob-report/
+/app/playwright/.cache/
+
+# E2E Microsoft login session + Chrome profile (credentials on disk)
+/app/e2e/.auth/
+
+# Local browser-saved reference pages (not part of the product)
 KCG WebMail*
 kcg.edu*
 /aaa_files
 aaa.html
-/community-server

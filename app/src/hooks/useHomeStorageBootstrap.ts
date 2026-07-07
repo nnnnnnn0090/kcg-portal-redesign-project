@@ -8,7 +8,7 @@ import storage from '../lib/storage';
 import { pageFetch, urls } from '../lib/api';
 import { isCourseRowArray, type CourseRow } from '../context/courses';
 import type { CustomLink, LinkConfig } from '../shared/types';
-import type { DuePayload } from '../features/calendar';
+import type { DuePayload } from '../ui/calendar';
 
 function isCustomLink(x: unknown): x is CustomLink {
   if (!x || typeof x !== 'object') return false;

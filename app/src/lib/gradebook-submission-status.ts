@@ -3,7 +3,7 @@
  */
 
 import { KING_LMS_ORIGIN } from '../shared/constants';
-import type { DueItem } from '../features/calendar/assignment';
+import type { DueItem } from '../ui/calendar/assignment';
 
 /** 提出済みとみなす gradebook user status */
 const SUBMITTED_STATUSES = new Set([

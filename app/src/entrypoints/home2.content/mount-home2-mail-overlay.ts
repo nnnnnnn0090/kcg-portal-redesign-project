@@ -11,10 +11,10 @@ import {
   removePortalBackdrop,
   syncPortalTheme,
   type StoredCustomThemeCollection,
-} from '../../themes';
+} from '../../domain/themes';
 import storage from '../../lib/storage';
-import { upsertRuntimeCss } from '../../themes/runtime-style';
-import type { Home2MailRoute } from '../../portal/home2-mail-router';
+import { upsertRuntimeCss } from '../../platform/runtime-css';
+import type { Home2MailRoute } from '../../domain/home2/router';
 import {
   HOME2_MAIL_OVERLAY_HEADER_ONLY_CLASS,
   HOME2_MAIL_OVERLAY_SURFACE_CLASS,
@@ -63,7 +63,7 @@ export async function mountHome2MailOverlay(route: Home2MailRoute): Promise<void
 
     const [{ createRoot }, { PortalApp }] = await Promise.all([
       import('react-dom/client'),
-      import('../../portal/App'),
+      import('../../ui/app'),
     ]);
     const root = createRoot(scroller);
     root.render(

@@ -49,5 +49,7 @@ export function appendKingLmsApiCapture(url: string, json: unknown): void {
     if (!Array.isArray(list)) return;
     list.push(row);
     sessionStorage.setItem(KING_LMS_API_CAPTURE_KEY, JSON.stringify(list));
-  } catch {}
+  } catch (error) {
+    void error;
+  }
 }

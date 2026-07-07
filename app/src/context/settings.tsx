@@ -14,13 +14,13 @@ import {
 } from 'react';
 import { SK } from '../shared/constants';
 import storage from '../lib/storage';
-import { syncPortalTheme } from '../themes';
+import { syncPortalTheme } from '../domain/themes';
 import {
   EMPTY_CUSTOM_THEMES,
   parseCustomThemeCollection,
   type CustomTheme,
   type StoredCustomThemeCollection,
-} from '../themes/custom-themes';
+} from '../domain/themes/custom-themes';
 import type { CalendarWeekStart } from '../lib/date';
 import { parseCalendarWeekStart } from '../lib/date';
 import {

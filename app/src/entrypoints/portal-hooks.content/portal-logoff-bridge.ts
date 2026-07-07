@@ -4,8 +4,8 @@
  */
 
 import { devWarn } from '../../lib/debug';
-import { FETCH_HOOK } from '../../shared/constants';
-import { findHostLogoffAnchor, triggerHostLogoffAnchor } from '../../shared/host-logoff';
+import { FETCH_HOOK } from '../../contract/messages';
+import { findHostLogoffAnchor, triggerHostLogoffAnchor } from '../../services/logoff';
 
 export function installLogoffBridge(): void {
   window.addEventListener('message', (e) => {

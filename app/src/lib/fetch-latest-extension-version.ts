@@ -2,7 +2,7 @@
  * 配布サイトの changelog.json から最新 manifest バージョンを取得する。
  */
 
-import { parseChangelogJson } from '../components/layout/settings/settings-changelog';
+import { parseChangelogJson } from '../ui/components/layout/settings/settings-changelog';
 import { CHANGELOG_JSON_URL } from '../shared/constants';
 import { semverGreater } from './semver';
 import { readExtensionVersion } from './extension-version';

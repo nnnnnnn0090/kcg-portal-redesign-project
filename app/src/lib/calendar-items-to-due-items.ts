@@ -2,7 +2,7 @@
  * King LMS calendarItems → 課題カレンダー用 DueItem へ変換。
  */
 
-import type { DueItem } from '../features/calendar/assignment';
+import type { DueItem } from '../ui/calendar/assignment';
 
 const GRADABLE_ITEM_TYPE = 'blackboard.platform.gradebook2.GradableItem';
 

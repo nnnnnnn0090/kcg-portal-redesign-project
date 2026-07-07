@@ -1,0 +1,9 @@
+export { HomePage } from './HomePage';
+export { NewsPage } from './NewsPage';
+export { DetailPage } from './DetailPage';
+export { KyukoPage } from './KyukoPage';
+export { SurveyPage } from './SurveyPage';
+export { Home2WebMailLoginPage } from './Home2WebMailLoginPage';
+export { Home2WebMailMailboxPage } from './Home2WebMailMailboxPage';
+export { Home2WebMailReadPage } from './Home2WebMailReadPage';
+export { Home2WebMailSendPage } from './Home2WebMailSendPage';

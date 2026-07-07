@@ -1,4 +1,4 @@
-import { removeRuntimeCss, upsertRuntimeCss } from '../themes/runtime-style';
+import { removeRuntimeCss, upsertRuntimeCss } from '../platform/runtime-css';
 
 let runtimeElementSeq = 0;
 

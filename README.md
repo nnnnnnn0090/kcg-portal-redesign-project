@@ -3,7 +3,9 @@
 京都コンピュータ学院（KCG）の学生向けポータル（`https://home.kcg.ac.jp`）向けの**非公式**ブラウザ拡張です。公式ページの表示を読みやすい UI に差し替えます。
 
 - **スタック**: [WXT](https://wxt.dev/) · React 19 · TypeScript · Manifest V3  
-- **バージョン**: `app/package.json` / `wxt.config.ts` の `version` を参照（ストア用メタデータと同期）
+- **バージョン**: `app/version.json`（単一ソース。`package.json` / manifest と同期）
+- **内部構成**: `src/contract/`（凍結契約）→ `platform/` → `domain/` → `services/` → `ui/` → `entrypoints/`（再設計仕様書 §10）
+- **CSS**: `src/styles/tailwind-overlay.css` → `@import './legacy/00-legacy-overlay.css'` + Tailwind utilities（出力等価を `scripts/css-equivalence.mjs` で検証）
 
 ### 主なライブラリ
 
@@ -110,16 +112,15 @@ npm run format:check
 npm run test            # Vitest
 ```
 
-### E2E（任意）
+### E2E
 
-実拡張ディレクトリを渡したときだけスモークテストが走ります。
+詳細は `app/e2e/README.md`。一括実行はリポジトリルートの `./scripts/run-tests.sh`。
 
 ```bash
 npm run build
-EXTENSION_PATH=.output/chrome-mv3 npm run test:e2e
+npm run test:e2e              # 拡張ロード smoke（ビルド必須、未ビルド時は skip）
+npm run test:e2e:flows        # 実ポータル FL-01..14（PORTAL_MS_* 必須）
 ```
-
-`EXTENSION_PATH` が未設定またはパスが無効な場合、該当スイートはスキップされます。
 
 ---
 
@@ -171,7 +172,7 @@ EXTENSION_PATH=.output/chrome-mv3 npm run test:e2e
 
 | ファイル | 説明 |
 |----------|------|
-| `portal-smoke.spec.ts` | ビルド済み拡張を読み込んだ Chromium で `#portal-overlay` 表示を確認するスモークテスト（`EXTENSION_PATH` 未設定時はスキップ） |
+| `smoke.spec.ts` | ビルド済み拡張を読み込んだ Chromium で service worker 起動を確認（`.output/chrome-mv3` 未生成時は skip） |
 
 ### `app/src/entrypoints/`
 

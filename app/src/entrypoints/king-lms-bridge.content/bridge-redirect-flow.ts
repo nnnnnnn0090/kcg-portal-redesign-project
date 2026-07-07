@@ -2,12 +2,14 @@
  * King LMS 上の同期処理で、一定時間応答がない場合のタイムアウトと、完了・失敗時のポータルへのリダイレクトを担います。
  */
 
-import { SK, SYNC_HASH } from '../../shared/constants';
+import { SK } from '../../contract/storage-keys';
+import { SYNC_HASH } from '../../contract/sync';
+import { TIMING } from '../../contract/timing';
 import storage from '../../lib/storage';
 import { buildRedirectUrl } from './bridge-urls';
 import { removeSyncOverlay } from './bridge-overlay-ui';
 
-const SYNC_SAFETY_MS = 120000;  // 2 分
+const SYNC_SAFETY_MS = TIMING.kingLmsSyncSafetyMs;
 
 let assignmentSyncTimer: ReturnType<typeof setTimeout> | null = null;
 let courseSyncTimer:     ReturnType<typeof setTimeout> | null = null;

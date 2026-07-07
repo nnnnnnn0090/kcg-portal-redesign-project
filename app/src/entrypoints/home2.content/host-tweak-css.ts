@@ -2,7 +2,7 @@
  * Home2 Web メールのホストページ用 CSS（レイアウト別）。オーバーレイ表示時に runtime CSS carrier へ渡す。
  */
 
-import type { Home2MailLayout } from '../../portal/home2-mail-router';
+import type { Home2MailLayout } from '../../domain/home2/router';
 
 export const HOME2_MAIL_LOGIN_HOST_TWEAK_CSS = `
 .page > div:first-of-type {

@@ -1,47 +1,5 @@
 /**
- * 拡張の manifest バージョンが前回より上がったときだけ一度だけ返すメッセージ（トースト用）。
- * 初回（記録なし）は記録のみ。ダウングレード時は記録を上書きしメッセージは返さない。
+ * 拡張の manifest バージョンが前回より上がったときだけ一度だけ返すメッセージ（後方互換再輸出）。
  */
 
-import { readExtensionVersion } from './extension-version';
-import { notifyExtensionUpdateToWeb } from './notify-extension-update';
-import { semverGreater } from './semver';
-import storage from './storage';
-import { SK } from '../shared/constants';
-import { messagesForLanguage, type AppLanguage } from '../i18n/messages';
-
-let inFlight: Promise<string> | null = null;
-
-async function runConsume(language: AppLanguage): Promise<string> {
-  const current = readExtensionVersion();
-  if (!current) return '';
-
-  const snap = await storage.get([SK.extensionVersionSeen]);
-  const seenRaw = snap[SK.extensionVersionSeen];
-  const seen = typeof seenRaw === 'string' ? seenRaw.trim() : '';
-
-  if (!seen) {
-    await storage.set({ [SK.extensionVersionSeen]: current });
-    return '';
-  }
-  if (seen === current) return '';
-
-  if (!semverGreater(current, seen)) {
-    await storage.set({ [SK.extensionVersionSeen]: current });
-    return '';
-  }
-
-  await storage.set({ [SK.extensionVersionSeen]: current });
-  void notifyExtensionUpdateToWeb(seen, current);
-  return messagesForLanguage(language).sync.updated(current);
-}
-
-/** 同時呼び出しは 1 本にまとめる（Strict Mode 等での二重取得を避ける） */
-export function consumeExtensionUpdateToastMessage(language: AppLanguage): Promise<string> {
-  if (!inFlight) {
-    inFlight = runConsume(language).finally(() => {
-      inFlight = null;
-    });
-  }
-  return inFlight;
-}
+export { consumeExtensionUpdateToastMessage } from '../services/update-notice';

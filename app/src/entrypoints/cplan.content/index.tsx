@@ -1,15 +1,17 @@
 import { createElement } from 'react';
 import '../../styles/tailwind-overlay.css';
-import { CplanApp, readCplanSnapshot } from '../../components/cplan/CplanApp';
-import storage from '../../lib/storage';
-import { appendPortalOverlayShell, removePortalBackdrop, syncCplanSurfaceRuntime } from '../../themes';
-import { CPLAN_CONTENT_SCRIPT_MATCHES, SK } from '../../shared/constants';
+import { CplanApp } from '../../ui/components/cplan/CplanApp';
+import { CPLAN_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
+import { TIMING } from '../../contract/timing';
+import { readCplanSnapshot } from '../../domain/cplan/snapshot';
+import { appendPortalOverlayShell, removePortalBackdrop, syncCplanSurfaceRuntime } from '../../domain/themes';
+import { storageRepo } from '../../platform/storage/repo';
 
 async function waitForCplanSnapshot() {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
+  for (let attempt = 0; attempt < TIMING.cplanSnapshotMaxAttempts; attempt += 1) {
     const snapshot = readCplanSnapshot();
     if (snapshot) return snapshot;
-    await new Promise((resolve) => window.setTimeout(resolve, 100));
+    await new Promise((resolve) => window.setTimeout(resolve, TIMING.cplanSnapshotPollMs));
   }
   return readCplanSnapshot();
 }
@@ -20,8 +22,8 @@ export default defineContentScript({
   main() {
     void (async () => {
       try {
-        const setting = await storage.get(SK.cplanOverlay);
-        if (setting[SK.cplanOverlay] === false) {
+        const enabled = await storageRepo.getCplanOverlay();
+        if (!enabled) {
           document.documentElement.dataset.cplanOverlayDisabled = 'true';
           removePortalBackdrop();
           return;

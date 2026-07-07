@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'wxt';
 import {
   EXTENSION_PROMO_ORIGIN,
@@ -5,6 +6,10 @@ import {
   KING_LMS_ORIGIN,
   PORTAL_ORIGIN,
 } from './src/shared/constants';
+
+const { version } = JSON.parse(readFileSync(new URL('./version.json', import.meta.url), 'utf8')) as {
+  version: string;
+};
 
 type WxtGeckoBaseline = {
   id?: string;
@@ -19,7 +24,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'KCG Portal Redesign Project',
-    version: '6.2.4',
+    version,
     description:
       '京都コンピュータ学院の学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',
     author: 'nnnnnnn0090' as unknown as { email: string },

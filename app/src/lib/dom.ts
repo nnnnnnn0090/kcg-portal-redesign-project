@@ -3,6 +3,39 @@
  * 純粋な文字列変換は lib/date.ts など、DOM に依存する処理はすべてここに集約する。
  */
 
+import DOMPurify from 'dompurify';
+
+const HOST_HTML_TAGS = [
+  'a',
+  'b',
+  'br',
+  'div',
+  'em',
+  'i',
+  'li',
+  'ol',
+  'p',
+  'span',
+  'strong',
+  'ul',
+] as const;
+
+const HOST_HTML_ATTR = ['class', 'href', 'rel', 'target', 'title'] as const;
+
+/** ホストページ由来 HTML（Cplan お知らせ等）を表示用にサニタイズする。 */
+export function sanitizeHostHtml(raw: string): string {
+  const sanitized = DOMPurify.sanitize(String(raw ?? ''), {
+    ALLOWED_TAGS: [...HOST_HTML_TAGS],
+    ALLOWED_ATTR: [...HOST_HTML_ATTR],
+  });
+  const doc = new DOMParser().parseFromString(sanitized, 'text/html');
+  for (const anchor of doc.body.querySelectorAll('a[href]')) {
+    anchor.setAttribute('target', '_blank');
+    anchor.setAttribute('rel', 'noopener noreferrer');
+  }
+  return doc.body.innerHTML;
+}
+
 // ─── HTML エスケープ ───────────────────────────────────────────────────────
 
 /** テキストノード挿入用エスケープ */

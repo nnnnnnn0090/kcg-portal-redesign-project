@@ -2,7 +2,7 @@
  * 拡張の manifest バージョンが上がったとき、Web API へ通知する（Web 側で Discord へ転送）。
  */
 
-import { getOrCreateClientUserId } from './client-user-id';
+import { getOrCreateClientUserId } from '../services/client-identity';
 import { getClientLifecycleTimestamps } from './extension-client-lifecycle';
 import {
   CLIENT_INSTALL_AT_HEADER,

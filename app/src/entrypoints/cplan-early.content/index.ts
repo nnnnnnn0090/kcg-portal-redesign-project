@@ -1,23 +1,18 @@
-import storage from '../../lib/storage';
-import { CPLAN_CONTENT_SCRIPT_MATCHES, PORTAL_DOM, SK } from '../../shared/constants';
-import { syncCplanSurfaceRuntime } from '../../themes';
+import { PORTAL_DOM } from '../../contract/dom';
+import { CPLAN_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
+import { SK } from '../../contract/storage-keys';
+import { isCplanTargetPage } from '../../domain/home2/router';
+import { syncCplanSurfaceRuntime } from '../../domain/themes';
+import { storageRepo } from '../../platform/storage/repo';
 
 export default defineContentScript({
   matches: [...CPLAN_CONTENT_SCRIPT_MATCHES],
   runAt: 'document_start',
   main() {
-    const page = location.pathname.split('/').pop()?.toLowerCase() ?? '';
-    if (![
-      'loginform.aspx',
-      'mainmenu.aspx',
-      'mainmenuv2.aspx',
-      'category.aspx',
-      'categoryv2.aspx',
-      'wsk_gakuseishukketsushinsei.aspx',
-    ].includes(page)) return;
+    if (!isCplanTargetPage()) return;
 
-    void storage.get(SK.cplanOverlay).then((snap) => {
-      if (snap[SK.cplanOverlay] === false || document.documentElement.dataset.cplanOverlayDisabled === 'true') return;
+    void storageRepo.getCplanOverlay().then((enabled) => {
+      if (!enabled || document.documentElement.dataset.cplanOverlayDisabled === 'true') return;
       syncCplanSurfaceRuntime();
       const cover = document.createElement('div');
       cover.id = PORTAL_DOM.bootCover;

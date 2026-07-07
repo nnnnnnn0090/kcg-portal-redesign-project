@@ -1,10 +1,12 @@
 /**
- * Home2 Web メールの対象 URL で React オーバーレイをマウントします。ホストページの `head` は置き換えません。
+ * Home2 Web メールの対象 URL で React オーバーレイをマウントします。
  */
 
-import { matchHome2MailRoute } from '../../portal/home2-mail-router';
-import { HOME2_MAIL_CONTENT_SCRIPT_MATCHES } from '../../shared/constants';
-import { removePortalBackdrop } from '../../themes';
+import { HOME2_MAIL_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
+import {
+  resolveHome2MailRoute,
+  teardownHome2Overlay,
+} from '../../services/home2-host';
 import { mountHome2MailOverlay } from './mount-home2-mail-overlay';
 
 export default defineContentScript({
@@ -12,9 +14,9 @@ export default defineContentScript({
   runAt: 'document_end',
 
   main() {
-    const route = matchHome2MailRoute();
+    const route = resolveHome2MailRoute();
     if (!route) {
-      removePortalBackdrop();
+      teardownHome2Overlay();
       return;
     }
 

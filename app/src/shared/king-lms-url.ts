@@ -1,13 +1,27 @@
 /** King LMS の画面遷移 URL と SAML ログイン経由 URL を一元管理する。 */
 
-export const KING_LMS_ORIGIN = 'https://king-lms.kcg.edu' as const;
-export const KING_LMS_HOSTNAME = new URL(KING_LMS_ORIGIN).hostname;
-export const KING_LMS_SAML_LOGIN_PATH = '/auth-saml/saml/login' as const;
-export const KING_LMS_SAML_APP_ID = '_4_1' as const;
+import { KING_LMS_HOSTNAME, KING_LMS_ORIGIN } from '../contract/origins';
+import {
+  KING_LMS_ASSIGNMENT_SYNC_TARGET_URL,
+  KING_LMS_ASSIGNMENT_SYNC_URL,
+  KING_LMS_COURSE_SYNC_TARGET_URL,
+  KING_LMS_COURSE_SYNC_URL,
+  KING_LMS_HOME_URL,
+  KING_LMS_SAML_APP_ID,
+  KING_LMS_SAML_LOGIN_PATH,
+} from '../contract/sync';
 
-export const KING_LMS_HOME_URL = `${KING_LMS_ORIGIN}/ultra` as const;
-export const KING_LMS_COURSE_SYNC_TARGET_URL = `${KING_LMS_ORIGIN}/ultra/course` as const;
-export const KING_LMS_ASSIGNMENT_SYNC_TARGET_URL = `${KING_LMS_ORIGIN}/ultra/calendar` as const;
+export {
+  KING_LMS_ORIGIN,
+  KING_LMS_HOSTNAME,
+  KING_LMS_SAML_LOGIN_PATH,
+  KING_LMS_SAML_APP_ID,
+  KING_LMS_HOME_URL,
+  KING_LMS_COURSE_SYNC_TARGET_URL,
+  KING_LMS_ASSIGNMENT_SYNC_TARGET_URL,
+  KING_LMS_COURSE_SYNC_URL,
+  KING_LMS_ASSIGNMENT_SYNC_URL,
+};
 
 export function isKingLmsSamlLoginUrl(rawUrl: string): boolean {
   try {
@@ -47,8 +61,3 @@ export function buildKingLmsSamlLoginUrl(destination: string): string {
   loginUrl.searchParams.set('redirectUrl', redirectUrl);
   return loginUrl.href;
 }
-
-export const KING_LMS_COURSE_SYNC_URL = buildKingLmsSamlLoginUrl(KING_LMS_COURSE_SYNC_TARGET_URL);
-export const KING_LMS_ASSIGNMENT_SYNC_URL = buildKingLmsSamlLoginUrl(
-  KING_LMS_ASSIGNMENT_SYNC_TARGET_URL,
-);

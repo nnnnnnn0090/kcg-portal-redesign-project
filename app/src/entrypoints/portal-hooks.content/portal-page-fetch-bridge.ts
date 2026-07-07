@@ -5,7 +5,8 @@
  */
 
 import { devWarn } from '../../lib/debug';
-import { FETCH_HOOK, PORTAL_CP_AUTHORIZE_READY } from '../../shared/constants';
+import { FETCH_HOOK, PORTAL_CP_AUTHORIZE_READY } from '../../contract/messages';
+import { pageFetchRetryDelayMs, TIMING } from '../../contract/timing';
 import { hasPortalCpAuthorizeHeaders } from './portal-header-cache';
 
 export function installFetchBridge(): void {
@@ -19,8 +20,8 @@ export function installFetchBridge(): void {
     const headers = { ...BASE_HEADERS, ...(window.__portalCapturedApiHeaders ?? {}) };
     fetch(url, { credentials: 'include', cache: 'no-store', headers })
       .then((response) => {
-        if (response.status === 401 && attempt < 10) {
-          const delay = Math.min(100 + attempt * 200, 2200);
+        if (response.status === 401 && attempt < TIMING.pageFetchMaxAttempts) {
+          const delay = pageFetchRetryDelayMs(attempt);
           setTimeout(() => doFetch(url, attempt + 1), delay);
         }
       })
@@ -34,7 +35,7 @@ export function installFetchBridge(): void {
       doFetch(url, 0);
       return;
     }
-    const deadline = Date.now() + 15000;
+    const deadline = Date.now() + TIMING.pageFetchDeadlineMs;
     let pollTimer: ReturnType<typeof setTimeout> | null = null;
     let finished = false;
 
@@ -62,7 +63,7 @@ export function installFetchBridge(): void {
         done();
         return;
       }
-      pollTimer = setTimeout(poll, 200);
+      pollTimer = setTimeout(poll, TIMING.pageFetchPollMs);
     }
     poll();
   }

@@ -1,5 +1,5 @@
-import type { DuePayload } from '../features/calendar';
-import type { CalEvent } from '../features/calendar/types';
+import type { DuePayload } from '../ui/calendar';
+import type { CalEvent } from '../ui/calendar/types';
 import { addDaysIso, toIsoLocal } from '../lib/date';
 import type { NewsListItem } from './types';
 

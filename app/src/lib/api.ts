@@ -3,11 +3,12 @@
  * 再取得は `postMessage` で `portal-hooks`（MAIN）側のブリッジへ依頼します。
  */
 
-import { FETCH_HOOK } from '../shared/constants';
 import { PORTAL_API } from './api-paths';
-import type { CalParams } from '../features/calendar/types';
+import type { CalParams } from '../ui/calendar/types';
 
 export type { CalParams };
+
+export { pageFetch } from '../services/page-fetch';
 
 // ─── URL ビルダー ─────────────────────────────────────────────────────────
 
@@ -78,13 +79,6 @@ export const urls = {
   questionnaireInfo: () =>
     new URL(`/portal/api/${PORTAL_API.questionnaireInfo}`, location.origin).href,
 };
-
-// ─── pageFetch ────────────────────────────────────────────────────────────
-
-/** pageFetch 用 postMessage（portal-hooks のブリッジが処理） */
-export function pageFetch(url: string): void {
-  window.postMessage({ type: FETCH_HOOK.pageFetch, url: String(url) }, '*');
-}
 
 // ─── カレンダー URL パース ─────────────────────────────────────────────────
 

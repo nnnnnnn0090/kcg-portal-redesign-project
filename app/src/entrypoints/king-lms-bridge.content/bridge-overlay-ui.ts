@@ -4,7 +4,7 @@
 
 import { isLoginRedirectPage } from './bridge-urls';
 import { messagesForLanguage, type AppLanguage } from '../../i18n/messages';
-import { upsertRuntimeCss } from '../../themes/runtime-style';
+import { upsertRuntimeCss } from '../../platform/runtime-css';
 
 const OVERLAY_ID    = 'kcg-portal-ext-sync-overlay';
 const LOGIN_HINT_ID = 'kcg-portal-ext-login-hint';

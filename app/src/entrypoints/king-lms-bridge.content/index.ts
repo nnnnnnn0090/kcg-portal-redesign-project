@@ -3,7 +3,7 @@
  * `king-lms-hooks` が同一ページの MAIN ワールドでフックした結果を `postMessage` 経由で受け、ストレージとリダイレクトを扱います。
  */
 
-import { KING_LMS_ORIGIN } from '../../shared/constants';
+import { KING_LMS_ORIGIN } from '../../contract/origins';
 import { isLoginRedirectPage, isSamlLoginPage } from './bridge-urls';
 import { cancelPendingForLoginRedirect, maybeShowOverlayFromStorage } from './bridge-storage-sync';
 import { installMessageListener } from './bridge-message-listener';
