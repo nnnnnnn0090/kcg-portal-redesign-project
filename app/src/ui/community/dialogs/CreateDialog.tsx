@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
-import { activeTagPattern, COMMUNITY_INPUT_LIMITS } from '../constants';
+import { activeTagPattern, COMMUNITY_INPUT_LIMITS, COMMUNITY_TAG_NEW_CLASS, COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS } from '../constants';
 import type { CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
 import { Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
@@ -380,14 +380,14 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                     setActiveTagIndex(
                       (index) => (index - 1 + matchingTags.length) % matchingTags.length,
                     );
-                  } else if (event.key === 'Enter') {
+                  } else if (event.key === 'Enter' || (event.key === 'Tab' && !event.shiftKey)) {
                     event.preventDefault();
                     insertTag(matchingTags[activeTagIndex] ?? matchingTags[0]);
                   }
                 }}
                 onKeyUp={(event) => {
                   if (event.key === 'Escape') setTagSearch(null);
-                  else if (!['ArrowDown', 'ArrowUp', 'Enter'].includes(event.key))
+                  else if (!['ArrowDown', 'ArrowUp', 'Enter', 'Tab'].includes(event.key))
                     updateTagSearch(event.currentTarget.value, event.currentTarget.selectionStart);
                 }}
                 required
@@ -395,15 +395,13 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
             </Field>
             {tagSearch !== null ? (
               <div
-                className={
-                  'community-tag-suggestions tw-absolute tw-inset-x-0 tw-top-[calc(100%+8px)] tw-z-[3] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card [&.is-profile-tags]:tw-static [&.is-profile-tags]:tw-mt-[-8px] [&_header]:tw-flex [&_header]:tw-justify-between [&_header]:tw-gap-2 [&_header]:tw-border-b [&_header]:tw-border-community-border [&_header]:tw-px-3 [&_header]:tw-py-2 [&_header]:tw-text-xs [&_header]:tw-text-community-muted [&_button]:tw-flex [&_button]:tw-min-h-10 [&_button]:tw-w-full [&_button]:tw-items-center [&_button]:tw-gap-2 [&_button]:tw-border-0 [&_button]:tw-bg-transparent [&_button]:tw-px-3 [&_button]:tw-text-left [&_button]:tw-text-sm [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-accent-bg [&_button.is-active]:tw-bg-community-accent-bg [&_b]:tw-text-community-accent-light'
-                }
+                className={COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS}
                 role="listbox"
                 aria-label={ja ? 'タグ候補' : 'Tag suggestions'}
               >
                 <header>
                   <span>{ja ? 'タグ候補' : 'Suggested tags'}</span>
-                  <small>{ja ? '選択して本文に追加' : 'Select to insert'}</small>
+                  <small>{ja ? 'Enter / Tab で追加' : 'Enter or Tab to insert'}</small>
                 </header>
                 {matchingTags.length ? (
                   matchingTags.map((item, index) => (
@@ -422,16 +420,12 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                     </button>
                   ))
                 ) : tagSearch ? (
-                  <div
-                    className={'community-tag-new tw-p-3 tw-text-[13px] tw-text-community-muted'}
-                  >
+                  <div className={COMMUNITY_TAG_NEW_CLASS}>
                     <b>#{tagSearch}</b>
                     <span>{ja ? '新しいタグとして投稿できます' : 'This will be a new tag'}</span>
                   </div>
                 ) : (
-                  <div
-                    className={'community-tag-new tw-p-3 tw-text-[13px] tw-text-community-muted'}
-                  >
+                  <div className={COMMUNITY_TAG_NEW_CLASS}>
                     <span>
                       {ja
                         ? '文字を続けて入力すると新しいタグを作れます'

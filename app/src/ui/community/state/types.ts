@@ -67,6 +67,7 @@ export type CommunityAction =
   | { type: 'patchPost'; postId: string; value: Partial<CommunityPost> }
   | { type: 'restorePost'; post: CommunityPost }
   | { type: 'removePost'; postId: string }
+  | { type: 'prependPost'; post: CommunityPost }
   | { type: 'resetSession' };
 
 export type CommunityStateDispatch = Dispatch<CommunityAction>;

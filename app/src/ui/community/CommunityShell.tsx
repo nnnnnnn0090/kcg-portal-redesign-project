@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { ALL_TAG } from './constants';
 import { collectTags, filterPosts } from './utils';
-import { Busy } from './components/FormUi';
 import { Glyph } from './components/Glyph';
 import { MobileNav, Sidebar } from './components/Navigation';
 import { ModalLayer } from './dialogs/ModalLayer';
@@ -33,7 +32,6 @@ export function CommunityShell() {
     query,
     tag,
     loading,
-    refreshing,
     busy,
     error,
     postImages,
@@ -59,7 +57,6 @@ export function CommunityShell() {
     toggleBookmark,
     recordImpression,
     toggleFollow,
-    refreshCurrentPage,
     openLikes,
     openProfileEditor,
     closeModal,
@@ -164,20 +161,6 @@ export function CommunityShell() {
               <strong>{pageTitle}</strong>
               <small>CAMPUS COMMUNITY</small>
             </div>
-            <button
-              className={cn(
-                'community-refresh tw-inline-flex tw-h-10 tw-min-w-10 tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light disabled:tw-cursor-wait disabled:tw-opacity-60 max-[620px]:tw-w-10 max-[620px]:tw-px-0 max-[620px]:[&>span]:tw-hidden [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current',
-                refreshing && 'is-refreshing',
-              )}
-              type="button"
-              onClick={() => void refreshCurrentPage()}
-              disabled={refreshing}
-              aria-label={ja ? '画面を更新' : 'Refresh'}
-              title={ja ? '更新' : 'Refresh'}
-            >
-              {refreshing ? <Busy /> : <Glyph name="refresh" />}
-              <span>{refreshing ? (ja ? '更新中' : 'Refreshing') : ja ? '更新' : 'Refresh'}</span>
-            </button>
             {!user ? (
               <div
                 className={

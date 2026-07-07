@@ -22,6 +22,7 @@ import { communityReducer, createCommunityState } from './reducer';
 import type { CommunityActions, CommunityState, CommunityStateDispatch } from './types';
 import { useCommunityImageInputs } from './useCommunityImageInputs';
 import { useCommunityLoaders } from './useCommunityLoaders';
+import { useCommunityTimelineStream } from './useCommunityTimelineStream';
 import { useObjectUrlRegistry } from './useObjectUrlRegistry';
 
 const CommunityStateContext = createContext<CommunityState | null>(null);
@@ -129,6 +130,16 @@ export function CommunityProvider({
     setLoading,
     setError,
   });
+  useCommunityTimelineStream({
+    token,
+    page,
+    query,
+    tag,
+    dispatch,
+    loadNotifications,
+    loadFollowing,
+    setKnownTags,
+  });
   const recordedImpressions = useRef<Set<string>>(new Set());
   const closeTimer = useRef<number | null>(null);
 
@@ -221,15 +232,6 @@ export function CommunityProvider({
   }, [page, query, setSearchUsers, token]);
 
   useEffect(() => {
-    if (!token) return;
-    const timer = window.setInterval(
-      () => void loadNotifications(token),
-      COMMUNITY_TIMING.notificationPollMs,
-    );
-    return () => window.clearInterval(timer);
-  }, [loadNotifications, token]);
-
-  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       if (modal.kind !== 'none' && !busy) setModal({ kind: 'none' });
@@ -262,7 +264,6 @@ export function CommunityProvider({
       return;
     }
     setPage(next);
-    if (next === 'home' || next === 'explore') void loadFeed(token || undefined, true);
     if (next === 'profile' && user) {
       setProfileUser(user);
       setProfilePosts(ownPosts);
@@ -616,32 +617,27 @@ export function CommunityProvider({
     setRefreshing(true);
     setError('');
     try {
-      const refreshData = async () => {
-        if (page === 'following' && token) {
-          await loadFollowing(token);
-        } else if (page === 'bookmarks' && token) {
-          await loadBookmarks(token);
-        } else if (page === 'notifications' && token) {
-          await loadNotifications(token);
-        } else if (page === 'profile' && profileUser) {
-          if (
-            user &&
-            profileUser.loginId.toLocaleLowerCase() === user.loginId.toLocaleLowerCase()
-          ) {
-            await refreshOwnProfile(profileUser.loginId, token);
-          } else {
-            await openProfile(profileUser.loginId);
-          }
+      if (page === 'following' && token) {
+        await loadFollowing(token);
+      } else if (page === 'bookmarks' && token) {
+        await loadBookmarks(token);
+      } else if (page === 'notifications' && token) {
+        await loadNotifications(token);
+      } else if (page === 'profile' && profileUser) {
+        if (
+          user &&
+          profileUser.loginId.toLocaleLowerCase() === user.loginId.toLocaleLowerCase()
+        ) {
+          await refreshOwnProfile(profileUser.loginId, token);
         } else {
-          await loadFeed(token || undefined, true);
+          await openProfile(profileUser.loginId);
         }
-      };
-      await Promise.all([
-        refreshData(),
-        new Promise<void>((resolve) =>
-          window.setTimeout(resolve, COMMUNITY_TIMING.refreshMinimumBusyMs),
-        ),
-      ]);
+      } else {
+        await loadFeed(token || undefined, true);
+      }
+      await new Promise<void>((resolve) =>
+        window.setTimeout(resolve, COMMUNITY_TIMING.refreshMinimumBusyMs),
+      );
     } catch (cause) {
       setError(
         cause instanceof Error

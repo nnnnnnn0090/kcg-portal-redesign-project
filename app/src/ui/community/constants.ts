@@ -20,6 +20,12 @@ export const COMMUNITY_INPUT_LIMITS = {
 export const TAG_CHARS = 'A-Za-z0-9_\\-\\u3040-\\u30ff\\u3400-\\u9fff\\uac00-\\ud7af';
 export const activeTagPattern = new RegExp(`(?:^|\\s)[#＃]([${TAG_CHARS}]*)$`, 'u');
 
+export const COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS =
+  'community-tag-suggestions tw-absolute tw-inset-x-0 tw-top-[calc(100%+8px)] tw-z-10 tw-isolate tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-shadow-community-card [&.is-profile-tags]:tw-static [&.is-profile-tags]:tw-mt-[-8px] [&_header]:tw-flex [&_header]:tw-justify-between [&_header]:tw-gap-2 [&_header]:tw-border-b [&_header]:tw-border-community-border [&_header]:tw-bg-community-bg3 [&_header]:tw-px-3 [&_header]:tw-py-2 [&_header]:tw-text-xs [&_header]:tw-text-community-muted [&_button]:tw-flex [&_button]:tw-min-h-10 [&_button]:tw-w-full [&_button]:tw-items-center [&_button]:tw-gap-2 [&_button]:tw-border-0 [&_button]:tw-bg-community-bg3 [&_button]:tw-px-3 [&_button]:tw-text-left [&_button]:tw-text-sm [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer hover:[&_button]:tw-bg-community-bg2 [&_button.is-active]:tw-bg-community-bg2 [&_b]:tw-text-community-accent-light';
+
+export const COMMUNITY_TAG_NEW_CLASS =
+  'community-tag-new tw-bg-community-bg3 tw-p-3 tw-text-[13px] tw-text-community-muted';
+
 export const ACADEMIC_GROUPS: Record<string, string[]> = {
   'アート・デザイン学系': [
     '芸術情報学科',

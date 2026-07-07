@@ -89,6 +89,14 @@ export function communityReducer(state: CommunityState, action: CommunityAction)
         followingPosts: removePostFromList(state.followingPosts, action.postId),
         bookmarkedPosts: removePostFromList(state.bookmarkedPosts, action.postId),
       };
+    case 'prependPost': {
+      const exists = state.posts.some((post) => post.id === action.post.id);
+      const nextPosts = exists
+        ? updatePostList(state.posts, action.post.id, action.post)
+        : [action.post, ...state.posts].slice(0, 30);
+      const next = updatePostEverywhere(state, action.post.id, action.post);
+      return { ...next, posts: nextPosts };
+    }
     case 'resetSession':
       return {
         ...state,
