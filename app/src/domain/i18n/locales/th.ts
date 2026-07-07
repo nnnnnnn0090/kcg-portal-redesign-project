@@ -95,7 +95,7 @@ export const thMessages: typeof jaMessages = {
     licenseCopyright: 'ประกาศลิขสิทธิ์',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web Mail',
     settings: 'การตั้งค่า',
     logout: 'ออกจากระบบ',
@@ -375,7 +375,7 @@ export const thMessages: typeof jaMessages = {
       {
         id: 'welcome',
         title: 'ยินดีต้อนรับ',
-        body: 'ขอบคุณที่ติดตั้ง KCG Portal Redesign Project\n\nคู่มือสั้นนี้แนะนำฟีเจอร์ที่คุณใช้บ่อยที่สุด',
+        body: 'ขอบคุณที่ติดตั้ง KCGLMS+\n\nคู่มือสั้นนี้แนะนำฟีเจอร์ที่คุณใช้บ่อยที่สุด',
       },
       {
         id: 'navigation',

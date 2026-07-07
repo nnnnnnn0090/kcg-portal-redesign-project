@@ -35,6 +35,7 @@ export function ModalLayer(props: ModalLayerProps) {
           onDelete={
             props.canDeletePost(modal.post) ? () => props.requestDelete(modal.post) : undefined
           }
+          onDeleteComment={(comment) => props.requestDeleteComment(modal.post, comment)}
           onTagClick={props.openTag}
           onAuthorClick={() => props.openProfile(modal.post.authorLoginId)}
           onCommentAuthorClick={props.openProfile}
@@ -60,6 +61,20 @@ export function ModalLayer(props: ModalLayerProps) {
           error={error}
           close={close}
           confirm={() => props.removePost(modal.post)}
+          detail={modal.post.caption}
+          detailLabel={{ ja: '投稿', en: 'Post' }}
+        />
+      ) : null}
+      {modal.kind === 'deleteComment' ? (
+        <ConfirmDialog
+          ja={ja}
+          busy={busy}
+          error={error}
+          close={() => props.backToPost(modal.post)}
+          confirm={() => props.removeComment(modal.post, modal.comment)}
+          title={{ ja: 'コメントを削除しますか？', en: 'Delete this comment?' }}
+          detail={modal.comment.content}
+          detailLabel={{ ja: 'コメント', en: 'Comment' }}
         />
       ) : null}
       {modal.kind === 'sent' ? <SentDialog ja={ja} close={close} /> : null}

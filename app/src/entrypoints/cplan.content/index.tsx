@@ -5,6 +5,7 @@ import { CPLAN_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
 import { TIMING } from '../../contract/timing';
 import { readCplanSnapshot } from '../../domain/cplan/snapshot';
 import { appendPortalOverlayShell, removePortalBackdrop, syncCplanSurfaceRuntime } from '../../domain/themes';
+import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
 import { storageRepo } from '../../platform/storage/repo';
 
 async function waitForCplanSnapshot() {
@@ -22,6 +23,10 @@ export default defineContentScript({
   main() {
     void (async () => {
       try {
+        if (!(await ensureExtensionOperationallyEnabled())) {
+          removePortalBackdrop();
+          return;
+        }
         const enabled = await storageRepo.getCplanOverlay();
         if (!enabled) {
           document.documentElement.dataset.cplanOverlayDisabled = 'true';

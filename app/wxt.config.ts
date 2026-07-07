@@ -23,7 +23,7 @@ export default defineConfig({
   manifestVersion: 3,
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    name: 'KCG Portal Redesign Project',
+    name: 'KCGLMS+',
     version,
     description:
       '京都コンピュータ学院の学生ポータルを見やすく再設計し、さまざまな便利機能を追加する非公式拡張機能です。',

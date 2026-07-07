@@ -95,7 +95,7 @@ export const zhTWMessages: typeof jaMessages = {
     licenseCopyright: '著作權聲明',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web 郵件',
     settings: '設定',
     logout: '登出',
@@ -367,7 +367,7 @@ export const zhTWMessages: typeof jaMessages = {
       {
         id: 'welcome',
         title: '歡迎',
-        body: '感謝您安裝 KCG Portal Redesign Project。\n\n本指南將簡要介紹您最常用的功能。',
+        body: '感謝您安裝 KCGLMS+。\n\n本指南將簡要介紹您最常用的功能。',
       },
       {
         id: 'navigation',

@@ -96,7 +96,7 @@ export const koMessages: typeof jaMessages = {
     licenseCopyright: '저작권 표시',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web 메일',
     settings: '설정',
     logout: '로그아웃',
@@ -371,7 +371,7 @@ export const koMessages: typeof jaMessages = {
       {
         id: 'welcome',
         title: '환영합니다',
-        body: 'KCG Portal Redesign Project를 설치해 주셔서 감사합니다.\n\n자주 사용하는 기능을 간단히 안내합니다.',
+        body: 'KCGLMS+를 설치해 주셔서 감사합니다.\n\n자주 사용하는 기능을 간단히 안내합니다.',
       },
       {
         id: 'navigation',

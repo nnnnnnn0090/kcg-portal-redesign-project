@@ -54,6 +54,7 @@ export function CommunityShell() {
     submitPost,
     saveProfile,
     removePost,
+    removeComment,
     toggleLike,
     toggleBookmark,
     recordImpression,
@@ -344,7 +345,11 @@ export function CommunityShell() {
           avatarImage={avatarImage}
           headerImage={headerImage}
           suggestedTags={tags.filter((item) => item !== ALL_TAG)}
-          close={closeModal}
+          close={
+            modal.kind === 'deleteComment'
+              ? () => setModal({ kind: 'post', post: modal.post })
+              : closeModal
+          }
           toggleLike={(post) => void toggleLike(post)}
           toggleBookmark={(post) => void toggleBookmark(post)}
           setAuthMode={setAuthMode}
@@ -352,7 +357,12 @@ export function CommunityShell() {
           submitPost={submitPost}
           saveProfile={saveProfile}
           removePost={removePost}
+          removeComment={removeComment}
           requestDelete={(post) => setModal({ kind: 'delete', post })}
+          requestDeleteComment={(post, comment) =>
+            setModal({ kind: 'deleteComment', post, comment })
+          }
+          backToPost={(post) => setModal({ kind: 'post', post })}
           openLikes={openLikes}
           canDeletePost={canDeletePost}
           openTag={openTag}

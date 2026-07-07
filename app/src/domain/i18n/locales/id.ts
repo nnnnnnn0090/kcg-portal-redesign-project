@@ -96,7 +96,7 @@ export const idMessages: typeof jaMessages = {
     licenseCopyright: 'Pemberitahuan hak cipta',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web Mail',
     settings: 'Pengaturan',
     logout: 'Keluar',
@@ -379,7 +379,7 @@ export const idMessages: typeof jaMessages = {
       {
         id: 'welcome',
         title: 'Selamat datang',
-        body: 'Terima kasih telah menginstal KCG Portal Redesign Project.\n\nPanduan singkat ini menyoroti fitur yang paling sering Anda gunakan.',
+        body: 'Terima kasih telah menginstal KCGLMS+.\n\nPanduan singkat ini menyoroti fitur yang paling sering Anda gunakan.',
       },
       {
         id: 'navigation',

@@ -3,6 +3,7 @@
  */
 
 import { PORTAL_CONTENT_SCRIPT_MATCHES } from '../../contract/origins';
+import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
 import { applyPortalEarlyBootCover } from '../../services/boot-cover';
 
 export default defineContentScript({
@@ -10,6 +11,9 @@ export default defineContentScript({
   runAt: 'document_start',
 
   main() {
-    applyPortalEarlyBootCover();
+    void (async () => {
+      if (!(await ensureExtensionOperationallyEnabled())) return;
+      applyPortalEarlyBootCover();
+    })();
   },
 });

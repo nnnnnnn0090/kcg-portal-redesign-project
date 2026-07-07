@@ -96,7 +96,7 @@ export const viMessages: typeof jaMessages = {
     licenseCopyright: 'Thông báo bản quyền',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web Mail',
     settings: 'Cài đặt',
     logout: 'Đăng xuất',
@@ -377,7 +377,7 @@ export const viMessages: typeof jaMessages = {
       {
         id: 'welcome',
         title: 'Chào mừng',
-        body: 'Cảm ơn bạn đã cài đặt KCG Portal Redesign Project.\n\nHướng dẫn ngắn này giới thiệu các tính năng bạn dùng thường xuyên nhất.',
+        body: 'Cảm ơn bạn đã cài đặt KCGLMS+.\n\nHướng dẫn ngắn này giới thiệu các tính năng bạn dùng thường xuyên nhất.',
       },
       {
         id: 'navigation',

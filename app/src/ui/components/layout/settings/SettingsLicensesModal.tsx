@@ -15,7 +15,7 @@ interface ThirdPartyLicense {
 
 const THIRD_PARTY_LICENSES: ThirdPartyLicense[] = [
   {
-    name: 'KCG Portal Redesign Project',
+    name: 'KCGLMS+',
     license: 'MIT',
     copyright: 'Copyright (c) 2026 nnnnnnn0090',
     url: 'https://github.com/nnnnnnn0090/kcg-portal-redesign-project/blob/main/LICENSE',

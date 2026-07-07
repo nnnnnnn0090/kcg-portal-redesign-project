@@ -17,6 +17,7 @@ export function PostDialog({
   toggleBookmark,
   openLikes,
   onDelete,
+  onDeleteComment,
   onTagClick,
   onAuthorClick,
   onCommentAuthorClick,
@@ -30,6 +31,7 @@ export function PostDialog({
   toggleBookmark: (post: CommunityPost) => void;
   openLikes: () => void;
   onDelete?: () => void;
+  onDeleteComment?: (comment: CommunityComment) => void;
   onTagClick: (tag: string) => void;
   onAuthorClick?: () => void;
   onCommentAuthorClick: (loginId: string) => void;
@@ -54,8 +56,6 @@ export function PostDialog({
   const [reportReason, setReportReason] = useState('');
   const [likeCelebrating, setLikeCelebrating] = useState(false);
   const [bookmarkCelebrating, setBookmarkCelebrating] = useState(false);
-  const [pendingDeleteComment, setPendingDeleteComment] = useState<CommunityComment | null>(null);
-  const [deletingCommentId, setDeletingCommentId] = useState('');
   useEffect(() => {
     let active = true;
     setCommentsLoading(true);
@@ -103,27 +103,6 @@ export function PostDialog({
       );
     } finally {
       setCommentBusy(false);
-    }
-  };
-  const deleteComment = async () => {
-    const comment = pendingDeleteComment;
-    if (!token || !comment || deletingCommentId) return;
-    setDeletingCommentId(comment.id);
-    setCommentError('');
-    try {
-      await communityApi.deleteComment(token, post.id, comment.id);
-      setComments((current) => current.filter((item) => item.id !== comment.id));
-      setPendingDeleteComment(null);
-    } catch (deleteError) {
-      setCommentError(
-        deleteError instanceof Error
-          ? deleteError.message
-          : ja
-            ? '削除できませんでした。'
-            : 'Could not delete comment.',
-      );
-    } finally {
-      setDeletingCommentId('');
     }
   };
   const submitReport = async (event: FormEvent) => {
@@ -449,37 +428,6 @@ export function PostDialog({
             <strong>{ja ? 'コメント' : 'Comments'}</strong>
             <span>{comments.length}</span>
           </div>
-          {pendingDeleteComment ? (
-            <div
-              className={
-                'community-comment-delete-confirm tw-mb-4 tw-grid tw-gap-3 tw-rounded-xl tw-border tw-border-community-danger/50 tw-bg-community-danger/10 tw-p-3 [&_strong]:tw-text-sm [&_strong]:tw-text-community-danger [&_p]:tw-m-0 [&_p]:tw-text-[13px] [&_p]:tw-text-community-text [&_footer]:tw-flex [&_footer]:tw-justify-end [&_footer]:tw-gap-2 [&_button]:tw-inline-flex [&_button]:tw-min-h-9 [&_button]:tw-items-center [&_button]:tw-justify-center [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-px-3 [&_button]:tw-text-[13px] [&_button]:tw-font-bold [&_button]:tw-cursor-pointer [&_button:disabled]:tw-cursor-wait [&_button:disabled]:tw-opacity-60'
-              }
-            >
-              <strong>{ja ? 'コメントを削除しますか？' : 'Delete this comment?'}</strong>
-              <p>{ja ? 'この操作は取り消せません。' : 'This action cannot be undone.'}</p>
-              <footer>
-                <button
-                  className={
-                    'tw-border-community-border tw-bg-community-bg3 tw-text-community-text'
-                  }
-                  type="button"
-                  disabled={Boolean(deletingCommentId)}
-                  onClick={() => setPendingDeleteComment(null)}
-                >
-                  {ja ? 'キャンセル' : 'Cancel'}
-                </button>
-                <button
-                  className={'tw-border-community-danger tw-bg-community-danger tw-text-white'}
-                  type="button"
-                  disabled={Boolean(deletingCommentId)}
-                  onClick={() => void deleteComment()}
-                >
-                  {deletingCommentId ? <Busy /> : null}
-                  {ja ? '削除' : 'Delete'}
-                </button>
-              </footer>
-            </div>
-          ) : null}
           <div
             className={
               'community-comment-list tw-grid tw-gap-3 [&>p]:tw-m-0 [&>p]:tw-text-[13px] [&>p]:tw-text-community-muted'
@@ -546,7 +494,7 @@ export function PostDialog({
                           <button
                             className="tw-inline-flex tw-items-center tw-border-0 tw-bg-transparent tw-p-0 tw-text-xs tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-text-community-bright"
                             type="button"
-                            onClick={() => setPendingDeleteComment(comment)}
+                            onClick={() => onDeleteComment?.(comment)}
                           >
                             {ja ? '削除' : 'Delete'}
                           </button>

@@ -96,7 +96,7 @@ export const enMessages: typeof jaMessages = {
     licenseCopyright: 'Copyright notice',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web Mail',
     settings: 'Settings',
     logout: 'Log out',

@@ -17,7 +17,7 @@ import { setCommunityApiOrigin, setCommunityRequestLoginId } from '../api/runtim
 import { SOCIAL_PLATFORMS } from '../constants';
 import { formString, optionalFormString } from '../forms/formData';
 import { COMMUNITY_TIMING } from '../timing';
-import type { CommunityPage, CommunityPost, CommunityUser } from '../types';
+import type { CommunityComment, CommunityPage, CommunityPost, CommunityUser } from '../types';
 import { communityReducer, createCommunityState } from './reducer';
 import type { CommunityActions, CommunityState, CommunityStateDispatch } from './types';
 import { useCommunityImageInputs } from './useCommunityImageInputs';
@@ -480,6 +480,19 @@ export function CommunityProvider({
     }
   };
 
+  const removeComment = async (post: CommunityPost, comment: CommunityComment) => {
+    setBusy(true);
+    setError('');
+    try {
+      await communityApi.deleteComment(token, post.id, comment.id);
+      setModal({ kind: 'post', post });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not delete comment');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const toggleLike = async (post: CommunityPost) => {
     if (!token) {
       setModal({ kind: 'auth', mode: 'login' });
@@ -671,6 +684,7 @@ export function CommunityProvider({
     submitPost,
     saveProfile,
     removePost,
+    removeComment,
     toggleLike,
     toggleBookmark,
     recordImpression,

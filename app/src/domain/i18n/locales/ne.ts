@@ -95,7 +95,7 @@ export const neMessages: typeof jaMessages = {
     licenseCopyright: 'प्रतिलिपि अधिकार सूचना',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web मेल',
     settings: 'सेटिङ',
     logout: 'लगआउट',
@@ -376,7 +376,7 @@ export const neMessages: typeof jaMessages = {
       {
         id: 'welcome',
         title: 'स्वागत छ',
-        body: 'KCG Portal Redesign Project स्थापना गर्नुभएकोमा धन्यवाद।\n\nयो छोटो मार्गदर्शनले तपाईंले धेरै प्रयोग गर्ने सुविधाहरू देखाउँछ।',
+        body: 'KCGLMS+ स्थापना गर्नुभएकोमा धन्यवाद।\n\nयो छोटो मार्गदर्शनले तपाईंले धेरै प्रयोग गर्ने सुविधाहरू देखाउँछ।',
       },
       {
         id: 'navigation',

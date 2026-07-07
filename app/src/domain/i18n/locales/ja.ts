@@ -93,7 +93,7 @@ export const jaMessages = {
     licenseCopyright: '著作権表示',
   },
   header: {
-    portal: 'Portal RE',
+    portal: 'KCGLMS+',
     webMail: 'Web メール',
     settings: '設定',
     logout: 'ログアウト',

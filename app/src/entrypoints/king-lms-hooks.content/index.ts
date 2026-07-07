@@ -4,6 +4,7 @@
  */
 
 import { KING_LMS_ORIGIN } from '../../contract/origins';
+import { ensureExtensionOperationallyEnabled } from '../../services/extension-runtime';
 import { installKingLmsHook } from '../../services/king-lms-hooks';
 
 export default defineContentScript({
@@ -12,6 +13,9 @@ export default defineContentScript({
   world: 'MAIN',
 
   main() {
-    installKingLmsHook();
+    void (async () => {
+      if (!(await ensureExtensionOperationallyEnabled())) return;
+      installKingLmsHook();
+    })();
   },
 });

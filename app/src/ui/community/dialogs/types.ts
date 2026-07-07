@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import type { CommunityPost, CommunityUser } from '../types';
+import type { CommunityComment, CommunityPost, CommunityUser } from '../types';
 import type { CommunityModal } from '../state/types';
 
 export interface ModalLayerProps {
@@ -20,7 +20,10 @@ export interface ModalLayerProps {
   submitPost: (event: FormEvent<HTMLFormElement>) => void;
   saveProfile: (event: FormEvent<HTMLFormElement>) => void;
   removePost: (post: CommunityPost) => void;
+  removeComment: (post: CommunityPost, comment: CommunityComment) => void;
   requestDelete: (post: CommunityPost) => void;
+  requestDeleteComment: (post: CommunityPost, comment: CommunityComment) => void;
+  backToPost: (post: CommunityPost) => void;
   openLikes: (post: CommunityPost) => void;
   canDeletePost: (post: CommunityPost) => boolean;
   openTag: (tag: string) => void;

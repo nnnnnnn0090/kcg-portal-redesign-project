@@ -1,4 +1,4 @@
-# KCG Portal Redesign Project
+# KCGLMS+
 
 京都コンピュータ学院（KCG）の学生向けポータル（`https://home.kcg.ac.jp`）向けの**非公式**ブラウザ拡張です。公式ページの表示を読みやすい UI に差し替えます。
 

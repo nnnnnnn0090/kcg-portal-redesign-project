@@ -1,5 +1,11 @@
 import type { Dispatch, FormEvent, SetStateAction } from 'react';
-import type { CommunityNotification, CommunityPage, CommunityPost, CommunityUser } from '../types';
+import type {
+  CommunityComment,
+  CommunityNotification,
+  CommunityPage,
+  CommunityPost,
+  CommunityUser,
+} from '../types';
 
 export type CommunityModal =
   | { kind: 'none' }
@@ -8,6 +14,7 @@ export type CommunityModal =
   | { kind: 'post'; post: CommunityPost }
   | { kind: 'profile' }
   | { kind: 'delete'; post: CommunityPost }
+  | { kind: 'deleteComment'; post: CommunityPost; comment: CommunityComment }
   | { kind: 'likes'; post: CommunityPost; users: CommunityUser[]; loading: boolean }
   | {
       kind: 'connections';
@@ -77,6 +84,7 @@ export interface CommunityActions {
   submitPost: (event: FormEvent<HTMLFormElement>) => Promise<void>;
   saveProfile: (event: FormEvent<HTMLFormElement>) => Promise<void>;
   removePost: (post: CommunityPost) => Promise<void>;
+  removeComment: (post: CommunityPost, comment: CommunityComment) => Promise<void>;
   toggleLike: (post: CommunityPost) => Promise<void>;
   toggleBookmark: (post: CommunityPost) => Promise<void>;
   recordImpression: (post: CommunityPost) => void;
