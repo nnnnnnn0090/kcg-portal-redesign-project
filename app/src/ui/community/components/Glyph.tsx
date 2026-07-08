@@ -6,6 +6,7 @@ export function Glyph({
     | 'search'
     | 'plus'
     | 'user'
+    | 'users'
     | 'close'
     | 'image'
     | 'heart'
@@ -14,7 +15,11 @@ export function Glyph({
     | 'impression'
     | 'refresh'
     | 'bell'
-    | 'settings';
+    | 'settings'
+    | 'school'
+    | 'tag'
+    | 'link'
+    | 'clock';
 }) {
   const paths = {
     home: (
@@ -34,6 +39,14 @@ export function Glyph({
       <>
         <circle cx="12" cy="8" r="4" />
         <path d="M5 21c.5-4.2 2.8-6.3 7-6.3s6.5 2.1 7 6.3" />
+      </>
+    ),
+    users: (
+      <>
+        <circle cx="9" cy="8" r="3.2" />
+        <path d="M3.5 20c.4-3.4 2.3-5.1 5.5-5.1" />
+        <circle cx="16.2" cy="9" r="2.6" />
+        <path d="M12.4 20c.35-2.7 1.7-4.1 3.8-4.1 2.3 0 3.9 1.5 4.3 4.1" />
       </>
     ),
     close: <path d="M6 6l12 12M18 6 6 18" />,
@@ -77,6 +90,31 @@ export function Glyph({
       <>
         <circle cx="12" cy="12" r="3" />
         <path d="M4 12a8 8 0 0 1 .4-2.5l-1.7-1.3 2-3.4 2.1.7A8 8 0 0 1 9.5 4.4L10 2.5h4l.5 1.9a8 8 0 0 1 2.7 1.1l2.1-.7 2 3.4-1.7 1.3a8 8 0 0 1 0 5l1.7 1.3-2 3.4-2.1-.7a8 8 0 0 1-2.7 1.1L14 21.5h-4l-.5-1.9a8 8 0 0 1-2.7-1.1l-2.1.7-2-3.4 1.7-1.3A8 8 0 0 1 4 12Z" />
+      </>
+    ),
+    school: (
+      <>
+        <path d="m3 10 9-5 9 5-9 5-9-5Z" />
+        <path d="M7 12.2V17c0 .8 2.2 2.2 5 2.2s5-1.4 5-2.2v-4.8" />
+        <path d="M21 10v6.5" />
+      </>
+    ),
+    tag: (
+      <>
+        <path d="M3.5 12.5V4.8A1.3 1.3 0 0 1 4.8 3.5h7.7L20.5 11.5l-7.8 7.8Z" />
+        <circle cx="8" cy="8" r="1.2" />
+      </>
+    ),
+    link: (
+      <>
+        <path d="M10 13.5a4 4 0 0 0 6 0l2.5-2.5a4 4 0 0 0-5.7-5.7L11.5 6.5" />
+        <path d="M14 10.5a4 4 0 0 0-6 0L5.5 13a4 4 0 0 0 5.7 5.7l1.3-1.2" />
+      </>
+    ),
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7.5V12l3 2" />
       </>
     ),
   };

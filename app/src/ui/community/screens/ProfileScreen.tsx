@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Avatar } from '../components/Avatar';
-import { VerifiedBadge } from '../components/VerifiedBadge';
 import { Empty } from '../components/Empty';
+import { Glyph } from '../components/Glyph';
 import { PostCard } from '../components/PostCard';
 import { SocialIcon } from '../components/SocialIcon';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import type { CommunityPost, CommunityUser } from '../types';
 import { socialEntries, websiteLabel } from '../utils';
 import { cn } from '../../../lib/cn';
@@ -151,128 +152,133 @@ export function ProfileScreen({
           </div>
           <div
             className={
-              'community-profile-body tw-grid tw-grid-cols-[minmax(0,1fr)_250px] tw-items-stretch tw-gap-4 tw-px-6 tw-pb-6 max-[760px]:tw-grid-cols-1 max-[620px]:tw-px-4'
+              'community-profile-body tw-grid tw-grid-cols-[minmax(0,1fr)_auto] tw-items-start tw-gap-4 tw-border-t tw-border-community-border tw-px-6 tw-pb-5 tw-pt-4 max-[760px]:tw-grid-cols-1 max-[620px]:tw-px-4'
             }
           >
-            <div
-              className={
-                'community-profile-details tw-grid tw-content-start tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg3)_38%,transparent)] [&>section]:tw-max-w-none [&>section]:tw-border-0 [&>section]:tw-border-b [&>section]:tw-border-community-border-light [&>section]:tw-bg-transparent [&>section]:tw-px-4 [&>section]:tw-py-3.5 [&>section:last-child]:tw-border-b-0'
-              }
-            >
-              <section
-                className={
-                  'community-profile-academic tw-grid tw-max-w-[640px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-center tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-min-w-0 [&>div]:tw-gap-0.5 [&_strong]:tw-break-words [&_strong]:tw-text-base [&_strong]:tw-text-community-bright [&_small]:tw-break-words [&_small]:tw-text-[13px] [&_small]:tw-text-community-accent-light'
-                }
-              >
-                <span>{ja ? '所属' : 'Program'}</span>
-                <div>
-                  {user.academicGroup && user.department ? (
-                    <>
-                      <strong>{user.academicGroup}</strong>
-                      <small>{user.department}</small>
-                    </>
-                  ) : (
-                    <small>{unsetText}</small>
-                  )}
-                </div>
+            <div className="community-profile-details tw-grid tw-min-w-0 tw-gap-3">
+              <section className="tw-grid tw-gap-1">
+                <span className="tw-inline-flex tw-items-center tw-gap-1.5 tw-text-[11px] tw-font-bold tw-tracking-[.06em] tw-text-community-muted [&_.community-glyph]:tw-h-3.5 [&_.community-glyph]:tw-w-3.5">
+                  <Glyph name="school" />
+                  {ja ? '所属' : 'Program'}
+                </span>
+                {user.academicGroup && user.department ? (
+                  <p className="tw-m-0 tw-flex tw-flex-wrap tw-items-baseline tw-gap-x-2">
+                    <strong className="tw-text-[14px] tw-font-bold tw-text-community-bright">
+                      {user.academicGroup}
+                    </strong>
+                    <span className="tw-text-[13px] tw-text-community-accent-light">
+                      {user.department}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="tw-m-0 tw-text-[13px] tw-text-community-muted">{unsetText}</p>
+                )}
               </section>
-              <section
-                className={
-                  'community-profile-tag-section tw-grid tw-max-w-[820px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-center tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted'
-                }
-              >
-                <span>{ja ? 'プロフィールタグ' : 'Profile tags'}</span>
+
+              <section className="tw-grid tw-gap-1.5 tw-border-t tw-border-community-border-light tw-pt-3">
+                <span className="tw-inline-flex tw-items-center tw-gap-1.5 tw-text-[11px] tw-font-bold tw-tracking-[.06em] tw-text-community-muted [&_.community-glyph]:tw-h-3.5 [&_.community-glyph]:tw-w-3.5">
+                  <Glyph name="tag" />
+                  {ja ? 'プロフィールタグ' : 'Profile tags'}
+                </span>
                 {profileTags.length ? (
                   <div
-                    className={
-                      'community-profile-tags tw-flex tw-flex-wrap tw-gap-[7px] [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-accent-bg [&>button]:tw-px-2.5 [&>button]:tw-py-1 [&>button]:tw-text-xs [&>button]:tw-font-bold [&>button]:tw-text-community-accent-light [&>button]:tw-cursor-pointer hover:[&>button]:tw-border-community-accent'
-                    }
+                    className="community-profile-tags tw-flex tw-flex-wrap tw-gap-1.5"
                     aria-label={ja ? 'プロフィールタグ' : 'Profile tags'}
                   >
                     {profileTags.map((tag) => (
-                      <button type="button" key={tag} onClick={() => onTagClick(tag)}>
+                      <button
+                        type="button"
+                        key={tag}
+                        onClick={() => onTagClick(tag)}
+                        className="tw-rounded-md tw-border tw-border-transparent tw-bg-community-accent-bg tw-px-2 tw-py-0.5 tw-text-[11px] tw-font-bold tw-leading-5 tw-text-community-accent-light tw-cursor-pointer tw-transition-[border-color,background-color,color] tw-duration-150 hover:tw-border-community-accent hover:tw-text-community-bright"
+                      >
                         #{tag}
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <p className={'tw-m-0 tw-text-[13px] tw-text-community-muted'}>{unsetText}</p>
+                  <p className="tw-m-0 tw-text-[13px] tw-text-community-muted">{unsetText}</p>
                 )}
               </section>
-              <section
-                className={
-                  'community-profile-link-section tw-grid tw-max-w-[820px] tw-grid-cols-[140px_minmax(0,1fr)] tw-items-start tw-gap-3 max-[620px]:tw-grid-cols-1 [&>span]:tw-pt-1 [&>span]:tw-text-[11px] [&>span]:tw-font-extrabold [&>span]:tw-tracking-[.08em] [&>span]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-min-w-0 [&>div]:tw-gap-2'
-                }
-              >
-                <span>{ja ? 'リンク' : 'Links'}</span>
-                <div>
-                  {user.websiteUrl || userSocialEntries.length ? (
-                    <>
-                      {user.websiteUrl ? (
-                        <a
-                          className={
-                            'community-profile-link tw-inline-flex tw-items-center tw-gap-1 tw-break-words tw-text-[13px] tw-text-community-accent-light tw-no-underline'
-                          }
-                          href={user.websiteUrl}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow ugc"
-                        >
-                          <span aria-hidden="true">↗</span>
-                          {websiteLabel(user.websiteUrl)}
-                        </a>
-                      ) : null}
-                      {userSocialEntries.length ? (
-                        <div
-                          className={
-                            'community-profile-socials tw-flex tw-flex-wrap tw-gap-2 [&>a]:tw-inline-flex [&>a]:tw-min-h-[34px] [&>a]:tw-items-center [&>a]:tw-gap-2 [&>a]:tw-rounded-full [&>a]:tw-border [&>a]:tw-border-community-border [&>a]:tw-bg-community-bg3 [&>a]:tw-py-0 [&>a]:tw-pl-2 [&>a]:tw-pr-3 [&>a]:tw-text-[13px] [&>a]:tw-font-bold [&>a]:tw-text-community-text [&>a]:tw-no-underline hover:[&>a]:tw-border-community-accent hover:[&>a]:tw-text-community-accent-light'
-                          }
-                          aria-label={ja ? '外部リンク' : 'Social links'}
-                        >
-                          {userSocialEntries.map((entry) => (
-                            <a
-                              key={entry.key}
-                              href={entry.url}
-                              target="_blank"
-                              rel="noopener noreferrer nofollow ugc"
-                            >
-                              <SocialIcon platform={entry.key} />
-                              <span>{entry.label}</span>
-                            </a>
-                          ))}
-                        </div>
-                      ) : null}
-                    </>
-                  ) : (
-                    <p className={'tw-m-0 tw-text-[13px] tw-text-community-muted'}>{unsetText}</p>
-                  )}
-                </div>
+
+              <section className="tw-grid tw-gap-1.5 tw-border-t tw-border-community-border-light tw-pt-3">
+                <span className="tw-inline-flex tw-items-center tw-gap-1.5 tw-text-[11px] tw-font-bold tw-tracking-[.06em] tw-text-community-muted [&_.community-glyph]:tw-h-3.5 [&_.community-glyph]:tw-w-3.5">
+                  <Glyph name="link" />
+                  {ja ? 'リンク' : 'Links'}
+                </span>
+                {user.websiteUrl || userSocialEntries.length ? (
+                  <div className="tw-flex tw-min-w-0 tw-flex-wrap tw-items-center tw-gap-1.5">
+                    {user.websiteUrl ? (
+                      <a
+                        className="community-profile-link tw-inline-flex tw-max-w-full tw-items-center tw-gap-1 tw-truncate tw-text-[13px] tw-font-semibold tw-text-community-accent-light tw-no-underline hover:tw-text-community-bright"
+                        href={user.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow ugc"
+                      >
+                        <span aria-hidden="true">↗</span>
+                        {websiteLabel(user.websiteUrl)}
+                      </a>
+                    ) : null}
+                    {userSocialEntries.map((entry) => (
+                      <a
+                        key={entry.key}
+                        href={entry.url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow ugc"
+                        title={entry.label}
+                        className="tw-inline-flex tw-h-7 tw-items-center tw-gap-1.5 tw-rounded-md tw-border tw-border-community-border tw-bg-community-bg3 tw-px-2 tw-text-[11px] tw-font-bold tw-text-community-text tw-no-underline tw-transition-[border-color,background-color,color] tw-duration-150 hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light [&_.community-social-icon]:tw-h-[16px] [&_.community-social-icon]:tw-w-[16px] [&_.community-social-icon_svg]:tw-h-2.5 [&_.community-social-icon_svg]:tw-w-2.5"
+                      >
+                        <SocialIcon platform={entry.key} />
+                        <span>{entry.label}</span>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="tw-m-0 tw-text-[13px] tw-text-community-muted">{unsetText}</p>
+                )}
               </section>
             </div>
+
             <aside
               className={
-                'community-profile-stats tw-grid tw-content-start tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg3)_38%,transparent)] [&>span]:tw-flex [&>span]:tw-min-h-[50px] [&>span]:tw-items-center [&>span]:tw-justify-between [&>span]:tw-gap-3 [&>span]:tw-border-b [&>span]:tw-border-community-border-light [&>span]:tw-px-4 [&>span]:tw-text-[13px] [&>span]:tw-text-community-muted [&>button]:tw-flex [&>button]:tw-min-h-[50px] [&>button]:tw-items-center [&>button]:tw-justify-between [&>button]:tw-gap-3 [&>button]:tw-border-0 [&>button]:tw-border-b [&>button]:tw-border-community-border-light [&>button]:tw-bg-transparent [&>button]:tw-px-4 [&>button]:tw-text-left [&>button]:tw-text-[13px] [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer [&>button]:tw-transition-[background-color,color,padding] [&>button]:tw-duration-180 hover:[&>button]:tw-bg-community-accent-bg hover:[&>button]:tw-pl-5 hover:[&>button]:tw-text-community-accent-light active:[&>button]:tw-bg-community-accent-bg [&>*:last-child]:tw-border-b-0 [&_strong]:tw-text-base [&_strong]:tw-leading-tight [&_strong]:tw-text-community-bright [&_strong]:tw-transition-transform [&_strong]:tw-duration-180 hover:[&>button_strong]:tw-scale-105'
+                'community-profile-stats tw-min-w-[176px] tw-rounded-xl tw-border tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg3)_42%,transparent)] tw-px-3.5 tw-py-2.5 max-[760px]:tw-min-w-0 [&>*]:tw-flex [&>*]:tw-min-h-8 [&>*]:tw-items-center [&>*]:tw-justify-between [&>*]:tw-gap-3 [&>*]:tw-border-0 [&>*]:tw-border-b [&>*]:tw-border-community-border-light [&>*]:tw-bg-transparent [&>*]:tw-px-0 [&>*]:tw-py-1.5 [&>*]:tw-text-[12px] [&>*]:tw-text-community-muted [&>button]:tw-w-full [&>button]:tw-cursor-pointer [&>button]:tw-text-left [&>button]:tw-transition-colors hover:[&>button]:tw-text-community-accent-light [&>*:last-child]:tw-border-b-0 [&_em]:tw-inline-flex [&_em]:tw-items-center [&_em]:tw-gap-1.5 [&_em]:tw-not-italic [&_.community-glyph]:tw-h-3.5 [&_.community-glyph]:tw-w-3.5 [&_strong]:tw-text-[14px] [&_strong]:tw-font-bold [&_strong]:tw-tabular-nums [&_strong]:tw-text-community-bright'
               }
             >
-              <span>
-                <span>{ja ? '投稿数' : 'Posts'}</span>
+              <div>
+                <em>
+                  <Glyph name="image" />
+                  {ja ? '投稿' : 'Posts'}
+                </em>
                 <strong>{postStatCount}</strong>
-              </span>
-              <span>
-                <span>{ja ? '受け取ったいいね数' : 'Likes received'}</span>
+              </div>
+              <div>
+                <em>
+                  <Glyph name="heart" />
+                  {ja ? 'いいね' : 'Likes'}
+                </em>
                 <strong>{likesReceivedStat}</strong>
-              </span>
+              </div>
               {isOwn ? (
-                <span>
-                  <span>{ja ? '審査中' : 'Pending'}</span>
+                <div>
+                  <em>
+                    <Glyph name="clock" />
+                    {ja ? '審査中' : 'Pending'}
+                  </em>
                   <strong>{posts.filter((post) => post.status === 'pending').length}</strong>
-                </span>
+                </div>
               ) : null}
               <button type="button" onClick={() => onConnections('followers')}>
-                <span>{ja ? 'フォロワー' : 'Followers'}</span>
+                <em>
+                  <Glyph name="users" />
+                  {ja ? 'フォロワー' : 'Followers'}
+                </em>
                 <strong>{user.followerCount ?? 0}</strong>
               </button>
               <button type="button" onClick={() => onConnections('following')}>
-                <span>{ja ? 'フォロー中' : 'Following'}</span>
+                <em>
+                  <Glyph name="user" />
+                  {ja ? 'フォロー中' : 'Following'}
+                </em>
                 <strong>{user.followingCount ?? 0}</strong>
               </button>
             </aside>
