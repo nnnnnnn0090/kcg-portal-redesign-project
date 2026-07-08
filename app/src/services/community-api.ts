@@ -235,6 +235,27 @@ export const communityApi = {
       '/reports',
       authorizedRequest(token, jsonRequest('POST', { targetType, targetId, reason })),
     ),
+  submitContactInquiry: (
+    body: {
+      category: 'bug' | 'feature' | 'account' | 'community' | 'other';
+      subject: string;
+      message: string;
+    },
+    token?: string,
+  ) =>
+    communityRequest<{ status: ReportStatus }>(
+      '/contact-inquiries',
+      token
+        ? authorizedRequest(token, jsonRequest('POST', body))
+        : jsonRequest('POST', body),
+    ),
+  submitSuggestion: (message: string, token?: string) =>
+    communityRequest<{ status: ReportStatus }>(
+      '/community-suggestions',
+      token
+        ? authorizedRequest(token, jsonRequest('POST', { message }))
+        : jsonRequest('POST', { message }),
+    ),
   notifications: (token: string) =>
     communityRequest<{ notifications: CommunityNotification[]; unreadCount: number }>(
       '/me/notifications',

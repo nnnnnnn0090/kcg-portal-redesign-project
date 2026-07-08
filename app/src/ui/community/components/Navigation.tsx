@@ -123,7 +123,7 @@ function NavButton({
   onClick,
 }: {
   active: boolean;
-  icon: 'home' | 'search' | 'user' | 'heart' | 'bookmark' | 'bell';
+  icon: 'home' | 'search' | 'user' | 'heart' | 'bookmark' | 'bell' | 'comment';
   label: string;
   badge?: number;
   onClick: () => void;

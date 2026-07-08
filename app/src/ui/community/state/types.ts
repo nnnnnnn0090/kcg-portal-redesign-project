@@ -93,6 +93,12 @@ export interface CommunityActions {
   refreshCurrentPage: () => Promise<void>;
   openLikes: (post: CommunityPost) => void;
   openProfileEditor: () => void;
+  submitSuggestion: (message: string) => Promise<void>;
+  submitContactInquiry: (values: {
+    category: 'bug' | 'feature' | 'account' | 'community' | 'other';
+    subject: string;
+    message: string;
+  }) => Promise<void>;
   closeModal: () => void;
   setAuthMode: (mode: 'login' | 'register') => void;
   setModal: (modal: CommunityModal) => void;

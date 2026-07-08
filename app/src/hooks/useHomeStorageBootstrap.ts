@@ -9,6 +9,7 @@ import storage from '../lib/storage';
 import { pageFetch, urls } from '../lib/api';
 import type { DuePayload } from '../ui/calendar';
 import { migrateLocalCustomLinks, refreshPortalUserLinks } from '../services/user-html-link';
+import { parseShortcutLayout, saveShortcutLayout } from '../services/shortcut-layout';
 
 function isDuePayload(x: unknown): x is DuePayload {
   if (!x || typeof x !== 'object') return false;
@@ -46,16 +47,15 @@ export function useHomeStorageBootstrap({
     refreshPortalUserLinks();
     void pageFetch(urls.kogiNews());
     void storage.get([SK.shortcutConfig, SK.kingLmsAssignmentDue]).then(async (data) => {
-      const legacyCustom = readLegacyCustomLinks(data[SK.shortcutConfig]);
+      const raw = data[SK.shortcutConfig];
+      const legacyCustom = readLegacyCustomLinks(raw);
       if (legacyCustom.length > 0) {
         try {
           await migrateLocalCustomLinks(legacyCustom);
         } catch {
           /* ポータル未ログイン等は無視 */
         }
-      }
-      if (data[SK.shortcutConfig] !== undefined) {
-        await storage.remove(SK.shortcutConfig);
+        await saveShortcutLayout(parseShortcutLayout(raw));
       }
 
       const due = data[SK.kingLmsAssignmentDue];

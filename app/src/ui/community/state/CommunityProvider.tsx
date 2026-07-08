@@ -5,6 +5,7 @@ import {
   useEffect,
   useReducer,
   useRef,
+  useState,
   type FormEvent,
   type ReactNode,
   type SetStateAction,
@@ -15,12 +16,16 @@ import storage from '../../../lib/storage';
 import { SK } from '../../../shared/constants';
 import { communityApi } from '../../../services/community-api';
 import { setCommunityApiOrigin, setCommunityRequestLoginId } from '../api/runtime';
-import { SOCIAL_PLATFORMS } from '../constants';
+import { ALL_TAG, SOCIAL_PLATFORMS } from '../constants';
 import { formString, optionalFormString } from '../forms/formData';
 import { COMMUNITY_TIMING } from '../timing';
 import type { CommunityComment, CommunityNotification, CommunityPage, CommunityPost, CommunityUser } from '../types';
 import { communityReducer, createCommunityState } from './reducer';
 import type { CommunityActions, CommunityState, CommunityStateDispatch } from './types';
+import {
+  parseCommunityUrl,
+  replaceCommunityUrl,
+} from './community-url';
 import { useCommunityImageInputs } from './useCommunityImageInputs';
 import { useCommunityLoaders } from './useCommunityLoaders';
 import { useCommunityTimelineStream } from './useCommunityTimelineStream';
@@ -62,7 +67,15 @@ export function CommunityProvider({
   onClose: () => void;
   children: ReactNode;
 }) {
-  const [state, dispatch] = useReducer(communityReducer, createCommunityState(language === 'ja'));
+  const [state, dispatch] = useReducer(communityReducer, language === 'ja', (ja) => {
+    const url = parseCommunityUrl();
+    return {
+      ...createCommunityState(ja),
+      page: url.page,
+      query: url.query,
+      tag: url.tag,
+    };
+  });
   const {
     ja,
     page,
@@ -80,7 +93,9 @@ export function CommunityProvider({
     headerImage,
     closing,
     notifications,
+    loading,
   } = state;
+  const [sessionChecked, setSessionChecked] = useState(false);
   const setPage = useCommunitySetter(dispatch, 'page');
   const setModal = useCommunitySetter(dispatch, 'modal');
   const setPosts = useCommunitySetter(dispatch, 'posts');
@@ -166,6 +181,8 @@ export function CommunityProvider({
   });
   const recordedImpressions = useRef<Set<string>>(new Set());
   const closeTimer = useRef<number | null>(null);
+  const initialUrl = useRef(parseCommunityUrl());
+  const urlRestored = useRef(false);
 
   useEffect(() => {
     dispatch({
@@ -189,6 +206,16 @@ export function CommunityProvider({
     return () => setCommunityRequestLoginId(null);
   }, [user?.loginId]);
 
+  useEffect(() => {
+    replaceCommunityUrl({
+      page,
+      query,
+      tag,
+      profileUser,
+      modal,
+    });
+  }, [page, query, tag, profileUser, modal]);
+
   const closeDrawer = useCallback(() => {
     if (closing) return;
     setClosing(true);
@@ -202,7 +229,10 @@ export function CommunityProvider({
       const saved = await storage.get(SK.communityAuthToken);
       const storedToken = saved[SK.communityAuthToken];
       const authToken = typeof storedToken === 'string' ? storedToken : '';
-      if (!authToken) return;
+      if (!authToken) {
+        setSessionChecked(true);
+        return;
+      }
       try {
         const result = await communityApi.session(authToken);
         setCommunityRequestLoginId(result.user.loginId);
@@ -218,6 +248,8 @@ export function CommunityProvider({
       } catch {
         setCommunityRequestLoginId(null);
         await storage.set({ [SK.communityAuthToken]: '' });
+      } finally {
+        setSessionChecked(true);
       }
     })();
     return () => {
@@ -582,6 +614,13 @@ export function CommunityProvider({
 
   const recordImpression = (post: CommunityPost) => {
     if (recordedImpressions.current.has(post.id)) return;
+    if (
+      user &&
+      (post.authorLoginId?.toLocaleLowerCase() === user.loginId.toLocaleLowerCase() ||
+        ownPosts.some((owned) => owned.id === post.id))
+    ) {
+      return;
+    }
     recordedImpressions.current.add(post.id);
     communityApi
       .recordImpression(post.id, token || undefined)
@@ -697,6 +736,126 @@ export function CommunityProvider({
       );
   };
 
+  useEffect(() => {
+    if (urlRestored.current || loading || !sessionChecked) return;
+    const url = initialUrl.current;
+    const needsRestore =
+      url.page !== 'home' ||
+      Boolean(url.userLoginId) ||
+      Boolean(url.postId) ||
+      url.modal.kind !== 'none' ||
+      Boolean(url.query) ||
+      url.tag !== ALL_TAG;
+    if (!needsRestore) {
+      urlRestored.current = true;
+      return;
+    }
+
+    const restore = async () => {
+      try {
+        if (
+          (url.page === 'following' ||
+            url.page === 'bookmarks' ||
+            url.page === 'notifications') &&
+          !user
+        ) {
+          setModal({ kind: 'auth', mode: 'login' });
+          return;
+        }
+        if (url.page === 'following' && token) await loadFollowing(token);
+        if (url.page === 'bookmarks' && token) await loadBookmarks(token);
+        if (url.page === 'notifications' && token) {
+          await loadNotifications(token);
+          void communityApi.readNotifications(token).then(() => setUnreadCount(0));
+        }
+        if (url.page === 'profile') {
+          if (url.userLoginId) await openProfile(url.userLoginId);
+          else if (user) {
+            setProfileUser(user);
+            setProfilePosts(ownPosts);
+            setPage('profile');
+          }
+        }
+
+        if (url.modal.kind === 'auth') setModal(url.modal);
+        else if (url.modal.kind === 'create') {
+          setModal(user ? { kind: 'create' } : { kind: 'auth', mode: 'login' });
+        } else if (url.modal.kind === 'profile') setModal({ kind: 'profile' });
+        else if (url.modal.kind === 'sent') setModal({ kind: 'sent' });
+        else if (url.modal.kind === 'post' && url.postId) {
+          const result = await communityApi.post(url.postId, token || undefined);
+          setModal({ kind: 'post', post: result.post });
+          dispatch({ type: 'patchPost', postId: result.post.id, value: result.post });
+        } else if (url.modal.kind === 'likes' && url.postId) {
+          const result = await communityApi.post(url.postId, token || undefined);
+          openLikes(result.post);
+        } else if (
+          url.modal.kind === 'connections' &&
+          url.userLoginId &&
+          (url.modal.relation === 'followers' || url.modal.relation === 'following')
+        ) {
+          const profile =
+            profileUser ??
+            (await communityApi.user(url.userLoginId, token || undefined)).user;
+          await openConnections(profile, url.modal.relation);
+        }
+      } finally {
+        urlRestored.current = true;
+      }
+    };
+    void restore();
+  }, [
+    loading,
+    sessionChecked,
+    token,
+    user,
+    ownPosts,
+    profileUser,
+    loadFollowing,
+    loadBookmarks,
+    loadNotifications,
+    setUnreadCount,
+    setProfileUser,
+    setProfilePosts,
+    setPage,
+    setModal,
+    openProfile,
+    openConnections,
+    openLikes,
+  ]);
+
+  const submitSuggestion = async (message: string) => {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      await communityApi.submitSuggestion(message, token || undefined);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not send suggestion');
+      throw cause;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitContactInquiry = async (values: {
+    category: 'bug' | 'feature' | 'account' | 'community' | 'other';
+    subject: string;
+    message: string;
+  }) => {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      await communityApi.submitContactInquiry(values, token || undefined);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not send inquiry');
+      throw cause;
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const actions: CommunityActions = {
     closeDrawer,
     loadFeed,
@@ -717,6 +876,8 @@ export function CommunityProvider({
     toggleFollow,
     refreshCurrentPage,
     openLikes,
+    submitSuggestion,
+    submitContactInquiry,
     openProfileEditor: () =>
       dispatch({
         type: 'patch',

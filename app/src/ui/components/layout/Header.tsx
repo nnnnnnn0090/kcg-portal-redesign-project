@@ -23,6 +23,10 @@ import {
   fetchCommunityAccess,
   getCommunityDisclaimerAccepted,
 } from '../../../services/community-access';
+import {
+  clearCommunityUrlParams,
+  hasCommunityUrlParams,
+} from '../../community/state/community-url';
 
 // ─── ナビゲーション型 ─────────────────────────────────────────────────────
 
@@ -332,6 +336,15 @@ export function Header({
     return () => controller.abort();
   }, [navSource]);
 
+  useEffect(() => {
+    if (navSource !== 'portal' || !communityEnabled || !communityApiOrigin) return;
+    if (!hasCommunityUrlParams()) return;
+    void (async () => {
+      const accepted = await getCommunityDisclaimerAccepted().catch(() => false);
+      if (accepted) setActivityOpen(true);
+    })();
+  }, [navSource, communityEnabled, communityApiOrigin]);
+
   /**
    * `href` が実URLのときだけ location 遷移する。`#` / `javascript:` / PostBack 等は click に任せる。
    */
@@ -492,7 +505,10 @@ export function Header({
             <CommunityActivityDrawer
               language={language}
               apiOrigin={communityApiOrigin}
-              onClose={() => setActivityOpen(false)}
+              onClose={() => {
+                clearCommunityUrlParams();
+                setActivityOpen(false);
+              }}
             />,
             document.getElementById(PORTAL_DOM.overlayRoot) ?? document.body,
           )

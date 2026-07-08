@@ -104,7 +104,7 @@ export function CommunityActivityIntroPanel({
         {items.map((item) => (
           <li
             key={item.title}
-            className="tw-flex tw-items-start tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-p-3 tw-shadow-community-card"
+            className="tw-flex tw-items-center tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-py-2.5 tw-shadow-community-card"
           >
             <span
               className="tw-grid tw-h-9 tw-w-9 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg2 tw-text-community-accent-light [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&_svg]:tw-stroke-[1.9]"
@@ -112,11 +112,11 @@ export function CommunityActivityIntroPanel({
             >
               <Glyph name={item.glyph} />
             </span>
-            <div className="tw-min-w-0">
-              <strong className="tw-block tw-text-[13px] tw-font-bold tw-leading-5 tw-text-community-bright">
+            <div className="tw-flex tw-min-w-0 tw-flex-col tw-gap-0.5">
+              <strong className="tw-text-[13px] tw-font-bold tw-leading-5 tw-text-community-bright">
                 {item.title}
               </strong>
-              <span className="tw-mt-1 tw-block tw-text-xs tw-leading-6 tw-text-community-muted">
+              <span className="tw-text-xs tw-leading-5 tw-text-community-muted">
                 {item.body}
               </span>
             </div>

@@ -299,7 +299,7 @@ export function PostDialog({
         >
           <button
             className={
-              'community-post-author tw-flex tw-min-w-0 tw-items-center tw-gap-3 tw-border-0 tw-bg-transparent tw-p-0 tw-text-left tw-cursor-pointer disabled:tw-cursor-default [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-overflow-hidden [&_strong]:tw-text-ellipsis [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
+              'community-post-author tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3 tw-overflow-hidden tw-border-0 tw-bg-transparent tw-p-0 tw-text-left tw-cursor-pointer disabled:tw-cursor-default [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-overflow-hidden [&_strong]:tw-text-ellipsis [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
             }
             type="button"
             onClick={onAuthorClick}
@@ -317,7 +317,7 @@ export function PostDialog({
           </button>
           <div
             className={
-              'community-post-header-actions tw-flex tw-items-center tw-gap-2 [&>time]:tw-mr-1 [&>time]:tw-whitespace-nowrap [&>time]:tw-text-xs [&>time]:tw-text-community-muted'
+              'community-post-header-actions tw-flex tw-shrink-0 tw-items-center tw-gap-2 [&>time]:tw-mr-1 [&>time]:tw-whitespace-nowrap [&>time]:tw-text-xs [&>time]:tw-text-community-muted'
             }
           >
             <time>{new Date(post.createdAt).toLocaleDateString(ja ? 'ja-JP' : 'en-US')}</time>
@@ -325,7 +325,7 @@ export function PostDialog({
             viewerLoginId?.toLocaleLowerCase() !== post.authorLoginId.toLocaleLowerCase() ? (
               <button
                 className={
-                  'community-post-delete tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card'
+                  'community-post-delete tw-shrink-0 tw-whitespace-nowrap tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card'
                 }
                 type="button"
                 disabled={reportBusy}
@@ -337,7 +337,7 @@ export function PostDialog({
             {onDelete ? (
               <button
                 className={
-                  'community-post-delete tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card'
+                  'community-post-delete tw-shrink-0 tw-whitespace-nowrap tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card'
                 }
                 type="button"
                 onClick={onDelete}
@@ -347,7 +347,7 @@ export function PostDialog({
             ) : null}
             <button
               className={
-                'community-post-close tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-text-community-text [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+                'community-post-close tw-shrink-0 tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-text-community-text [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
               }
               onClick={close}
               aria-label={ja ? '閉じる' : 'Close'}

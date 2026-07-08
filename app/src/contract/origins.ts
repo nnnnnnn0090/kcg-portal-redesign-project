@@ -1,5 +1,7 @@
 /** Origin / URL / content script matches 凍結値。 */
 
+import { isPortalDistributionBuild } from './distribution-build';
+
 export const PORTAL_ORIGIN = 'https://home.kcg.ac.jp' as const;
 
 /** `location.hostname` 比較用 */
@@ -40,6 +42,39 @@ export const KING_LMS_HOSTNAME = new URL(KING_LMS_ORIGIN).hostname;
 
 /** 拡張紹介ページ・開発者お知らせ JSON のオリジン（host_permissions と URL 生成用） */
 export const EXTENSION_PROMO_ORIGIN = 'https://kcg-portal-redesign-project-web.vercel.app' as const;
+
+/** みんなの活動 API（host_permissions と community-access 許可リスト用） */
+export const COMMUNITY_API_ORIGIN = 'https://portal-community.com' as const;
+
+const COMMUNITY_E2E_API_ORIGINS = [
+  'http://127.0.0.1:8787',
+  'http://localhost:8787',
+] as const;
+
+/** 拡張が接続を許可するコミュニティ API origin（manifest host_permissions と一致させる） */
+export function listAllowedCommunityApiOrigins(): readonly string[] {
+  if (isPortalDistributionBuild()) {
+    return [COMMUNITY_API_ORIGIN];
+  }
+  return [COMMUNITY_API_ORIGIN, ...COMMUNITY_E2E_API_ORIGINS];
+}
+
+export function isAllowedCommunityApiOrigin(origin: string): boolean {
+  const normalized = normalizeCommunityApiOrigin(origin);
+  if (!normalized) return false;
+  return listAllowedCommunityApiOrigins().includes(normalized);
+}
+
+export function normalizeCommunityApiOrigin(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    return url.origin;
+  } catch {
+    return '';
+  }
+}
 
 /** 拡張機能紹介ページ */
 export const EXTENSION_PROMO_PAGE_URL = `${EXTENSION_PROMO_ORIGIN}/` as const;

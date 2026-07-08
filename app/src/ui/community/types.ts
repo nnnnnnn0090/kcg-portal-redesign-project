@@ -30,5 +30,6 @@ export type CommunityPage =
   | 'following'
   | 'bookmarks'
   | 'notifications'
+  | 'feedback'
   | 'create'
   | 'profile';

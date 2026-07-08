@@ -7,6 +7,7 @@ import { Glyph } from './components/Glyph';
 import { MobileNav, Sidebar } from './components/Navigation';
 import { ModalLayer } from './dialogs/ModalLayer';
 import { ExploreScreen } from './screens/ExploreScreen';
+import { FeedbackScreen } from './screens/FeedbackScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
@@ -73,6 +74,8 @@ export function CommunityShell() {
     recordImpression,
     toggleFollow,
     openLikes,
+    submitSuggestion,
+    submitContactInquiry,
     openProfileEditor,
     closeModal,
     setAuthMode,
@@ -126,9 +129,13 @@ export function CommunityShell() {
               ? ja
                 ? '通知'
                 : 'Notifications'
-              : ja
-                ? 'プロフィール'
-                : 'Profile';
+              : page === 'feedback'
+                ? ja
+                  ? 'お問い合わせ・意見箱'
+                  : 'Contact and feedback'
+                : ja
+                  ? 'プロフィール'
+                  : 'Profile';
 
   return (
     <div
@@ -176,6 +183,19 @@ export function CommunityShell() {
               <strong>{pageTitle}</strong>
               <small>CAMPUS COMMUNITY</small>
             </div>
+            <button
+              type="button"
+              className={cn(
+                'community-feedback-entry tw-inline-flex tw-h-10 tw-shrink-0 tw-items-center tw-justify-center tw-gap-1.5 tw-whitespace-nowrap tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light max-[620px]:tw-w-10 max-[620px]:tw-gap-0 max-[620px]:tw-px-0 max-[620px]:tw-text-0 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px]',
+                page === 'feedback' && 'tw-border-community-accent tw-bg-community-accent-bg tw-text-community-accent-light',
+              )}
+              aria-label={ja ? 'お問い合わせ・意見箱' : 'Contact and feedback'}
+              aria-current={page === 'feedback' ? 'page' : undefined}
+              onClick={() => go('feedback')}
+            >
+              <Glyph name="comment" />
+              <span>{ja ? 'お問い合わせ・意見箱' : 'Contact'}</span>
+            </button>
             {!user ? (
               <div
                 className={
@@ -302,6 +322,15 @@ export function CommunityShell() {
               notifications={notifications}
               ja={ja}
               onOpenProfile={(loginId) => void openProfile(loginId)}
+            />
+          ) : null}
+          {page === 'feedback' ? (
+            <FeedbackScreen
+              ja={ja}
+              busy={busy}
+              error={error}
+              onSubmitSuggestion={submitSuggestion}
+              onSubmitContact={submitContactInquiry}
             />
           ) : null}
           {page === 'profile' && profileUser ? (

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { defineConfig } from 'wxt';
 import {
+  COMMUNITY_API_ORIGIN,
   EXTENSION_PROMO_ORIGIN,
   HOME2_ORIGIN,
   KING_LMS_ORIGIN,
@@ -17,6 +18,20 @@ type WxtGeckoBaseline = {
   strict_max_version?: string;
   update_url?: string;
 };
+
+function buildHostPermissions(): string[] {
+  const permissions = [
+    `${PORTAL_ORIGIN}/*`,
+    `${KING_LMS_ORIGIN}/*`,
+    `${EXTENSION_PROMO_ORIGIN}/*`,
+    `${HOME2_ORIGIN}/*`,
+    `${COMMUNITY_API_ORIGIN}/*`,
+  ];
+  if (process.env.VITE_PORTAL_DISTRIBUTION_BUILD !== '1') {
+    permissions.push('http://127.0.0.1:8787/*', 'http://localhost:8787/*');
+  }
+  return permissions;
+}
 
 export default defineConfig({
   srcDir: 'src',
@@ -49,14 +64,7 @@ export default defineConfig({
     ],
     minimum_chrome_version: '111',
     permissions: ['storage'],
-    host_permissions: [
-      `${PORTAL_ORIGIN}/*`,
-      `${KING_LMS_ORIGIN}/*`,
-      `${EXTENSION_PROMO_ORIGIN}/*`,
-      `${HOME2_ORIGIN}/*`,
-      'http://*/*',
-      'https://*/*',
-    ],
+    host_permissions: buildHostPermissions(),
     browser_specific_settings: {
       gecko: {
         id: 'kcg-portal-redesign-project@nnnnnnn0090.com',

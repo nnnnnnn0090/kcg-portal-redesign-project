@@ -2,7 +2,11 @@
  * 「みんなの活動」入口の公開可否確認（F-045）。
  */
 
-import { COMMUNITY_ACCESS_URL } from '../contract/origins';
+import {
+  COMMUNITY_ACCESS_URL,
+  isAllowedCommunityApiOrigin,
+  normalizeCommunityApiOrigin,
+} from '../contract/origins';
 import { storageRepo } from '../platform/storage/repo';
 import { buildClientTelemetryHeaders } from './client-identity';
 
@@ -13,20 +17,10 @@ export interface CommunityAccessResult {
 
 type CommunityAccessResponse = { enabled?: unknown; apiOrigin?: unknown };
 
-export function normalizeCommunityApiOrigin(value: unknown): string {
-  if (typeof value !== 'string') return '';
-  try {
-    const url = new URL(value.trim());
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
-    return url.origin;
-  } catch {
-    return '';
-  }
-}
-
-function parseCommunityAccessResponse(result: CommunityAccessResponse): CommunityAccessResult {
+export function parseCommunityAccessResponse(result: CommunityAccessResponse): CommunityAccessResult {
   const apiOrigin = normalizeCommunityApiOrigin(result.apiOrigin);
-  const enabled = result.enabled === true && apiOrigin.length > 0;
+  const enabled =
+    result.enabled === true && apiOrigin.length > 0 && isAllowedCommunityApiOrigin(apiOrigin);
   return { enabled, apiOrigin: enabled ? apiOrigin : '' };
 }
 
