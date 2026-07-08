@@ -13,18 +13,18 @@ export function communityActivityIntroItems(ja: boolean): IntroItem[] {
     return [
       {
         glyph: 'image',
-        title: '作品・課題',
+        title: '作品',
         body: '授業で作ったもの、ゲームや映像、ポートフォリオ',
       },
       {
         glyph: 'impression',
         title: 'イベント・展示',
-        body: '学園祭、作品展、オープンキャンパスなど',
+        body: '11月祭、作品展、オープンキャンパスなど',
       },
       {
         glyph: 'heart',
-        title: 'サークル・部活',
-        body: '練習、大会、活動の記録',
+        title: 'サークル',
+        body: '活動の共有',
       },
       {
         glyph: 'user',
@@ -34,7 +34,7 @@ export function communityActivityIntroItems(ja: boolean): IntroItem[] {
       {
         glyph: 'comment',
         title: 'その他',
-        body: 'ハンズオン、就活、制作の進捗、学内の話題',
+        body: '制作の進捗、学内の話題',
       },
     ];
   }

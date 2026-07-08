@@ -161,15 +161,25 @@ export function ProfileScreen({
                   <Glyph name="school" />
                   {ja ? '所属' : 'Program'}
                 </span>
-                {user.academicGroup && user.department ? (
-                  <p className="tw-m-0 tw-flex tw-flex-wrap tw-items-baseline tw-gap-x-2">
-                    <strong className="tw-text-[14px] tw-font-bold tw-text-community-bright">
-                      {user.academicGroup}
-                    </strong>
-                    <span className="tw-text-[13px] tw-text-community-accent-light">
-                      {user.department}
-                    </span>
-                  </p>
+                {user.academicGroup || user.department ? (
+                  <div className="tw-grid tw-gap-0.5">
+                    {user.academicGroup ? (
+                      <p className="tw-m-0 tw-text-[14px] tw-font-bold tw-leading-tight tw-text-community-bright">
+                        {user.academicGroup}
+                      </p>
+                    ) : null}
+                    {user.department ? (
+                      <p
+                        className={
+                          user.academicGroup
+                            ? 'tw-m-0 tw-text-[12px] tw-leading-tight tw-text-community-muted'
+                            : 'tw-m-0 tw-text-[14px] tw-font-bold tw-leading-tight tw-text-community-bright'
+                        }
+                      >
+                        {user.department}
+                      </p>
+                    ) : null}
+                  </div>
                 ) : (
                   <p className="tw-m-0 tw-text-[13px] tw-text-community-muted">{unsetText}</p>
                 )}
