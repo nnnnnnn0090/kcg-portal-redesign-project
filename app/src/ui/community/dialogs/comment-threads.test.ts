@@ -11,6 +11,7 @@ function comment(id: string, parentId: string | null): CommunityComment {
     replyToAuthorLoginId: parentId ? 'parent-user' : null,
     authorName: id,
     authorLoginId: id,
+    authorVerified: false,
     authorAvatarUrl: null,
     content: id,
     status: 'approved',

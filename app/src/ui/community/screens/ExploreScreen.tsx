@@ -1,6 +1,7 @@
 import { ALL_TAG, COMMUNITY_INPUT_LIMITS } from '../constants';
 import type { CommunityPost, CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { Empty } from '../components/Empty';
 import { Glyph } from '../components/Glyph';
 import { PostCard } from '../components/PostCard';
@@ -121,7 +122,10 @@ export function ExploreScreen({
                 <button type="button" key={item.id} onClick={() => onOpenProfile(item.loginId)}>
                   <Avatar user={item} />
                   <span>
-                    <strong>{item.displayName}</strong>
+                    <strong className="tw-flex tw-min-w-0 tw-items-center tw-gap-1">
+                      {item.displayName}
+                      {item.verified ? <VerifiedBadge ja={ja} /> : null}
+                    </strong>
                     <small>@{item.loginId}</small>
                     {(item.profileTags ?? []).length ? (
                       <em>{item.profileTags.map((profileTag) => `#${profileTag}`).join(' ')}</em>

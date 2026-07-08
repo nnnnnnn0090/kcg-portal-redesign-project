@@ -45,6 +45,7 @@ export interface CommunityUser {
   profileTags: string[];
   academicGroup: string | null;
   department: string | null;
+  verified: boolean;
   avatarUrl: string | null;
   headerUrl: string | null;
   pendingProfile: PendingProfile | null;
@@ -58,6 +59,7 @@ export interface CommunityPost {
   id: string;
   authorName: string;
   authorLoginId: string;
+  authorVerified: boolean;
   authorAvatarUrl: string | null;
   title: string;
   caption: string;
@@ -82,6 +84,7 @@ export interface CommunityComment {
   replyToAuthorLoginId: string | null;
   authorName: string;
   authorLoginId: string;
+  authorVerified: boolean;
   authorAvatarUrl: string | null;
   content: string;
   status: CommentStatus;

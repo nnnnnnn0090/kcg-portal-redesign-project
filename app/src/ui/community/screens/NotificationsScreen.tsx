@@ -1,5 +1,6 @@
 import type { CommunityNotification } from '../types';
 import { Avatar } from '../components/Avatar';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { Glyph } from '../components/Glyph';
 import { cn } from '../../../lib/cn';
 
@@ -73,7 +74,12 @@ export function NotificationsScreen({
                         'community-notification-head tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-4 [&>strong]:tw-overflow-hidden [&>strong]:tw-text-ellipsis [&>strong]:tw-whitespace-nowrap [&>strong]:tw-text-sm [&>strong]:tw-text-community-bright [&>time]:tw-flex-none [&>time]:tw-text-xs [&>time]:tw-text-community-muted'
                       }
                     >
-                      <strong>{item.actor.displayName}</strong>
+                      <span className="tw-flex tw-min-w-0 tw-items-center tw-gap-1">
+                        <strong className="tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-text-sm tw-text-community-bright">
+                          {item.actor.displayName}
+                        </strong>
+                        {item.actor.verified ? <VerifiedBadge ja={ja} /> : null}
+                      </span>
                       <time>{new Date(item.createdAt).toLocaleString(ja ? 'ja-JP' : 'en-US')}</time>
                     </span>
                     <em>{notificationText(item)}</em>

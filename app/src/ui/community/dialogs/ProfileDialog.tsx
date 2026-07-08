@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, type DragEvent } from 'react';
 import {
   ACADEMIC_GROUPS,
   activeTagPattern,
+  advanceTagSuggestionIndex,
   COMMUNITY_INPUT_LIMITS,
   COMMUNITY_TAG_NEW_CLASS,
   COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS,
@@ -9,8 +10,9 @@ import {
 } from '../constants';
 import type { CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
-import { Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
+import { BareField, Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
 import { SocialIcon } from '../components/SocialIcon';
+import { TagHighlightField } from '../components/TagHighlightField';
 import type { ModalLayerProps } from './types';
 import { cn } from '../../../lib/cn';
 import { dataTransferHasFiles } from '../imageFiles';
@@ -58,7 +60,7 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
     ),
   );
   const [profileTagSearch, setProfileTagSearch] = useState<string | null>(null);
-  const [activeProfileTagIndex, setActiveProfileTagIndex] = useState(0);
+  const [activeProfileTagIndex, setActiveProfileTagIndex] = useState(-1);
   const [headerDropActive, setHeaderDropActive] = useState(false);
   const [avatarDropActive, setAvatarDropActive] = useState(false);
   const headerDropDepth = useRef(0);
@@ -74,7 +76,7 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
 
   const updateProfileTagSearch = (value: string, caret: number | null) => {
     const match = value.slice(0, caret ?? value.length).match(activeTagPattern);
-    setActiveProfileTagIndex(0);
+    setActiveProfileTagIndex(-1);
     setProfileTagSearch(match ? match[1] : null);
   };
 
@@ -351,16 +353,17 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
             rows={4}
           />
         </Field>
-        <Field
+        <BareField
           label={ja ? 'プロフィールタグ' : 'Profile tags'}
           meta={
             <CharacterCount value={profileTagsValue} max={COMMUNITY_INPUT_LIMITS.profileTagsText} />
           }
         >
-          <input
+          <TagHighlightField
             ref={profileTagsInput}
             name="profileTags"
             value={profileTagsValue}
+            spellCheck={false}
             onChange={(event) => {
               setProfileTagsValue(event.currentTarget.value);
               updateProfileTagSearch(event.currentTarget.value, event.currentTarget.selectionStart);
@@ -373,16 +376,28 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
               if (profileTagSearch === null || matchingProfileTags.length === 0) return;
               if (event.key === 'ArrowDown') {
                 event.preventDefault();
-                setActiveProfileTagIndex((index) => (index + 1) % matchingProfileTags.length);
+                setActiveProfileTagIndex((index) =>
+                  advanceTagSuggestionIndex(index, matchingProfileTags.length, 1),
+                );
               } else if (event.key === 'ArrowUp') {
                 event.preventDefault();
-                setActiveProfileTagIndex(
-                  (index) => (index - 1 + matchingProfileTags.length) % matchingProfileTags.length,
+                setActiveProfileTagIndex((index) =>
+                  advanceTagSuggestionIndex(index, matchingProfileTags.length, -1),
                 );
-              } else if (event.key === 'Enter' || (event.key === 'Tab' && !event.shiftKey)) {
+              } else if (event.key === 'Tab') {
+                event.preventDefault();
+                setActiveProfileTagIndex((index) =>
+                  advanceTagSuggestionIndex(
+                    index,
+                    matchingProfileTags.length,
+                    event.shiftKey ? -1 : 1,
+                  ),
+                );
+              } else if (event.key === 'Enter') {
                 event.preventDefault();
                 insertProfileTag(
-                  matchingProfileTags[activeProfileTagIndex] ?? matchingProfileTags[0],
+                  matchingProfileTags[activeProfileTagIndex >= 0 ? activeProfileTagIndex : 0] ??
+                    matchingProfileTags[0],
                 );
               }
             }}
@@ -398,10 +413,8 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="none"
-            spellCheck={false}
             placeholder={ja ? '#ゲーム #デザイン #プログラミング' : '#game #design #programming'}
           />
-        </Field>
         {profileTagSearch !== null ? (
           <div
             className={cn(COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS, 'is-profile-tags')}
@@ -410,7 +423,7 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           >
             <header>
               <span>{ja ? 'タグ候補' : 'Suggested tags'}</span>
-              <small>{ja ? 'Enter / Tab で追加' : 'Enter or Tab to insert'}</small>
+              <small>{ja ? 'Tab で移動 / Enter で追加' : 'Tab to move / Enter to insert'}</small>
             </header>
             {matchingProfileTags.length ? (
               matchingProfileTags.map((item, index) => (
@@ -449,6 +462,7 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
             ? 'タグはプロフィール審査後に別枠で公開されます。最大5個まで。'
             : 'Tags are published separately after profile review. Up to 5 tags.'}
         </p>
+        </BareField>
         <Field
           label={ja ? 'URL' : 'Website'}
           meta={<CharacterCount value={websiteUrl} max={COMMUNITY_INPUT_LIMITS.websiteUrl} />}

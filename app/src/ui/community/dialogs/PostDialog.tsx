@@ -3,7 +3,8 @@ import { communityApi } from '../api';
 import type { CommunityComment, CommunityPost } from '../types';
 import { groupCommentsByParent } from './comment-threads';
 import { Avatar } from '../components/Avatar';
-import { renderCaptionWithTags } from '../components/CaptionTags';
+import { VerifiedBadge } from '../components/VerifiedBadge';
+import { CommunityCaption } from '../components/CommunityCaption';
 import { Busy, CharacterCount, ErrorMessage } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
 import { cn } from '../../../lib/cn';
@@ -121,6 +122,7 @@ export function PostDialog({
                 onClick={() => onCommentAuthorClick(comment.authorLoginId)}
               >
                 <strong>{comment.authorName}</strong>
+                {comment.authorVerified ? <VerifiedBadge ja={ja} /> : null}
                 <span>@{comment.authorLoginId}</span>
               </button>
               <div
@@ -306,7 +308,10 @@ export function PostDialog({
           >
             <Avatar name={post.authorName} url={post.authorAvatarUrl} />
             <div>
-              <strong>{post.authorName}</strong>
+              <span className="tw-flex tw-min-w-0 tw-items-center tw-gap-1">
+                <strong>{post.authorName}</strong>
+                {post.authorVerified ? <VerifiedBadge ja={ja} /> : null}
+              </span>
               <span>@{post.authorLoginId}</span>
             </div>
           </button>
@@ -360,13 +365,11 @@ export function PostDialog({
             <h2>{post.title}</h2>
           </div>
           {post.caption.trim() ? (
-            <div
-              className={
-                'community-post-caption tw-whitespace-pre-wrap tw-break-words [&_p]:tw-m-0 [&_p]:tw-leading-7'
-              }
-            >
-              <p>{renderCaptionWithTags(post.caption, { onTagClick })}</p>
-            </div>
+            <CommunityCaption
+              caption={post.caption}
+              className="tw-text-community-text"
+              onTagClick={onTagClick}
+            />
           ) : null}
         </section>
         {post.rejectionReason ? (

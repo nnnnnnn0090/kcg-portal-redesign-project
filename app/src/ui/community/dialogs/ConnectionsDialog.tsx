@@ -1,5 +1,6 @@
 import type { CommunityModal } from '../state/types';
 import { Avatar } from '../components/Avatar';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { Busy, DialogHeader, ErrorMessage } from '../components/FormUi';
 import { COMMUNITY_DIALOG_SURFACE_CLASS } from './dialogStyles';
 
@@ -57,7 +58,10 @@ export function ConnectionsDialog({
             <button type="button" key={item.id} onClick={() => openProfile(item.loginId)}>
               <Avatar user={item} />
               <span>
-                <strong>{item.displayName}</strong>
+                <strong className="tw-flex tw-min-w-0 tw-items-center tw-gap-1">
+                  {item.displayName}
+                  {item.verified ? <VerifiedBadge ja={ja} /> : null}
+                </strong>
                 <small>@{item.loginId}</small>
               </span>
               <em>{ja ? 'プロフィールを見る' : 'View profile'}</em>

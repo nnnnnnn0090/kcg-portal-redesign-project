@@ -1,5 +1,6 @@
 import type { CommunityPage, CommunityUser } from '../types';
 import { Avatar } from './Avatar';
+import { VerifiedBadge } from './VerifiedBadge';
 import { Glyph } from './Glyph';
 import { cn } from '../../../lib/cn';
 
@@ -96,7 +97,10 @@ export function Sidebar({
           >
             <Avatar user={user} />
             <span>
-              <strong>{user.displayName}</strong>
+              <span className="tw-flex tw-min-w-0 tw-items-center tw-gap-1">
+                <strong>{user.displayName}</strong>
+                {user.verified ? <VerifiedBadge ja={ja} /> : null}
+              </span>
               <em>@{user.loginId}</em>
             </span>
           </button>

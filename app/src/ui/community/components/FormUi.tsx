@@ -38,6 +38,31 @@ export function Field({
     </label>
   );
 }
+// Label-only shell for controls that manage their own box (e.g. TagHighlightField),
+// avoiding the descendant input/textarea styling in Field.
+export function BareField({
+  label,
+  meta,
+  children,
+}: {
+  label: string;
+  meta?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={
+        'community-field tw-grid tw-min-w-0 tw-gap-2 [&>.community-field-label]:tw-flex [&>.community-field-label]:tw-min-w-0 [&>.community-field-label]:tw-items-center [&>.community-field-label]:tw-justify-between [&>.community-field-label]:tw-gap-3 [&>.community-field-label]:tw-text-[13px] [&>.community-field-label]:tw-font-bold [&>.community-field-label]:tw-text-community-bright'
+      }
+    >
+      <span className="community-field-label">
+        <span>{label}</span>
+        {meta}
+      </span>
+      {children}
+    </div>
+  );
+}
 export function ErrorMessage({ text }: { text: string }) {
   return text ? (
     <p

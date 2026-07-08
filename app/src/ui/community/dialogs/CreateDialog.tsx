@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
-import { activeTagPattern, COMMUNITY_INPUT_LIMITS, COMMUNITY_TAG_NEW_CLASS, COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS } from '../constants';
+import { activeTagPattern, advanceTagSuggestionIndex, COMMUNITY_INPUT_LIMITS, COMMUNITY_TAG_NEW_CLASS, COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS } from '../constants';
 import type { CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
-import { Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
+import { BareField, Busy, CharacterCount, DialogHeader, ErrorMessage, Field } from '../components/FormUi';
 import { Glyph } from '../components/Glyph';
+import { TagHighlightField } from '../components/TagHighlightField';
 import type { ModalLayerProps } from './types';
 import { cn } from '../../../lib/cn';
 import { dataTransferHasFiles } from '../imageFiles';
@@ -27,7 +28,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const [caption, setCaption] = useState('');
   const [title, setTitle] = useState('');
   const [tagSearch, setTagSearch] = useState<string | null>(null);
-  const [activeTagIndex, setActiveTagIndex] = useState(0);
+  const [activeTagIndex, setActiveTagIndex] = useState(-1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [draggedImage, setDraggedImage] = useState<number | null>(null);
   const [dragTargetImage, setDragTargetImage] = useState<number | null>(null);
@@ -137,7 +138,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
   const updateTagSearch = (value: string, caret: number | null) => {
     const beforeCaret = value.slice(0, caret ?? value.length);
     const match = beforeCaret.match(activeTagPattern);
-    setActiveTagIndex(0);
+    setActiveTagIndex(-1);
     setTagSearch(match ? match[1] : null);
   };
 
@@ -347,20 +348,22 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
             />
           </Field>
           <div className={'community-caption-field tw-relative'}>
-            <Field
+            <BareField
               label={ja ? '本文' : 'Caption'}
               meta={<CharacterCount value={caption} max={COMMUNITY_INPUT_LIMITS.postCaption} />}
             >
-              <textarea
+              <TagHighlightField
+                multiline
                 ref={captionInput}
                 name="caption"
                 rows={7}
                 maxLength={COMMUNITY_INPUT_LIMITS.postCaption}
                 value={caption}
+                spellCheck={false}
                 placeholder={
                   ja
-                    ? '活動について書いてみましょう。\n# を入力するとタグを追加できます。'
-                    : 'Tell everyone about this activity.\nType # to add a tag.'
+                    ? '活動について書いてみましょう。\n**太字** *斜体* ~~取消~~ `コード` > 引用 が使えます。\nhttps://... または [リンク](https://...) 。\n# を入力するとタグを追加できます。'
+                    : 'Tell everyone about this activity.\n**bold** *italic* ~~strike~~ `code` > quote supported.\nUse https://... or [links](https://...).\nType # to add a tag.'
                 }
                 onChange={(event) => {
                   setCaption(event.currentTarget.value);
@@ -374,15 +377,18 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                   if (tagSearch === null || matchingTags.length === 0) return;
                   if (event.key === 'ArrowDown') {
                     event.preventDefault();
-                    setActiveTagIndex((index) => (index + 1) % matchingTags.length);
+                    setActiveTagIndex((index) => advanceTagSuggestionIndex(index, matchingTags.length, 1));
                   } else if (event.key === 'ArrowUp') {
                     event.preventDefault();
-                    setActiveTagIndex(
-                      (index) => (index - 1 + matchingTags.length) % matchingTags.length,
-                    );
-                  } else if (event.key === 'Enter' || (event.key === 'Tab' && !event.shiftKey)) {
+                    setActiveTagIndex((index) => advanceTagSuggestionIndex(index, matchingTags.length, -1));
+                  } else if (event.key === 'Tab') {
                     event.preventDefault();
-                    insertTag(matchingTags[activeTagIndex] ?? matchingTags[0]);
+                    setActiveTagIndex((index) =>
+                      advanceTagSuggestionIndex(index, matchingTags.length, event.shiftKey ? -1 : 1),
+                    );
+                  } else if (event.key === 'Enter') {
+                    event.preventDefault();
+                    insertTag(matchingTags[activeTagIndex >= 0 ? activeTagIndex : 0] ?? matchingTags[0]);
                   }
                 }}
                 onKeyUp={(event) => {
@@ -392,7 +398,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
                 }}
                 required
               />
-            </Field>
+            </BareField>
             {tagSearch !== null ? (
               <div
                 className={COMMUNITY_TAG_SUGGESTIONS_SURFACE_CLASS}
@@ -401,7 +407,7 @@ export function CreateDialog(props: ModalLayerProps & { user: CommunityUser }) {
               >
                 <header>
                   <span>{ja ? 'タグ候補' : 'Suggested tags'}</span>
-                  <small>{ja ? 'Enter / Tab で追加' : 'Enter or Tab to insert'}</small>
+                  <small>{ja ? 'Tab で移動 / Enter で追加' : 'Tab to move / Enter to insert'}</small>
                 </header>
                 {matchingTags.length ? (
                   matchingTags.map((item, index) => (

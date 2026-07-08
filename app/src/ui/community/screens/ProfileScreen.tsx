@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Avatar } from '../components/Avatar';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { Empty } from '../components/Empty';
 import { PostCard } from '../components/PostCard';
 import { SocialIcon } from '../components/SocialIcon';
@@ -97,7 +98,10 @@ export function ProfileScreen({
                   'community-profile-identity tw-grid tw-min-w-0 tw-gap-0.5 tw-pb-1 [&_h1]:tw-m-0 [&_h1]:tw-overflow-wrap-anywhere [&_h1]:tw-text-[clamp(24px,2.4vw,32px)] [&_h1]:tw-leading-tight [&_h1]:tw-text-community-bright max-[620px]:[&_h1]:tw-text-xl [&>span]:tw-text-sm [&>span]:tw-text-community-muted'
                 }
               >
-                <h1>{user.displayName}</h1>
+                <div className="tw-flex tw-min-w-0 tw-items-center tw-gap-2">
+                  <h1>{user.displayName}</h1>
+                  {user.verified ? <VerifiedBadge ja={ja} large /> : null}
+                </div>
                 <span>@{user.loginId}</span>
               </div>
               <p

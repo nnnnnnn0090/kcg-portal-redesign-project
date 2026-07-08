@@ -6,6 +6,7 @@ const post: CommunityPost = {
   id: 'post-1',
   authorName: 'User',
   authorLoginId: 'user',
+  authorVerified: false,
   authorAvatarUrl: null,
   title: 'Title',
   caption: 'Caption',
