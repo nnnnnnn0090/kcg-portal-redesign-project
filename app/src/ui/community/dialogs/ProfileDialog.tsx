@@ -155,11 +155,9 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
   };
 
   return (
-    <form
+    <div
+      role="form"
       className={`${COMMUNITY_DIALOG_SURFACE_CLASS} community-profile-dialog tw-w-full tw-max-w-[780px]`}
-      method="post"
-      onSubmitCapture={(event) => event.preventDefault()}
-      onSubmit={saveProfile}
     >
       <DialogHeader title={ja ? 'プロフィールを編集' : 'Edit profile'} close={close} />
       <aside
@@ -182,7 +180,7 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
         </div>
         <div
           className={cn(
-            'community-profile-editor-header tw-relative tw-h-[180px] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-transition [&.is-file-dragging]:tw-border-community-accent [&.is-file-dragging]:tw-ring-2 [&.is-file-dragging]:tw-ring-community-accent-bg [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-contain [&>.community-profile-editor-header-empty]:tw-h-full [&>.community-profile-editor-header-empty]:tw-w-full [&>button]:tw-absolute [&>button]:tw-bottom-3 [&>button]:tw-right-3 [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-font-bold [&>button]:tw-text-community-text',
+            'community-profile-editor-header tw-relative tw-h-[180px] tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-transition [&.is-file-dragging]:tw-border-community-accent [&.is-file-dragging]:tw-ring-2 [&.is-file-dragging]:tw-ring-community-accent-bg [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-contain [&>.community-profile-editor-header-empty]:tw-h-full [&>.community-profile-editor-header-empty]:tw-w-full [&>button]:tw-absolute [&>button]:tw-bottom-3 [&>button]:tw-right-3 [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-font-bold [&>button]:tw-text-community-text [&>button]:tw-cursor-pointer [&>button]:tw-transition-[transform,border-color,background-color,box-shadow,color] [&>button]:tw-duration-180 hover:[&>button]:tw-translate-y-[-2px] hover:[&>button]:tw-border-community-accent hover:[&>button]:tw-bg-community-accent-bg hover:[&>button]:tw-text-community-accent-light hover:[&>button]:tw-shadow-community-card active:[&>button]:tw-translate-y-0 active:[&>button]:tw-scale-[.98]',
             headerDropActive && 'is-file-dragging',
           )}
           onDragEnter={(event) => handleProfileImageDragEnter(event, 'header')}
@@ -226,7 +224,7 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
         />
         <div
           className={cn(
-            'community-profile-editor-identity tw-grid tw-grid-cols-[auto_minmax(0,1fr)_auto] tw-items-center tw-gap-3 tw-rounded-xl tw-transition max-[620px]:tw-grid-cols-[auto_minmax(0,1fr)] [&.is-file-dragging]:tw-bg-community-accent-bg [&.is-file-dragging]:tw-ring-2 [&.is-file-dragging]:tw-ring-community-accent-bg [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-text-community-bright [&_small]:tw-text-community-muted [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 [&>button]:tw-text-community-text max-[620px]:[&>button]:tw-col-span-full max-[620px]:[&>button]:tw-w-full',
+            'community-profile-editor-identity tw-grid tw-grid-cols-[auto_minmax(0,1fr)_auto] tw-items-center tw-gap-3 tw-rounded-xl tw-transition max-[620px]:tw-grid-cols-[auto_minmax(0,1fr)] [&.is-file-dragging]:tw-bg-community-accent-bg [&.is-file-dragging]:tw-ring-2 [&.is-file-dragging]:tw-ring-community-accent-bg [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-text-community-bright [&_small]:tw-text-community-muted [&>button]:tw-min-h-9 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 [&>button]:tw-text-community-text [&>button]:tw-cursor-pointer [&>button]:tw-transition-[transform,border-color,background-color,box-shadow,color] [&>button]:tw-duration-180 hover:[&>button]:tw-translate-y-[-2px] hover:[&>button]:tw-border-community-accent hover:[&>button]:tw-bg-community-accent-bg hover:[&>button]:tw-text-community-accent-light hover:[&>button]:tw-shadow-community-card active:[&>button]:tw-translate-y-0 active:[&>button]:tw-scale-[.98] max-[620px]:[&>button]:tw-col-span-full max-[620px]:[&>button]:tw-w-full',
             avatarDropActive && 'is-file-dragging',
           )}
           onDragEnter={(event) => handleProfileImageDragEnter(event, 'avatar')}
@@ -297,7 +295,6 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           >
             <Field label={ja ? '学系' : 'Academic group'}>
               <select
-                name="academicGroup"
                 value={academicGroup}
                 onChange={(event) => {
                   setAcademicGroup(event.target.value);
@@ -314,7 +311,6 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
             </Field>
             <Field label={ja ? '学科' : 'Department'}>
               <select
-                name="department"
                 value={department}
                 onChange={(event) => setDepartment(event.target.value)}
                 disabled={!academicGroup}
@@ -334,11 +330,9 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           meta={<CharacterCount value={displayName} max={COMMUNITY_INPUT_LIMITS.displayName} />}
         >
           <input
-            name="displayName"
             value={displayName}
             onChange={(event) => setDisplayName(event.currentTarget.value)}
             maxLength={COMMUNITY_INPUT_LIMITS.displayName}
-            required
           />
         </Field>
         <Field
@@ -346,7 +340,6 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           meta={<CharacterCount value={bio} max={COMMUNITY_INPUT_LIMITS.bio} />}
         >
           <textarea
-            name="bio"
             value={bio}
             onChange={(event) => setBio(event.currentTarget.value)}
             maxLength={COMMUNITY_INPUT_LIMITS.bio}
@@ -361,7 +354,6 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
         >
           <TagHighlightField
             ref={profileTagsInput}
-            name="profileTags"
             value={profileTagsValue}
             spellCheck={false}
             onChange={(event) => {
@@ -468,7 +460,6 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           meta={<CharacterCount value={websiteUrl} max={COMMUNITY_INPUT_LIMITS.websiteUrl} />}
         >
           <input
-            name="websiteUrl"
             type="url"
             inputMode="url"
             value={websiteUrl}
@@ -516,7 +507,6 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
                 >
                   <span>{SOCIAL_PLATFORM_FORMATS[platform.key].prefix}</span>
                   <input
-                    name={`social_${platform.key}`}
                     type="text"
                     inputMode={SOCIAL_PLATFORM_FORMATS[platform.key].inputMode ?? 'text'}
                     value={socialIds[platform.key] ?? ''}
@@ -545,15 +535,32 @@ export function ProfileDialog(props: ModalLayerProps & { user: CommunityUser }) 
           {ja ? 'キャンセル' : 'Cancel'}
         </button>
         <button
+          type="button"
           className={
             'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-on-accent hover:tw-translate-y-[-1px] hover:tw-brightness-110 hover:tw-shadow-community-card'
           }
           disabled={busy}
+          onClick={() =>
+            void saveProfile({
+              academicGroup,
+              department,
+              displayName,
+              bio,
+              websiteUrl,
+              profileTags: profileTagsValue,
+              socialLinks: Object.fromEntries(
+                SOCIAL_PLATFORMS.map((platform) => [
+                  platform.key,
+                  socialIds[platform.key] ?? '',
+                ]),
+              ),
+            })
+          }
         >
           {busy ? <Busy /> : null}
           {ja ? '審査へ送信' : 'Submit for review'}
         </button>
       </footer>
-    </form>
+    </div>
   );
 }

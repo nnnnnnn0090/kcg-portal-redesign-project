@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { ALL_TAG, COMMUNITY_INPUT_LIMITS } from '../constants';
 import type { CommunityPost, CommunityUser } from '../types';
 import { Avatar } from '../components/Avatar';
@@ -11,6 +12,9 @@ export function ExploreScreen({
   posts,
   users,
   loading,
+  loadingMore = false,
+  hasMore = false,
+  onLoadMore,
   query,
   tag,
   tags,
@@ -28,6 +32,9 @@ export function ExploreScreen({
   posts: CommunityPost[];
   users: CommunityUser[];
   loading: boolean;
+  loadingMore?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
   query: string;
   tag: string;
   tags: string[];
@@ -42,6 +49,23 @@ export function ExploreScreen({
   onBookmark: (post: CommunityPost) => void;
   onImpression: (post: CommunityPost) => void;
 }) {
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!hasMore || !onLoadMore || loading || loadingMore) return;
+    const node = sentinelRef.current;
+    if (!node) return;
+    const root = node.closest('.community-scroll');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) onLoadMore();
+      },
+      { root: root instanceof Element ? root : null, rootMargin: '240px 0px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, onLoadMore, posts.length]);
+
   return (
     <main
       className={
@@ -70,7 +94,7 @@ export function ExploreScreen({
         </header>
         <label
           className={
-            'community-search tw-flex tw-h-11 tw-items-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg2 tw-px-3 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-flex-none [&_svg]:tw-fill-none [&_svg]:tw-stroke-community-muted [&_input]:tw-min-w-0 [&_input]:tw-w-full [&_input]:tw-border-0 [&_input]:tw-bg-transparent [&_input]:tw-text-sm [&_input]:tw-text-community-text [&_input]:tw-outline-none'
+            'community-search tw-flex tw-h-11 tw-items-center tw-gap-2 tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg2 tw-px-3 tw-transition-[border-color,box-shadow,background-color] tw-duration-200 focus-within:tw-border-community-accent focus-within:tw-bg-community-bg3 focus-within:tw-shadow-[0_0_0_3px_color-mix(in_srgb,var(--p-accent)_22%,transparent)] [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-flex-none [&_svg]:tw-fill-none [&_svg]:tw-stroke-community-muted [&_svg]:tw-transition-[stroke,transform] [&_svg]:tw-duration-200 focus-within:[&_svg]:tw-stroke-community-accent-light focus-within:[&_svg]:tw-scale-110 [&_input]:tw-min-w-0 [&_input]:tw-w-full [&_input]:tw-border-0 [&_input]:tw-bg-transparent [&_input]:tw-text-sm [&_input]:tw-text-community-text [&_input]:tw-outline-none'
           }
         >
           <Glyph name="search" />
@@ -83,7 +107,7 @@ export function ExploreScreen({
         </label>
         <div
           className={
-            'community-chips tw-my-3 tw-mb-4 tw-flex tw-gap-2 tw-overflow-x-auto tw-pb-1 [&>button]:tw-min-h-9 [&>button]:tw-flex-none [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-text-[13px] [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer [&>button.is-active]:tw-border-community-accent [&>button.is-active]:tw-bg-community-accent-bg [&>button.is-active]:tw-text-community-accent-light'
+            'community-chips tw-my-3 tw-mb-4 tw-flex tw-gap-2 tw-overflow-x-auto tw-pb-1 [&>button]:tw-min-h-9 [&>button]:tw-flex-none [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-text-[13px] [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer [&>button]:tw-transition-[transform,border-color,background-color,color,box-shadow] [&>button]:tw-duration-180 hover:[&>button]:tw-translate-y-[-1px] hover:[&>button]:tw-border-community-accent hover:[&>button]:tw-bg-community-accent-bg hover:[&>button]:tw-text-community-accent-light active:[&>button]:tw-scale-95 [&>button.is-active]:tw-border-community-accent [&>button.is-active]:tw-bg-community-accent-bg [&>button.is-active]:tw-text-community-accent-light [&>button.is-active]:tw-shadow-[0_0_0_1px_color-mix(in_srgb,var(--p-accent)_35%,transparent)]'
           }
         >
           {tags.map((item) => (
@@ -107,7 +131,7 @@ export function ExploreScreen({
         {users.length ? (
           <section
             className={
-              'community-account-results tw-mb-4 tw-grid tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-p-3 [&>header]:tw-flex [&>header]:tw-justify-between [&>header]:tw-text-[13px] [&>header]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-grid-cols-[repeat(auto-fill,minmax(220px,1fr))] [&>div]:tw-gap-2 [&_button]:tw-flex [&_button]:tw-min-w-0 [&_button]:tw-items-center [&_button]:tw-gap-3 [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-3 [&_button]:tw-text-left [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer hover:[&_button]:tw-border-community-accent [&_button>span]:tw-grid [&_button>span]:tw-min-w-0 [&_button>span]:tw-gap-0.5 [&_strong]:tw-text-community-bright [&_small]:tw-text-community-muted [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-accent-light'
+              'community-account-results tw-mb-4 tw-grid tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-p-3 [&>header]:tw-flex [&>header]:tw-justify-between [&>header]:tw-text-[13px] [&>header]:tw-text-community-muted [&>div]:tw-grid [&>div]:tw-grid-cols-[repeat(auto-fill,minmax(220px,1fr))] [&>div]:tw-gap-2 [&_button]:tw-flex [&_button]:tw-min-w-0 [&_button]:tw-items-center [&_button]:tw-gap-3 [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-3 [&_button]:tw-text-left [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer [&_button]:tw-transition-[transform,border-color,background-color,box-shadow] [&_button]:tw-duration-180 hover:[&_button]:tw-translate-y-[-2px] hover:[&_button]:tw-border-community-accent hover:[&_button]:tw-bg-community-accent-bg hover:[&_button]:tw-shadow-community-card active:[&_button]:tw-translate-y-0 active:[&_button]:tw-scale-[.98] [&_button>span]:tw-grid [&_button>span]:tw-min-w-0 [&_button>span]:tw-gap-0.5 [&_strong]:tw-text-community-bright [&_small]:tw-text-community-muted [&_em]:tw-text-xs [&_em]:tw-not-italic [&_em]:tw-text-community-accent-light'
             }
           >
             <header>
@@ -139,21 +163,30 @@ export function ExploreScreen({
         {loading ? (
           <Empty ja={ja} loading />
         ) : posts.length ? (
-          <div
-            className={'community-grid tw-grid tw-grid-cols-2 tw-gap-4 max-[620px]:tw-grid-cols-1'}
-          >
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                ja={ja}
-                onOpen={() => onOpen(post)}
-                onLike={() => onLike(post)}
-                onBookmark={() => onBookmark(post)}
-                onImpression={() => onImpression(post)}
-              />
-            ))}
-          </div>
+          <>
+            <div
+              className={'community-grid tw-grid tw-grid-cols-2 tw-gap-4 max-[620px]:tw-grid-cols-1'}
+            >
+              {posts.map((post, index) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  ja={ja}
+                  index={index}
+                  onOpen={() => onOpen(post)}
+                  onLike={() => onLike(post)}
+                  onBookmark={() => onBookmark(post)}
+                  onImpression={() => onImpression(post)}
+                />
+              ))}
+            </div>
+            <div ref={sentinelRef} className="tw-h-px tw-w-full" aria-hidden />
+            {loadingMore ? (
+              <p className="tw-mt-4 tw-text-center tw-text-sm tw-text-community-muted">
+                {ja ? '読み込み中…' : 'Loading…'}
+              </p>
+            ) : null}
+          </>
         ) : (
           <Empty ja={ja} />
         )}

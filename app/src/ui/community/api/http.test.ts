@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CLIENT_USER_ID_HEADER } from '../../../shared/constants';
+import { formatCommunityProblem } from '../../../services/community-api';
 import { communityApi } from '../api';
 import { setCommunityApiOrigin, setCommunityRequestLoginId } from './runtime';
 
@@ -55,5 +56,71 @@ describe('community HTTP client', () => {
     expect(result.posts[0].authorAvatarUrl).toBe(
       'https://community.example.com/api/users/student/images/avatar',
     );
+  });
+
+  it('surfaces the first field error from validation problems', async () => {
+    expect(
+      formatCommunityProblem(
+        {
+          type: 'https://community.kcg.local/problems/validation_error',
+          title: 'VALIDATION_ERROR',
+          status: 400,
+          code: 'VALIDATION_ERROR',
+          detail: '入力内容を確認してください',
+          fieldErrors: {
+            currentPassword: ['現在のパスワードを入力してください'],
+            newPassword: ['新しいパスワードは8文字以上にしてください'],
+          },
+        },
+        400,
+      ),
+    ).toBe('現在のパスワードを入力してください');
+
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          type: 'https://community.kcg.local/problems/validation_error',
+          title: 'VALIDATION_ERROR',
+          status: 400,
+          code: 'VALIDATION_ERROR',
+          detail: '入力内容を確認してください',
+          fieldErrors: {
+            newPassword: ['新しいパスワードは8文字以上にしてください'],
+          },
+        }),
+        { status: 400, headers: { 'content-type': 'application/json' } },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(
+      communityApi.changePassword('token', {
+        currentPassword: 'password-123',
+        newPassword: 'short',
+        newPasswordConfirmation: 'short',
+      }),
+    ).rejects.toThrow('新しいパスワードは8文字以上にしてください');
+  });
+
+  it('surfaces feed nextCursor from response meta', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: { posts: [{ id: 'post-2' }] },
+          meta: { nextCursor: 'cursor-abc' },
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await communityApi.posts('token', 'cursor-abc');
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      'https://community.example.com/api/posts?cursor=cursor-abc',
+    );
+    expect(result).toEqual({
+      posts: [{ id: 'post-2' }],
+      nextCursor: 'cursor-abc',
+    });
   });
 });

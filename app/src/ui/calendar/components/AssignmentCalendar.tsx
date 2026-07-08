@@ -18,6 +18,7 @@ import { clearRuntimeElementCss, setRuntimeElementCss } from '../../../lib/runti
 import { useSettings } from '../../../context/settings';
 import { buildCalendarGridHtml } from '../grid';
 import { SK, KING_LMS_ASSIGNMENT_SYNC_URL } from '../../../shared/constants';
+import { canonicalPortalHref } from '../../../domain/portal/portal-location-url';
 import storage from '../../../lib/storage';
 import {
   clearCalBodyLoadingAttrs,
@@ -134,7 +135,7 @@ export function AssignmentCalendar({ payload, titles, demoTodayIso }: Assignment
     try {
       await storage.set({
         [SK.kingLmsAssignmentSyncPending]:    true,
-        [SK.kingLmsAssignmentSyncReturnUrl]:  location.href,
+        [SK.kingLmsAssignmentSyncReturnUrl]:  canonicalPortalHref(),
       });
       window.location.href = KING_LMS_ASSIGNMENT_SYNC_URL;
     } catch {

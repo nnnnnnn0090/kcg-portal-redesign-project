@@ -5,6 +5,7 @@ import { Avatar } from './Avatar';
 import { Glyph } from './Glyph';
 import { VerifiedBadge } from './VerifiedBadge';
 import { cn } from '../../../lib/cn';
+import { formatCommunityDateTime } from '../utils';
 
 export function PostCard({
   post,
@@ -13,6 +14,7 @@ export function PostCard({
   onLike,
   onBookmark,
   onImpression,
+  index = 0,
 }: {
   post: CommunityPost;
   ja: boolean;
@@ -20,6 +22,7 @@ export function PostCard({
   onLike: () => void;
   onBookmark: () => void;
   onImpression: () => void;
+  index?: number;
 }) {
   const cardRef = useRef<HTMLElement | null>(null);
   const [likeCelebrating, setLikeCelebrating] = useState(false);
@@ -35,13 +38,7 @@ export function PostCard({
     onBookmark();
   };
   const visibleTags = post.tags.slice(0, 3);
-  const postedAt = new Date(post.createdAt);
-  const postedLabel = Number.isNaN(postedAt.getTime())
-    ? ''
-    : postedAt.toLocaleDateString(ja ? 'ja-JP' : 'en-US', {
-        month: 'short',
-        day: 'numeric',
-      });
+  const postedLabel = formatCommunityDateTime(post.createdAt, ja, 'compact');
   useEffect(() => {
     const element = cardRef.current;
     if (!element) return;
@@ -65,8 +62,9 @@ export function PostCard({
     <article
       ref={cardRef}
       className={
-        'community-post tw-min-w-0 tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card tw-cursor-pointer tw-transition hover:tw-translate-y-[-2px] hover:tw-border-community-accent hover:tw-shadow-lg focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-community-accent'
+        'community-post tw-group tw-min-w-0 tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg2 tw-shadow-community-card tw-cursor-pointer tw-animate-community-item-in tw-transition-[transform,border-color,box-shadow] tw-duration-200 tw-ease-out hover:tw-translate-y-[-3px] hover:tw-border-community-accent hover:tw-shadow-[0_14px_36px_color-mix(in_srgb,#000_20%,transparent)] focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-community-accent active:tw-translate-y-[-1px]'
       }
+      style={{ animationDelay: `${Math.min(index, 12) * 35}ms` }}
       tabIndex={0}
       onClick={onOpen}
       onKeyDown={(event) => {
@@ -75,14 +73,14 @@ export function PostCard({
     >
       <div
         className={
-          'community-post-media tw-relative tw-aspect-video tw-overflow-hidden tw-bg-community-bg3 [&>img]:tw-block [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-cover'
+          'community-post-media tw-relative tw-aspect-video tw-overflow-hidden tw-bg-community-bg3 [&>img]:tw-block [&>img]:tw-h-full [&>img]:tw-w-full [&>img]:tw-object-cover [&>img]:tw-transition-transform [&>img]:tw-duration-500 [&>img]:tw-ease-out group-hover:[&>img]:tw-scale-[1.035]'
         }
       >
         <img src={post.previewUrl || post.imageUrl} alt="" loading="lazy" />
         {(post.imageUrls?.length ?? 1) > 1 ? (
           <span
             className={
-              'community-post-image-count tw-absolute tw-right-2 tw-top-2 tw-rounded-full tw-bg-black/70 tw-px-2 tw-py-[3px] tw-text-xs tw-text-white'
+              'community-post-image-count tw-absolute tw-right-2 tw-top-2 tw-rounded-full tw-bg-black/70 tw-px-2 tw-py-[3px] tw-text-xs tw-text-white tw-backdrop-blur-[2px] tw-transition-transform tw-duration-200 group-hover:tw-scale-105'
             }
           >
             ▣ {post.imageUrls?.length}
@@ -124,7 +122,12 @@ export function PostCard({
               }
             >
               {visibleTags.map((item) => (
-                <span key={item}>#{item}</span>
+                <span
+                  key={item}
+                  className="tw-transition-colors tw-duration-150 group-hover:tw-text-community-accent"
+                >
+                  #{item}
+                </span>
               ))}
             </div>
           ) : null}
@@ -151,7 +154,7 @@ export function PostCard({
             </span>
             <button
               className={cn(
-                'community-bookmark tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-shadow-community-card [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-accent-light [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
+                'community-bookmark tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-shadow-community-card active:tw-translate-y-0 active:tw-scale-95 [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-accent-light [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
                 post.bookmarkedByMe && 'is-active',
                 bookmarkCelebrating && 'is-celebrating',
               )}
@@ -165,7 +168,7 @@ export function PostCard({
             </button>
             <button
               className={cn(
-                'community-like tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-bg-community-danger/10 hover:tw-text-community-danger hover:tw-shadow-community-card [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-danger [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
+                'community-like tw-inline-flex tw-h-8 tw-min-w-11 tw-items-center tw-justify-center tw-gap-1 tw-rounded-full tw-border-0 tw-bg-community-bg3 tw-text-xs tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-bg-community-danger/10 hover:tw-text-community-danger hover:tw-shadow-community-card active:tw-translate-y-0 active:tw-scale-95 [&_svg]:tw-h-4 [&_svg]:tw-w-4 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-text-community-danger [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
                 post.likedByMe && 'is-active',
                 likeCelebrating && 'is-celebrating',
               )}

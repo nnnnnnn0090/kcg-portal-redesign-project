@@ -6,7 +6,6 @@ import {
   useReducer,
   useRef,
   useState,
-  type FormEvent,
   type ReactNode,
   type SetStateAction,
   type AnimationEvent,
@@ -16,9 +15,9 @@ import storage from '../../../lib/storage';
 import { SK } from '../../../shared/constants';
 import { communityApi } from '../../../services/community-api';
 import { setCommunityApiOrigin, setCommunityRequestLoginId } from '../api/runtime';
-import { ALL_TAG, SOCIAL_PLATFORMS } from '../constants';
-import { formString, optionalFormString } from '../forms/formData';
+import { ALL_TAG } from '../constants';
 import { COMMUNITY_TIMING } from '../timing';
+import { resolveCommunityNotificationTarget } from '../notificationTarget';
 import type { CommunityComment, CommunityNotification, CommunityPage, CommunityPost, CommunityUser } from '../types';
 import { communityReducer, createCommunityState } from './reducer';
 import type { CommunityActions, CommunityState, CommunityStateDispatch } from './types';
@@ -92,8 +91,12 @@ export function CommunityProvider({
     avatarImage,
     headerImage,
     closing,
+    commentsRevision,
     notifications,
     loading,
+    postsNextCursor,
+    followingNextCursor,
+    feedLoadingMore,
   } = state;
   const [sessionChecked, setSessionChecked] = useState(false);
   const setPage = useCommunitySetter(dispatch, 'page');
@@ -132,12 +135,17 @@ export function CommunityProvider({
     return () => setCommunityApiOrigin('');
   }, [apiOrigin]);
   const setClosing = useCommunitySetter(dispatch, 'closing');
+  const setPostsNextCursor = useCommunitySetter(dispatch, 'postsNextCursor');
+  const setFollowingNextCursor = useCommunitySetter(dispatch, 'followingNextCursor');
+  const setFeedLoadingMore = useCommunitySetter(dispatch, 'feedLoadingMore');
   const objectUrls = useObjectUrlRegistry();
   const profileObjectUrls = useObjectUrlRegistry();
   const {
     loadFeed,
+    loadMoreFeed,
     loadOwn,
     loadFollowing,
+    loadMoreFollowing,
     loadBookmarks,
     hydrateOwnProfileImages,
     refreshOwnProfile,
@@ -159,7 +167,11 @@ export function CommunityProvider({
     setUser,
     setLoading,
     setError,
+    setPostsNextCursor,
+    setFollowingNextCursor,
+    setFeedLoadingMore,
   });
+  const sessionRevokeRef = useRef<() => void>(() => {});
   const {
     streamDisconnected,
     streamConnecting,
@@ -173,10 +185,21 @@ export function CommunityProvider({
     page,
     query,
     tag,
+    openPostId:
+      modal.kind === 'post' ||
+      modal.kind === 'likes' ||
+      modal.kind === 'delete' ||
+      modal.kind === 'deleteComment'
+        ? modal.post.id
+        : undefined,
     notifications,
     dispatch,
     loadNotifications,
     loadFollowing,
+    loadOwn,
+    loadBookmarks,
+    refreshOwnProfile,
+    onSessionRevoked: () => sessionRevokeRef.current(),
     setKnownTags,
   });
   const recordedImpressions = useRef<Set<string>>(new Set());
@@ -316,6 +339,10 @@ export function CommunityProvider({
       setModal({ kind: 'auth', mode: 'login' });
       return;
     }
+    if (next === 'settings' && !user) {
+      setModal({ kind: 'auth', mode: 'login' });
+      return;
+    }
     if (next === 'create') {
       setPostImages([]);
       setModal(user ? { kind: 'create' } : { kind: 'auth', mode: 'login' });
@@ -342,9 +369,9 @@ export function CommunityProvider({
     }
   };
 
-  const openProfile = async (loginId: string) => {
+  const openProfile = async (loginId: string): Promise<boolean> => {
     const normalized = loginId.trim();
-    if (!normalized) return;
+    if (!normalized) return false;
     setLoading(true);
     setError('');
     try {
@@ -360,8 +387,10 @@ export function CommunityProvider({
       }
       setModal({ kind: 'none' });
       setPage('profile');
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not load profile');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -373,8 +402,78 @@ export function CommunityProvider({
       .post(post.id, token || undefined)
       .then((result) => {
         dispatch({ type: 'patchPost', postId: post.id, value: result.post });
+        setModal((current) =>
+          current.kind === 'post' && current.post.id === post.id
+            ? { kind: 'post', post: result.post }
+            : current,
+        );
       })
       .catch(() => undefined);
+  };
+
+  const openNotification = async (item: CommunityNotification) => {
+    const target = resolveCommunityNotificationTarget(item);
+    setError('');
+    if (target.kind === 'post') {
+      setLoading(true);
+      try {
+        const result = await communityApi.post(target.postId, token || undefined);
+        dispatch({ type: 'patchPost', postId: result.post.id, value: result.post });
+        setModal({ kind: 'post', post: result.post });
+      } catch {
+        setModal({
+          kind: 'unavailable',
+          title: { ja: '投稿が見つかりません', en: 'Post not found' },
+          body: {
+            ja: 'この投稿は削除されたか、表示できなくなりました。',
+            en: 'This post was deleted or is no longer available.',
+          },
+        });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    if (target.kind === 'profile') {
+      const opened = await openProfile(target.loginId);
+      if (!opened) {
+        setModal({
+          kind: 'unavailable',
+          title: { ja: 'ユーザーが見つかりません', en: 'User not found' },
+          body: {
+            ja: 'このユーザーは削除されたか、表示できなくなりました。',
+            en: 'This user was deleted or is no longer available.',
+          },
+        });
+      }
+      return;
+    }
+    if (target.kind === 'ownProfile') {
+      if (!user) {
+        setModal({ kind: 'auth', mode: 'login' });
+        return;
+      }
+      const opened = await openProfile(user.loginId);
+      if (!opened) {
+        setModal({
+          kind: 'unavailable',
+          title: { ja: 'プロフィールが見つかりません', en: 'Profile not found' },
+          body: {
+            ja: 'プロフィールを表示できませんでした。',
+            en: 'Your profile could not be opened.',
+          },
+        });
+      }
+      return;
+    }
+    setModal({
+      kind: 'unavailable',
+      title: { ja: '見つかりません', en: 'Unavailable' },
+      body: {
+        ja: 'この通知の対象はもう存在しません。',
+        en: 'The target of this notification no longer exists.',
+      },
+    });
   };
 
   const openTag = (nextTag: string) => {
@@ -412,24 +511,61 @@ export function CommunityProvider({
     }
   };
 
-  const authenticate = async (event: FormEvent<HTMLFormElement>, mode: 'login' | 'register') => {
-    event.preventDefault();
+  const authenticate = async (
+    mode: 'login' | 'register',
+    values: {
+      loginId: string;
+      displayName?: string;
+      password: string;
+      passwordConfirmation?: string;
+    },
+  ) => {
     if (busy) return;
-    const form = new FormData(event.currentTarget);
-    if (
-      mode === 'register' &&
-      form.get('communitySecret') !== form.get('communitySecretConfirmation')
-    ) {
-      setError(ja ? 'パスワードが一致しません。' : 'Passwords do not match.');
+    const loginId = values.loginId.trim();
+    if (!loginId) {
+      setError(ja ? 'ユーザーIDを入力してください。' : 'Enter a user ID.');
+      return;
+    }
+    if (mode === 'register') {
+      if (loginId.length < 4) {
+        setError(
+          ja ? 'ユーザーIDは4文字以上にしてください。' : 'User ID must be at least 4 characters.',
+        );
+        return;
+      }
+      if (!/^[A-Za-z0-9_.-]+$/.test(loginId)) {
+        setError(
+          ja
+            ? 'ユーザーIDは半角英数字と . _ - のみ使えます。'
+            : 'User ID can only use letters, numbers, and . _ -',
+        );
+        return;
+      }
+      if (!(values.displayName || '').trim()) {
+        setError(ja ? '表示名を入力してください。' : 'Enter a display name.');
+        return;
+      }
+      if (values.password.length < 8) {
+        setError(
+          ja ? 'パスワードは8文字以上にしてください。' : 'Password must be at least 8 characters.',
+        );
+        return;
+      }
+      if (values.password !== values.passwordConfirmation) {
+        setError(ja ? 'パスワードが一致しません。' : 'Passwords do not match.');
+        return;
+      }
+    } else if (!values.password) {
+      setError(ja ? 'パスワードを入力してください。' : 'Enter your password.');
       return;
     }
     setBusy(true);
     setError('');
     try {
       const result = await communityApi.authenticate(mode, {
-        loginId: formString(form, 'communityLoginId'),
-        displayName: optionalFormString(form, 'displayName'),
-        password: formString(form, 'communitySecret'),
+        loginId,
+        displayName: values.displayName || null,
+        password: values.password,
       });
       await storage.set({ [SK.communityAuthToken]: result.token });
       setCommunityRequestLoginId(result.user.loginId);
@@ -460,18 +596,63 @@ export function CommunityProvider({
     profileObjectUrls.current = [];
     dispatch({ type: 'resetSession' });
   };
+  sessionRevokeRef.current = () => {
+    void logout();
+  };
 
-  const submitPost = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const changePassword = async (values: {
+    currentPassword: string;
+    newPassword: string;
+    newPasswordConfirmation: string;
+  }) => {
+    if (!token || busy) return;
+    if (values.newPassword !== values.newPasswordConfirmation) {
+      setError(ja ? '新しいパスワードが一致しません。' : 'New passwords do not match.');
+      throw new Error('mismatch');
+    }
+    setBusy(true);
+    setError('');
+    try {
+      await communityApi.changePassword(token, values);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not change password');
+      throw cause;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteAccount = async (password: string) => {
+    if (!token || busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      await communityApi.deleteAccount(token, { password });
+      setCommunityRequestLoginId(null);
+      await storage.set({ [SK.communityAuthToken]: '' });
+      objectUrls.current.forEach(URL.revokeObjectURL);
+      objectUrls.current = [];
+      profileObjectUrls.current.forEach(URL.revokeObjectURL);
+      profileObjectUrls.current = [];
+      dispatch({ type: 'resetSession' });
+      closeDrawer();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not delete account');
+      throw cause;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitPost = async (values: { title: string; caption: string }) => {
     if (!postImages.length || busy) return;
-    const form = new FormData(event.currentTarget);
     setBusy(true);
     setError('');
     try {
       await Promise.all([
         communityApi.createPost(token, {
-          title: formString(form, 'title'),
-          caption: formString(form, 'caption'),
+          title: values.title,
+          caption: values.caption,
           imageDataUrls: postImages,
         }),
         new Promise((resolve) =>
@@ -489,29 +670,26 @@ export function CommunityProvider({
     }
   };
 
-  const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const saveProfile = async (values: {
+    academicGroup: string;
+    department: string;
+    displayName: string;
+    bio: string;
+    websiteUrl: string;
+    profileTags: string;
+    socialLinks: Record<string, string>;
+  }) => {
     if (busy) return;
-    const form = new FormData(event.currentTarget);
     setBusy(true);
     setError('');
     try {
-      await communityApi.updateAcademicProfile(
-        token,
-        formString(form, 'academicGroup'),
-        formString(form, 'department'),
-      );
+      await communityApi.updateAcademicProfile(token, values.academicGroup, values.department);
       const result = await communityApi.updateProfile(token, {
-        displayName: formString(form, 'displayName'),
-        bio: formString(form, 'bio'),
-        websiteUrl: formString(form, 'websiteUrl'),
-        profileTags: formString(form, 'profileTags'),
-        socialLinks: Object.fromEntries(
-          SOCIAL_PLATFORMS.map((platform) => [
-            platform.key,
-            formString(form, `social_${platform.key}`),
-          ]),
-        ),
+        displayName: values.displayName,
+        bio: values.bio,
+        websiteUrl: values.websiteUrl,
+        profileTags: values.profileTags,
+        socialLinks: values.socialLinks,
       });
       if (avatarImage) await communityApi.submitAvatar(token, avatarImage);
       if (headerImage) await communityApi.submitHeader(token, headerImage);
@@ -548,6 +726,7 @@ export function CommunityProvider({
     setError('');
     try {
       await communityApi.deleteComment(token, post.id, comment.id);
+      dispatch({ type: 'bumpCommentsRevision' });
       setModal({ kind: 'post', post });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not delete comment');
@@ -856,16 +1035,31 @@ export function CommunityProvider({
     }
   };
 
+  const loadMoreExplore = async () => {
+    if (feedLoadingMore || !postsNextCursor) return;
+    await loadMoreFeed(token || undefined, postsNextCursor);
+  };
+
+  const loadMoreFollowingPage = async () => {
+    if (!token || feedLoadingMore || !followingNextCursor) return;
+    await loadMoreFollowing(token, followingNextCursor);
+  };
+
   const actions: CommunityActions = {
     closeDrawer,
     loadFeed,
+    loadMoreFeed: loadMoreExplore,
+    loadMoreFollowing: loadMoreFollowingPage,
     go,
     openProfile,
     openPost,
+    openNotification,
     openTag,
     openConnections,
     authenticate,
     logout,
+    changePassword,
+    deleteAccount,
     submitPost,
     saveProfile,
     removePost,
@@ -888,6 +1082,10 @@ export function CommunityProvider({
         setError('');
         setModal({ kind: 'none' });
       }
+    },
+    openDeleteAccount: () => {
+      setError('');
+      setModal({ kind: 'deleteAccount' });
     },
     setAuthMode: (mode) => {
       setError('');

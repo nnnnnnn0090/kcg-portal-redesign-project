@@ -104,10 +104,10 @@ export function CommunityActivityIntroPanel({
         {items.map((item) => (
           <li
             key={item.title}
-            className="tw-flex tw-items-center tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-py-2.5 tw-shadow-community-card"
+            className="tw-group tw-flex tw-items-center tw-gap-3 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-py-2.5 tw-shadow-community-card tw-transition-[transform,border-color,box-shadow] tw-duration-200 hover:tw-translate-y-[-2px] hover:tw-border-community-accent hover:tw-shadow-[0_12px_28px_color-mix(in_srgb,#000_18%,transparent)]"
           >
             <span
-              className="tw-grid tw-h-9 tw-w-9 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg2 tw-text-community-accent-light [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&_svg]:tw-stroke-[1.9]"
+              className="tw-grid tw-h-9 tw-w-9 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg2 tw-text-community-accent-light tw-transition-transform tw-duration-200 group-hover:tw-scale-105 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&_svg]:tw-stroke-[1.9]"
               aria-hidden="true"
             >
               <Glyph name={item.glyph} />

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CommunityPost } from '../types';
 import { communityReducer, createCommunityState } from './reducer';
+import type { CommunityState } from './types';
 
 const post: CommunityPost = {
   id: 'post-1',
@@ -65,7 +66,7 @@ describe('communityReducer', () => {
     expect(communityReducer(state, { type: 'restorePost', post }).posts[0]).toEqual(post);
   });
 
-  it('removes a deleted post from every collection', () => {
+  it('removes a deleted post from public collections but keeps ownPosts for status refresh', () => {
     const state = {
       ...createCommunityState(true),
       posts: [post],
@@ -73,13 +74,32 @@ describe('communityReducer', () => {
       profilePosts: [post],
       followingPosts: [post],
       bookmarkedPosts: [post],
+      modal: { kind: 'post' as const, post },
     };
     const updated = communityReducer(state, { type: 'removePost', postId: post.id });
     expect(updated.posts).toEqual([]);
-    expect(updated.ownPosts).toEqual([]);
+    expect(updated.ownPosts).toEqual([post]);
     expect(updated.profilePosts).toEqual([]);
     expect(updated.followingPosts).toEqual([]);
     expect(updated.bookmarkedPosts).toEqual([]);
+    expect(updated.modal.kind).toBe('unavailable');
+  });
+
+  it('prepends restored posts into author/profile collections', () => {
+    const profile = {
+      id: 'u1',
+      loginId: 'user',
+      displayName: 'User',
+    } as CommunityState['user'];
+    const state = {
+      ...createCommunityState(true),
+      user: profile,
+      profileUser: profile,
+    };
+    const updated = communityReducer(state, { type: 'prependPost', post });
+    expect(updated.posts[0].id).toBe(post.id);
+    expect(updated.ownPosts[0]?.id).toBe(post.id);
+    expect(updated.profilePosts[0]?.id).toBe(post.id);
   });
 
   it('clears session-owned state on logout without discarding the public feed', () => {

@@ -1,3 +1,4 @@
+import { sanitizePortalLocationUrl } from '../../../domain/portal/portal-location-url';
 import { ALL_TAG } from '../constants';
 import type { CommunityPage, CommunityPost } from '../types';
 import type { CommunityModal } from './types';
@@ -23,6 +24,7 @@ const PAGES = new Set<CommunityPage>([
   'bookmarks',
   'notifications',
   'feedback',
+  'settings',
   'profile',
 ]);
 
@@ -158,6 +160,7 @@ export function communityUrlFromState(values: {
     case 'post':
       params.set(KEYS.post, values.modal.post.id);
       break;
+    case 'unavailable':
     case 'delete':
     case 'deleteComment':
     case 'none':
@@ -170,6 +173,7 @@ export function communityUrlFromState(values: {
 function currentHrefWithoutCommunityParams(): URL {
   const url = new URL(location.href);
   for (const key of COMMUNITY_KEYS) url.searchParams.delete(key);
+  sanitizePortalLocationUrl(url);
   return url;
 }
 

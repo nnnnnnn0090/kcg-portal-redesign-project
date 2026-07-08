@@ -1,0 +1,37 @@
+/* Soften motion-icons presets inside the connection status control only. */
+.community-connection-status .motion-pulse {
+  animation-name: community-connection-pulse;
+  animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.community-connection-status .motion-spin {
+  animation-name: community-connection-spin;
+  animation-timing-function: linear;
+}
+
+@keyframes community-connection-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes community-connection-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .community-connection-status .motion-pulse,
+  .community-connection-status .motion-spin {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}

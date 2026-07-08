@@ -1,6 +1,47 @@
 import type { CommunityPost, CommunityUser, SocialLinks } from './types';
 import { ALL_TAG, SOCIAL_PLATFORMS } from './constants';
 
+export function formatCommunityDateTime(
+  value: string | number | Date,
+  ja: boolean,
+  style: 'compact' | 'full' = 'full',
+): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const locale = ja ? 'ja-JP' : 'en-US';
+  if (style === 'compact') {
+    return date.toLocaleString(locale, {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+  return date.toLocaleString(locale, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+export function formatCommunityCount(count: number, ja: boolean): string {
+  const formatted = count.toLocaleString(ja ? 'ja-JP' : 'en-US');
+  return ja ? `${formatted}件` : formatted;
+}
+
+export function formatCommunityMetric(
+  count: number,
+  ja: boolean,
+  metric: { ja: string; enSingular: string; enPlural: string },
+): string {
+  const formatted = count.toLocaleString(ja ? 'ja-JP' : 'en-US');
+  if (ja) return `${metric.ja} ${formatted}件`;
+  const unit = count === 1 ? metric.enSingular : metric.enPlural;
+  return `${formatted} ${unit}`;
+}
+
 export function websiteLabel(value: string): string {
   try {
     const url = new URL(value);

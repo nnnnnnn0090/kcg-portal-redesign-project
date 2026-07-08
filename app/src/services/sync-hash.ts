@@ -2,6 +2,7 @@
  * King LMS からポータルへ戻った直後の `location.hash` を解釈し、トースト用メッセージを返します。
  */
 
+import { buildPortalHistoryUrl } from '../domain/portal/portal-location-url';
 import { SK, SYNC_HASH } from '../shared/constants';
 import storage from '../lib/storage';
 import { messagesForLanguage, normalizeLanguage, type AppLanguage } from '../i18n/messages';
@@ -27,7 +28,7 @@ export function consumeKingLmsSyncReturnHash(language: AppLanguage): string {
 
   if (msg) {
     try {
-      history.replaceState(null, '', `${location.pathname}${location.search}`);
+      history.replaceState(null, '', buildPortalHistoryUrl());
     } catch {
       try { location.hash = ''; } catch { /* ignore */ }
     }

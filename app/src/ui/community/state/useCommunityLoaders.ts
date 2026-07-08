@@ -1,5 +1,6 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import { communityApi } from '../api';
+import { COMMUNITY_CONNECTION_ERROR } from '../constants';
 import type { CommunityNotification, CommunityPost, CommunityUser } from '../types';
 import { mergeOwnProfile } from '../utils';
 
@@ -21,6 +22,16 @@ interface CommunityLoaderOptions {
   setUser: Setter<CommunityUser | null>;
   setLoading: Setter<boolean>;
   setError: Setter<string>;
+  setPostsNextCursor: Setter<string | null>;
+  setFollowingNextCursor: Setter<string | null>;
+  setFeedLoadingMore: Setter<boolean>;
+}
+
+function appendUniquePosts(current: CommunityPost[], incoming: CommunityPost[]) {
+  if (!incoming.length) return current;
+  const seen = new Set(current.map((post) => post.id));
+  const extra = incoming.filter((post) => !seen.has(post.id));
+  return extra.length ? [...current, ...extra] : current;
 }
 
 export function useCommunityLoaders({
@@ -39,24 +50,42 @@ export function useCommunityLoaders({
   setUser,
   setLoading,
   setError,
+  setPostsNextCursor,
+  setFollowingNextCursor,
+  setFeedLoadingMore,
 }: CommunityLoaderOptions) {
   const loadFeed = useCallback(
     async (authToken?: string, silent = false) => {
       if (!silent) setLoading(true);
       setError('');
       try {
-        setPosts((await communityApi.posts(authToken)).posts);
+        const result = await communityApi.posts(authToken);
+        setPosts(result.posts);
+        setPostsNextCursor(result.nextCursor);
       } catch {
-        setError(
-          ja
-            ? 'コミュニティサーバーに接続できません。'
-            : 'Could not connect to the community server.',
-        );
+        setError(ja ? COMMUNITY_CONNECTION_ERROR.ja : COMMUNITY_CONNECTION_ERROR.en);
       } finally {
         if (!silent) setLoading(false);
       }
     },
-    [ja, setError, setLoading, setPosts],
+    [ja, setError, setLoading, setPosts, setPostsNextCursor],
+  );
+
+  const loadMoreFeed = useCallback(
+    async (authToken: string | undefined, cursor: string | null) => {
+      if (!cursor) return;
+      setFeedLoadingMore(true);
+      try {
+        const result = await communityApi.posts(authToken, cursor);
+        setPosts((current) => appendUniquePosts(current, result.posts));
+        setPostsNextCursor(result.nextCursor);
+      } catch {
+        // Keep already loaded posts; silent failure on append.
+      } finally {
+        setFeedLoadingMore(false);
+      }
+    },
+    [setFeedLoadingMore, setPosts, setPostsNextCursor],
   );
 
   const loadOwn = useCallback(
@@ -94,12 +123,32 @@ export function useCommunityLoaders({
   const loadFollowing = useCallback(
     async (authToken: string) => {
       try {
-        setFollowingPosts((await communityApi.followingPosts(authToken)).posts);
+        const result = await communityApi.followingPosts(authToken);
+        setFollowingPosts(result.posts);
+        setFollowingNextCursor(result.nextCursor);
       } catch {
         setFollowingPosts([]);
+        setFollowingNextCursor(null);
       }
     },
-    [setFollowingPosts],
+    [setFollowingNextCursor, setFollowingPosts],
+  );
+
+  const loadMoreFollowing = useCallback(
+    async (authToken: string, cursor: string | null) => {
+      if (!cursor) return;
+      setFeedLoadingMore(true);
+      try {
+        const result = await communityApi.followingPosts(authToken, cursor);
+        setFollowingPosts((current) => appendUniquePosts(current, result.posts));
+        setFollowingNextCursor(result.nextCursor);
+      } catch {
+        // Keep already loaded posts; silent failure on append.
+      } finally {
+        setFeedLoadingMore(false);
+      }
+    },
+    [setFeedLoadingMore, setFollowingNextCursor, setFollowingPosts],
   );
 
   const loadBookmarks = useCallback(
@@ -180,8 +229,10 @@ export function useCommunityLoaders({
 
   return {
     loadFeed,
+    loadMoreFeed,
     loadOwn,
     loadFollowing,
+    loadMoreFollowing,
     loadBookmarks,
     hydrateOwnProfileImages,
     refreshOwnProfile,

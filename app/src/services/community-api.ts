@@ -20,6 +20,17 @@ import { getOrCreateClientUserId } from './client-identity';
 
 const COMMUNITY_LOGIN_ID_HEADER = 'X-KCG-Community-Login-Id';
 
+export function formatCommunityProblem(
+  problem: ApiProblem | null,
+  status: number,
+): string {
+  const fieldMessages = Object.values(problem?.fieldErrors ?? {})
+    .flat()
+    .filter((message): message is string => typeof message === 'string' && message.length > 0);
+  if (fieldMessages.length > 0) return fieldMessages[0]!;
+  return problem?.detail || `HTTP ${status}`;
+}
+
 export async function withCommunityRequestIdentity(init: RequestInit = {}): Promise<RequestInit> {
   const headers = new Headers(init.headers);
   headers.set(CLIENT_USER_ID_HEADER, await getOrCreateClientUserId());
@@ -39,10 +50,33 @@ export async function communityRequest<T>(path: string, init?: RequestInit): Pro
   const body = (await response.json().catch(() => null)) as ApiEnvelope<T> | ApiProblem | null;
   if (!response.ok) {
     const problem = body as ApiProblem | null;
-    throw new Error(problem?.detail || `HTTP ${response.status}`);
+    throw new Error(formatCommunityProblem(problem, response.status));
   }
   if (!body || !('data' in body)) throw new Error(`HTTP ${response.status}`);
   return resolveCommunityMediaUrls(body.data, origin);
+}
+
+export async function communityRequestWithMeta<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<{ data: T; meta?: ApiEnvelope<T>['meta'] }> {
+  const origin = getCommunityApiOrigin();
+  const response = await fetch(`${origin}/api${path}`, {
+    cache: 'no-store',
+    ...(await withCommunityRequestIdentity(init)),
+  });
+  if (response.status === 204) return { data: null as T };
+
+  const body = (await response.json().catch(() => null)) as ApiEnvelope<T> | ApiProblem | null;
+  if (!response.ok) {
+    const problem = body as ApiProblem | null;
+    throw new Error(formatCommunityProblem(problem, response.status));
+  }
+  if (!body || !('data' in body)) throw new Error(`HTTP ${response.status}`);
+  return {
+    data: resolveCommunityMediaUrls(body.data, origin),
+    meta: body.meta,
+  };
 }
 
 export function authorizedRequest(token: string, init: RequestInit = {}): RequestInit {
@@ -91,12 +125,34 @@ export interface UpdateProfileInput {
   socialLinks: SocialLinks;
 }
 
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
+}
+
+export interface DeleteAccountInput {
+  password: string;
+}
+
+function feedPath(params: { scope?: 'following'; cursor?: string | null } = {}) {
+  const search = new URLSearchParams();
+  if (params.scope) search.set('scope', params.scope);
+  if (params.cursor) search.set('cursor', params.cursor);
+  const query = search.toString();
+  return params.scope === 'following'
+    ? `/feed${query ? `?${query}` : ''}`
+    : `/posts${query ? `?${query}` : ''}`;
+}
+
 export const communityApi = {
-  posts: (token?: string) =>
-    communityRequest<{ posts: CommunityPost[] }>(
-      '/posts',
+  posts: async (token?: string, cursor?: string | null) => {
+    const result = await communityRequestWithMeta<{ posts: CommunityPost[] }>(
+      feedPath({ cursor }),
       token ? authorizedRequest(token) : undefined,
-    ),
+    );
+    return { posts: result.data.posts, nextCursor: result.meta?.nextCursor ?? null };
+  },
   post: (id: string, token?: string) =>
     communityRequest<{ post: CommunityPost }>(
       `/posts/${encodeURIComponent(id)}`,
@@ -113,8 +169,13 @@ export const communityApi = {
     communityRequest<null>('/session', authorizedRequest(token, { method: 'DELETE' })),
   ownPosts: (token: string) =>
     communityRequest<{ posts: CommunityPost[] }>('/me/posts', authorizedRequest(token)),
-  followingPosts: (token: string) =>
-    communityRequest<{ posts: CommunityPost[] }>('/feed?scope=following', authorizedRequest(token)),
+  followingPosts: async (token: string, cursor?: string | null) => {
+    const result = await communityRequestWithMeta<{ posts: CommunityPost[] }>(
+      feedPath({ scope: 'following', cursor }),
+      authorizedRequest(token),
+    );
+    return { posts: result.data.posts, nextCursor: result.meta?.nextCursor ?? null };
+  },
   bookmarkedPosts: (token: string) =>
     communityRequest<{ posts: CommunityPost[] }>('/me/bookmarks', authorizedRequest(token)),
   user: (loginId: string, token?: string) =>
@@ -286,6 +347,13 @@ export const communityApi = {
       '/me/academic',
       authorizedRequest(token, jsonRequest('PATCH', { academicGroup, department })),
     ),
+  changePassword: (token: string, body: ChangePasswordInput) =>
+    communityRequest<{ ok: true }>(
+      '/me/password',
+      authorizedRequest(token, jsonRequest('POST', body)),
+    ),
+  deleteAccount: (token: string, body: DeleteAccountInput) =>
+    communityRequest<{ ok: true }>('/me', authorizedRequest(token, jsonRequest('DELETE', body))),
   submitAvatar: async (token: string, imageDataUrl: string) =>
     communityRequest<{ status: 'pending' }>(
       '/me/profile-submission/images/avatar',

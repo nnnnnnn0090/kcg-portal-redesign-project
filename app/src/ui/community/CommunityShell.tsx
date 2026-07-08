@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
-import { ALL_TAG } from './constants';
+import { useEffect, useMemo, useState } from 'react';
+import { ALL_TAG, COMMUNITY_CONNECTION_ERROR } from './constants';
 import { collectTags, filterPosts } from './utils';
+import { CommunityConnectionOverlay } from './components/CommunityConnectionOverlay';
+import { CommunityConnectionStatus } from './components/CommunityConnectionStatus';
 import { CommunityNotificationToast } from './components/CommunityNotificationToast';
-import { CommunityStreamReconnect } from './components/CommunityStreamReconnect';
 import { Glyph } from './components/Glyph';
 import { MobileNav, Sidebar } from './components/Navigation';
 import { ModalLayer } from './dialogs/ModalLayer';
@@ -11,6 +12,7 @@ import { FeedbackScreen } from './screens/FeedbackScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import {
   useCommunityActions,
   useCommunityState,
@@ -30,6 +32,7 @@ export function CommunityShell() {
     dismissNotificationToast,
     handleNotificationToastAnimationEnd,
   } = useCommunityStreamUi();
+  const [connectionOutageVisible, setConnectionOutageVisible] = useState(false);
   const {
     ja,
     page,
@@ -54,17 +57,26 @@ export function CommunityShell() {
     avatarImage,
     headerImage,
     closing,
+    commentsRevision,
+    postsNextCursor,
+    followingNextCursor,
+    feedLoadingMore,
   } = state;
   const {
     closeDrawer,
     loadFeed,
+    loadMoreFeed,
+    loadMoreFollowing,
     go,
     openProfile,
     openPost,
+    openNotification,
     openTag,
     openConnections,
     authenticate,
     logout,
+    changePassword,
+    deleteAccount,
     submitPost,
     saveProfile,
     removePost,
@@ -78,6 +90,7 @@ export function CommunityShell() {
     submitContactInquiry,
     openProfileEditor,
     closeModal,
+    openDeleteAccount,
     setAuthMode,
     setModal,
     setQuery,
@@ -107,6 +120,23 @@ export function CommunityShell() {
     () => collectTags(bookmarkedPosts, [], locale),
     [bookmarkedPosts, locale],
   );
+  const feedFailed =
+    error === (ja ? COMMUNITY_CONNECTION_ERROR.ja : COMMUNITY_CONNECTION_ERROR.en);
+  useEffect(() => {
+    if (feedFailed) {
+      setConnectionOutageVisible(true);
+      return;
+    }
+    if (streamDisconnected) {
+      const timer = window.setTimeout(() => {
+        setConnectionOutageVisible(true);
+      }, 1200);
+      return () => window.clearTimeout(timer);
+    }
+    if (!streamConnecting) {
+      setConnectionOutageVisible(false);
+    }
+  }, [feedFailed, streamConnecting, streamDisconnected]);
 
   const pageTitle =
     page === 'home'
@@ -133,9 +163,13 @@ export function CommunityShell() {
                 ? ja
                   ? 'お問い合わせ・意見箱'
                   : 'Contact and feedback'
-                : ja
-                  ? 'プロフィール'
-                  : 'Profile';
+                : page === 'settings'
+                  ? ja
+                    ? '設定'
+                    : 'Settings'
+                  : ja
+                    ? 'プロフィール'
+                    : 'Profile';
 
   return (
     <div
@@ -196,22 +230,34 @@ export function CommunityShell() {
               <Glyph name="comment" />
               <span>{ja ? 'お問い合わせ・意見箱' : 'Contact'}</span>
             </button>
-            {!user ? (
-              <div
-                className={
-                  'community-auth-actions tw-flex tw-items-center tw-gap-2 [&>button]:tw-h-10 [&>button]:tw-rounded-lg [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg3 [&>button]:tw-px-3 [&>button]:tw-font-semibold [&>button]:tw-cursor-pointer [&>button.is-primary]:tw-border-community-accent [&>button.is-primary]:tw-bg-community-accent [&>button.is-primary]:tw-text-community-on-accent max-[620px]:[&>button]:tw-w-10 max-[620px]:[&>button]:tw-overflow-hidden max-[620px]:[&>button]:tw-px-1 max-[620px]:[&>button]:tw-text-xs'
-                }
+            {user ? (
+              <button
+                type="button"
+                className={cn(
+                  'community-settings-entry tw-inline-flex tw-h-10 tw-shrink-0 tw-items-center tw-justify-center tw-gap-1.5 tw-whitespace-nowrap tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light max-[620px]:tw-w-10 max-[620px]:tw-gap-0 max-[620px]:tw-px-0 max-[620px]:tw-text-0 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px]',
+                  page === 'settings' &&
+                    'tw-border-community-accent tw-bg-community-accent-bg tw-text-community-accent-light',
+                )}
+                aria-label={ja ? '設定' : 'Settings'}
+                aria-current={page === 'settings' ? 'page' : undefined}
+                onClick={() => go('settings')}
               >
+                <Glyph name="settings" />
+                <span>{ja ? '設定' : 'Settings'}</span>
+              </button>
+            ) : null}
+            {!user ? (
+              <div className="community-auth-actions tw-flex tw-items-center tw-gap-2">
                 <button
-                  className="tw-text-community-text"
+                  type="button"
+                  className="tw-inline-flex tw-h-10 tw-shrink-0 tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light max-[620px]:tw-w-10 max-[620px]:tw-px-1 max-[620px]:tw-text-xs"
                   onClick={() => setModal({ kind: 'auth', mode: 'register' })}
                 >
                   {ja ? '新規登録' : 'Sign up'}
                 </button>
                 <button
-                  className={
-                    'is-primary tw-border-community-accent tw-bg-community-accent tw-text-community-on-accent'
-                  }
+                  type="button"
+                  className="tw-inline-flex tw-h-10 tw-shrink-0 tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-font-semibold tw-text-community-text tw-cursor-pointer hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light max-[620px]:tw-w-10 max-[620px]:tw-px-1 max-[620px]:tw-text-xs"
                   onClick={() => setModal({ kind: 'auth', mode: 'login' })}
                 >
                   {ja ? 'ログイン' : 'Log in'}
@@ -227,9 +273,15 @@ export function CommunityShell() {
                 {ja ? 'ログアウト' : 'Log out'}
               </button>
             )}
+            <CommunityConnectionStatus
+              connecting={streamConnecting}
+              disconnected={streamDisconnected}
+              ja={ja}
+              onReconnect={reconnectStream}
+            />
             <button
               className={
-                'community-close tw-grid tw-h-10 tw-w-10 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-text-community-text tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+                'community-close tw-grid tw-h-10 tw-w-10 tw-flex-none tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-text-community-text tw-cursor-pointer tw-transition-[background-color,border-color,color,transform] tw-duration-180 hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-rotate-90 active:tw-scale-95 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
               }
               type="button"
               onClick={closeDrawer}
@@ -257,6 +309,9 @@ export function CommunityShell() {
             <ExploreScreen
               posts={visiblePosts}
               loading={loading}
+              loadingMore={feedLoadingMore}
+              hasMore={Boolean(postsNextCursor) && !query && tag === ALL_TAG}
+              onLoadMore={() => void loadMoreFeed()}
               query={query}
               tag={tag}
               tags={tags}
@@ -275,6 +330,9 @@ export function CommunityShell() {
             <ExploreScreen
               posts={visibleFollowingPosts}
               loading={loading}
+              loadingMore={feedLoadingMore}
+              hasMore={Boolean(followingNextCursor) && !query && tag === ALL_TAG}
+              onLoadMore={() => void loadMoreFollowing()}
               query={query}
               tag={tag}
               tags={followingTags}
@@ -321,7 +379,7 @@ export function CommunityShell() {
             <NotificationsScreen
               notifications={notifications}
               ja={ja}
-              onOpenProfile={(loginId) => void openProfile(loginId)}
+              onOpen={(item) => void openNotification(item)}
             />
           ) : null}
           {page === 'feedback' ? (
@@ -333,6 +391,15 @@ export function CommunityShell() {
               onSubmitContact={submitContactInquiry}
             />
           ) : null}
+          {page === 'settings' && user ? (
+            <SettingsScreen
+              ja={ja}
+              busy={busy}
+              error={error}
+              onChangePassword={changePassword}
+              onRequestDeleteAccount={openDeleteAccount}
+            />
+          ) : null}
           {page === 'profile' && profileUser ? (
             <ProfileScreen
               user={profileUser}
@@ -341,6 +408,7 @@ export function CommunityShell() {
               ja={ja}
               isOwn={Boolean(user && profileUser.loginId === user.loginId)}
               onEdit={openProfileEditor}
+              onSettings={() => go('settings')}
               onCreate={() => go('create')}
               onOpen={openPost}
               onLike={(post) => void toggleLike(post)}
@@ -352,6 +420,18 @@ export function CommunityShell() {
             />
           ) : null}
         </div>
+        {connectionOutageVisible ? (
+          <CommunityConnectionOverlay
+            ja={ja}
+            connecting={streamConnecting || (loading && feedFailed)}
+            feedFailed={feedFailed}
+            onRetry={() => {
+              reconnectStream();
+              void loadFeed();
+            }}
+            onClose={closeDrawer}
+          />
+        ) : null}
         <MobileNav
           page={page}
           user={user}
@@ -385,6 +465,7 @@ export function CommunityShell() {
           saveProfile={saveProfile}
           removePost={removePost}
           removeComment={removeComment}
+          deleteAccount={deleteAccount}
           requestDelete={(post) => setModal({ kind: 'delete', post })}
           requestDeleteComment={(post, comment) =>
             setModal({ kind: 'deleteComment', post, comment })
@@ -392,6 +473,7 @@ export function CommunityShell() {
           backToPost={(post) => setModal({ kind: 'post', post })}
           openLikes={openLikes}
           canDeletePost={canDeletePost}
+          commentsRevision={commentsRevision}
           openTag={openTag}
           openProfile={(loginId) => void openProfile(loginId)}
           readPost={readPostFiles}
@@ -403,17 +485,12 @@ export function CommunityShell() {
           closing={notificationToastClosing}
           ja={ja}
           onOpen={() => {
+            const current = notificationToast;
             dismissNotificationToast();
-            go('notifications');
+            if (current) void openNotification(current);
           }}
           onDismiss={dismissNotificationToast}
           onAnimationEnd={handleNotificationToastAnimationEnd}
-        />
-        <CommunityStreamReconnect
-          visible={streamDisconnected}
-          connecting={streamConnecting}
-          ja={ja}
-          onReconnect={reconnectStream}
         />
       </section>
     </div>

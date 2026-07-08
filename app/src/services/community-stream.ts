@@ -1,10 +1,11 @@
-import type { CommunityPost } from '../ui/community/types';
+import type { CommunityPost, CommunityUser } from '../ui/community/types';
 import { getCommunityApiOrigin } from './community-runtime';
 
 const RETRY_MS = [1_000, 2_000, 5_000, 10_000, 30_000] as const;
 
 export type CommunityStreamingHandlers = {
   onNote: (post: CommunityPost) => void;
+  onPostUpdated?: (post: CommunityPost) => void;
   onPostRemoved: (postId: string) => void;
   onPostStats: (payload: {
     postId: string;
@@ -13,7 +14,17 @@ export type CommunityStreamingHandlers = {
     commentCount?: number;
     impressionCount?: number;
   }) => void;
+  onCommentsChanged?: (postId: string) => void;
+  onProfileUpdated?: (user: CommunityUser) => void;
+  onFollowUpdated?: (payload: {
+    targetLoginId: string;
+    followerCount: number;
+    actorLoginId: string;
+    actorFollowingCount: number;
+    followed: boolean;
+  }) => void;
   onNotificationFlushed: () => void;
+  onSessionRevoked?: () => void;
   onStatusChange?: (status: CommunityStreamStatus) => void;
   onOpen?: () => void;
 };
@@ -104,6 +115,11 @@ export function connectCommunityStreaming(
             options.onNote(payload as CommunityPost);
           }
           return;
+        case 'noteUpdated':
+          if (payload && typeof payload === 'object') {
+            options.onPostUpdated?.(payload as CommunityPost);
+          }
+          return;
         case 'postRemoved':
           if (
             payload &&
@@ -124,8 +140,40 @@ export function connectCommunityStreaming(
             });
           }
           return;
+        case 'commentsChanged':
+          if (
+            payload &&
+            typeof payload === 'object' &&
+            typeof (payload as { postId?: unknown }).postId === 'string'
+          ) {
+            options.onCommentsChanged?.(
+              (payload as { postId: string }).postId,
+            );
+          }
+          return;
+        case 'profileUpdated':
+          if (payload && typeof payload === 'object') {
+            options.onProfileUpdated?.(payload as CommunityUser);
+          }
+          return;
+        case 'followUpdated':
+          if (payload && typeof payload === 'object') {
+            options.onFollowUpdated?.(
+              payload as {
+                targetLoginId: string;
+                followerCount: number;
+                actorLoginId: string;
+                actorFollowingCount: number;
+                followed: boolean;
+              },
+            );
+          }
+          return;
         case 'notificationFlushed':
           options.onNotificationFlushed();
+          return;
+        case 'sessionRevoked':
+          options.onSessionRevoked?.();
           return;
         default:
           return;

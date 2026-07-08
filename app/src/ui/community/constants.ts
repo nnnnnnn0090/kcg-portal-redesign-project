@@ -1,6 +1,12 @@
 import type { SocialPlatform } from './types';
 
 export const ALL_TAG = '__all__';
+
+export const COMMUNITY_CONNECTION_ERROR = {
+  ja: 'コミュニティサーバーに接続できません。',
+  en: 'Could not connect to the community server.',
+} as const;
+
 export const COMMUNITY_INPUT_LIMITS = {
   displayName: 12,
   loginId: 12,

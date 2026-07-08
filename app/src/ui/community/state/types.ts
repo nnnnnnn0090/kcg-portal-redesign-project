@@ -1,4 +1,4 @@
-import type { Dispatch, FormEvent, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type {
   CommunityComment,
   CommunityNotification,
@@ -15,6 +15,7 @@ export type CommunityModal =
   | { kind: 'profile' }
   | { kind: 'delete'; post: CommunityPost }
   | { kind: 'deleteComment'; post: CommunityPost; comment: CommunityComment }
+  | { kind: 'deleteAccount' }
   | { kind: 'likes'; post: CommunityPost; users: CommunityUser[]; loading: boolean }
   | {
       kind: 'connections';
@@ -23,7 +24,12 @@ export type CommunityModal =
       users: CommunityUser[];
       loading: boolean;
     }
-  | { kind: 'sent' };
+  | { kind: 'sent' }
+  | {
+      kind: 'unavailable';
+      title?: { ja: string; en: string };
+      body?: { ja: string; en: string };
+    };
 
 export interface CommunityState {
   ja: boolean;
@@ -51,6 +57,10 @@ export interface CommunityState {
   avatarImage: string;
   headerImage: string;
   closing: boolean;
+  commentsRevision: number;
+  postsNextCursor: string | null;
+  followingNextCursor: string | null;
+  feedLoadingMore: boolean;
 }
 
 type SetAction = {
@@ -68,6 +78,16 @@ export type CommunityAction =
   | { type: 'restorePost'; post: CommunityPost }
   | { type: 'removePost'; postId: string }
   | { type: 'prependPost'; post: CommunityPost }
+  | { type: 'bumpCommentsRevision' }
+  | { type: 'profileUpdated'; user: CommunityUser }
+  | {
+      type: 'followUpdated';
+      targetLoginId: string;
+      followerCount: number;
+      actorLoginId: string;
+      actorFollowingCount: number;
+      followed: boolean;
+    }
   | { type: 'resetSession' };
 
 export type CommunityStateDispatch = Dispatch<CommunityAction>;
@@ -75,15 +95,40 @@ export type CommunityStateDispatch = Dispatch<CommunityAction>;
 export interface CommunityActions {
   closeDrawer: () => void;
   loadFeed: (authToken?: string, silent?: boolean) => Promise<void>;
+  loadMoreFeed: () => Promise<void>;
+  loadMoreFollowing: () => Promise<void>;
   go: (page: CommunityPage) => void;
-  openProfile: (loginId: string) => Promise<void>;
+  openProfile: (loginId: string) => Promise<boolean>;
   openPost: (post: CommunityPost) => void;
+  openNotification: (item: CommunityNotification) => Promise<void>;
   openTag: (tag: string) => void;
   openConnections: (profile: CommunityUser, relation: 'followers' | 'following') => Promise<void>;
-  authenticate: (event: FormEvent<HTMLFormElement>, mode: 'login' | 'register') => Promise<void>;
+  authenticate: (
+    mode: 'login' | 'register',
+    values: {
+      loginId: string;
+      displayName?: string;
+      password: string;
+      passwordConfirmation?: string;
+    },
+  ) => Promise<void>;
   logout: () => Promise<void>;
-  submitPost: (event: FormEvent<HTMLFormElement>) => Promise<void>;
-  saveProfile: (event: FormEvent<HTMLFormElement>) => Promise<void>;
+  changePassword: (values: {
+    currentPassword: string;
+    newPassword: string;
+    newPasswordConfirmation: string;
+  }) => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
+  submitPost: (values: { title: string; caption: string }) => Promise<void>;
+  saveProfile: (values: {
+    academicGroup: string;
+    department: string;
+    displayName: string;
+    bio: string;
+    websiteUrl: string;
+    profileTags: string;
+    socialLinks: Record<string, string>;
+  }) => Promise<void>;
   removePost: (post: CommunityPost) => Promise<void>;
   removeComment: (post: CommunityPost, comment: CommunityComment) => Promise<void>;
   toggleLike: (post: CommunityPost) => Promise<void>;
@@ -100,6 +145,7 @@ export interface CommunityActions {
     message: string;
   }) => Promise<void>;
   closeModal: () => void;
+  openDeleteAccount: () => void;
   setAuthMode: (mode: 'login' | 'register') => void;
   setModal: (modal: CommunityModal) => void;
   setQuery: (query: string) => void;

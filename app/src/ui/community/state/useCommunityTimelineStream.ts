@@ -6,21 +6,19 @@ import {
   connectCommunityStreaming,
   type CommunityStreamStatus,
 } from '../../../services/community-stream';
-import type { CommunityNotification, CommunityPost } from '../types';
-import { filterPosts } from '../utils';
-import type { CommunityAction, CommunityPage } from './types';
+import type { CommunityNotification, CommunityPage, CommunityPost, CommunityUser } from '../types';
+import type { CommunityAction } from './types';
 
 const NOTIFICATION_TOAST_MS = 4_500;
 
-function shouldPrependPost(
-  post: CommunityPost,
-  page: CommunityPage,
-  query: string,
-  tag: string,
-): boolean {
-  if (page === 'home') return true;
-  if (page === 'explore') return filterPosts([post], query, tag).length > 0;
-  return false;
+function stripViewerFlags(post: CommunityPost): Partial<CommunityPost> {
+  const {
+    likedByMe: _likedByMe,
+    bookmarkedByMe: _bookmarkedByMe,
+    previewUrl: _previewUrl,
+    ...rest
+  } = post;
+  return rest;
 }
 
 export function useCommunityTimelineStream(options: {
@@ -28,10 +26,15 @@ export function useCommunityTimelineStream(options: {
   page: CommunityPage;
   query: string;
   tag: string;
+  openPostId?: string;
   notifications: CommunityNotification[];
   dispatch: (action: CommunityAction) => void;
   loadNotifications: (authToken: string) => Promise<void>;
   loadFollowing: (authToken: string) => Promise<void>;
+  loadOwn?: (authToken: string) => Promise<unknown>;
+  refreshOwnProfile?: (loginId: string, authToken: string) => Promise<unknown>;
+  loadBookmarks?: (authToken: string) => Promise<void>;
+  onSessionRevoked?: () => void;
   setKnownTags: (value: SetStateAction<string[]>) => void;
 }) {
   const optionsRef = useRef(options);
@@ -43,8 +46,8 @@ export function useCommunityTimelineStream(options: {
   const streamControlRef = useRef<{ reconnect: () => void }>({ reconnect: () => {} });
   const notificationBaselineRef = useRef<Set<string> | null>(null);
   const toastQueueRef = useRef<CommunityNotification[]>([]);
-  const toastTimerRef = useRef<number | undefined>();
-  const toastGapTimerRef = useRef<number | undefined>();
+  const toastTimerRef = useRef<number | undefined>(undefined);
+  const toastGapTimerRef = useRef<number | undefined>(undefined);
   const activeToastRef = useRef(false);
 
   const clearToastTimers = useCallback(() => {
@@ -112,9 +115,7 @@ export function useCommunityTimelineStream(options: {
       onNote: (post) => {
         const current = optionsRef.current;
         const normalized = resolveCommunityMediaUrls(post, getCommunityApiOrigin());
-        if (shouldPrependPost(normalized, current.page, current.query, current.tag)) {
-          current.dispatch({ type: 'prependPost', post: normalized });
-        }
+        current.dispatch({ type: 'prependPost', post: normalized });
         if (normalized.tags.length) {
           current.setKnownTags((tags) => {
             const next = new Set(tags);
@@ -126,8 +127,18 @@ export function useCommunityTimelineStream(options: {
           void current.loadFollowing(current.token);
         }
       },
+      onPostUpdated: (post) => {
+        const normalized = resolveCommunityMediaUrls(post, getCommunityApiOrigin());
+        optionsRef.current.dispatch({
+          type: 'patchPost',
+          postId: normalized.id,
+          value: stripViewerFlags(normalized),
+        });
+      },
       onPostRemoved: (postId) => {
-        optionsRef.current.dispatch({ type: 'removePost', postId });
+        const current = optionsRef.current;
+        current.dispatch({ type: 'removePost', postId });
+        if (current.token && current.loadOwn) void current.loadOwn(current.token);
       },
       onPostStats: (payload) => {
         optionsRef.current.dispatch({
@@ -142,6 +153,34 @@ export function useCommunityTimelineStream(options: {
               : {}),
           },
         });
+        if (
+          payload.bookmarkCount !== undefined &&
+          optionsRef.current.token &&
+          optionsRef.current.page === 'bookmarks' &&
+          optionsRef.current.loadBookmarks
+        ) {
+          void optionsRef.current.loadBookmarks(optionsRef.current.token);
+        }
+      },
+      onCommentsChanged: (postId) => {
+        const current = optionsRef.current;
+        if (current.openPostId === postId) {
+          current.dispatch({ type: 'bumpCommentsRevision' });
+        }
+      },
+      onProfileUpdated: (user) => {
+        const normalized = resolveCommunityMediaUrls(user, getCommunityApiOrigin()) as CommunityUser;
+        optionsRef.current.dispatch({ type: 'profileUpdated', user: normalized });
+      },
+      onFollowUpdated: (payload) => {
+        const current = optionsRef.current;
+        current.dispatch({ type: 'followUpdated', ...payload });
+        if (current.token && current.page === 'following') {
+          void current.loadFollowing(current.token);
+        }
+      },
+      onSessionRevoked: () => {
+        optionsRef.current.onSessionRevoked?.();
       },
       onNotificationFlushed: () => {
         void (async () => {
@@ -158,8 +197,32 @@ export function useCommunityTimelineStream(options: {
                 unreadCount: result.unreadCount,
               },
             });
+            const fresh = baseline
+              ? result.notifications.filter((item) => !baseline.has(item.id))
+              : [];
+            const needsOwnRefresh = fresh.some((item) =>
+              [
+                'post_approved',
+                'post_rejected',
+                'comment_approved',
+                'comment_rejected',
+                'profile_approved',
+                'profile_rejected',
+              ].includes(item.type),
+            );
+            if (needsOwnRefresh && current.loadOwn) {
+              await current.loadOwn(current.token);
+            }
+            const profileFresh = fresh.some((item) => item.type.startsWith('profile_'));
+            if (profileFresh && current.refreshOwnProfile) {
+              try {
+                const session = await communityApi.session(current.token);
+                await current.refreshOwnProfile(session.user.loginId, current.token);
+              } catch {
+                // Session may already be invalid; ignore.
+              }
+            }
             if (baseline === null) return;
-            const fresh = result.notifications.filter((item) => !baseline.has(item.id));
             if (current.page !== 'notifications' && fresh.length) {
               enqueueNotificationToasts(fresh);
             }

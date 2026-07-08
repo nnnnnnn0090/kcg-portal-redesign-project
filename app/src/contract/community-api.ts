@@ -51,6 +51,7 @@ export interface CommunityUser {
   pendingProfile: PendingProfile | null;
   createdAt: string;
   postCount: number;
+  likesReceived: number;
   followerCount: number;
   followingCount: number;
   followedByMe: boolean;
@@ -90,6 +91,7 @@ export interface CommunityComment {
   status: CommentStatus;
   rejectionReason: string | null;
   createdAt: string;
+  unavailable?: boolean;
 }
 export interface CommunityNotification {
   id: string;

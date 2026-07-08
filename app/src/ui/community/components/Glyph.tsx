@@ -13,7 +13,8 @@ export function Glyph({
     | 'comment'
     | 'impression'
     | 'refresh'
-    | 'bell';
+    | 'bell'
+    | 'settings';
 }) {
   const paths = {
     home: (
@@ -70,6 +71,12 @@ export function Glyph({
       <>
         <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
         <path d="M10 21h4" />
+      </>
+    ),
+    settings: (
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M4 12a8 8 0 0 1 .4-2.5l-1.7-1.3 2-3.4 2.1.7A8 8 0 0 1 9.5 4.4L10 2.5h4l.5 1.9a8 8 0 0 1 2.7 1.1l2.1-.7 2 3.4-1.7 1.3a8 8 0 0 1 0 5l1.7 1.3-2 3.4-2.1-.7a8 8 0 0 1-2.7 1.1L14 21.5h-4l-.5-1.9a8 8 0 0 1-2.7-1.1l-2.1.7-2-3.4 1.7-1.3A8 8 0 0 1 4 12Z" />
       </>
     ),
   };

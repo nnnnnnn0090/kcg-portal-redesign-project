@@ -153,6 +153,45 @@ export default {
           from: { opacity: '1', transform: 'translateX(0)' },
           to: { opacity: '0', transform: 'translateX(14px)' },
         },
+        'community-item-in': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'community-soft-pulse': {
+          '0%, 100%': { boxShadow: '0 0 0 0 color-mix(in srgb, var(--p-accent) 0%, transparent)' },
+          '50%': { boxShadow: '0 0 0 4px color-mix(in srgb, var(--p-accent) 18%, transparent)' },
+        },
+        'community-badge-pop': {
+          '0%': { transform: 'scale(.5)', opacity: '0' },
+          '70%': { transform: 'scale(1.12)', opacity: '1' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'community-signal-pulse': {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '.55', transform: 'scale(.82)' },
+        },
+        'community-signal-ring': {
+          '0%': { opacity: '.55', transform: 'scale(.55)' },
+          '70%': { opacity: '0', transform: 'scale(1.7)' },
+          '100%': { opacity: '0', transform: 'scale(1.7)' },
+        },
+        'community-orbit': {
+          to: { transform: 'rotate(360deg)' },
+        },
+        'community-wave': {
+          '0%, 100%': { opacity: '.35', transform: 'translateY(0)' },
+          '50%': { opacity: '1', transform: 'translateY(-1px)' },
+        },
+        'community-connection-sheen': {
+          '0%': { transform: 'translateX(0) skewX(-20deg)', opacity: '0' },
+          '25%': { opacity: '.7' },
+          '55%': { transform: 'translateX(280%) skewX(-20deg)', opacity: '0' },
+          '100%': { transform: 'translateX(280%) skewX(-20deg)', opacity: '0' },
+        },
+        'community-auth-switch': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'portal-fade-in': 'portal-fade-in var(--p-enter-dur) var(--p-enter-ease) both',
@@ -169,6 +208,15 @@ export default {
         'community-action-pop': 'community-action-pop 520ms cubic-bezier(.2,.9,.25,1.25) both',
         'community-toast-from-right': 'community-toast-from-right 220ms cubic-bezier(.2,.8,.2,1) both',
         'community-toast-out-right': 'community-toast-out-right 180ms ease both',
+        'community-item-in': 'community-item-in 280ms cubic-bezier(.2,.8,.2,1) both',
+        'community-soft-pulse': 'community-soft-pulse 2.4s ease-in-out infinite',
+        'community-badge-pop': 'community-badge-pop 360ms cubic-bezier(.2,.9,.25,1.2) both',
+        'community-signal-pulse': 'community-signal-pulse 1.6s ease-in-out infinite',
+        'community-signal-ring': 'community-signal-ring 1.8s ease-out infinite',
+        'community-orbit': 'community-orbit 1.1s linear infinite',
+        'community-wave': 'community-wave 1.2s ease-in-out infinite',
+        'community-connection-sheen': 'community-connection-sheen 2.8s ease-in-out infinite',
+        'community-auth-switch': 'community-auth-switch 240ms cubic-bezier(.2,.8,.2,1) both',
       },
     },
   },

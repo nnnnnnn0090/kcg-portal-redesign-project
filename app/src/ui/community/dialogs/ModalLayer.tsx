@@ -2,10 +2,12 @@ import { AuthDialog } from './AuthDialog';
 import { ConfirmDialog } from './ConfirmDialog';
 import { ConnectionsDialog } from './ConnectionsDialog';
 import { CreateDialog } from './CreateDialog';
+import { DeleteAccountDialog } from './DeleteAccountDialog';
 import { LikesDialog } from './LikesDialog';
 import { PostDialog } from './PostDialog';
 import { ProfileDialog } from './ProfileDialog';
 import { SentDialog } from './SentDialog';
+import { UnavailableDialog } from './UnavailableDialog';
 import type { ModalLayerProps } from './types';
 
 export function ModalLayer(props: ModalLayerProps) {
@@ -39,6 +41,7 @@ export function ModalLayer(props: ModalLayerProps) {
           onTagClick={props.openTag}
           onAuthorClick={() => props.openProfile(modal.post.authorLoginId)}
           onCommentAuthorClick={props.openProfile}
+          commentsRevision={props.commentsRevision}
         />
       ) : null}
       {modal.kind === 'profile' && user ? <ProfileDialog {...props} user={user} /> : null}
@@ -77,7 +80,24 @@ export function ModalLayer(props: ModalLayerProps) {
           detailLabel={{ ja: 'コメント', en: 'Comment' }}
         />
       ) : null}
+      {modal.kind === 'deleteAccount' ? (
+        <DeleteAccountDialog
+          ja={ja}
+          busy={busy}
+          error={error}
+          close={close}
+          confirm={(password) => void props.deleteAccount(password)}
+        />
+      ) : null}
       {modal.kind === 'sent' ? <SentDialog ja={ja} close={close} /> : null}
+      {modal.kind === 'unavailable' ? (
+        <UnavailableDialog
+          ja={ja}
+          close={close}
+          title={modal.title}
+          body={modal.body}
+        />
+      ) : null}
     </div>
   );
 }

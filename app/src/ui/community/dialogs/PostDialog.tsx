@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { communityApi } from '../api';
 import type { CommunityComment, CommunityPost } from '../types';
 import { groupCommentsByParent } from './comment-threads';
@@ -10,6 +10,7 @@ import { Glyph } from '../components/Glyph';
 import { cn } from '../../../lib/cn';
 import { clearRuntimeElementCss, setRuntimeElementCss } from '../../../lib/runtime-element-style';
 import { COMMUNITY_INPUT_LIMITS } from '../constants';
+import { formatCommunityCount, formatCommunityDateTime, formatCommunityMetric } from '../utils';
 
 export function PostDialog({
   post,
@@ -25,6 +26,7 @@ export function PostDialog({
   onCommentAuthorClick,
   token,
   viewerLoginId,
+  commentsRevision = 0,
 }: {
   post: CommunityPost;
   ja: boolean;
@@ -39,6 +41,7 @@ export function PostDialog({
   onCommentAuthorClick: (loginId: string) => void;
   token: string;
   viewerLoginId?: string;
+  commentsRevision?: number;
 }) {
   const images =
     post.status !== 'approved' && post.previewUrl
@@ -78,7 +81,7 @@ export function PostDialog({
     return () => {
       active = false;
     };
-  }, [ja, post.id, token]);
+  }, [commentsRevision, ja, post.id, token]);
 
   const commentGroups = useMemo(() => groupCommentsByParent(comments), [comments]);
 
@@ -89,6 +92,31 @@ export function PostDialog({
 
   const renderComment = (comment: CommunityComment, depth = 0): ReactElement => {
     const replies = commentGroups.get(comment.id) ?? [];
+    if (comment.unavailable) {
+      return (
+        <div className="tw-grid tw-gap-3" key={comment.id}>
+          <article
+            className={cn(
+              'community-comment is-unavailable tw-grid tw-grid-cols-[36px_minmax(0,1fr)] tw-items-start tw-gap-3',
+              depth > 0 && 'tw-ml-8',
+            )}
+          >
+            <span
+              className="tw-grid tw-h-9 tw-w-9 tw-place-items-center tw-rounded-full tw-border tw-border-community-border tw-bg-community-bg3 tw-text-xs tw-font-bold tw-text-community-muted"
+              aria-hidden
+            >
+              ?
+            </span>
+            <div className="community-comment-card tw-min-w-0 tw-rounded-xl tw-border tw-border-dashed tw-border-community-border tw-bg-community-bg2 tw-p-3">
+              <p className="tw-m-0 tw-text-[13px] tw-text-community-muted">
+                {ja ? 'このコメントは存在しません' : 'This comment is no longer available'}
+              </p>
+            </div>
+          </article>
+          {replies.map((reply) => renderComment(reply, depth + 1))}
+        </div>
+      );
+    }
     return (
       <div className="tw-grid tw-gap-3" key={comment.id}>
         <article
@@ -141,9 +169,7 @@ export function PostDialog({
                         : 'Rejected'}
                   </em>
                 ) : null}
-                <time>
-                  {new Date(comment.createdAt).toLocaleDateString(ja ? 'ja-JP' : 'en-US')}
-                </time>
+                <time>{formatCommunityDateTime(comment.createdAt, ja)}</time>
                 {token ? (
                   <button
                     className="is-reply tw-font-bold"
@@ -191,8 +217,7 @@ export function PostDialog({
     return () => clearRuntimeElementCss(track, 'carousel-offset');
   }, [imageIndex]);
 
-  const submitComment = async (event: FormEvent) => {
-    event.preventDefault();
+  const submitComment = async () => {
     const content = commentText.trim();
     if (!content || !token || commentBusy) return;
     const parentId = replyingTo?.id;
@@ -215,8 +240,7 @@ export function PostDialog({
       setCommentBusy(false);
     }
   };
-  const submitReport = async (event: FormEvent) => {
-    event.preventDefault();
+  const submitReport = async () => {
     if (!token || !reportReason.trim() || reportBusy) return;
     setReportBusy(true);
     setCommentError('');
@@ -245,13 +269,13 @@ export function PostDialog({
     >
       <div
         className={
-          'community-post-viewer-image tw-relative tw-grid tw-min-h-0 tw-place-items-center tw-overflow-hidden tw-bg-[#08090d] max-[760px]:tw-h-[clamp(280px,52vh,480px)] [&>button]:tw-absolute [&>button]:tw-top-1/2 [&>button]:tw-z-[2] [&>button]:tw-grid [&>button]:tw-h-10 [&>button]:tw-w-10 [&>button]:tw-translate-y-[-50%] [&>button]:tw-place-items-center [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-white/50 [&>button]:tw-bg-black/70 [&>button]:tw-text-white [&>button]:tw-shadow-lg [&>button]:tw-cursor-pointer hover:[&>button]:tw-scale-110 hover:[&>button]:tw-border-white/80 hover:[&>button]:tw-bg-black/85 [&>button_svg]:tw-h-5 [&>button_svg]:tw-w-5 [&>button_svg]:tw-fill-none [&>button_svg]:tw-stroke-current [&>button_svg]:tw-stroke-[2.5] [&>button_svg]:[stroke-linecap:round] [&>button_svg]:[stroke-linejoin:round] [&>button.is-prev]:tw-left-3 [&>button.is-next]:tw-right-3 [&>span]:tw-absolute [&>span]:tw-bottom-3 [&>span]:tw-left-1/2 [&>span]:tw-z-[2] [&>span]:tw-translate-x-[-50%] [&>span]:tw-rounded-full [&>span]:tw-bg-black/70 [&>span]:tw-px-2 [&>span]:tw-py-1 [&>span]:tw-text-xs [&>span]:tw-text-white'
+          'community-post-viewer-image tw-relative tw-grid tw-min-h-0 tw-place-items-center tw-overflow-hidden tw-bg-[#08090d] max-[760px]:tw-h-[clamp(280px,52vh,480px)] [&>button]:tw-absolute [&>button]:tw-top-1/2 [&>button]:tw-z-[2] [&>button]:tw-grid [&>button]:tw-h-10 [&>button]:tw-w-10 [&>button]:tw-translate-y-[-50%] [&>button]:tw-place-items-center [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-white/50 [&>button]:tw-bg-black/70 [&>button]:tw-text-white [&>button]:tw-shadow-lg [&>button]:tw-cursor-pointer [&>button]:tw-transition-[transform,border-color,background-color,box-shadow] [&>button]:tw-duration-180 hover:[&>button]:tw-scale-110 hover:[&>button]:tw-border-white/80 hover:[&>button]:tw-bg-black/85 hover:[&>button]:tw-shadow-[0_8px_24px_rgba(0,0,0,.45)] active:[&>button]:tw-scale-95 [&>button_svg]:tw-h-5 [&>button_svg]:tw-w-5 [&>button_svg]:tw-fill-none [&>button_svg]:tw-stroke-current [&>button_svg]:tw-stroke-[2.5] [&>button_svg]:[stroke-linecap:round] [&>button_svg]:[stroke-linejoin:round] [&>button.is-prev]:tw-left-3 [&>button.is-next]:tw-right-3 [&>span]:tw-absolute [&>span]:tw-bottom-3 [&>span]:tw-left-1/2 [&>span]:tw-z-[2] [&>span]:tw-translate-x-[-50%] [&>span]:tw-rounded-full [&>span]:tw-bg-black/70 [&>span]:tw-px-2 [&>span]:tw-py-1 [&>span]:tw-text-xs [&>span]:tw-text-white'
         }
       >
         <div
           ref={imageTrackRef}
           className={
-            'community-post-viewer-track tw-flex tw-h-full tw-transition-transform [&_img]:tw-h-full [&_img]:tw-w-full [&_img]:tw-flex-[0_0_100%] [&_img]:tw-object-contain'
+            'community-post-viewer-track tw-flex tw-h-full tw-transition-transform tw-duration-300 tw-ease-[cubic-bezier(.2,.8,.2,1)] [&_img]:tw-h-full [&_img]:tw-w-full [&_img]:tw-flex-[0_0_100%] [&_img]:tw-object-contain'
           }
         >
           {images.map((image, index) => (
@@ -289,248 +313,269 @@ export function PostDialog({
 
       <section
         className={
-          'community-post-viewer-panel tw-min-w-0 tw-overflow-y-auto tw-border-l tw-border-community-border tw-bg-community-bg max-[760px]:tw-border-l-0 max-[760px]:tw-border-t max-[760px]:tw-border-community-border'
+          'community-post-viewer-panel tw-flex tw-min-h-0 tw-min-w-0 tw-flex-col tw-overflow-hidden tw-border-l tw-border-community-border tw-bg-community-bg max-[760px]:tw-border-l-0 max-[760px]:tw-border-t max-[760px]:tw-border-community-border'
         }
       >
         <header
           className={
-            'community-post-viewer-head tw-sticky tw-top-0 tw-z-[2] tw-flex tw-min-h-16 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-community-border tw-bg-community-bg2 tw-px-4 tw-py-3 max-[420px]:tw-px-3'
+            'community-post-viewer-head tw-shrink-0 tw-border-b tw-border-community-border tw-bg-community-bg2 tw-px-4 tw-py-3 max-[420px]:tw-px-3'
           }
         >
-          <button
-            className={
-              'community-post-author tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3 tw-overflow-hidden tw-border-0 tw-bg-transparent tw-p-0 tw-text-left tw-cursor-pointer disabled:tw-cursor-default [&>div]:tw-grid [&>div]:tw-min-w-0 [&_strong]:tw-overflow-hidden [&_strong]:tw-text-ellipsis [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-text-community-bright [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
-            }
-            type="button"
-            onClick={onAuthorClick}
-            disabled={!onAuthorClick}
-            aria-label={onAuthorClick ? `${post.authorName}のプロフィールを開く` : undefined}
-          >
-            <Avatar name={post.authorName} url={post.authorAvatarUrl} />
-            <div>
-              <span className="tw-flex tw-min-w-0 tw-items-center tw-gap-1">
-                <strong>{post.authorName}</strong>
-                {post.authorVerified ? <VerifiedBadge ja={ja} /> : null}
-              </span>
-              <span>@{post.authorLoginId}</span>
-            </div>
-          </button>
-          <div
-            className={
-              'community-post-header-actions tw-flex tw-shrink-0 tw-items-center tw-gap-2 [&>time]:tw-mr-1 [&>time]:tw-whitespace-nowrap [&>time]:tw-text-xs [&>time]:tw-text-community-muted'
-            }
-          >
-            <time>{new Date(post.createdAt).toLocaleDateString(ja ? 'ja-JP' : 'en-US')}</time>
-            {token &&
-            viewerLoginId?.toLocaleLowerCase() !== post.authorLoginId.toLocaleLowerCase() ? (
-              <button
-                className={
-                  'community-post-delete tw-shrink-0 tw-whitespace-nowrap tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card'
-                }
-                type="button"
-                disabled={reportBusy}
-                onClick={() => setReportOpen((value) => !value)}
-              >
-                {ja ? '通報' : 'Report'}
-              </button>
-            ) : null}
-            {onDelete ? (
-              <button
-                className={
-                  'community-post-delete tw-shrink-0 tw-whitespace-nowrap tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card'
-                }
-                type="button"
-                onClick={onDelete}
-              >
-                {ja ? '削除' : 'Delete'}
-              </button>
-            ) : null}
+          <div className="tw-flex tw-items-start tw-justify-between tw-gap-3">
             <button
               className={
-                'community-post-close tw-shrink-0 tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-text-community-text [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+                'community-post-author tw-flex tw-min-w-0 tw-flex-1 tw-items-center tw-gap-3 tw-overflow-hidden tw-rounded-lg tw-border-0 tw-bg-transparent tw-p-1 tw-text-left tw-cursor-pointer tw-transition-[background-color,transform] tw-duration-180 hover:tw-bg-community-accent-bg enabled:hover:tw-translate-x-[1px] disabled:tw-cursor-default'
               }
-              onClick={close}
-              aria-label={ja ? '閉じる' : 'Close'}
+              type="button"
+              onClick={onAuthorClick}
+              disabled={!onAuthorClick}
+              aria-label={onAuthorClick ? `${post.authorName}のプロフィールを開く` : undefined}
             >
-              <Glyph name="close" />
+              <Avatar name={post.authorName} url={post.authorAvatarUrl} />
+              <div className="tw-min-w-0">
+                <span className="tw-flex tw-min-w-0 tw-items-center tw-gap-1">
+                  <strong className="tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-text-sm tw-font-bold tw-text-community-bright">
+                    {post.authorName}
+                  </strong>
+                  {post.authorVerified ? <VerifiedBadge ja={ja} /> : null}
+                </span>
+                <span className="tw-mt-0.5 tw-block tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-text-xs tw-text-community-muted">
+                  @{post.authorLoginId}
+                </span>
+              </div>
             </button>
-          </div>
-        </header>
-        <section className={'community-post-content tw-px-5 tw-py-5'}>
-          <div
-            className={
-              'community-post-copy tw-grid tw-gap-3 [&_h2]:tw-m-0 [&_h2]:tw-break-words [&_h2]:tw-text-2xl [&_h2]:tw-leading-tight [&_h2]:tw-text-community-bright'
-            }
-          >
-            <h2>{post.title}</h2>
-          </div>
-          {post.caption.trim() ? (
-            <CommunityCaption
-              caption={post.caption}
-              className="tw-text-community-text"
-              onTagClick={onTagClick}
-            />
-          ) : null}
-        </section>
-        {post.rejectionReason ? (
-          <aside>
-            <strong>{ja ? '非公開の理由' : 'Reason'}</strong>
-            {post.rejectionReason}
-          </aside>
-        ) : null}
-        {reportOpen ? (
-          <form
-            className={
-              'community-report-form tw-mx-5 tw-mb-4 tw-grid tw-gap-2 tw-rounded-xl tw-border tw-border-community-danger/40 tw-bg-community-bg2 tw-p-3 [&_label]:tw-grid [&_label]:tw-gap-2 [&_span]:tw-text-[13px] [&_span]:tw-font-bold [&_span]:tw-text-community-bright [&_textarea]:tw-min-h-24 [&_textarea]:tw-w-full [&_textarea]:tw-resize-y [&_textarea]:tw-rounded-lg [&_textarea]:tw-border [&_textarea]:tw-border-community-border [&_textarea]:tw-bg-community-bg [&_textarea]:tw-px-3 [&_textarea]:tw-py-2 [&_textarea]:tw-text-sm [&_textarea]:tw-text-community-text [&_textarea]:tw-outline-none focus:[&_textarea]:tw-border-community-accent [&>div]:tw-flex [&>div]:tw-items-center [&>div]:tw-justify-between [&>div]:tw-gap-2 [&_button]:tw-min-h-9 [&_button]:tw-rounded-lg [&_button]:tw-px-3 [&_button]:tw-font-bold [&_button]:tw-cursor-pointer'
-            }
-            onSubmit={submitReport}
-          >
-            <label>
-              <span className="tw-flex tw-items-center tw-justify-between tw-gap-3">
-                <span>{ja ? '通報理由' : 'Report reason'}</span>
-                <CharacterCount value={reportReason} max={COMMUNITY_INPUT_LIMITS.reportReason} />
-              </span>
-              <textarea
-                value={reportReason}
-                onChange={(event) => setReportReason(event.currentTarget.value)}
-                maxLength={COMMUNITY_INPUT_LIMITS.reportReason}
-                rows={3}
-                placeholder={ja ? '問題の内容を入力してください' : 'Describe the issue'}
-                required
-              />
-            </label>
-            <div>
+            <div className="community-post-header-actions tw-flex tw-shrink-0 tw-items-center tw-gap-2">
+              {token &&
+              viewerLoginId?.toLocaleLowerCase() !== post.authorLoginId.toLocaleLowerCase() ? (
+                <button
+                  className={
+                    'community-post-delete tw-shrink-0 tw-whitespace-nowrap tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-180 hover:tw-translate-y-[-1px] hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card active:tw-translate-y-0 active:tw-scale-[.98]'
+                  }
+                  type="button"
+                  disabled={reportBusy}
+                  onClick={() => setReportOpen((value) => !value)}
+                >
+                  {ja ? '通報' : 'Report'}
+                </button>
+              ) : null}
+              {onDelete ? (
+                <button
+                  className={
+                    'community-post-delete tw-shrink-0 tw-whitespace-nowrap tw-min-h-9 tw-rounded-lg tw-border tw-border-community-danger tw-bg-transparent tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-danger tw-cursor-pointer tw-transition-[background-color,color,box-shadow,transform] tw-duration-180 hover:tw-translate-y-[-1px] hover:tw-bg-community-danger hover:tw-text-white hover:tw-shadow-community-card active:tw-translate-y-0 active:tw-scale-[.98]'
+                  }
+                  type="button"
+                  onClick={onDelete}
+                >
+                  {ja ? '削除' : 'Delete'}
+                </button>
+              ) : null}
               <button
                 className={
-                  'tw-border tw-border-community-border tw-bg-community-bg3 tw-text-community-text'
+                  'community-post-close tw-shrink-0 tw-grid tw-h-10 tw-w-10 tw-place-items-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-p-0 tw-text-community-text tw-cursor-pointer tw-transition-[background-color,border-color,color,transform] tw-duration-180 hover:tw-border-community-accent hover:tw-bg-community-accent-bg hover:tw-text-community-accent-light hover:tw-rotate-90 active:tw-scale-95 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
                 }
-                type="button"
-                onClick={() => {
-                  setReportOpen(false);
-                  setReportReason('');
-                }}
+                onClick={close}
+                aria-label={ja ? '閉じる' : 'Close'}
               >
-                {ja ? 'キャンセル' : 'Cancel'}
-              </button>
-              <button
-                className={
-                  'tw-border tw-border-community-danger tw-bg-community-danger tw-text-white'
-                }
-                disabled={reportBusy || !reportReason.trim()}
-              >
-                {reportBusy ? <Busy /> : null}
-                {ja ? '送信' : 'Submit'}
+                <Glyph name="close" />
               </button>
             </div>
-          </form>
-        ) : null}
-        <div
-          className={
-            'community-post-actions tw-mx-5 tw-grid tw-gap-3 tw-border-y tw-border-community-border tw-py-4'
-          }
-        >
-          <div
-            className={'community-post-primary-actions tw-flex tw-min-w-0 tw-flex-wrap tw-gap-3'}
-          >
-            <button
-              className={cn(
-                'community-detail-like tw-flex tw-min-h-[58px] tw-min-w-[148px] tw-flex-[1_1_148px] tw-items-center tw-gap-2.5 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-py-2.5 tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-border-community-danger hover:tw-bg-[color-mix(in_srgb,var(--p-danger,#e54867)_10%,var(--p-bg3))] hover:tw-text-community-danger hover:tw-shadow-community-card [&.is-active]:tw-border-community-danger [&.is-active]:tw-bg-[color-mix(in_srgb,var(--p-danger,#e54867)_20%,var(--p-bg3))] [&.is-active]:tw-text-community-danger [&.is-active]:tw-shadow-[0_0_0_1px_color-mix(in_srgb,var(--p-danger,#e54867)_22%,transparent)]',
-                post.likedByMe && 'is-active',
-                likeCelebrating && 'is-celebrating',
-              )}
-              type="button"
-              onClick={() => {
-                if (!post.likedByMe) setLikeCelebrating(true);
-                toggleLike(post);
-              }}
-              onAnimationEnd={() => setLikeCelebrating(false)}
-              aria-label={ja ? 'いいね' : 'Like'}
+          </div>
+          <time className="tw-mt-2 tw-block tw-text-xs tw-text-community-muted">
+            {formatCommunityDateTime(post.createdAt, ja)}
+          </time>
+        </header>
+
+        <div className="tw-min-h-0 tw-flex-1 tw-overflow-y-auto">
+          <section className="community-post-content tw-px-4 tw-py-4 max-[420px]:tw-px-3">
+            {post.title.trim() ? (
+              <h2 className="tw-m-0 tw-mb-3 tw-break-words tw-text-xl tw-font-bold tw-leading-snug tw-text-community-bright">
+                {post.title}
+              </h2>
+            ) : null}
+            {post.caption.trim() ? (
+              <CommunityCaption
+                caption={post.caption}
+                className="tw-text-[15px] tw-leading-7 tw-text-community-text"
+                onTagClick={onTagClick}
+              />
+            ) : null}
+          </section>
+          {post.rejectionReason ? (
+            <aside className="tw-mx-4 tw-mb-4 tw-rounded-xl tw-border tw-border-community-danger/40 tw-bg-community-danger/10 tw-p-3 tw-text-sm tw-text-community-text max-[420px]:tw-mx-3">
+              <strong className="tw-block tw-mb-1 tw-text-community-danger">
+                {ja ? '非公開の理由' : 'Reason'}
+              </strong>
+              {post.rejectionReason}
+            </aside>
+          ) : null}
+          {reportOpen ? (
+            <div
+              className={
+                'community-report-form tw-mx-4 tw-mb-4 tw-grid tw-gap-2 tw-rounded-xl tw-border tw-border-community-danger/40 tw-bg-community-bg2 tw-p-3 max-[420px]:tw-mx-3 [&_label]:tw-grid [&_label]:tw-gap-2 [&_span]:tw-text-[13px] [&_span]:tw-font-bold [&_span]:tw-text-community-bright [&_textarea]:tw-min-h-24 [&_textarea]:tw-w-full [&_textarea]:tw-resize-y [&_textarea]:tw-rounded-lg [&_textarea]:tw-border [&_textarea]:tw-border-community-border [&_textarea]:tw-bg-community-bg [&_textarea]:tw-px-3 [&_textarea]:tw-py-2 [&_textarea]:tw-text-sm [&_textarea]:tw-text-community-text [&_textarea]:tw-outline-none focus:[&_textarea]:tw-border-community-accent [&>div]:tw-flex [&>div]:tw-items-center [&>div]:tw-justify-between [&>div]:tw-gap-2 [&_button]:tw-min-h-9 [&_button]:tw-rounded-lg [&_button]:tw-px-3 [&_button]:tw-font-bold [&_button]:tw-cursor-pointer'
+              }
+              role="form"
+              aria-label={ja ? '通報' : 'Report'}
             >
-              <span
-                className={
-                  'community-like-icon tw-grid tw-h-8 tw-w-8 tw-flex-none tw-place-items-center tw-rounded-full tw-bg-community-bg2 tw-text-community-muted [&_svg]:tw-h-5 [&_svg]:tw-w-5 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [.is-active_&]:tw-bg-community-danger [.is-active_&]:tw-text-white [.is-active_&_svg]:tw-fill-current [.is-celebrating_&_svg]:tw-animate-community-action-pop'
+              <label>
+                <span className="tw-flex tw-items-center tw-justify-between tw-gap-3">
+                  <span>{ja ? '通報理由' : 'Report reason'}</span>
+                  <CharacterCount value={reportReason} max={COMMUNITY_INPUT_LIMITS.reportReason} />
+                </span>
+                <textarea
+                  value={reportReason}
+                  onChange={(event) => setReportReason(event.currentTarget.value)}
+                  maxLength={COMMUNITY_INPUT_LIMITS.reportReason}
+                  rows={3}
+                  placeholder={ja ? '問題の内容を入力してください' : 'Describe the issue'}
+                />
+              </label>
+              <div>
+                <button
+                  className={
+                    'tw-border tw-border-community-border tw-bg-community-bg3 tw-text-community-text'
+                  }
+                  type="button"
+                  onClick={() => {
+                    setReportOpen(false);
+                    setReportReason('');
+                  }}
+                >
+                  {ja ? 'キャンセル' : 'Cancel'}
+                </button>
+                <button
+                  className={
+                    'tw-border tw-border-community-danger tw-bg-community-danger tw-text-white'
+                  }
+                  type="button"
+                  disabled={reportBusy || !reportReason.trim()}
+                  onClick={() => void submitReport()}
+                >
+                  {reportBusy ? <Busy /> : null}
+                  {ja ? '送信' : 'Submit'}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          <section
+            className={
+              'community-post-actions tw-border-t tw-border-community-border tw-px-4 tw-py-3 max-[420px]:tw-px-3'
+            }
+          >
+            <div className="community-post-primary-actions tw-grid tw-grid-cols-2 tw-gap-2.5">
+              <button
+                className={cn(
+                  'community-detail-like tw-flex tw-h-11 tw-w-full tw-items-center tw-gap-2 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,transform,box-shadow] tw-duration-180 hover:tw-translate-y-[-1px] hover:tw-border-community-danger/40 hover:tw-bg-community-danger/10 hover:tw-text-community-danger hover:tw-shadow-community-card active:tw-translate-y-0 active:tw-scale-[.98] [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-shrink-0 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-border-community-danger/50 [&.is-active]:tw-bg-community-danger/15 [&.is-active]:tw-text-community-danger [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
+                  post.likedByMe && 'is-active',
+                  likeCelebrating && 'is-celebrating',
+                )}
+                type="button"
+                onClick={() => {
+                  if (!post.likedByMe) setLikeCelebrating(true);
+                  toggleLike(post);
+                }}
+                onAnimationEnd={() => setLikeCelebrating(false)}
+                aria-label={
+                  post.likedByMe
+                    ? ja
+                      ? `いいね済み ${formatCommunityCount(post.likeCount, true)}`
+                      : `Liked, ${post.likeCount}`
+                    : ja
+                      ? `いいね ${formatCommunityCount(post.likeCount, true)}`
+                      : `Like, ${post.likeCount}`
                 }
               >
                 <Glyph name="heart" />
-              </span>
-              <span
-                className={
-                  'community-like-copy tw-grid tw-min-w-0 tw-gap-0.5 tw-text-left [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-font-bold [&_small]:tw-whitespace-nowrap [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
-                }
-              >
-                <strong>
+                <span className="tw-min-w-0 tw-flex-1 tw-truncate tw-text-left">
                   {post.likedByMe ? (ja ? 'いいね済み' : 'Liked') : ja ? 'いいね' : 'Like'}
-                </strong>
-                <small>
-                  {post.likeCount.toLocaleString()} {ja ? '件' : ''}
-                </small>
-              </span>
-            </button>
-            <button
-              className={cn(
-                'community-detail-bookmark tw-flex tw-min-h-[58px] tw-min-w-[148px] tw-flex-[1_1_148px] tw-items-center tw-gap-2.5 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-py-2.5 tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,box-shadow,transform] tw-duration-200 tw-ease-out hover:tw-translate-y-[-1px] hover:tw-border-community-accent hover:tw-bg-[color-mix(in_srgb,var(--p-accent)_10%,var(--p-bg3))] hover:tw-text-community-accent-light hover:tw-shadow-community-card [&.is-active]:tw-border-community-accent [&.is-active]:tw-bg-[color-mix(in_srgb,var(--p-accent)_20%,var(--p-bg3))] [&.is-active]:tw-text-community-accent-light [&.is-active]:tw-shadow-[0_0_0_1px_color-mix(in_srgb,var(--p-accent)_22%,transparent)]',
-                post.bookmarkedByMe && 'is-active',
-                bookmarkCelebrating && 'is-celebrating',
-              )}
-              type="button"
-              onClick={() => {
-                if (!post.bookmarkedByMe) setBookmarkCelebrating(true);
-                toggleBookmark(post);
-              }}
-              onAnimationEnd={() => setBookmarkCelebrating(false)}
-              aria-label={ja ? '保存' : 'Bookmark'}
-            >
-              <span
-                className={
-                  'community-bookmark-icon tw-grid tw-h-8 tw-w-8 tw-flex-none tw-place-items-center tw-rounded-full tw-bg-community-bg2 tw-text-community-muted [&_svg]:tw-h-5 [&_svg]:tw-w-5 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [.is-active_&]:tw-bg-community-accent [.is-active_&]:tw-text-community-on-accent [.is-active_&_svg]:tw-fill-current [.is-celebrating_&_svg]:tw-animate-community-action-pop'
+                </span>
+                <span
+                  className={cn(
+                    'tw-shrink-0 tw-rounded-md tw-bg-black/15 tw-px-2 tw-py-0.5 tw-text-xs tw-font-semibold tw-tabular-nums tw-text-community-muted',
+                    post.likedByMe && 'tw-bg-community-danger/20 tw-text-community-danger',
+                  )}
+                >
+                  {formatCommunityCount(post.likeCount, ja)}
+                </span>
+              </button>
+              <button
+                className={cn(
+                  'community-detail-bookmark tw-flex tw-h-11 tw-w-full tw-items-center tw-gap-2 tw-rounded-xl tw-border tw-border-community-border tw-bg-community-bg3 tw-px-3 tw-text-[13px] tw-font-bold tw-text-community-muted tw-cursor-pointer tw-transition-[background-color,border-color,color,transform,box-shadow] tw-duration-180 hover:tw-translate-y-[-1px] hover:tw-border-community-accent/40 hover:tw-bg-community-accent/10 hover:tw-text-community-accent-light hover:tw-shadow-community-card active:tw-translate-y-0 active:tw-scale-[.98] [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-shrink-0 [&_svg]:tw-fill-none [&_svg]:tw-stroke-current [&.is-active]:tw-border-community-accent/50 [&.is-active]:tw-bg-community-accent/15 [&.is-active]:tw-text-community-accent-light [&.is-active_svg]:tw-fill-current [&.is-celebrating_svg]:tw-animate-community-action-pop',
+                  post.bookmarkedByMe && 'is-active',
+                  bookmarkCelebrating && 'is-celebrating',
+                )}
+                type="button"
+                onClick={() => {
+                  if (!post.bookmarkedByMe) setBookmarkCelebrating(true);
+                  toggleBookmark(post);
+                }}
+                onAnimationEnd={() => setBookmarkCelebrating(false)}
+                aria-label={
+                  post.bookmarkedByMe
+                    ? ja
+                      ? `保存済み ${formatCommunityCount(post.bookmarkCount, true)}`
+                      : `Saved, ${post.bookmarkCount}`
+                    : ja
+                      ? `保存 ${formatCommunityCount(post.bookmarkCount, true)}`
+                      : `Save, ${post.bookmarkCount}`
                 }
               >
                 <Glyph name="bookmark" />
-              </span>
+                <span className="tw-min-w-0 tw-flex-1 tw-truncate tw-text-left">
+                  {post.bookmarkedByMe ? (ja ? '保存済み' : 'Saved') : ja ? '保存' : 'Save'}
+                </span>
+                <span
+                  className={cn(
+                    'tw-shrink-0 tw-rounded-md tw-bg-black/15 tw-px-2 tw-py-0.5 tw-text-xs tw-font-semibold tw-tabular-nums tw-text-community-muted',
+                    post.bookmarkedByMe && 'tw-bg-community-accent/20 tw-text-community-accent-light',
+                  )}
+                >
+                  {formatCommunityCount(post.bookmarkCount, ja)}
+                </span>
+              </button>
+            </div>
+            <div className="tw-mt-2.5 tw-flex tw-items-center tw-justify-between tw-gap-3">
               <span
                 className={
-                  'community-bookmark-copy tw-grid tw-min-w-0 tw-gap-0.5 tw-text-left [&_strong]:tw-whitespace-nowrap [&_strong]:tw-text-sm [&_strong]:tw-font-bold [&_small]:tw-whitespace-nowrap [&_small]:tw-text-xs [&_small]:tw-text-community-muted'
+                  'community-detail-impressions tw-inline-flex tw-items-center tw-gap-1.5 tw-text-xs tw-text-community-muted [&_svg]:tw-h-4 [&_svg]:tw-w-4'
+                }
+                aria-label={
+                  ja
+                    ? formatCommunityMetric(post.impressionCount, true, {
+                        ja: '表示',
+                        enSingular: 'view',
+                        enPlural: 'views',
+                      })
+                    : formatCommunityMetric(post.impressionCount, false, {
+                        ja: '表示',
+                        enSingular: 'view',
+                        enPlural: 'views',
+                      })
                 }
               >
-                <strong>
-                  {post.bookmarkedByMe ? (ja ? '保存済み' : 'Saved') : ja ? '保存' : 'Save'}
-                </strong>
-                <small>
-                  {post.bookmarkCount.toLocaleString()} {ja ? '件' : ''}
-                </small>
+                <Glyph name="impression" />
+                <span>
+                  {formatCommunityMetric(post.impressionCount, ja, {
+                    ja: '表示',
+                    enSingular: 'view',
+                    enPlural: 'views',
+                  })}
+                </span>
               </span>
-            </button>
-          </div>
-          <div
-            className={
-              'tw-flex tw-items-center tw-justify-end tw-gap-3 max-[420px]:tw-justify-between'
-            }
-          >
-            <span
-              className={
-                'community-detail-impressions tw-inline-flex tw-items-center tw-gap-1.5 tw-text-xs tw-text-community-muted [&_svg]:tw-h-4 [&_svg]:tw-w-4'
-              }
-              aria-label={ja ? `表示 ${post.impressionCount}件` : `${post.impressionCount} views`}
-            >
-              <Glyph name="impression" />
-              <span>
-                {ja ? '表示' : 'Views'} {post.impressionCount.toLocaleString()}
-                {ja ? '件' : ''}
-              </span>
-            </span>
-            <button
-              className={
-                'community-post-likes-list tw-whitespace-nowrap tw-rounded-lg tw-border-0 tw-bg-transparent tw-px-2 tw-py-1 tw-text-[13px] tw-text-community-accent-light tw-cursor-pointer hover:tw-bg-community-accent-bg'
-              }
-              type="button"
-              onClick={openLikes}
-            >
-              <span>{ja ? 'いいねした人' : 'People who liked this'}</span>
-              <span aria-hidden>›</span>
-            </button>
-          </div>
-        </div>
-        <div className={'community-comments tw-border-t tw-border-community-border tw-p-5'}>
+              <button
+                className={
+                  'community-post-likes-list tw-inline-flex tw-items-center tw-gap-1 tw-whitespace-nowrap tw-rounded-lg tw-border-0 tw-bg-transparent tw-px-2 tw-py-1 tw-text-[13px] tw-font-bold tw-text-community-accent-light tw-cursor-pointer tw-transition-[background-color,transform,color] tw-duration-150 hover:tw-bg-community-accent-bg hover:tw-text-community-bright active:tw-scale-95'
+                }
+                type="button"
+                onClick={openLikes}
+              >
+                <span>{ja ? 'いいねした人' : 'People who liked this'}</span>
+                <span aria-hidden>›</span>
+              </button>
+            </div>
+          </section>
+
+          <div className={'community-comments tw-border-t tw-border-community-border tw-p-4 max-[420px]:tw-p-3'}>
           <div
             className={
               'community-comments-heading tw-mb-4 tw-flex tw-items-center tw-justify-between [&_strong]:tw-text-community-bright [&_span]:tw-rounded-full [&_span]:tw-bg-community-bg3 [&_span]:tw-px-2 [&_span]:tw-text-xs [&_span]:tw-text-community-muted'
@@ -553,11 +598,12 @@ export function PostDialog({
             )}
           </div>
           {token ? (
-            <form
+            <div
               className={
                 'community-comment-form tw-mt-4 tw-grid tw-gap-2 [&_textarea]:tw-w-full [&_textarea]:tw-resize-y [&_textarea]:tw-rounded-lg [&_textarea]:tw-border [&_textarea]:tw-border-community-border [&_textarea]:tw-bg-community-bg2 [&_textarea]:tw-px-3 [&_textarea]:tw-py-2.5 [&_textarea]:tw-text-community-text [&>div]:tw-flex [&>div]:tw-items-center [&>div]:tw-justify-between [&>div]:tw-gap-3 [&_small]:tw-text-community-muted [&_button]:tw-inline-flex [&_button]:tw-min-h-9 [&_button]:tw-items-center [&_button]:tw-gap-1.5 [&_button]:tw-rounded-lg [&_button]:tw-border-0 [&_button]:tw-bg-community-accent [&_button]:tw-px-3 [&_button]:tw-font-bold [&_button]:tw-text-community-on-accent hover:[&_button:not(:disabled)]:tw-translate-y-[-1px] hover:[&_button:not(:disabled)]:tw-brightness-110 hover:[&_button:not(:disabled)]:tw-shadow-community-card disabled:[&_button]:tw-opacity-55'
               }
-              onSubmit={submitComment}
+              role="form"
+              aria-label={ja ? 'コメント' : 'Comment'}
             >
               {replyingTo ? (
                 <div className="tw-flex tw-items-center tw-justify-between tw-gap-3 tw-rounded-lg tw-bg-community-bg2 tw-px-3 tw-py-2 tw-text-[13px] tw-text-community-muted">
@@ -601,12 +647,16 @@ export function PostDialog({
                     ? 'すべてのコメントは審査後に公開されます。'
                     : 'All comments are published after review.'}
                 </small>
-                <button disabled={commentBusy || !commentText.trim()}>
+                <button
+                  type="button"
+                  disabled={commentBusy || !commentText.trim()}
+                  onClick={() => void submitComment()}
+                >
                   {commentBusy ? <Busy /> : null}
                   {ja ? '審査へ送信' : 'Submit'}
                 </button>
               </div>
-            </form>
+            </div>
           ) : (
             <p
               className={
@@ -617,6 +667,7 @@ export function PostDialog({
             </p>
           )}
           <ErrorMessage text={commentError} />
+        </div>
         </div>
       </section>
     </article>

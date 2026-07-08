@@ -15,6 +15,7 @@ export function ProfileScreen({
   ja,
   isOwn,
   onEdit,
+  onSettings,
   onCreate,
   onOpen,
   onLike,
@@ -30,6 +31,7 @@ export function ProfileScreen({
   ja: boolean;
   isOwn: boolean;
   onEdit: () => void;
+  onSettings: () => void;
   onCreate: () => void;
   onOpen: (post: CommunityPost) => void;
   onLike: (post: CommunityPost) => void;
@@ -45,6 +47,10 @@ export function ProfileScreen({
   const profileTags = user.profileTags ?? [];
   const userSocialEntries = socialEntries(user.socialLinks);
   const unsetText = ja ? '未設定' : 'Not set';
+  const postStatCount = user.postCount ?? posts.filter((post) => post.status === 'approved').length;
+  const likesReceivedStat =
+    user.likesReceived ??
+    posts.filter((post) => post.status === 'approved').reduce((sum, post) => sum + post.likeCount, 0);
   return (
     <main
       className={
@@ -114,13 +120,20 @@ export function ProfileScreen({
             </div>
             <div
               className={
-                'community-profile-actions tw-pt-5 max-[620px]:tw-col-span-full max-[620px]:tw-pt-0 [&_button]:tw-min-h-10 [&_button]:tw-min-w-[96px] [&_button]:tw-whitespace-nowrap [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-accent [&_button]:tw-bg-community-accent [&_button]:tw-px-4 [&_button]:tw-font-bold [&_button]:tw-text-community-on-accent [&_button]:tw-cursor-pointer hover:[&_button]:tw-translate-y-[-1px] hover:[&_button]:tw-brightness-110 hover:[&_button]:tw-shadow-community-card max-[620px]:[&_button]:tw-w-full [&_button.is-following]:tw-bg-community-bg3 [&_button.is-following]:tw-text-community-accent-light'
+                'community-profile-actions tw-flex tw-flex-wrap tw-justify-end tw-gap-2 tw-pt-5 max-[620px]:tw-col-span-full max-[620px]:tw-pt-0 [&_button]:tw-min-h-10 [&_button]:tw-min-w-[96px] [&_button]:tw-whitespace-nowrap [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-accent [&_button]:tw-bg-community-accent [&_button]:tw-px-4 [&_button]:tw-font-bold [&_button]:tw-text-community-on-accent [&_button]:tw-cursor-pointer [&_button]:tw-transition-[transform,filter,box-shadow] [&_button]:tw-duration-200 hover:[&_button]:tw-translate-y-[-2px] hover:[&_button]:tw-brightness-110 hover:[&_button]:tw-shadow-[0_10px_24px_color-mix(in_srgb,var(--p-accent)_35%,transparent)] active:[&_button]:tw-translate-y-0 active:[&_button]:tw-scale-[.98] max-[620px]:[&_button]:tw-flex-1 [&_button.is-secondary]:tw-border-community-border [&_button.is-secondary]:tw-bg-community-bg3 [&_button.is-secondary]:tw-text-community-text hover:[&_button.is-secondary]:tw-border-community-accent hover:[&_button.is-secondary]:tw-bg-community-accent-bg hover:[&_button.is-secondary]:tw-text-community-accent-light hover:[&_button.is-secondary]:tw-shadow-none [&_button.is-following]:tw-bg-community-bg3 [&_button.is-following]:tw-text-community-accent-light'
               }
             >
               {isOwn ? (
-                <button onClick={onEdit}>{ja ? '編集' : 'Edit'}</button>
+                <>
+                  <button type="button" className="is-secondary" onClick={onSettings}>
+                    {ja ? '設定' : 'Settings'}
+                  </button>
+                  <button type="button" onClick={onEdit}>
+                    {ja ? '編集' : 'Edit'}
+                  </button>
+                </>
               ) : viewer ? (
-                <button className={cn(user.followedByMe && 'is-following')} onClick={onFollow}>
+                <button type="button" className={cn(user.followedByMe && 'is-following')} onClick={onFollow}>
                   {user.followedByMe
                     ? ja
                       ? 'フォロー中'
@@ -130,7 +143,7 @@ export function ProfileScreen({
                       : 'Follow'}
                 </button>
               ) : (
-                <button onClick={onFollow}>
+                <button type="button" onClick={onFollow}>
                   {ja ? 'ログインしてフォロー' : 'Log in to follow'}
                 </button>
               )}
@@ -237,18 +250,16 @@ export function ProfileScreen({
             </div>
             <aside
               className={
-                'community-profile-stats tw-grid tw-content-start tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg3)_38%,transparent)] [&>span]:tw-flex [&>span]:tw-min-h-[50px] [&>span]:tw-items-center [&>span]:tw-justify-between [&>span]:tw-gap-3 [&>span]:tw-border-b [&>span]:tw-border-community-border-light [&>span]:tw-px-4 [&>span]:tw-text-[13px] [&>span]:tw-text-community-muted [&>button]:tw-flex [&>button]:tw-min-h-[50px] [&>button]:tw-items-center [&>button]:tw-justify-between [&>button]:tw-gap-3 [&>button]:tw-border-0 [&>button]:tw-border-b [&>button]:tw-border-community-border-light [&>button]:tw-bg-transparent [&>button]:tw-px-4 [&>button]:tw-text-left [&>button]:tw-text-[13px] [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer hover:[&>button]:tw-bg-community-accent-bg [&>*:last-child]:tw-border-b-0 [&_strong]:tw-text-base [&_strong]:tw-leading-tight [&_strong]:tw-text-community-bright'
+                'community-profile-stats tw-grid tw-content-start tw-overflow-hidden tw-rounded-xl tw-border tw-border-community-border tw-bg-[color-mix(in_srgb,var(--p-bg3)_38%,transparent)] [&>span]:tw-flex [&>span]:tw-min-h-[50px] [&>span]:tw-items-center [&>span]:tw-justify-between [&>span]:tw-gap-3 [&>span]:tw-border-b [&>span]:tw-border-community-border-light [&>span]:tw-px-4 [&>span]:tw-text-[13px] [&>span]:tw-text-community-muted [&>button]:tw-flex [&>button]:tw-min-h-[50px] [&>button]:tw-items-center [&>button]:tw-justify-between [&>button]:tw-gap-3 [&>button]:tw-border-0 [&>button]:tw-border-b [&>button]:tw-border-community-border-light [&>button]:tw-bg-transparent [&>button]:tw-px-4 [&>button]:tw-text-left [&>button]:tw-text-[13px] [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer [&>button]:tw-transition-[background-color,color,padding] [&>button]:tw-duration-180 hover:[&>button]:tw-bg-community-accent-bg hover:[&>button]:tw-pl-5 hover:[&>button]:tw-text-community-accent-light active:[&>button]:tw-bg-community-accent-bg [&>*:last-child]:tw-border-b-0 [&_strong]:tw-text-base [&_strong]:tw-leading-tight [&_strong]:tw-text-community-bright [&_strong]:tw-transition-transform [&_strong]:tw-duration-180 hover:[&>button_strong]:tw-scale-105'
               }
             >
               <span>
-                <span>{ja ? '投稿' : 'Posts'}</span>
-                <strong>{posts.length}</strong>
+                <span>{ja ? '投稿数' : 'Posts'}</span>
+                <strong>{postStatCount}</strong>
               </span>
               <span>
-                <span>{ja ? '公開中' : 'Published'}</span>
-                <strong>
-                  {isOwn ? posts.filter((post) => post.status === 'approved').length : posts.length}
-                </strong>
+                <span>{ja ? '受け取ったいいね数' : 'Likes received'}</span>
+                <strong>{likesReceivedStat}</strong>
               </span>
               {isOwn ? (
                 <span>
@@ -279,7 +290,7 @@ export function ProfileScreen({
         {isOwn ? (
           <nav
             className={
-              'community-profile-tabs tw-mb-4 tw-flex tw-gap-2 tw-overflow-x-auto [&>button]:tw-min-h-9 [&>button]:tw-flex-none [&>button]:tw-whitespace-nowrap [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-text-[13px] [&>button]:tw-font-normal [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer [&>button.is-active]:tw-border-community-accent [&>button.is-active]:tw-bg-community-accent-bg [&>button.is-active]:tw-text-community-accent-light'
+              'community-profile-tabs tw-mb-4 tw-flex tw-gap-2 tw-overflow-x-auto [&>button]:tw-min-h-9 [&>button]:tw-flex-none [&>button]:tw-whitespace-nowrap [&>button]:tw-rounded-full [&>button]:tw-border [&>button]:tw-border-community-border [&>button]:tw-bg-community-bg2 [&>button]:tw-px-3 [&>button]:tw-text-[13px] [&>button]:tw-font-normal [&>button]:tw-text-community-muted [&>button]:tw-cursor-pointer [&>button]:tw-transition-[transform,border-color,background-color,color,box-shadow] [&>button]:tw-duration-180 hover:[&>button]:tw-translate-y-[-1px] hover:[&>button]:tw-border-community-accent hover:[&>button]:tw-bg-community-accent-bg hover:[&>button]:tw-text-community-accent-light active:[&>button]:tw-scale-95 [&>button.is-active]:tw-border-community-accent [&>button.is-active]:tw-bg-community-accent-bg [&>button.is-active]:tw-text-community-accent-light [&>button.is-active]:tw-shadow-[0_0_0_1px_color-mix(in_srgb,var(--p-accent)_35%,transparent)]'
             }
           >
             {(['all', 'approved', 'pending', 'rejected'] as const).map((item) => (
@@ -294,8 +305,8 @@ export function ProfileScreen({
                     : 'All'
                   : item === 'approved'
                     ? ja
-                      ? '公開中'
-                      : 'Published'
+                      ? '投稿'
+                      : 'Posts'
                     : item === 'pending'
                       ? ja
                         ? '審査中'
@@ -311,7 +322,7 @@ export function ProfileScreen({
           <div
             className={'community-grid tw-grid tw-grid-cols-2 tw-gap-4 max-[620px]:tw-grid-cols-1'}
           >
-            {shown.map((post) => (
+            {shown.map((post, index) => (
               <div
                 className={
                   'community-own-post tw-relative tw-min-w-0 [&>span]:tw-absolute [&>span]:tw-right-3 [&>span]:tw-top-3 [&>span]:tw-rounded-full [&>span]:tw-bg-[color-mix(in_srgb,var(--p-bg)_88%,transparent)] [&>span]:tw-px-2 [&>span]:tw-py-1 [&>span]:tw-text-xs [&>span]:tw-font-bold [&>span]:tw-text-community-bright [&>span]:tw-backdrop-blur [&>span.is-pending]:tw-text-[#e7a92f] [&>span.is-rejected]:tw-text-community-danger'
@@ -321,6 +332,7 @@ export function ProfileScreen({
                 <PostCard
                   post={post}
                   ja={ja}
+                  index={index}
                   onOpen={() => onOpen(post)}
                   onLike={() => onLike(post)}
                   onBookmark={() => onBookmark(post)}
@@ -329,8 +341,8 @@ export function ProfileScreen({
                 <span className={cn(`is-${post.status}`)}>
                   {post.status === 'approved'
                     ? ja
-                      ? '公開中'
-                      : 'Published'
+                      ? '投稿'
+                      : 'Post'
                     : post.status === 'pending'
                       ? ja
                         ? '審査中'

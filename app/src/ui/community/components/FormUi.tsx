@@ -5,7 +5,7 @@ export function DialogHeader({ title, close }: { title: string; close: () => voi
   return (
     <header
       className={
-        'community-dialog-header tw-flex tw-min-h-16 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-community-border tw-bg-community-bg2 tw-px-4 tw-py-3 [&_h2]:tw-m-0 [&_h2]:tw-text-xl [&_h2]:tw-text-community-bright [&_button]:tw-grid [&_button]:tw-h-10 [&_button]:tw-w-10 [&_button]:tw-flex-none [&_button]:tw-place-items-center [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-0 [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
+        'community-dialog-header tw-flex tw-min-h-16 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-community-border tw-bg-community-bg2 tw-px-4 tw-py-3 [&_h2]:tw-m-0 [&_h2]:tw-text-xl [&_h2]:tw-text-community-bright [&_button]:tw-grid [&_button]:tw-h-10 [&_button]:tw-w-10 [&_button]:tw-flex-none [&_button]:tw-place-items-center [&_button]:tw-rounded-lg [&_button]:tw-border [&_button]:tw-border-community-border [&_button]:tw-bg-community-bg3 [&_button]:tw-p-0 [&_button]:tw-text-community-text [&_button]:tw-cursor-pointer [&_button]:tw-transition-[background-color,border-color,color,transform] [&_button]:tw-duration-180 hover:[&_button]:tw-border-community-accent hover:[&_button]:tw-bg-community-accent-bg hover:[&_button]:tw-text-community-accent-light hover:[&_button]:tw-rotate-90 active:[&_button]:tw-scale-95 [&_svg]:tw-h-[18px] [&_svg]:tw-w-[18px] [&_svg]:tw-fill-none [&_svg]:tw-stroke-current'
       }
     >
       <h2>{title}</h2>

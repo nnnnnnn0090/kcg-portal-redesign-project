@@ -5,25 +5,29 @@ export function communityNotificationCopy(
   ja: boolean,
 ): { title: string; body: string } {
   const actor = item.actor.displayName;
+  const postGone = Boolean(item.post?.id) && !item.post?.title && !item.post?.imageUrl;
+  const postTitle = postGone
+    ? ja
+      ? '削除された投稿'
+      : 'Deleted post'
+    : item.post?.title || (ja ? '投稿' : 'your post');
+
   if (item.type === 'like') {
-    const postTitle = item.post?.title ?? (ja ? '投稿' : 'your post');
     return {
       title: actor,
-      body: ja ? `「${postTitle}」にいいねしました` : `liked “${postTitle}”`,
+      body: ja ? `が「${postTitle}」にいいねしました` : `liked “${postTitle}”`,
     };
   }
   if (item.type === 'follow') {
     return { title: actor, body: ja ? 'あなたをフォローしました' : 'followed you' };
   }
   if (item.type === 'post_approved') {
-    const postTitle = item.post?.title ?? (ja ? '投稿' : 'your post');
     return {
       title: ja ? '投稿が承認されました' : 'Post approved',
       body: postTitle,
     };
   }
   if (item.type === 'post_rejected') {
-    const postTitle = item.post?.title ?? (ja ? '投稿' : 'your post');
     return {
       title: ja ? '投稿が却下されました' : 'Post rejected',
       body: postTitle,
@@ -32,13 +36,13 @@ export function communityNotificationCopy(
   if (item.type === 'comment_approved') {
     return {
       title: ja ? 'コメントが承認されました' : 'Comment approved',
-      body: actor,
+      body: postGone ? postTitle : actor,
     };
   }
   if (item.type === 'comment_rejected') {
     return {
       title: ja ? 'コメントが却下されました' : 'Comment rejected',
-      body: actor,
+      body: postGone ? postTitle : actor,
     };
   }
   if (item.type === 'profile_approved') {

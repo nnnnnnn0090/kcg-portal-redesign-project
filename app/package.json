@@ -25,7 +25,9 @@
   },
   "dependencies": {
     "dompurify": "^3.4.11",
+    "lucide-react": "^1.23.0",
     "marked": "^18.0.5",
+    "motion-icons-react": "^1.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

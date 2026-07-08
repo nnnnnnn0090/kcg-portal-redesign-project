@@ -1,6 +1,7 @@
 import { createElement } from 'react';
 import { PORTAL_BOOT_COVER_RAF_FRAMES } from '../contract/dom';
 import { SK } from '../contract/storage-keys';
+import { ensureCanonicalPortalUrl } from '../domain/portal/portal-location-url';
 import { matchPortalRoute } from '../domain/portal/router';
 import {
   appendPortalOverlayShell,
@@ -42,6 +43,8 @@ export async function bootPortalContent(): Promise<void> {
     removePortalBackdrop();
     return;
   }
+
+  ensureCanonicalPortalUrl();
 
   try {
     await ensurePortalExtensionBootstrapped();

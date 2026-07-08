@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { COMMUNITY_INPUT_LIMITS } from '../constants';
 import { CharacterCount, ErrorMessage, Field } from '../components/FormUi';
 
@@ -31,8 +31,7 @@ export function FeedbackScreen({
   const [contactMessage, setContactMessage] = useState('');
   const [contactSent, setContactSent] = useState(false);
 
-  const submitSuggestion = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const sendSuggestion = async () => {
     if (busy || !suggestion.trim()) return;
     try {
       await onSubmitSuggestion(suggestion.trim());
@@ -43,8 +42,7 @@ export function FeedbackScreen({
     }
   };
 
-  const submitContact = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const sendContact = async () => {
     if (busy || !subject.trim() || !contactMessage.trim()) return;
     try {
       await onSubmitContact({
@@ -103,7 +101,11 @@ export function FeedbackScreen({
                 {ja ? 'ご意見を受け付けました。ありがとうございます。' : 'Thanks for your feedback.'}
               </p>
             ) : (
-              <form className="tw-grid tw-gap-4" onSubmit={(event) => void submitSuggestion(event)}>
+              <div
+                className="tw-grid tw-gap-4"
+                role="form"
+                aria-label={ja ? '意見箱' : 'Suggestion box'}
+              >
                 <Field
                   label={ja ? 'ご意見' : 'Your message'}
                   meta={
@@ -114,7 +116,6 @@ export function FeedbackScreen({
                   }
                 >
                   <textarea
-                    name="message"
                     value={suggestion}
                     maxLength={COMMUNITY_INPUT_LIMITS.suggestionMessage}
                     placeholder={
@@ -124,10 +125,15 @@ export function FeedbackScreen({
                   />
                 </Field>
                 <ErrorMessage text={error} />
-                <button className={submitButtonClass} type="submit" disabled={busy || !suggestion.trim()}>
+                <button
+                  className={submitButtonClass}
+                  type="button"
+                  disabled={busy || !suggestion.trim()}
+                  onClick={() => void sendSuggestion()}
+                >
                   {ja ? '意見を送る' : 'Send suggestion'}
                 </button>
-              </form>
+              </div>
             )}
           </section>
 
@@ -151,10 +157,13 @@ export function FeedbackScreen({
                   : 'Your inquiry was received. We will review it.'}
               </p>
             ) : (
-              <form className="tw-grid tw-gap-4" onSubmit={(event) => void submitContact(event)}>
+              <div
+                className="tw-grid tw-gap-4"
+                role="form"
+                aria-label={ja ? 'お問い合わせ' : 'Contact'}
+              >
                 <Field label={ja ? '種別' : 'Category'}>
                   <select
-                    name="category"
                     value={category}
                     onChange={(event) => setCategory(event.target.value as ContactCategory)}
                   >
@@ -172,11 +181,15 @@ export function FeedbackScreen({
                   }
                 >
                   <input
-                    name="subject"
                     value={subject}
                     maxLength={COMMUNITY_INPUT_LIMITS.contactSubject}
                     placeholder={ja ? '例: 投稿画像が表示されない' : 'e.g. Images do not load'}
                     onChange={(event) => setSubject(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Enter' || event.shiftKey) return;
+                      event.preventDefault();
+                      void sendContact();
+                    }}
                   />
                 </Field>
                 <Field
@@ -189,7 +202,6 @@ export function FeedbackScreen({
                   }
                 >
                   <textarea
-                    name="message"
                     value={contactMessage}
                     maxLength={COMMUNITY_INPUT_LIMITS.contactMessage}
                     placeholder={
@@ -203,12 +215,13 @@ export function FeedbackScreen({
                 <ErrorMessage text={error} />
                 <button
                   className={submitButtonClass}
-                  type="submit"
+                  type="button"
                   disabled={busy || !subject.trim() || !contactMessage.trim()}
+                  onClick={() => void sendContact()}
                 >
                   {ja ? 'お問い合わせを送る' : 'Send inquiry'}
                 </button>
-              </form>
+              </div>
             )}
           </section>
         </div>

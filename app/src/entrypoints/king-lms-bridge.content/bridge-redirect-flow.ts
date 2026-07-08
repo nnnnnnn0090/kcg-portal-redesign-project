@@ -2,6 +2,7 @@
  * King LMS 上の同期処理で、一定時間応答がない場合のタイムアウトと、完了・失敗時のポータルへのリダイレクトを担います。
  */
 
+import { canonicalPortalHref, isPortalHomePathname } from '../../domain/portal/portal-location-url';
 import { SK } from '../../contract/storage-keys';
 import { SYNC_HASH } from '../../contract/sync';
 import { TIMING } from '../../contract/timing';
@@ -55,17 +56,7 @@ export async function redirectAfterCourse(hash: string): Promise<void> {
     [SK.kingLmsSyncReturnUrl]:   '',
     [SK.kingLmsSyncAwaitCourse]: false,
   });
-  window.location.href = buildRedirectUrl(url, hash);
-}
-
-/** 戻り先が学ポータル「ホーム」相当パスか（課題カレンダーがある画面） */
-function isPortalHomeReturnPathname(baseUrl: string): boolean {
-  try {
-    const p = new URL(baseUrl).pathname.replace(/\/+$/, '') || '/';
-    return p === '/portal';
-  } catch {
-    return false;
-  }
+  window.location.href = buildRedirectUrl(canonicalPortalHref(url), hash);
 }
 
 export async function redirectAfterAssignment(hash: string): Promise<void> {
@@ -79,9 +70,15 @@ export async function redirectAfterAssignment(hash: string): Promise<void> {
     [SK.kingLmsAssignmentSyncPending]:   false,
     [SK.kingLmsAssignmentSyncReturnUrl]: '',
   };
-  if (hash === SYNC_HASH.assignmentDone && isPortalHomeReturnPathname(url)) {
-    toSet[SK.portalScrollToAssignmentOnce] = true;
+  if (hash === SYNC_HASH.assignmentDone) {
+    try {
+      if (isPortalHomePathname(new URL(url).pathname)) {
+        toSet[SK.portalScrollToAssignmentOnce] = true;
+      }
+    } catch {
+      /* ignore */
+    }
   }
   await storage.set(toSet);
-  window.location.href = buildRedirectUrl(url, hash);
+  window.location.href = buildRedirectUrl(canonicalPortalHref(url), hash);
 }
