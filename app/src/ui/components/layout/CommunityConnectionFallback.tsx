@@ -1,44 +1,50 @@
 import { MotionIcon } from 'motion-icons-react';
 import 'motion-icons-react/style.css';
 import './community-connection-status.css';
-import { cn } from '../../../lib/cn';
+import { cn } from '../../../shared/cn';
+import type { I18nMessages } from '../../../i18n/messages';
 
-export function CommunityConnectionOverlay({
-  ja,
-  connecting,
-  feedFailed,
+export type CommunityConnectionReason =
+  | 'reconnecting'
+  | 'health_failed'
+  | 'gate_failed'
+  | 'ready_timeout'
+  | 'disconnected';
+
+/** portal-community-server の CommunityConnectionOverlay と同じ見た目 */
+export function CommunityConnectionFallback({
+  messages,
+  reason,
   onRetry,
   onClose,
 }: {
-  ja: boolean;
-  connecting: boolean;
-  feedFailed: boolean;
+  messages: I18nMessages['community']['connection'];
+  reason: CommunityConnectionReason;
   onRetry: () => void;
   onClose: () => void;
 }) {
+  const connecting = reason === 'reconnecting';
   const title = connecting
-    ? ja
-      ? '再接続しています…'
-      : 'Reconnecting…'
-    : feedFailed
-      ? ja
-        ? 'コミュニティサーバーに接続できません'
-        : 'Could not reach the community server'
-      : ja
-        ? 'コミュニティサーバーとの接続が切れました'
-        : 'Disconnected from the community server';
+    ? messages.reconnecting
+    : reason === 'gate_failed'
+      ? messages.gateFailed
+      : reason === 'ready_timeout'
+        ? messages.readyTimeout
+        : reason === 'health_failed'
+          ? messages.serverUnavailable
+          : messages.disconnected;
 
   const body = connecting
-    ? ja
-      ? 'ネットワーク状態を確認しています。しばらくお待ちください。'
-      : 'Checking the network. Please wait a moment.'
-    : ja
-      ? 'メンテナンス中の可能性があります。時間をおいてからもう一度お試しください。'
-      : 'The service may be under maintenance. Please try again in a little while.';
+    ? messages.checkingNetwork
+    : reason === 'gate_failed'
+      ? messages.gateFailed
+      : reason === 'ready_timeout'
+        ? messages.readyTimeout
+        : messages.maintenanceHint;
 
   return (
     <div
-      className="community-connection-overlay tw-absolute tw-inset-0 tw-z-[40] tw-grid tw-place-items-center tw-overflow-auto tw-bg-community-bg2 tw-p-6 tw-animate-community-fade-in max-[620px]:tw-p-3"
+      className="community-connection-overlay tw-grid tw-h-full tw-place-items-center tw-overflow-auto tw-bg-community-bg2 tw-p-6 tw-animate-community-fade-in max-[620px]:tw-p-3"
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="community-connection-overlay-title"
@@ -92,16 +98,8 @@ export function CommunityConnectionOverlay({
           {body}
         </p>
         <ul className="tw-mx-auto tw-mb-0 tw-mt-5 tw-max-w-[340px] tw-list-disc tw-space-y-1.5 tw-pl-5 tw-text-left tw-text-[13px] tw-leading-relaxed tw-text-community-muted">
-          <li>
-            {ja
-              ? 'サーバー側の一時的な障害・メンテナンスの可能性'
-              : 'A temporary outage or maintenance may be in progress'}
-          </li>
-          <li>
-            {ja
-              ? '校内ネットワークやVPNの状態もご確認ください'
-              : 'Also check campus network or VPN connectivity'}
-          </li>
+          <li>{messages.bulletOutage}</li>
+          <li>{messages.bulletNetwork}</li>
         </ul>
         <div className="tw-mt-6 tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-gap-2">
           <button
@@ -110,14 +108,14 @@ export function CommunityConnectionOverlay({
             onClick={onRetry}
             className="tw-inline-flex tw-min-h-10 tw-items-center tw-justify-center tw-gap-2 tw-rounded-lg tw-border-0 tw-bg-community-accent tw-px-4 tw-font-bold tw-text-community-on-accent tw-cursor-pointer disabled:tw-cursor-wait disabled:tw-opacity-70"
           >
-            {ja ? (connecting ? '接続中…' : '再接続する') : connecting ? 'Connecting…' : 'Reconnect'}
+            {connecting ? messages.connecting : messages.reconnect}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="tw-inline-flex tw-min-h-10 tw-items-center tw-justify-center tw-rounded-lg tw-border tw-border-community-border tw-bg-community-bg3 tw-px-4 tw-font-bold tw-text-community-text tw-cursor-pointer"
           >
-            {ja ? 'コミュニティを閉じる' : 'Close community'}
+            {messages.close}
           </button>
         </div>
       </section>

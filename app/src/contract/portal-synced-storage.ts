@@ -19,7 +19,6 @@ export const PORTAL_SYNCED_STORAGE_KEYS = [
   SK.developerNoticeLang,
   SK.developerSurveyAnswered,
   SK.clientUserId,
-  SK.communityAuthToken,
   SK.communityDisclaimerAccepted,
 ] as const;
 

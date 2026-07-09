@@ -45,8 +45,6 @@ export const SK = {
   clientLastUpdatedAt: 'portalThemeClientLastUpdatedAt',
   /** ライフサイクル追跡用の最後に記録した manifest version */
   clientLastKnownVersion: 'portalThemeClientLastKnownVersion',
-  /** みんなの活動のログインセッション（サーバー発行） */
-  communityAuthToken: 'portalThemeCommunityAuthToken',
   /** 「みんなの活動」が学校公式サービスではないことへの初回同意 */
   communityDisclaimerAccepted: 'portalThemeCommunityDisclaimerAccepted',
 } as const;

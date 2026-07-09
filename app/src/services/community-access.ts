@@ -7,6 +7,7 @@ import {
   isAllowedCommunityApiOrigin,
   normalizeCommunityApiOrigin,
 } from '../contract/origins';
+import { COMMUNITY_BOUNDARY_TIMING } from '@community-boundary/timing';
 import { storageRepo } from '../platform/storage/repo';
 import { buildClientTelemetryHeaders } from './client-identity';
 
@@ -35,10 +36,12 @@ export async function acceptCommunityDisclaimer(): Promise<void> {
 /** 匿名 UUID で community-access を問い合わせる */
 export async function fetchCommunityAccess(signal?: AbortSignal): Promise<CommunityAccessResult> {
   const headers = await buildClientTelemetryHeaders('GET', '/community-access');
+  const timeoutSignal = AbortSignal.timeout(COMMUNITY_BOUNDARY_TIMING.accessTimeoutMs);
+  const mergedSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;
   const response = await fetch(COMMUNITY_ACCESS_URL, {
     cache: 'no-store',
     headers,
-    signal,
+    signal: mergedSignal,
   });
   if (!response.ok) throw new Error(String(response.status));
   const result = (await response.json()) as CommunityAccessResponse;

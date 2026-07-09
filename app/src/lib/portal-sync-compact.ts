@@ -32,7 +32,6 @@ export const PORTAL_SYNC_SHORT_KEY: Record<string, string> = {
   [SK.developerNoticeLang]: 'dn',
   [SK.developerSurveyAnswered]: 'ds',
   [SK.clientUserId]: 'id',
-  [SK.communityAuthToken]: 'ca',
   [SK.communityDisclaimerAccepted]: 'cd',
 };
 

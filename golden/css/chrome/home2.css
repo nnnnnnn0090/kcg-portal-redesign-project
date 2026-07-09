@@ -503,1299 +503,6 @@
   .p-community-activity-drawer {
   animation: 0.26s cubic-bezier(0.4, 0, 1, 1) forwards p-community-drawer-out;
 }
-#portal-overlay .p-community-activity-head {
-  border-bottom: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  flex: none;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem clamp(1rem, 3vw, 2rem);
-  display: flex;
-}
-#portal-overlay .p-community-activity-head span {
-  color: var(--p-accent);
-  letter-spacing: 0.13em;
-  margin-bottom: 0.18rem;
-  font-size: 0.62rem;
-  font-weight: 750;
-  display: block;
-}
-#portal-overlay .p-community-activity-head h2 {
-  color: var(--p-text-bright);
-  letter-spacing: -0.02em;
-  margin: 0;
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-}
-#portal-overlay .p-community-activity-head > button.p-community-drawer-close {
-  border: 1px solid var(--p-border);
-  width: 2.25rem;
-  height: 2.25rem;
-  color: var(--p-text-dim);
-  cursor: pointer;
-  background: 0 0;
-  border-radius: 10px;
-  flex: none;
-  place-items: center;
-  padding: 0;
-  transition:
-    color 0.16s,
-    background 0.16s,
-    border-color 0.16s,
-    transform 0.16s;
-  display: grid;
-}
-#portal-overlay
-  .p-community-activity-head
-  > button.p-community-drawer-close:hover {
-  border-color: var(--p-border-hover);
-  background: var(--p-bg-hover);
-  color: var(--p-text-bright);
-}
-#portal-overlay
-  .p-community-activity-head
-  > button.p-community-drawer-close:active {
-  transform: scale(0.92);
-}
-#portal-overlay
-  .p-community-activity-head
-  > button.p-community-drawer-close:focus-visible {
-  outline: 2px solid var(--p-accent);
-  outline-offset: 2px;
-}
-#portal-overlay .p-community-activity-body {
-  flex: 1;
-  min-height: 0;
-  padding: 1rem clamp(1rem, 3vw, 2rem) 2.5rem;
-  overflow: auto;
-}
-#portal-overlay .p-community-activity-toolbar {
-  z-index: 3;
-  box-sizing: border-box;
-  border: 1px solid var(--p-border);
-  background: color-mix(in srgb, var(--p-bg2) 92%, transparent);
-  width: min(100%, 68rem);
-  box-shadow: 0 5px 24px var(--p-shadow);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  animation: p-community-toolbar-in 0.32s 0.12s var(--p-enter-ease) both;
-  border-radius: 12px;
-  align-items: center;
-  gap: 0.55rem;
-  margin: 0 auto 1rem;
-  padding: 0.45rem;
-  display: flex;
-  position: sticky;
-  top: 0;
-}
-#portal-overlay .p-community-feed-tabs {
-  gap: 0.2rem;
-  display: flex;
-}
-#portal-overlay .p-community-feed-tabs button {
-  color: var(--p-text-dim);
-  cursor: pointer;
-  background: 0 0;
-  border: 0;
-  border-radius: 8px;
-  padding: 0.48rem 0.7rem;
-  font: 600 0.72rem/1 inherit;
-}
-#portal-overlay .p-community-feed-tabs button.is-active {
-  background: var(--p-accent-bg);
-  color: var(--p-accent-light);
-}
-#portal-overlay .p-community-search {
-  border: 1px solid var(--p-border-light);
-  background: var(--p-bg3);
-  min-width: 8rem;
-  color: var(--p-text-dim);
-  border-radius: 8px;
-  flex: 1;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.42rem 0.58rem;
-  display: flex;
-}
-#portal-overlay .p-community-search input {
-  width: 100%;
-  min-width: 0;
-  color: var(--p-text);
-  background: 0 0;
-  border: 0;
-  outline: 0;
-  font: 500 0.72rem/1.2 inherit;
-}
-#portal-overlay .p-community-search input::placeholder {
-  color: var(--p-text-dimmer);
-}
-#portal-overlay .p-community-create-post {
-  border: 1px solid var(--p-accent);
-  background: var(--p-accent);
-  color: var(--p-on-accent);
-  white-space: nowrap;
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 0.48rem 0.72rem;
-  font: 700 0.7rem/1 inherit;
-  transition:
-    transform 0.16s,
-    filter 0.16s,
-    box-shadow 0.16s;
-}
-#portal-overlay .p-community-create-post:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 5px 16px color-mix(in srgb, var(--p-accent) 25%, transparent);
-  transform: translateY(-1px);
-}
-#portal-overlay .p-community-create-post:active {
-  transform: scale(0.97);
-}
-#portal-overlay .p-community-activity-layout {
-  grid-template-columns: minmax(0, 1fr) 15.5rem;
-  align-items: start;
-  gap: 1rem;
-  width: min(100%, 68rem);
-  margin: 0 auto;
-  display: grid;
-}
-#portal-overlay .p-community-activity-feed {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  display: grid;
-}
-#portal-overlay .p-community-post {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  min-width: 0;
-  box-shadow: 0 5px 22px var(--p-shadow);
-  animation: p-community-card-in 0.4s var(--p-enter-ease) both;
-  border-radius: 15px;
-  transition:
-    transform 0.22s,
-    border-color 0.22s,
-    box-shadow 0.22s;
-  overflow: hidden;
-}
-#portal-overlay .p-community-post[role="button"] {
-  cursor: pointer;
-}
-#portal-overlay .p-community-post[role="button"]:focus-visible {
-  outline: 2px solid var(--p-accent);
-  outline-offset: 2px;
-}
-#portal-overlay .p-community-post:nth-child(2) {
-  animation-delay: 50ms;
-}
-#portal-overlay .p-community-post:nth-child(3) {
-  animation-delay: 0.1s;
-}
-#portal-overlay .p-community-post:nth-child(4) {
-  animation-delay: 0.15s;
-}
-#portal-overlay .p-community-post:nth-child(5) {
-  animation-delay: 0.2s;
-}
-#portal-overlay .p-community-post:nth-child(6) {
-  animation-delay: 0.25s;
-}
-#portal-overlay .p-community-post:hover {
-  border-color: var(--p-border-hover);
-  box-shadow: 0 10px 30px var(--p-shadow-strong);
-  transform: translateY(-3px);
-}
-#portal-overlay .p-community-post-head {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.68rem 0.72rem;
-  display: grid;
-}
-#portal-overlay .p-community-avatar {
-  background: var(--p-accent);
-  width: 1.9rem;
-  height: 1.9rem;
-  color: var(--p-on-accent);
-  box-shadow: 0 0 0 2px var(--p-accent-bg);
-  border-radius: 50%;
-  place-items: center;
-  font-size: 0.68rem;
-  font-weight: 800;
-  display: grid;
-}
-#portal-overlay .p-community-avatar--2 {
-  background: linear-gradient(145deg, #7c3aed, #ec4899);
-}
-#portal-overlay .p-community-avatar--3 {
-  background: linear-gradient(145deg, #0891b2, #22c55e);
-}
-#portal-overlay .p-community-avatar--4 {
-  background: linear-gradient(145deg, #f59e0b, #ef4444);
-}
-#portal-overlay .p-community-post-head div {
-  gap: 0.12rem;
-  min-width: 0;
-  display: grid;
-}
-#portal-overlay .p-community-post-head strong {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--p-text-bright);
-  font-size: 0.7rem;
-  overflow: hidden;
-}
-#portal-overlay .p-community-post-head span {
-  color: var(--p-text-dimmer);
-  font-size: 0.58rem;
-}
-#portal-overlay .p-community-post-head > button {
-  color: var(--p-text-dim);
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  background: 0 0;
-  border: 0;
-  font-weight: 700;
-}
-#portal-overlay .p-community-post-image {
-  aspect-ratio: 4/3;
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--p-accent) 72%, #101827),
-    color-mix(in srgb, var(--p-accent-light) 25%, var(--p-bg3))
-  );
-  position: relative;
-  overflow: hidden;
-}
-#portal-overlay .p-community-post-image--2 {
-  background: linear-gradient(135deg, #261440, #7048a8 48%, #e882b4);
-}
-#portal-overlay .p-community-post-image--3 {
-  background: linear-gradient(145deg, #0c4a6e, #0891b2 48%, #67e8f9);
-}
-#portal-overlay .p-community-post-image--4 {
-  background: linear-gradient(135deg, #78350f, #e87918 45%, #fef08a);
-}
-#portal-overlay .p-community-post-image:before,
-#portal-overlay .p-community-post-image:after {
-  content: "";
-  filter: blur(1px);
-  background: #ffffff2e;
-  border-radius: 999px;
-  position: absolute;
-}
-#portal-overlay .p-community-post-image:before {
-  aspect-ratio: 1;
-  width: 55%;
-  top: -22%;
-  right: -8%;
-}
-#portal-overlay .p-community-post-image:after {
-  aspect-ratio: 1;
-  width: 38%;
-  bottom: -18%;
-  left: 8%;
-}
-#portal-overlay .p-community-post-tag {
-  z-index: 1;
-  color: #fff;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  background: #00000047;
-  border: 1px solid #ffffff40;
-  border-radius: 999px;
-  padding: 0.3rem 0.48rem;
-  font-size: 0.58rem;
-  font-weight: 650;
-  position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
-}
-#portal-overlay .p-community-photo-mark {
-  justify-content: center;
-  align-items: center;
-  gap: 0.3rem;
-  display: flex;
-  position: absolute;
-  inset: 0;
-  transform: rotate(-8deg);
-}
-#portal-overlay .p-community-photo-mark span {
-  aspect-ratio: 1;
-  background: #ffffff21;
-  border: 1px solid #ffffff40;
-  border-radius: 5px;
-  width: 13%;
-  box-shadow: 0 6px 20px #0000001f;
-}
-#portal-overlay .p-community-photo-mark span:nth-child(2) {
-  width: 20%;
-  transform: translateY(-12%);
-}
-#portal-overlay .p-community-post-actions {
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.58rem 0.72rem 0.2rem;
-  display: flex;
-}
-#portal-overlay .p-community-post-actions button {
-  color: var(--p-text-muted);
-  cursor: pointer;
-  background: 0 0;
-  border: 0;
-  align-items: center;
-  gap: 0.22rem;
-  font: 600 0.64rem/1 inherit;
-  display: inline-flex;
-}
-#portal-overlay .p-community-post-actions button span {
-  color: var(--p-text);
-  font-size: 1.05rem;
-}
-#portal-overlay .p-community-post-actions .p-community-post-save {
-  margin-left: auto;
-  font-size: 1rem;
-}
-#portal-overlay .p-community-post > p {
-  color: var(--p-text-muted);
-  margin: 0;
-  padding: 0.35rem 0.72rem 0.78rem;
-  font-size: 0.67rem;
-  line-height: 1.45;
-}
-#portal-overlay .p-community-post > p strong {
-  color: var(--p-text-bright);
-}
-#portal-overlay .p-community-activity-aside {
-  gap: 0.75rem;
-  display: grid;
-  position: sticky;
-  top: 4.6rem;
-}
-#portal-overlay .p-community-welcome-card,
-#portal-overlay .p-community-trends {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  box-shadow: 0 4px 18px var(--p-shadow);
-  border-radius: 14px;
-  padding: 0.9rem;
-}
-#portal-overlay .p-community-welcome-icon {
-  background: var(--p-accent-bg);
-  width: 2.15rem;
-  height: 2.15rem;
-  color: var(--p-accent);
-  border-radius: 10px;
-  place-items: center;
-  margin-bottom: 0.7rem;
-  font-size: 1rem;
-  display: grid;
-}
-#portal-overlay .p-community-welcome-card h3,
-#portal-overlay .p-community-trends h3 {
-  color: var(--p-text-bright);
-  margin: 0;
-  font-size: 0.76rem;
-}
-#portal-overlay .p-community-welcome-card p {
-  color: var(--p-text-dim);
-  margin: 0.42rem 0 0.75rem;
-  font-size: 0.65rem;
-  line-height: 1.55;
-}
-#portal-overlay .p-community-welcome-card button {
-  border: 1px solid var(--p-accent-border);
-  background: var(--p-accent-bg);
-  width: 100%;
-  color: var(--p-accent-light);
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 0.48rem;
-  font: 650 0.66rem/1 inherit;
-}
-#portal-overlay .p-community-trends > div {
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.45rem;
-  display: flex;
-}
-#portal-overlay .p-community-trends > div button {
-  color: var(--p-accent);
-  cursor: pointer;
-  background: 0 0;
-  border: 0;
-  font: 600 0.58rem/1 inherit;
-}
-#portal-overlay .p-community-trends > button {
-  border: 0;
-  border-top: 1px solid var(--p-border-light);
-  width: 100%;
-  color: var(--p-text-muted);
-  cursor: pointer;
-  background: 0 0;
-  justify-content: space-between;
-  gap: 0.4rem;
-  padding: 0.55rem 0.1rem;
-  font: 600 0.64rem/1 inherit;
-  display: flex;
-}
-#portal-overlay .p-community-trends > button small {
-  color: var(--p-text-dimmer);
-  font-size: 0.56rem;
-  font-weight: 500;
-}
-#portal-overlay .p-community-submissions {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  box-shadow: 0 4px 18px var(--p-shadow);
-  border-radius: 14px;
-  padding: 0.85rem;
-}
-#portal-overlay .p-community-submissions > div {
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.35rem;
-  display: flex;
-}
-#portal-overlay .p-community-submissions h3 {
-  color: var(--p-text-bright);
-  margin: 0;
-  font-size: 0.76rem;
-}
-#portal-overlay .p-community-submissions > div button {
-  color: var(--p-accent);
-  cursor: pointer;
-  background: 0 0;
-  border: 0;
-}
-#portal-overlay .p-community-submissions article {
-  border-top: 1px solid var(--p-border-light);
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.18rem 0.4rem;
-  padding: 0.48rem 0;
-  display: grid;
-}
-#portal-overlay .p-community-submissions article > span {
-  background: var(--p-bg3);
-  color: var(--p-text-dim);
-  border-radius: 5px;
-  align-self: start;
-  padding: 0.18rem 0.3rem;
-  font-size: 0.52rem;
-  font-weight: 700;
-}
-#portal-overlay .p-community-submissions article > span.is-approved {
-  background: var(--p-accent-bg);
-  color: var(--p-accent-light);
-}
-#portal-overlay .p-community-submissions article > span.is-rejected {
-  background: color-mix(in srgb, var(--p-danger) 12%, transparent);
-  color: var(--p-danger);
-}
-#portal-overlay .p-community-submissions strong {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--p-text-muted);
-  font-size: 0.62rem;
-  overflow: hidden;
-}
-#portal-overlay .p-community-submissions small {
-  color: var(--p-danger);
-  grid-column: 2;
-  font-size: 0.55rem;
-  line-height: 1.35;
-}
-#portal-overlay .p-community-post-image:before,
-#portal-overlay .p-community-post-image:after {
-  display: none;
-}
-#portal-overlay .p-community-post-image > img {
-  -o-object-fit: cover;
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-  display: block;
-}
-#portal-overlay .p-community-post:hover .p-community-post-image > img {
-  transform: scale(1.035);
-}
-#portal-overlay .p-community-post-copy {
-  padding: 0.72rem 0.78rem 0.82rem;
-}
-#portal-overlay .p-community-post-copy h3 {
-  color: var(--p-text-bright);
-  margin: 0 0 0.3rem;
-  font-size: 0.76rem;
-  line-height: 1.35;
-}
-#portal-overlay .p-community-post-copy p {
-  -webkit-line-clamp: 3;
-  color: var(--p-text-muted);
-  white-space: pre-wrap;
-  -webkit-box-orient: vertical;
-  margin: 0;
-  font-size: 0.66rem;
-  line-height: 1.55;
-  display: -webkit-box;
-  overflow: hidden;
-}
-#portal-overlay .p-community-feed-state {
-  text-align: center;
-  border: 1px dashed var(--p-border-hover);
-  color: var(--p-text-dim);
-  border-radius: 14px;
-  grid-column: 1/-1;
-  padding: 4rem 1rem;
-  font-size: 0.76rem;
-}
-#portal-overlay .p-community-feed-state strong,
-#portal-overlay .p-community-feed-state span {
-  display: block;
-}
-#portal-overlay .p-community-feed-state strong {
-  color: var(--p-text-bright);
-  margin-bottom: 0.35rem;
-  font-size: 0.88rem;
-}
-#portal-overlay .p-community-feed-state button {
-  border: 1px solid var(--p-accent);
-  background: var(--p-accent);
-  color: var(--p-on-accent);
-  cursor: pointer;
-  border-radius: 8px;
-  margin-top: 1rem;
-  padding: 0.55rem 0.8rem;
-  font: 700 0.66rem/1 inherit;
-}
-#portal-overlay .p-community-activity-feed.is-own-posts {
-  grid-template-columns: 1fr;
-}
-#portal-overlay .p-community-own-post {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  min-width: 0;
-  box-shadow: 0 5px 22px var(--p-shadow);
-  animation: p-community-card-in 0.3s var(--p-enter-ease) both;
-  border-radius: 15px;
-  grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
-  display: grid;
-  overflow: hidden;
-}
-#portal-overlay .p-community-own-post-image {
-  background: var(--p-bg3);
-  min-height: 10rem;
-  color: var(--p-text-dim);
-  place-items: center;
-  font-size: 0.62rem;
-  display: grid;
-  position: relative;
-  overflow: hidden;
-}
-#portal-overlay .p-community-own-post-image img {
-  -o-object-fit: cover;
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-  min-height: 10rem;
-}
-#portal-overlay .p-community-own-post-image b {
-  background: var(--p-bg);
-  color: var(--p-text-muted);
-  box-shadow: 0 2px 10px var(--p-shadow);
-  border-radius: 999px;
-  padding: 0.3rem 0.5rem;
-  font-size: 0.56rem;
-  position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
-}
-#portal-overlay .p-community-own-post-image b.is-approved {
-  background: var(--p-accent);
-  color: var(--p-on-accent);
-}
-#portal-overlay .p-community-own-post-image b.is-rejected {
-  background: var(--p-danger);
-  color: #fff;
-}
-#portal-overlay .p-community-own-post-content {
-  flex-direction: column;
-  min-width: 0;
-  padding: 0.9rem 1rem;
-  display: flex;
-}
-#portal-overlay .p-community-own-post-content > div {
-  color: var(--p-text-dim);
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.58rem;
-  display: flex;
-}
-#portal-overlay .p-community-own-post-content > div > span {
-  color: var(--p-accent-light);
-}
-#portal-overlay .p-community-own-post-content h3 {
-  color: var(--p-text-bright);
-  margin: 0.55rem 0 0.3rem;
-  font-size: 0.9rem;
-}
-#portal-overlay .p-community-own-post-content > p {
-  -webkit-line-clamp: 2;
-  color: var(--p-text-muted);
-  white-space: pre-wrap;
-  -webkit-box-orient: vertical;
-  margin: 0;
-  font-size: 0.66rem;
-  line-height: 1.55;
-  display: -webkit-box;
-  overflow: hidden;
-}
-#portal-overlay .p-community-own-post-content aside {
-  background: color-mix(in srgb, var(--p-danger) 10%, transparent);
-  color: var(--p-danger);
-  border-radius: 8px;
-  margin-top: 0.65rem;
-  padding: 0.5rem 0.6rem;
-  font-size: 0.6rem;
-  line-height: 1.45;
-}
-#portal-overlay .p-community-own-post-content aside strong {
-  margin-bottom: 0.15rem;
-  font-size: 0.56rem;
-  display: block;
-}
-#portal-overlay .p-community-delete-post {
-  border: 1px solid color-mix(in srgb, var(--p-danger) 55%, var(--p-border));
-  color: var(--p-danger);
-  cursor: pointer;
-  background: 0 0;
-  border-radius: 8px;
-  justify-content: center;
-  align-self: flex-end;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: auto;
-  padding: 0.45rem 0.65rem;
-  font: 650 0.62rem/1 inherit;
-  display: inline-flex;
-}
-#portal-overlay .p-community-delete-post:hover {
-  background: color-mix(in srgb, var(--p-danger) 10%, transparent);
-}
-#portal-overlay .p-community-delete-post:disabled {
-  opacity: 0.55;
-  cursor: wait;
-}
-#portal-overlay .p-community-status {
-  box-sizing: border-box;
-  width: min(100%, 68rem);
-  animation: p-community-status-in 0.28s var(--p-enter-ease) both;
-  border: 1px solid;
-  border-radius: 10px;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.7rem;
-  margin: 0 auto 1rem;
-  padding: 0.68rem 0.8rem;
-  font-size: 0.7rem;
-  display: flex;
-}
-#portal-overlay .p-community-status.is-success {
-  border-color: var(--p-accent-border);
-  background: var(--p-accent-bg);
-  color: var(--p-accent-light);
-}
-#portal-overlay .p-community-status.is-error {
-  border-color: color-mix(in srgb, var(--p-danger) 55%, transparent);
-  background: color-mix(in srgb, var(--p-danger) 10%, var(--p-bg2));
-  color: var(--p-text);
-}
-#portal-overlay .p-community-status button {
-  background: var(--p-bg3);
-  color: var(--p-text);
-  cursor: pointer;
-  border: 0;
-  border-radius: 7px;
-  padding: 0.32rem 0.5rem;
-  font: 600 0.62rem/1 inherit;
-}
-#portal-overlay .p-community-composer-root {
-  z-index: 10;
-  background: color-mix(in srgb, var(--p-bg) 72%, transparent);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  place-items: center;
-  padding: 1rem;
-  display: grid;
-  position: absolute;
-  inset: 0;
-}
-#portal-overlay .p-community-composer {
-  border: 1px solid var(--p-border-hover);
-  background: var(--p-bg);
-  width: min(100%, 48rem);
-  max-height: min(92vh, 42rem);
-  box-shadow: 0 24px 80px var(--p-shadow-strong);
-  animation: p-scale-in var(--p-pop-dur) var(--p-enter-ease) both;
-  border-radius: 18px;
-  flex-direction: column;
-  display: flex;
-  overflow: hidden;
-}
-#portal-overlay .p-community-composer > header {
-  border-bottom: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.9rem 1rem;
-  display: flex;
-}
-#portal-overlay .p-community-composer > header span {
-  color: var(--p-accent);
-  letter-spacing: 0.12em;
-  font-size: 0.56rem;
-  font-weight: 750;
-  display: block;
-}
-#portal-overlay .p-community-composer > header h3 {
-  color: var(--p-text-bright);
-  margin: 0.15rem 0 0;
-  font-size: 1rem;
-}
-#portal-overlay .p-community-composer > header button {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg3);
-  width: 2rem;
-  height: 2rem;
-  color: var(--p-text);
-  cursor: pointer;
-  border-radius: 50%;
-  font-size: 1.1rem;
-}
-#portal-overlay .p-community-composer-body {
-  grid-template-columns: minmax(13rem, 0.9fr) minmax(15rem, 1.1fr);
-  gap: 1rem;
-  min-height: 0;
-  padding: 1rem;
-  display: grid;
-  overflow: auto;
-}
-#portal-overlay .p-community-image-picker {
-  border: 1px dashed var(--p-border-hover);
-  background: var(--p-bg2);
-  min-height: 19rem;
-  color: var(--p-text-muted);
-  cursor: pointer;
-  border-radius: 13px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.32rem;
-  display: flex;
-  position: relative;
-  overflow: hidden;
-}
-#portal-overlay .p-community-image-picker:hover {
-  border-color: var(--p-accent);
-}
-#portal-overlay .p-community-image-picker > strong {
-  color: var(--p-accent);
-  font-size: 1.6rem;
-}
-#portal-overlay .p-community-image-picker > span {
-  font-size: 0.75rem;
-  font-weight: 650;
-}
-#portal-overlay .p-community-image-picker > small {
-  color: var(--p-text-dim);
-  font-size: 0.58rem;
-}
-#portal-overlay .p-community-image-picker > input {
-  opacity: 0;
-  pointer-events: none;
-  width: 1px;
-  height: 1px;
-  position: absolute;
-}
-#portal-overlay .p-community-image-picker.has-image {
-  border-style: solid;
-}
-#portal-overlay .p-community-image-picker > img {
-  -o-object-fit: contain;
-  object-fit: contain;
-  background: var(--p-bg3);
-  width: 100%;
-  height: 100%;
-}
-#portal-overlay .p-community-composer-fields {
-  flex-direction: column;
-  gap: 0.68rem;
-  display: flex;
-}
-#portal-overlay .p-community-composer-fields label {
-  color: var(--p-text-muted);
-  gap: 0.28rem;
-  font-size: 0.65rem;
-  font-weight: 650;
-  display: grid;
-}
-#portal-overlay .p-community-composer-fields input,
-#portal-overlay .p-community-composer-fields select,
-#portal-overlay .p-community-composer-fields textarea {
-  box-sizing: border-box;
-  border: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  width: 100%;
-  color: var(--p-text);
-  border-radius: 8px;
-  outline: 0;
-  padding: 0.55rem 0.62rem;
-  font: 500 0.72rem/1.4 inherit;
-}
-#portal-overlay .p-community-composer-fields textarea {
-  resize: vertical;
-  min-height: 6.5rem;
-}
-#portal-overlay .p-community-composer-fields input:focus,
-#portal-overlay .p-community-composer-fields select:focus,
-#portal-overlay .p-community-composer-fields textarea:focus {
-  border-color: var(--p-accent);
-}
-#portal-overlay .p-community-composer-fields > p {
-  background: var(--p-accent-bg);
-  color: var(--p-text-muted);
-  border-radius: 8px;
-  margin: auto 0 0;
-  padding: 0.55rem 0.62rem;
-  font-size: 0.62rem;
-  line-height: 1.45;
-}
-#portal-overlay .p-community-composer-error {
-  border: 1px solid color-mix(in srgb, var(--p-danger) 35%, transparent);
-  background: color-mix(in srgb, var(--p-danger) 10%, transparent);
-  color: var(--p-danger);
-  border-radius: 8px;
-  padding: 0.55rem 0.62rem;
-  font-size: 0.62rem;
-  line-height: 1.45;
-}
-#portal-overlay .p-community-composer-author {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  border-radius: 8px;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.58rem 0.65rem;
-  display: flex;
-}
-#portal-overlay .p-community-composer-author span {
-  color: var(--p-text-muted);
-  font-size: 0.65rem;
-  font-weight: 650;
-}
-#portal-overlay .p-community-composer-author strong {
-  color: var(--p-text-bright);
-  font-size: 0.72rem;
-}
-#portal-overlay .p-community-composer > footer {
-  border-top: 1px solid var(--p-border);
-  background: var(--p-bg2);
-  justify-content: flex-end;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  display: flex;
-}
-#portal-overlay .p-community-composer > footer button {
-  border: 1px solid var(--p-border-hover);
-  background: var(--p-bg3);
-  min-width: 6rem;
-  color: var(--p-text);
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 0.52rem 0.75rem;
-  font: 650 0.7rem/1 inherit;
-}
-#portal-overlay .p-community-composer > footer button.is-primary {
-  border-color: var(--p-accent);
-  background: var(--p-accent);
-  color: var(--p-on-accent);
-}
-#portal-overlay
-  .p-community-composer
-  > footer
-  button.is-primary[aria-busy="true"] {
-  justify-content: center;
-  align-items: center;
-  gap: 0.42rem;
-  display: inline-flex;
-}
-#portal-overlay .p-community-composer > footer button:disabled {
-  opacity: 0.48;
-  cursor: not-allowed;
-}
-#portal-overlay .p-community-submit-spinner {
-  border: 2px solid color-mix(in srgb, var(--p-bg) 35%, transparent);
-  border-top-color: var(--p-on-accent);
-  border-radius: 50%;
-  width: 0.78rem;
-  height: 0.78rem;
-  animation: 0.65s linear infinite p-community-spin;
-}
-#portal-overlay .p-community-submit-complete {
-  box-sizing: border-box;
-  border: 1px solid var(--p-border-hover);
-  background: var(--p-bg);
-  width: min(100%, 25rem);
-  box-shadow: 0 24px 80px var(--p-shadow-strong);
-  text-align: center;
-  animation: p-community-complete-in 0.4s var(--p-enter-ease) both;
-  border-radius: 18px;
-  flex-direction: column;
-  align-items: center;
-  padding: 2.25rem 2rem;
-  display: flex;
-}
-#portal-overlay .p-community-submit-complete > span {
-  background: var(--p-accent-bg);
-  width: 3.4rem;
-  height: 3.4rem;
-  color: var(--p-accent);
-  animation: p-community-check-in 0.45s 0.12s var(--p-enter-ease) both;
-  border-radius: 50%;
-  place-items: center;
-  font-size: 1.6rem;
-  font-weight: 800;
-  display: grid;
-}
-#portal-overlay .p-community-submit-complete h3 {
-  color: var(--p-text-bright);
-  margin: 1rem 0 0.4rem;
-  font-size: 1.05rem;
-}
-#portal-overlay .p-community-submit-complete p {
-  color: var(--p-text-muted);
-  margin: 0;
-  font-size: 0.72rem;
-  line-height: 1.65;
-}
-#portal-overlay .p-community-submit-complete button {
-  border: 1px solid var(--p-accent);
-  background: var(--p-accent);
-  color: var(--p-on-accent);
-  cursor: pointer;
-  border-radius: 9px;
-  margin-top: 1.2rem;
-  padding: 0.58rem 1rem;
-  font: 700 0.7rem/1 inherit;
-}
-#portal-overlay .p-community-detail-root {
-  z-index: 11;
-  background: color-mix(in srgb, var(--p-bg) 78%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  place-items: center;
-  padding: clamp(1rem, 4vw, 3rem);
-  animation: 0.2s ease-out p-community-backdrop-in;
-  display: grid;
-  position: absolute;
-  inset: 0;
-}
-#portal-overlay .p-community-detail {
-  border: 1px solid var(--p-border-hover);
-  background: var(--p-bg);
-  width: min(100%, 62rem);
-  max-height: min(90vh, 44rem);
-  box-shadow: 0 28px 90px var(--p-shadow-strong);
-  animation: p-community-detail-in 0.38s var(--p-enter-ease) both;
-  border-radius: 18px;
-  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
-  display: grid;
-  overflow: hidden;
-}
-#portal-overlay .p-community-detail-image {
-  background: #050505;
-  place-items: center;
-  min-width: 0;
-  min-height: 24rem;
-  display: grid;
-}
-#portal-overlay .p-community-detail-image img {
-  -o-object-fit: contain;
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-  max-height: 90vh;
-  display: block;
-}
-#portal-overlay .p-community-detail-content {
-  min-width: 0;
-  padding: 1rem 1.1rem 1.5rem;
-  overflow: auto;
-}
-#portal-overlay .p-community-detail-content > header {
-  border-bottom: 1px solid var(--p-border);
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.55rem;
-  padding-bottom: 0.9rem;
-  display: grid;
-}
-#portal-overlay .p-community-detail-content > header > div:nth-child(2) {
-  gap: 0.12rem;
-  min-width: 0;
-  display: grid;
-}
-#portal-overlay .p-community-detail-content > header strong {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--p-text-bright);
-  font-size: 0.74rem;
-  overflow: hidden;
-}
-#portal-overlay .p-community-detail-content > header time {
-  color: var(--p-text-dim);
-  font-size: 0.58rem;
-}
-#portal-overlay .p-community-detail-content > header button {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg3);
-  width: 2rem;
-  height: 2rem;
-  color: var(--p-text);
-  cursor: pointer;
-  border-radius: 50%;
-  font-size: 1.1rem;
-}
-#portal-overlay .p-community-detail-tag {
-  background: var(--p-accent-bg);
-  color: var(--p-accent-light);
-  border-radius: 999px;
-  margin-top: 1rem;
-  padding: 0.28rem 0.48rem;
-  font-size: 0.58rem;
-  font-weight: 650;
-  display: inline-block;
-}
-#portal-overlay .p-community-detail-content > h3 {
-  color: var(--p-text-bright);
-  margin: 0.7rem 0 0.45rem;
-  font-size: 1.05rem;
-  line-height: 1.4;
-}
-#portal-overlay .p-community-detail-content > p {
-  color: var(--p-text-muted);
-  white-space: pre-wrap;
-  margin: 0;
-  font-size: 0.74rem;
-  line-height: 1.75;
-}
-#portal-overlay .p-community-account {
-  align-items: center;
-  gap: 0.55rem;
-  margin-left: auto;
-  padding-right: 0.35rem;
-  display: flex;
-}
-#portal-overlay .p-community-account > span {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 10rem;
-  color: var(--p-text-muted);
-  letter-spacing: 0;
-  font-size: 0.68rem;
-  font-weight: 650;
-  overflow: hidden;
-}
-#portal-overlay .p-community-account > button {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg3);
-  width: auto;
-  height: auto;
-  color: var(--p-text-muted);
-  cursor: pointer;
-  border-radius: 7px;
-  padding: 0.38rem 0.5rem;
-  font-size: 0.6rem;
-}
-#portal-overlay .p-community-guest-actions {
-  align-items: center;
-  gap: 0.4rem;
-  margin-left: auto;
-  display: flex;
-}
-#portal-overlay .p-community-guest-actions button {
-  border: 1px solid var(--p-border-hover);
-  background: var(--p-bg3);
-  color: var(--p-text-muted);
-  white-space: nowrap;
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 0.48rem 0.7rem;
-  font: 650 0.64rem/1 inherit;
-}
-#portal-overlay .p-community-guest-actions button.is-primary {
-  border-color: var(--p-accent);
-  background: var(--p-accent);
-  color: var(--p-on-accent);
-}
-#portal-overlay .p-community-auth-root {
-  z-index: 12;
-  background: var(--p-bg);
-  place-items: center;
-  padding: clamp(0.75rem, 3vw, 2rem);
-  animation: 0.2s ease-out both p-community-backdrop-in;
-  display: grid;
-  position: absolute;
-  inset: 0;
-  overflow: auto;
-}
-#portal-overlay .p-community-auth {
-  box-sizing: border-box;
-  border: 1px solid var(--p-border-hover);
-  background: var(--p-bg2);
-  width: min(100%, 25rem);
-  max-height: calc(100vh - 2rem);
-  box-shadow: 0 24px 80px var(--p-shadow-strong);
-  animation: p-community-detail-in 0.3s var(--p-enter-ease) both;
-  border-radius: 18px;
-  flex-direction: column;
-  gap: 0.72rem;
-  padding: 1.6rem;
-  display: flex;
-  position: relative;
-  overflow: auto;
-}
-#portal-overlay .p-community-auth > span {
-  color: var(--p-accent);
-  letter-spacing: 0.11em;
-  font-size: 0.56rem;
-  font-weight: 750;
-}
-#portal-overlay .p-community-auth h3 {
-  color: var(--p-text-bright);
-  margin: -0.25rem 0 0;
-  font-size: 1.18rem;
-}
-#portal-overlay .p-community-auth > p {
-  color: var(--p-text-dim);
-  margin: 0 0 0.25rem;
-  font-size: 0.68rem;
-  line-height: 1.6;
-}
-#portal-overlay .p-community-auth-tabs {
-  box-sizing: border-box;
-  border: 1px solid var(--p-border);
-  background: var(--p-bg);
-  border-radius: 10px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.25rem;
-  width: 100%;
-  margin: 0.25rem 0 0.15rem;
-  padding: 0.25rem;
-  display: grid;
-}
-#portal-overlay .p-community-auth-tabs button {
-  box-sizing: border-box;
-  background: var(--p-bg);
-  width: 100%;
-  min-width: 0;
-  color: var(--p-text-dim);
-  white-space: nowrap;
-  cursor: pointer;
-  border: 0;
-  border-radius: 7px;
-  padding: 0.55rem 0.4rem;
-  font: 650 0.65rem/1 inherit;
-}
-#portal-overlay .p-community-auth-tabs button.is-active {
-  background: var(--p-accent-bg);
-  color: var(--p-accent-light);
-  box-shadow: 0 1px 5px var(--p-shadow);
-}
-#portal-overlay .p-community-auth label {
-  color: var(--p-text-muted);
-  gap: 0.28rem;
-  font-size: 0.64rem;
-  font-weight: 650;
-  display: grid;
-}
-#portal-overlay .p-community-auth label input {
-  box-sizing: border-box;
-  border: 1px solid var(--p-border);
-  background: var(--p-bg);
-  width: 100%;
-  color: var(--p-text);
-  border-radius: 9px;
-  outline: 0;
-  padding: 0.62rem 0.68rem;
-  font: 500 0.74rem/1.3 inherit;
-}
-#portal-overlay .p-community-auth label input:focus {
-  border-color: var(--p-accent);
-  box-shadow: 0 0 0 3px var(--p-accent-bg);
-}
-#portal-overlay .p-community-auth label small {
-  color: var(--p-text-dimmer);
-  font-size: 0.54rem;
-  font-weight: 500;
-}
-#portal-overlay .p-community-auth > button {
-  cursor: pointer;
-  border: 0;
-  border-radius: 9px;
-  min-height: 2.35rem;
-  font: 700 0.68rem/1 inherit;
-}
-#portal-overlay .p-community-auth > button.is-primary {
-  background: var(--p-accent);
-  color: var(--p-on-accent);
-  justify-content: center;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.2rem;
-  display: flex;
-}
-#portal-overlay .p-community-auth > button.is-primary:disabled {
-  opacity: 0.55;
-  cursor: wait;
-}
-#portal-overlay .p-community-auth > button.is-switch {
-  color: var(--p-accent-light);
-  background: 0 0;
-}
-#portal-overlay .p-community-auth > button.p-community-auth-close {
-  border: 1px solid var(--p-border);
-  background: var(--p-bg3);
-  width: 2rem;
-  height: 2rem;
-  min-height: 0;
-  color: var(--p-text);
-  border-radius: 50%;
-  place-items: center;
-  padding: 0;
-  font: 400 1.1rem/1 inherit;
-  display: grid;
-  position: absolute;
-  top: 0.8rem;
-  right: 0.8rem;
-}
-#portal-overlay .p-community-auth-error {
-  background: color-mix(in srgb, var(--p-danger) 12%, transparent);
-  color: var(--p-danger);
-  border-radius: 8px;
-  padding: 0.55rem 0.62rem;
-  font-size: 0.62rem;
-  line-height: 1.45;
-}
-#portal-overlay .p-community-auth-loading {
-  min-height: 8rem;
-  color: var(--p-text-muted);
-  justify-content: center;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.68rem;
-  display: flex;
-}
 @keyframes p-community-drawer-in {
   0% {
     transform: translate(100%);
@@ -1828,158 +535,16 @@
     opacity: 0;
   }
 }
-@keyframes p-community-toolbar-in {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes p-community-card-in {
-  0% {
-    opacity: 0;
-    transform: translateY(14px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-@keyframes p-community-status-in {
-  0% {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes p-community-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes p-community-complete-in {
-  0% {
-    opacity: 0;
-    transform: translateY(12px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-@keyframes p-community-check-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.4) rotate(-18deg);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-}
-@keyframes p-community-detail-in {
-  0% {
-    opacity: 0;
-    transform: translateY(18px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-@media (width<=820px) {
-  #portal-overlay .p-community-activity-layout {
-    grid-template-columns: 1fr;
-  }
-  #portal-overlay .p-community-activity-aside {
-    display: none;
-  }
-}
-@media (width<=700px) {
-  #portal-overlay .p-community-detail {
-    grid-template-columns: 1fr;
-    overflow: auto;
-  }
-  #portal-overlay .p-community-detail-image {
-    aspect-ratio: 1;
-    min-height: 0;
-  }
-  #portal-overlay .p-community-detail-image img {
-    max-height: none;
-  }
-}
 @media (width<=620px) {
   #portal-overlay .p-community-activity-root {
     grid-template-columns: 2.5rem minmax(0, 1fr);
   }
-  #portal-overlay .p-community-activity-head {
-    gap: 0.45rem;
-    padding: 0.8rem;
-  }
-  #portal-overlay .p-community-activity-head h2 {
-    font-size: 1rem;
-  }
-  #portal-overlay .p-community-activity-head > div:first-child > span {
-    display: none;
-  }
-  #portal-overlay .p-community-account > span {
-    max-width: 5rem;
-  }
-  #portal-overlay .p-community-account > button {
-    display: none;
-  }
-  #portal-overlay .p-community-guest-actions {
-    gap: 0.25rem;
-  }
-  #portal-overlay .p-community-guest-actions button {
-    padding: 0.42rem 0.5rem;
-    font-size: 0.58rem;
-  }
-  #portal-overlay .p-community-activity-feed,
-  #portal-overlay .p-community-own-post {
-    grid-template-columns: 1fr;
-  }
-  #portal-overlay .p-community-own-post-image {
-    aspect-ratio: 16/9;
-    min-height: 0;
-  }
-  #portal-overlay .p-community-search {
-    display: none;
-  }
-  #portal-overlay .p-community-create-post {
-    padding: 0.48rem 0.55rem;
-  }
-  #portal-overlay .p-community-composer-body {
-    grid-template-columns: 1fr;
-  }
-  #portal-overlay .p-community-image-picker {
-    min-height: 13rem;
-  }
-  #portal-overlay .p-community-detail-root {
-    padding: 0.75rem;
-  }
-  #portal-overlay .p-community-auth {
-    padding: 1.35rem 1rem 1rem;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   #portal-overlay .p-community-activity-root,
-  #portal-overlay .p-community-activity-drawer,
-  #portal-overlay .p-community-activity-toolbar,
-  #portal-overlay .p-community-post,
-  #portal-overlay .p-community-status,
-  #portal-overlay .p-community-composer {
+  #portal-overlay .p-community-activity-drawer {
     animation-duration: 0.01ms;
     animation-delay: 0s;
-  }
-  #portal-overlay .p-community-post-image > img {
-    transition: none;
   }
 }
 #portal-overlay .p-profile-wrap {
@@ -3907,12 +2472,26 @@
   z-index: 70;
   width: min(24rem, 100vw - 2rem);
   animation: p-scale-in var(--p-pop-dur) var(--p-enter-ease) both;
+  transform-origin: 0 0;
   -webkit-user-select: none;
   user-select: none;
   position: absolute;
   top: calc(100% + 0.35rem);
   left: 0;
   right: auto;
+}
+#portal-overlay .p-settings-pop.is-viewport-docked {
+  top: var(--p-settings-pop-top, auto);
+  bottom: var(--p-settings-pop-bottom, auto);
+  left: var(--p-settings-pop-left, 0);
+  width: var(--p-settings-pop-width, min(24rem, calc(100vw - 2rem)));
+  z-index: 80;
+  position: fixed;
+  right: auto;
+  overflow: hidden;
+}
+#portal-overlay .p-settings-pop.is-viewport-docked.is-flipped {
+  transform-origin: 0 100%;
 }
 #portal-overlay .p-settings-pop.is-closing {
   animation: p-scale-out var(--p-pop-dur) var(--p-enter-ease) forwards;
@@ -3931,10 +2510,10 @@
   border: 1px solid var(--p-border);
   width: 100%;
   box-shadow: 0 16px 48px var(--p-shadow-strong);
+  max-height: min(46rem, var(--p-settings-max-height, calc(100dvh - 5rem)));
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   border-radius: 14px;
-  max-height: min(46rem, 100dvh - 4rem);
   margin: 0;
   padding: 1.1rem 1.15rem;
   overflow: hidden auto;
@@ -4090,6 +2669,73 @@
   margin: 0;
   font-size: 0.68rem;
   line-height: 1.45;
+}
+#portal-overlay .p-settings-section--feedback .p-settings-client-user-id-block {
+  border-top: 1px solid var(--p-border-light);
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+}
+#portal-overlay .p-settings-client-user-id-label {
+  color: var(--p-text-muted);
+  margin: 0 0 0.2rem 0.55rem;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+#portal-overlay .p-settings-client-user-id-row {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.45rem;
+  padding-top: 0.15rem;
+  display: flex;
+}
+#portal-overlay .p-settings-client-user-id-code {
+  border: 1px solid var(--p-border);
+  background: var(--p-bg3);
+  letter-spacing: 0.01em;
+  word-break: break-all;
+  min-width: 0;
+  color: var(--p-text-muted);
+  -webkit-user-select: all;
+  user-select: all;
+  border-radius: 8px;
+  flex: 1;
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    Liberation Mono,
+    Courier New,
+    monospace;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+#portal-overlay .p-settings-client-user-id-copy {
+  border: 1px solid var(--p-border);
+  background: var(--p-bg3);
+  min-width: 4.25rem;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  flex-shrink: 0;
+  align-self: stretch;
+  padding: 0.5rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+#portal-overlay .p-settings-client-user-id-copy:hover {
+  background: var(--p-bg-hover);
+  border-color: var(--p-border-hover);
+  color: var(--p-text);
 }
 #portal-overlay .p-settings-update-callout {
   border: 1px solid var(--p-accent-border);
@@ -4863,7 +3509,8 @@
 #portal-overlay .p-theme-btn {
   border: 2px solid var(--p-border);
   background: var(--p-bg3);
-  min-width: 4.75rem;
+  min-width: 0;
+  max-width: calc(50% - 0.2rem);
   color: var(--p-text-muted);
   cursor: pointer;
   border-radius: 8px;
@@ -8546,17 +7193,6 @@
     padding: 1.5rem;
   }
 }
-#portal-overlay .tw-sr-only {
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  position: absolute;
-  overflow: hidden;
-}
 #portal-overlay .tw-pointer-events-none {
   pointer-events: none;
 }
@@ -8569,76 +7205,14 @@
 #portal-overlay .tw-relative {
   position: relative;
 }
-#portal-overlay .tw-sticky {
-  position: sticky;
-}
 #portal-overlay .tw-inset-0 {
   inset: 0;
-}
-#portal-overlay .tw-inset-x-0 {
-  left: 0;
-  right: 0;
-}
-#portal-overlay .tw-inset-y-0 {
-  top: 0;
-  bottom: 0;
-}
-#portal-overlay .tw-left-0 {
-  left: 0;
-}
-#portal-overlay .tw-left-\[-120px\] {
-  left: -120px;
 }
 #portal-overlay .tw-left-\[-9999px\] {
   left: -9999px;
 }
-#portal-overlay .tw-right-1 {
-  right: 0.25rem;
-}
-#portal-overlay .tw-right-2 {
-  right: 0.5rem;
-}
-#portal-overlay .tw-right-3 {
-  right: 0.75rem;
-}
-#portal-overlay .tw-right-\[-8\%\] {
-  right: -8%;
-}
 #portal-overlay .tw-top-0 {
   top: 0;
-}
-#portal-overlay .tw-top-1 {
-  top: 0.25rem;
-}
-#portal-overlay .tw-top-2 {
-  top: 0.5rem;
-}
-#portal-overlay .tw-top-3 {
-  top: 0.75rem;
-}
-#portal-overlay .tw-top-\[-120px\] {
-  top: -120px;
-}
-#portal-overlay .tw-top-\[calc\(100\%\+8px\)\] {
-  top: calc(100% + 8px);
-}
-#portal-overlay .tw-z-20 {
-  z-index: 20;
-}
-#portal-overlay .tw-z-\[2147483300\] {
-  z-index: 2147483300;
-}
-#portal-overlay .tw-z-\[2147483647\] {
-  z-index: 2147483647;
-}
-#portal-overlay .tw-z-\[2\] {
-  z-index: 2;
-}
-#portal-overlay .tw-z-\[3\] {
-  z-index: 3;
-}
-#portal-overlay .tw-z-\[5\] {
-  z-index: 5;
 }
 #portal-overlay .tw-z-boot-cover {
   z-index: 2147483646;
@@ -8646,65 +7220,27 @@
 #portal-overlay .tw-m-0 {
   margin: 0;
 }
-#portal-overlay .tw-mx-4 {
-  margin-left: 1rem;
-  margin-right: 1rem;
-}
-#portal-overlay .tw-mx-5 {
-  margin-left: 1.25rem;
-  margin-right: 1.25rem;
-}
-#portal-overlay .tw-mx-6 {
-  margin-left: 1.5rem;
-  margin-right: 1.5rem;
-}
-#portal-overlay .tw-mx-\[-12px\] {
-  margin-left: -12px;
-  margin-right: -12px;
-}
 #portal-overlay .tw-mx-auto {
   margin-left: auto;
   margin-right: auto;
 }
-#portal-overlay .tw-my-3 {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
 #portal-overlay .tw-mb-0 {
   margin-bottom: 0;
 }
-#portal-overlay .tw-mb-3 {
-  margin-bottom: 0.75rem;
+#portal-overlay .tw-mb-2 {
+  margin-bottom: 0.5rem;
 }
 #portal-overlay .tw-mb-4 {
   margin-bottom: 1rem;
 }
-#portal-overlay .tw-mb-5 {
-  margin-bottom: 1.25rem;
-}
-#portal-overlay .tw-ml-auto {
-  margin-left: auto;
-}
-#portal-overlay .tw-mt-1 {
-  margin-top: 0.25rem;
-}
-#portal-overlay .tw-mt-4 {
-  margin-top: 1rem;
+#portal-overlay .tw-mt-3 {
+  margin-top: 0.75rem;
 }
 #portal-overlay .tw-mt-5 {
   margin-top: 1.25rem;
 }
 #portal-overlay .tw-mt-6 {
   margin-top: 1.5rem;
-}
-#portal-overlay .tw-mt-auto {
-  margin-top: auto;
-}
-#portal-overlay .tw-block {
-  display: block;
-}
-#portal-overlay .tw-inline {
-  display: inline;
 }
 #portal-overlay .tw-flex {
   display: flex;
@@ -8715,62 +7251,11 @@
 #portal-overlay .tw-grid {
   display: grid;
 }
-#portal-overlay .tw-inline-grid {
-  display: inline-grid;
-}
-#portal-overlay .tw-hidden {
-  display: none;
-}
-#portal-overlay .tw-aspect-\[4\/3\] {
-  aspect-ratio: 4/3;
-}
-#portal-overlay .tw-aspect-square {
-  aspect-ratio: 1;
-}
-#portal-overlay .tw-aspect-video {
-  aspect-ratio: 16/9;
-}
-#portal-overlay .tw-h-10 {
-  height: 2.5rem;
-}
-#portal-overlay .tw-h-11 {
-  height: 2.75rem;
-}
-#portal-overlay .tw-h-6 {
-  height: 1.5rem;
-}
-#portal-overlay .tw-h-8 {
-  height: 2rem;
-}
-#portal-overlay .tw-h-9 {
-  height: 2.25rem;
-}
-#portal-overlay .tw-h-\[180px\] {
-  height: 180px;
-}
-#portal-overlay .tw-h-\[18px\] {
-  height: 18px;
-}
-#portal-overlay .tw-h-\[22px\] {
-  height: 22px;
-}
-#portal-overlay .tw-h-\[78px\] {
-  height: 78px;
-}
-#portal-overlay .tw-h-\[clamp\(170px\,22vw\,260px\)\] {
-  height: clamp(170px, 22vw, 260px);
-}
-#portal-overlay .tw-h-\[min\(780px\,90vh\)\] {
-  height: min(780px, 90vh);
+#portal-overlay .tw-h-14 {
+  height: 3.5rem;
 }
 #portal-overlay .tw-h-full {
   height: 100%;
-}
-#portal-overlay .tw-max-h-\[min\(90vh\,900px\)\] {
-  max-height: min(90vh, 900px);
-}
-#portal-overlay .tw-max-h-\[min\(92vh\,820px\)\] {
-  max-height: min(92vh, 820px);
 }
 #portal-overlay .tw-min-h-0 {
   min-height: 0;
@@ -8778,53 +7263,8 @@
 #portal-overlay .tw-min-h-10 {
   min-height: 2.5rem;
 }
-#portal-overlay .tw-min-h-11 {
-  min-height: 2.75rem;
-}
-#portal-overlay .tw-min-h-14 {
-  min-height: 3.5rem;
-}
-#portal-overlay .tw-min-h-16 {
-  min-height: 4rem;
-}
-#portal-overlay .tw-min-h-9 {
-  min-height: 2.25rem;
-}
-#portal-overlay .tw-min-h-\[38px\] {
-  min-height: 38px;
-}
-#portal-overlay .tw-min-h-\[50px\] {
-  min-height: 50px;
-}
-#portal-overlay .tw-min-h-\[58px\] {
-  min-height: 58px;
-}
-#portal-overlay .tw-w-10 {
-  width: 2.5rem;
-}
-#portal-overlay .tw-w-6 {
-  width: 1.5rem;
-}
-#portal-overlay .tw-w-8 {
-  width: 2rem;
-}
-#portal-overlay .tw-w-9 {
-  width: 2.25rem;
-}
-#portal-overlay .tw-w-\[18px\] {
-  width: 18px;
-}
-#portal-overlay .tw-w-\[22px\] {
-  width: 22px;
-}
-#portal-overlay .tw-w-\[34\%\] {
-  width: 34%;
-}
-#portal-overlay .tw-w-\[42\%\] {
-  width: 42%;
-}
-#portal-overlay .tw-w-\[78px\] {
-  width: 78px;
+#portal-overlay .tw-w-14 {
+  width: 3.5rem;
 }
 #portal-overlay .tw-w-full {
   width: 100%;
@@ -8901,77 +7341,11 @@
 #portal-overlay .tw-w-tour-progress-9-14 {
   width: 64.2857%;
 }
-#portal-overlay .tw-min-w-0 {
-  min-width: 0;
-}
-#portal-overlay .tw-min-w-10 {
-  min-width: 2.5rem;
-}
-#portal-overlay .tw-min-w-11 {
-  min-width: 2.75rem;
-}
-#portal-overlay .tw-min-w-5 {
-  min-width: 1.25rem;
-}
-#portal-overlay .tw-min-w-\[148px\] {
-  min-width: 148px;
-}
-#portal-overlay .tw-max-w-\[1080px\] {
-  max-width: 1080px;
-}
-#portal-overlay .tw-max-w-\[1120px\] {
-  max-width: 1120px;
-}
-#portal-overlay .tw-max-w-\[420px\] {
-  max-width: 420px;
-}
-#portal-overlay .tw-max-w-\[430px\] {
-  max-width: 430px;
+#portal-overlay .tw-max-w-\[340px\] {
+  max-width: 340px;
 }
 #portal-overlay .tw-max-w-\[450px\] {
   max-width: 450px;
-}
-#portal-overlay .tw-max-w-\[520px\] {
-  max-width: 520px;
-}
-#portal-overlay .tw-max-w-\[620px\] {
-  max-width: 620px;
-}
-#portal-overlay .tw-max-w-\[640px\] {
-  max-width: 640px;
-}
-#portal-overlay .tw-max-w-\[68ch\] {
-  max-width: 68ch;
-}
-#portal-overlay .tw-max-w-\[760px\] {
-  max-width: 760px;
-}
-#portal-overlay .tw-max-w-\[780px\] {
-  max-width: 780px;
-}
-#portal-overlay .tw-max-w-\[820px\] {
-  max-width: 820px;
-}
-#portal-overlay .tw-max-w-\[980px\] {
-  max-width: 980px;
-}
-#portal-overlay .tw-flex-1 {
-  flex: 1;
-}
-#portal-overlay .tw-flex-\[0_0_36px\] {
-  flex: 0 0 36px;
-}
-#portal-overlay .tw-flex-\[1_1_148px\] {
-  flex: 148px;
-}
-#portal-overlay .tw-flex-none {
-  flex: none;
-}
-#portal-overlay .tw-skew-x-\[-16deg\] {
-  --tw-skew-x: -16deg;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 @keyframes tw-community-dialog-in {
   0% {
@@ -8990,193 +7364,37 @@
 #portal-overlay .tw-animate-community-fade-in {
   animation: 0.18s both tw-community-fade-in;
 }
-@keyframes tw-community-slide-in {
-  0% {
-    transform: translate(5%);
-  }
-}
-#portal-overlay .tw-animate-community-slide-in {
-  animation: 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both tw-community-slide-in;
-}
-@keyframes tw-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-#portal-overlay .tw-animate-spin {
-  animation: 1s linear infinite tw-spin;
-}
-#portal-overlay .tw-cursor-grab {
-  cursor: grab;
-}
 #portal-overlay .tw-cursor-pointer {
   cursor: pointer;
 }
-#portal-overlay .tw-cursor-w-resize {
-  cursor: w-resize;
-}
-#portal-overlay .tw-grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-#portal-overlay .tw-grid-cols-6 {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-#portal-overlay .tw-grid-cols-\[140px_minmax\(0\,1fr\)\] {
-  grid-template-columns: 140px minmax(0, 1fr);
-}
-#portal-overlay .tw-grid-cols-\[220px_minmax\(0\,1fr\)\] {
-  grid-template-columns: 220px minmax(0, 1fr);
-}
-#portal-overlay .tw-grid-cols-\[224px_minmax\(0\,1fr\)\] {
-  grid-template-columns: 224px minmax(0, 1fr);
-}
-#portal-overlay .tw-grid-cols-\[36px_minmax\(0\,1fr\)\] {
-  grid-template-columns: 36px minmax(0, 1fr);
-}
-#portal-overlay .tw-grid-cols-\[auto_minmax\(0\,1fr\)_auto\] {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-#portal-overlay .tw-grid-cols-\[clamp\(44px\,6vw\,88px\)_minmax\(0\,1fr\)\] {
-  grid-template-columns: clamp(44px, 6vw, 88px) minmax(0, 1fr);
-}
-#portal-overlay .tw-grid-cols-\[minmax\(0\,1\.12fr\)_minmax\(320px\,\.88fr\)\] {
-  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
-}
-#portal-overlay .tw-grid-cols-\[minmax\(0\,1\.35fr\)_minmax\(360px\,\.85fr\)\] {
-  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.85fr);
-}
-#portal-overlay .tw-grid-cols-\[minmax\(0\,1fr\)_250px\] {
-  grid-template-columns: minmax(0, 1fr) 250px;
-}
-#portal-overlay .tw-grid-rows-\[56px_minmax\(0\,1fr\)\] {
-  grid-template-rows: 56px minmax(0, 1fr);
-}
-#portal-overlay .tw-flex-col {
-  flex-direction: column;
+#portal-overlay .tw-list-disc {
+  list-style-type: disc;
 }
 #portal-overlay .tw-flex-wrap {
   flex-wrap: wrap;
 }
-#portal-overlay .tw-place-content-center {
-  place-content: center;
-}
 #portal-overlay .tw-place-items-center {
   place-items: center;
-}
-#portal-overlay .tw-content-start {
-  align-content: flex-start;
-}
-#portal-overlay .tw-items-start {
-  align-items: flex-start;
-}
-#portal-overlay .tw-items-end {
-  align-items: flex-end;
 }
 #portal-overlay .tw-items-center {
   align-items: center;
 }
-#portal-overlay .tw-items-stretch {
-  align-items: stretch;
-}
-#portal-overlay .tw-justify-end {
-  justify-content: flex-end;
-}
 #portal-overlay .tw-justify-center {
   justify-content: center;
-}
-#portal-overlay .tw-justify-between {
-  justify-content: space-between;
-}
-#portal-overlay .tw-justify-items-center {
-  justify-items: center;
-}
-#portal-overlay .tw-gap-0\.5 {
-  gap: 0.125rem;
-}
-#portal-overlay .tw-gap-1 {
-  gap: 0.25rem;
-}
-#portal-overlay .tw-gap-1\.5 {
-  gap: 0.375rem;
 }
 #portal-overlay .tw-gap-2 {
   gap: 0.5rem;
 }
-#portal-overlay .tw-gap-2\.5 {
-  gap: 0.625rem;
-}
-#portal-overlay .tw-gap-3 {
-  gap: 0.75rem;
-}
-#portal-overlay .tw-gap-3\.5 {
-  gap: 0.875rem;
-}
-#portal-overlay .tw-gap-4 {
-  gap: 1rem;
-}
-#portal-overlay .tw-gap-5 {
-  gap: 1.25rem;
-}
-#portal-overlay .tw-gap-6 {
-  gap: 1.5rem;
-}
-#portal-overlay .tw-gap-7 {
-  gap: 1.75rem;
-}
-#portal-overlay .tw-gap-\[7px\] {
-  gap: 7px;
-}
-#portal-overlay .tw-gap-x-2 {
-  -moz-column-gap: 0.5rem;
-  column-gap: 0.5rem;
-}
-#portal-overlay .tw-gap-y-1 {
-  row-gap: 0.25rem;
-}
-#portal-overlay .tw-justify-self-end {
-  justify-self: end;
+#portal-overlay :is(.tw-space-y-1\.5 > :not([hidden]) ~ :not([hidden])) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.375rem * var(--tw-space-y-reverse));
 }
 #portal-overlay .tw-overflow-auto {
   overflow: auto;
 }
-#portal-overlay .tw-overflow-hidden {
-  overflow: hidden;
-}
-#portal-overlay .tw-overflow-visible {
-  overflow: visible;
-}
-#portal-overlay .tw-overflow-x-auto {
-  overflow-x: auto;
-}
-#portal-overlay .tw-overflow-y-auto {
-  overflow-y: auto;
-}
-#portal-overlay .tw-whitespace-nowrap {
-  white-space: nowrap;
-}
-#portal-overlay .tw-whitespace-pre-wrap {
-  white-space: pre-wrap;
-}
-#portal-overlay .tw-break-words {
-  overflow-wrap: break-word;
-}
-#portal-overlay .tw-rounded-2xl {
-  border-radius: 1rem;
-}
-#portal-overlay .tw-rounded-\[10px\] {
-  border-radius: 10px;
-}
-#portal-overlay .tw-rounded-\[11px\] {
-  border-radius: 11px;
-}
 #portal-overlay .tw-rounded-\[18px\] {
   border-radius: 18px;
-}
-#portal-overlay .tw-rounded-\[7px\] {
-  border-radius: 7px;
-}
-#portal-overlay .tw-rounded-\[9px\] {
-  border-radius: 9px;
 }
 #portal-overlay .tw-rounded-full {
   border-radius: 9999px;
@@ -9184,113 +7402,17 @@
 #portal-overlay .tw-rounded-lg {
   border-radius: 0.5rem;
 }
-#portal-overlay .tw-rounded-md {
-  border-radius: 0.375rem;
-}
-#portal-overlay .tw-rounded-xl {
-  border-radius: 0.75rem;
-}
 #portal-overlay .tw-border {
   border-width: 1px;
 }
 #portal-overlay .tw-border-0 {
   border-width: 0;
 }
-#portal-overlay .tw-border-2 {
-  border-width: 2px;
-}
-#portal-overlay .tw-border-y {
-  border-top-width: 1px;
-  border-bottom-width: 1px;
-}
-#portal-overlay .tw-border-b {
-  border-bottom-width: 1px;
-}
-#portal-overlay .tw-border-l {
-  border-left-width: 1px;
-}
-#portal-overlay .tw-border-r {
-  border-right-width: 1px;
-}
-#portal-overlay .tw-border-t {
-  border-top-width: 1px;
-}
-#portal-overlay .tw-border-dashed {
-  border-style: dashed;
-}
-#portal-overlay .tw-border-\[var\(--p-avatar-ring\,\#fff\)\] {
-  border-color: var(--p-avatar-ring, #fff);
-}
-#portal-overlay .tw-border-\[var\(--p-border-hover\)\] {
-  border-color: var(--p-border-hover);
-}
-#portal-overlay .tw-border-community-accent {
-  border-color: var(--p-accent);
-}
 #portal-overlay .tw-border-community-border {
   border-color: var(--p-border);
 }
-#portal-overlay .tw-border-community-border-light {
-  border-color: var(--p-border-light);
-}
-#portal-overlay .tw-border-community-danger {
-  border-color: var(--p-danger, #e54867);
-}
-#portal-overlay .tw-border-transparent {
-  border-color: #0000;
-}
-#portal-overlay .tw-border-white {
-  --tw-border-opacity: 1;
-  border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
-}
-#portal-overlay .tw-border-white\/30 {
-  border-color: #ffffff4d;
-}
-#portal-overlay .tw-bg-\[\#08090d\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(8 9 13 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay .tw-bg-\[\#111\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(17 17 17 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay .tw-bg-\[color-mix\(in_srgb\,\#000_48\%\,transparent\)\] {
-  background-color: #0000007a;
-}
-#portal-overlay .tw-bg-\[color-mix\(in_srgb\,\#000_62\%\,transparent\)\] {
-  background-color: #0000009e;
-}
-#portal-overlay
-  .tw-bg-\[color-mix\(in_srgb\,var\(--p-bg2\)_94\%\,transparent\)\] {
-  background-color: color-mix(in srgb, var(--p-bg2) 94%, transparent);
-}
-#portal-overlay
-  .tw-bg-\[color-mix\(in_srgb\,var\(--p-bg3\)_38\%\,transparent\)\] {
-  background-color: color-mix(in srgb, var(--p-bg3) 38%, transparent);
-}
-#portal-overlay
-  .tw-bg-\[color-mix\(in_srgb\,var\(--p-danger\,\#e54867\)_12\%\,var\(--p-bg2\)\)\] {
-  background-color: color-mix(
-    in srgb,
-    var(--p-danger, #e54867) 12%,
-    var(--p-bg2)
-  );
-}
-#portal-overlay .tw-bg-black {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay .tw-bg-black\/70 {
-  background-color: #000000b3;
-}
 #portal-overlay .tw-bg-community-accent {
   background-color: var(--p-accent);
-}
-#portal-overlay .tw-bg-community-accent-bg {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay .tw-bg-community-accent-light {
-  background-color: var(--p-accent-light);
 }
 #portal-overlay .tw-bg-community-bg {
   background-color: var(--p-bg);
@@ -9301,55 +7423,11 @@
 #portal-overlay .tw-bg-community-bg3 {
   background-color: var(--p-bg3);
 }
-#portal-overlay .tw-bg-community-bright {
-  background-color: var(--p-text-bright);
-}
-#portal-overlay .tw-bg-community-danger {
-  background-color: var(--p-danger, #e54867);
-}
 #portal-overlay .tw-bg-transparent {
   background-color: #0000;
 }
-#portal-overlay .tw-bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
-#portal-overlay .tw-from-community-accent-bg {
-  --tw-gradient-from: var(--p-accent-bg) var(--tw-gradient-from-position);
-  --tw-gradient-to: #fff0 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-#portal-overlay .tw-to-community-bg3 {
-  --tw-gradient-to: var(--p-bg3) var(--tw-gradient-to-position);
-}
-#portal-overlay .tw-fill-\[\#2a68c5\] {
-  fill: #2a68c5;
-}
-#portal-overlay .tw-fill-\[\#2e93ff\] {
-  fill: #2e93ff;
-}
-#portal-overlay .tw-fill-none {
-  fill: none;
-}
-#portal-overlay .tw-stroke-current {
-  stroke: currentColor;
-}
-#portal-overlay .tw-stroke-\[1\.9\] {
-  stroke-width: 1.9px;
-}
 #portal-overlay .tw-p-0 {
   padding: 0;
-}
-#portal-overlay .tw-p-2 {
-  padding: 0.5rem;
-}
-#portal-overlay .tw-p-3 {
-  padding: 0.75rem;
-}
-#portal-overlay .tw-p-4 {
-  padding: 1rem;
-}
-#portal-overlay .tw-p-5 {
-  padding: 1.25rem;
 }
 #portal-overlay .tw-p-6 {
   padding: 1.5rem;
@@ -9357,102 +7435,16 @@
 #portal-overlay .tw-p-8 {
   padding: 2rem;
 }
-#portal-overlay .tw-px-1\.5 {
-  padding-left: 0.375rem;
-  padding-right: 0.375rem;
-}
-#portal-overlay .tw-px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-#portal-overlay .tw-px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
 #portal-overlay .tw-px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
-}
-#portal-overlay .tw-px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-#portal-overlay .tw-px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-#portal-overlay .tw-px-7 {
-  padding-left: 1.75rem;
-  padding-right: 1.75rem;
-}
-#portal-overlay .tw-py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-#portal-overlay .tw-py-10 {
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
-}
-#portal-overlay .tw-py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-#portal-overlay .tw-py-2\.5 {
-  padding-top: 0.625rem;
-  padding-bottom: 0.625rem;
-}
-#portal-overlay .tw-py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-#portal-overlay .tw-py-4 {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-#portal-overlay .tw-py-5 {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
 }
 #portal-overlay .tw-py-\[\.35rem\] {
   padding-top: 0.35rem;
   padding-bottom: 0.35rem;
 }
-#portal-overlay .tw-py-\[3px\] {
-  padding-top: 3px;
-  padding-bottom: 3px;
-}
-#portal-overlay .tw-pb-1 {
-  padding-bottom: 0.25rem;
-}
-#portal-overlay .tw-pb-14 {
-  padding-bottom: 3.5rem;
-}
-#portal-overlay .tw-pb-3 {
-  padding-bottom: 0.75rem;
-}
-#portal-overlay .tw-pb-4 {
-  padding-bottom: 1rem;
-}
-#portal-overlay .tw-pb-5 {
-  padding-bottom: 1.25rem;
-}
-#portal-overlay .tw-pb-6 {
-  padding-bottom: 1.5rem;
-}
-#portal-overlay .tw-pb-7 {
-  padding-bottom: 1.75rem;
-}
-#portal-overlay .tw-pr-10 {
-  padding-right: 2.5rem;
-}
-#portal-overlay .tw-pt-2 {
-  padding-top: 0.5rem;
-}
-#portal-overlay .tw-pt-5 {
-  padding-top: 1.25rem;
-}
-#portal-overlay .tw-pt-6 {
-  padding-top: 1.5rem;
+#portal-overlay .tw-pl-5 {
+  padding-left: 1.25rem;
 }
 #portal-overlay .tw-text-left {
   text-align: left;
@@ -9460,49 +7452,36 @@
 #portal-overlay .tw-text-center {
   text-align: center;
 }
-#portal-overlay .tw-font-community {
-  font-family: var(--p-font);
+#portal-overlay .tw-text-\[10px\] {
+  font-size: 10px;
 }
 #portal-overlay .tw-text-\[13px\] {
   font-size: 13px;
+}
+#portal-overlay .tw-text-\[22px\] {
+  font-size: 22px;
 }
 #portal-overlay .tw-text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
-#portal-overlay .tw-text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
 #portal-overlay .tw-font-bold {
   font-weight: 700;
-}
-#portal-overlay .tw-font-extrabold {
-  font-weight: 800;
-}
-#portal-overlay .tw-font-semibold {
-  font-weight: 600;
-}
-#portal-overlay .tw-leading-7 {
-  line-height: 1.75rem;
-}
-#portal-overlay .tw-leading-\[18px\] {
-  line-height: 18px;
 }
 #portal-overlay .tw-leading-relaxed {
   line-height: 1.625;
 }
+#portal-overlay .tw-leading-tight {
+  line-height: 1.25;
+}
+#portal-overlay .tw-tracking-\[\.12em\] {
+  letter-spacing: 0.12em;
+}
 #portal-overlay .tw-text-community-accent-light {
   color: var(--p-accent-light);
 }
-#portal-overlay .tw-text-community-bg {
-  color: var(--p-bg);
-}
 #portal-overlay .tw-text-community-bright {
   color: var(--p-text-bright);
-}
-#portal-overlay .tw-text-community-danger {
-  color: var(--p-danger, #e54867);
 }
 #portal-overlay .tw-text-community-muted {
   color: var(--p-text-muted);
@@ -9513,58 +7492,8 @@
 #portal-overlay .tw-text-community-text {
   color: var(--p-text);
 }
-#portal-overlay .tw-text-current {
-  color: currentColor;
-}
-#portal-overlay .tw-text-white {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay .tw-no-underline {
-  text-decoration-line: none;
-}
 #portal-overlay .tw-opacity-0 {
   opacity: 0;
-}
-#portal-overlay .tw-opacity-80 {
-  opacity: 0.8;
-}
-#portal-overlay .tw-opacity-\[0\.08\] {
-  opacity: 0.08;
-}
-#portal-overlay .tw-opacity-\[0\.10\] {
-  opacity: 0.1;
-}
-#portal-overlay .tw-opacity-\[0\.12\] {
-  opacity: 0.12;
-}
-#portal-overlay .tw-shadow-2xl {
-  --tw-shadow: 0 25px 50px -12px #00000040;
-  --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay
-  .tw-shadow-\[-18px_0_60px_color-mix\(in_srgb\,\#000_30\%\,transparent\)\] {
-  --tw-shadow: -18px 0 60px #0000004d;
-  --tw-shadow-colored: -18px 0 60px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay
-  .tw-shadow-\[0_0_0_1px_color-mix\(in_srgb\,var\(--p-accent\)_18\%\,transparent\)\,0_22px_80px_color-mix\(in_srgb\,\#000_34\%\,transparent\)\] {
-  --tw-shadow: 0 0 0 1px color-mix(in srgb, var(--p-accent) 18%, transparent),
-    0 22px 80px #00000057;
-  --tw-shadow-colored: 0 0 0 1px var(--tw-shadow-color),
-    0 22px 80px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay .tw-shadow-community-card {
-  --tw-shadow: 0 8px 24px #00000021;
-  --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 #portal-overlay .tw-shadow-community-modal {
   --tw-shadow: 0 24px 80px #00000057;
@@ -9572,3322 +7501,491 @@
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
     var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
-#portal-overlay .tw-transition {
-  transition-property:
-    color,
-    background-color,
-    border-color,
-    text-decoration-color,
-    fill,
-    stroke,
-    opacity,
-    box-shadow,
-    transform,
-    filter,
-    -webkit-backdrop-filter,
-    backdrop-filter;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay
-  .tw-transition-\[background-color\,border-color\,color\,box-shadow\,transform\] {
-  transition-property: background-color, border-color, color, box-shadow,
-    transform;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay
-  .tw-transition-\[background-color\,color\,box-shadow\,transform\] {
-  transition-property: background-color, color, box-shadow, transform;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay .tw-transition-colors {
-  transition-property: color, background-color, border-color,
-    text-decoration-color, fill, stroke;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay .tw-transition-transform {
-  transition-property: transform;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay .tw-duration-200 {
-  transition-duration: 0.2s;
-}
-#portal-overlay .tw-ease-out {
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-}
-#portal-overlay .\[-webkit-text-security\:disc\] {
-  -webkit-text-security: disc;
-}
-#portal-overlay .\[scrollbar-gutter\:stable\] {
-  scrollbar-gutter: stable;
-}
-#portal-overlay .\[stroke-linecap\:round\] {
-  stroke-linecap: round;
-}
-#portal-overlay .\[stroke-linejoin\:round\] {
-  stroke-linejoin: round;
-}
-#portal-overlay .\[text-security\:disc\] {
-  text-security: disc;
-}
-#portal-overlay .focus-within\:tw-border-community-accent:focus-within {
-  border-color: var(--p-accent);
-}
-#portal-overlay .focus-within\:tw-ring-2:focus-within {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 #0000);
-}
-#portal-overlay .focus-within\:tw-ring-community-accent-bg:focus-within {
-  --tw-ring-color: var(--p-accent-bg);
-}
-#portal-overlay .hover\:tw-translate-y-\[-1px\]:hover {
-  --tw-translate-y: -1px;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay .hover\:tw-translate-y-\[-2px\]:hover {
-  --tw-translate-y: -2px;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay .hover\:tw-border-community-accent:hover {
-  border-color: var(--p-accent);
-}
-#portal-overlay .hover\:tw-border-community-danger:hover {
-  border-color: var(--p-danger, #e54867);
-}
-#portal-overlay
-  .hover\:tw-bg-\[color-mix\(in_srgb\,var\(--p-accent\)_10\%\,var\(--p-bg3\)\)\]:hover {
-  background-color: color-mix(in srgb, var(--p-accent) 10%, var(--p-bg3));
-}
-#portal-overlay
-  .hover\:tw-bg-\[color-mix\(in_srgb\,var\(--p-danger\,\#e54867\)_10\%\,var\(--p-bg3\)\)\]:hover {
-  background-color: color-mix(
-    in srgb,
-    var(--p-danger, #e54867) 10%,
-    var(--p-bg3)
-  );
-}
-#portal-overlay .hover\:tw-bg-\[var\(--p-bg-hover\)\]:hover {
-  background-color: var(--p-bg-hover);
-}
-#portal-overlay .hover\:tw-bg-community-accent-bg:hover {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay .hover\:tw-bg-community-bg3:hover {
-  background-color: var(--p-bg3);
-}
-#portal-overlay .hover\:tw-bg-community-danger:hover {
-  background-color: var(--p-danger, #e54867);
-}
-#portal-overlay .hover\:tw-text-community-accent-light:hover {
-  color: var(--p-accent-light);
-}
-#portal-overlay .hover\:tw-text-community-bright:hover {
-  color: var(--p-text-bright);
-}
-#portal-overlay .hover\:tw-text-community-danger:hover {
-  color: var(--p-danger, #e54867);
-}
-#portal-overlay .hover\:tw-text-community-text:hover {
-  color: var(--p-text);
-}
-#portal-overlay .hover\:tw-text-white:hover {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay .hover\:tw-opacity-100:hover {
-  opacity: 1;
-}
-#portal-overlay .hover\:tw-opacity-90:hover {
-  opacity: 0.9;
-}
-#portal-overlay .hover\:tw-shadow-community-card:hover {
-  --tw-shadow: 0 8px 24px #00000021;
-  --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay .hover\:tw-shadow-lg:hover {
-  --tw-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a;
-  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color),
-    0 4px 6px -4px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay .hover\:tw-brightness-110:hover {
-  --tw-brightness: brightness(1.1);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast)
-    var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate)
-    var(--tw-sepia) var(--tw-drop-shadow);
-}
-#portal-overlay .focus-visible\:tw-bg-community-bg3:focus-visible {
-  background-color: var(--p-bg3);
-}
-#portal-overlay .focus-visible\:tw-text-community-text:focus-visible {
-  color: var(--p-text);
-}
-#portal-overlay .focus-visible\:tw-opacity-100:focus-visible {
-  opacity: 1;
-}
-#portal-overlay .focus-visible\:tw-outline-none:focus-visible {
-  outline-offset: 2px;
-  outline: 2px solid #0000;
-}
-#portal-overlay .focus-visible\:tw-outline:focus-visible {
-  outline-style: solid;
-}
-#portal-overlay .focus-visible\:tw-outline-2:focus-visible {
-  outline-width: 2px;
-}
-#portal-overlay .focus-visible\:tw-outline-community-accent:focus-visible {
-  outline-color: var(--p-accent);
-}
-#portal-overlay .focus-visible\:tw-ring-2:focus-visible {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 #0000);
-}
-#portal-overlay .focus-visible\:tw-ring-community-accent-bg:focus-visible {
-  --tw-ring-color: var(--p-accent-bg);
-}
-#portal-overlay .active\:tw-translate-y-px:active {
-  --tw-translate-y: 1px;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay .disabled\:tw-cursor-default:disabled {
-  cursor: default;
-}
-#portal-overlay .disabled\:tw-cursor-not-allowed:disabled {
-  cursor: not-allowed;
-}
 #portal-overlay .disabled\:tw-cursor-wait:disabled {
   cursor: wait;
 }
-#portal-overlay .disabled\:tw-opacity-55:disabled {
-  opacity: 0.55;
-}
-#portal-overlay .disabled\:tw-opacity-60:disabled {
-  opacity: 0.6;
-}
-@media (width<=960px) {
-  #portal-overlay .max-\[960px\]\:tw-absolute {
-    position: absolute;
-  }
-  #portal-overlay .max-\[960px\]\:tw-mx-\[-8px\] {
-    margin-left: -8px;
-    margin-right: -8px;
-  }
-  #portal-overlay .max-\[960px\]\:tw-mb-6 {
-    margin-bottom: 1.5rem;
-  }
-  #portal-overlay .max-\[960px\]\:tw-ml-6 {
-    margin-left: 1.5rem;
-  }
-  #portal-overlay .max-\[960px\]\:tw-min-h-11 {
-    min-height: 2.75rem;
-  }
-  #portal-overlay .max-\[960px\]\:tw-grid-cols-\[52px_minmax\(0\,1fr\)\] {
-    grid-template-columns: 52px minmax(0, 1fr);
-  }
-  #portal-overlay .max-\[960px\]\:tw-grid-cols-\[76px_minmax\(0\,1fr\)\] {
-    grid-template-columns: 76px minmax(0, 1fr);
-  }
-  #portal-overlay .max-\[960px\]\:tw-grid-cols-\[minmax\(0\,1fr\)_320px\] {
-    grid-template-columns: minmax(0, 1fr) 320px;
-  }
-  #portal-overlay .max-\[960px\]\:tw-items-stretch {
-    align-items: stretch;
-  }
-  #portal-overlay .max-\[960px\]\:tw-justify-center {
-    justify-content: center;
-  }
-  #portal-overlay .max-\[960px\]\:tw-p-1 {
-    padding: 0.25rem;
-  }
-  #portal-overlay .max-\[960px\]\:tw-px-0 {
-    padding-left: 0;
-    padding-right: 0;
-  }
-  #portal-overlay .max-\[960px\]\:tw-px-2 {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-  #portal-overlay .max-\[960px\]\:tw-px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-@media (width<=760px) {
-  #portal-overlay .max-\[760px\]\:tw-block {
-    display: block;
-  }
-  #portal-overlay .max-\[760px\]\:tw-h-\[clamp\(280px\,52vh\,480px\)\] {
-    height: clamp(280px, 52vh, 480px);
-  }
-  #portal-overlay .max-\[760px\]\:tw-h-auto {
-    height: auto;
-  }
-  #portal-overlay .max-\[760px\]\:tw-max-h-\[calc\(100vh-24px\)\] {
-    max-height: calc(100vh - 24px);
-  }
-  #portal-overlay .max-\[760px\]\:tw-grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-  #portal-overlay .max-\[760px\]\:tw-overflow-auto {
-    overflow: auto;
-  }
-  #portal-overlay .max-\[760px\]\:tw-border-l-0 {
-    border-left-width: 0;
-  }
-  #portal-overlay .max-\[760px\]\:tw-border-t {
-    border-top-width: 1px;
-  }
-  #portal-overlay .max-\[760px\]\:tw-border-community-border {
-    border-color: var(--p-border);
-  }
-}
-@media (width<=720px) {
-  #portal-overlay .max-\[720px\]\:tw-block {
-    display: block;
-  }
-  #portal-overlay .max-\[720px\]\:tw-hidden {
-    display: none;
-  }
-  #portal-overlay .max-\[720px\]\:tw-max-w-\[480px\] {
-    max-width: 480px;
-  }
+#portal-overlay .disabled\:tw-opacity-70:disabled {
+  opacity: 0.7;
 }
 @media (width<=620px) {
-  #portal-overlay .max-\[620px\]\:tw-col-span-full {
-    grid-column: 1/-1;
-  }
-  #portal-overlay .max-\[620px\]\:tw-mx-4 {
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-block {
-    display: block;
-  }
-  #portal-overlay .max-\[620px\]\:tw-grid {
-    display: grid;
-  }
-  #portal-overlay .max-\[620px\]\:tw-hidden {
-    display: none;
-  }
-  #portal-overlay .max-\[620px\]\:tw-max-h-\[calc\(100vh-24px\)\] {
-    max-height: calc(100vh - 24px);
-  }
-  #portal-overlay .max-\[620px\]\:tw-w-10 {
-    width: 2.5rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-  #portal-overlay .max-\[620px\]\:tw-grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  #portal-overlay .max-\[620px\]\:tw-grid-cols-7 {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-  }
-  #portal-overlay .max-\[620px\]\:tw-grid-cols-\[24px_minmax\(0\,1fr\)\] {
-    grid-template-columns: 24px minmax(0, 1fr);
-  }
-  #portal-overlay .max-\[620px\]\:tw-grid-cols-\[auto_minmax\(0\,1fr\)\] {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  #portal-overlay .max-\[620px\]\:tw-grid-rows-\[56px_minmax\(0\,1fr\)_64px\] {
-    grid-template-rows: 56px minmax(0, 1fr) 64px;
-  }
-  #portal-overlay .max-\[620px\]\:tw-items-start {
-    align-items: flex-start;
-  }
-  #portal-overlay .max-\[620px\]\:tw-gap-3 {
-    gap: 0.75rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-rounded-2xl {
-    border-radius: 1rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-border-t {
-    border-top-width: 1px;
-  }
-  #portal-overlay .max-\[620px\]\:tw-border-community-border {
-    border-color: var(--p-border);
-  }
-  #portal-overlay .max-\[620px\]\:tw-bg-community-bg2 {
-    background-color: var(--p-bg2);
-  }
   #portal-overlay .max-\[620px\]\:tw-p-3 {
     padding: 0.75rem;
   }
-  #portal-overlay .max-\[620px\]\:tw-p-4 {
-    padding: 1rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-spin,
+  .motion-bounce,
+  .motion-ping,
+  .motion-wiggle,
+  .motion-flip,
+  .motion-heartbeat,
+  .motion-shake,
+  .motion-swing,
+  .motion-tada,
+  .motion-rubber,
+  .motion-nudge {
+    animation: none !important;
   }
-  #portal-overlay .max-\[620px\]\:tw-px-0 {
-    padding-left: 0;
-    padding-right: 0;
+  .motion-press,
+  .motion-success,
+  .motion-pop {
+    animation: 0.16s forwards motion-fade-in !important;
   }
-  #portal-overlay .max-\[620px\]\:tw-px-1 {
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-px-3 {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-pb-12 {
-    padding-bottom: 3rem;
-  }
-  #portal-overlay .max-\[620px\]\:tw-pt-0 {
-    padding-top: 0;
-  }
-  #portal-overlay .max-\[620px\]\:tw-text-xs {
-    font-size: 0.75rem;
-    line-height: 1rem;
+  .motion-fade-in-up,
+  .motion-fade-in-down,
+  .motion-fade-in-left,
+  .motion-fade-in-right,
+  .motion-scale-in,
+  .motion-slide-in-up,
+  .motion-slide-in-down,
+  .motion-rotate-in,
+  .motion-zoom-in {
+    animation: 0.2s forwards motion-fade-in !important;
   }
 }
-@media (width<=520px) {
-  #portal-overlay .max-\[520px\]\:tw-max-h-\[calc\(100vh-16px\)\] {
-    max-height: calc(100vh - 16px);
+:root {
+  --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --motion-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes motion-pulse {
+  0%,
+  to {
+    opacity: 1;
   }
-  #portal-overlay .max-\[520px\]\:tw-rounded-xl {
-    border-radius: 0.75rem;
-  }
-  #portal-overlay .max-\[520px\]\:tw-px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  #portal-overlay .max-\[520px\]\:tw-pb-5 {
-    padding-bottom: 1.25rem;
-  }
-  #portal-overlay .max-\[520px\]\:tw-pt-5 {
-    padding-top: 1.25rem;
+  50% {
+    opacity: 0.5;
   }
 }
-@media (width<=420px) {
-  #portal-overlay .max-\[420px\]\:tw-grid {
-    display: grid;
+@keyframes motion-spin {
+  0% {
+    transform: rotate(0);
   }
-  #portal-overlay .max-\[420px\]\:tw-grid-cols-\[12px_minmax\(0\,1fr\)\] {
-    grid-template-columns: 12px minmax(0, 1fr);
-  }
-  #portal-overlay .max-\[420px\]\:tw-items-end {
-    align-items: flex-end;
-  }
-  #portal-overlay .max-\[420px\]\:tw-justify-between {
-    justify-content: space-between;
-  }
-  #portal-overlay .max-\[420px\]\:tw-gap-1 {
-    gap: 0.25rem;
-  }
-  #portal-overlay .max-\[420px\]\:tw-px-3 {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+  to {
+    transform: rotate(360deg);
   }
 }
-@media (width>=721px) {
-  #portal-overlay .min-\[721px\]\:tw-hidden {
-    display: none;
+@keyframes motion-bounce {
+  0%,
+  to {
+    animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1);
+    transform: translateY(-25%);
+  }
+  50% {
+    animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1);
+    transform: translateY(0);
   }
 }
-#portal-overlay .\[\&\.has-image\]\:tw-border-solid.has-image {
-  border-style: solid;
+@keyframes motion-ping {
+  0% {
+    opacity: 1;
+    transform: scale(0.95);
+  }
+  75%,
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
 }
-#portal-overlay .\[\&\.has-image\]\:tw-border-community-border.has-image {
-  border-color: var(--p-border);
+@keyframes motion-wiggle {
+  0%,
+  to {
+    transform: translate(0);
+  }
+  25% {
+    transform: translate(-4px);
+  }
+  75% {
+    transform: translate(4px);
+  }
 }
-#portal-overlay .\[\&\.has-image\]\:tw-bg-\[\#08090d\].has-image {
-  --tw-bg-opacity: 1;
-  background-color: rgb(8 9 13 / var(--tw-bg-opacity, 1));
+@keyframes motion-flip {
+  0% {
+    transform: rotateY(0);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
 }
-#portal-overlay .\[\&\.is-active\]\:tw-border-community-accent.is-active {
-  border-color: var(--p-accent);
+@keyframes motion-heartbeat {
+  0%,
+  to {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.2);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.2);
+  }
+  56% {
+    transform: scale(1);
+  }
 }
-#portal-overlay .\[\&\.is-active\]\:tw-border-community-danger.is-active {
-  border-color: var(--p-danger, #e54867);
+@keyframes motion-shake {
+  0%,
+  to {
+    transform: translate(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translate(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate(5px);
+  }
 }
-#portal-overlay
-  .\[\&\.is-active\]\:tw-bg-\[color-mix\(in_srgb\,var\(--p-accent\)_20\%\,var\(--p-bg3\)\)\].is-active {
-  background-color: color-mix(in srgb, var(--p-accent) 20%, var(--p-bg3));
+@keyframes motion-swing {
+  20% {
+    transform: rotate(15deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(5deg);
+  }
+  80% {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(0);
+  }
 }
-#portal-overlay
-  .\[\&\.is-active\]\:tw-bg-\[color-mix\(in_srgb\,var\(--p-danger\,\#e54867\)_20\%\,var\(--p-bg3\)\)\].is-active {
-  background-color: color-mix(
-    in srgb,
-    var(--p-danger, #e54867) 20%,
-    var(--p-bg3)
-  );
+@keyframes motion-tada {
+  0% {
+    transform: scale(1) rotate(0);
+  }
+  10%,
+  20% {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: scale(1.1) rotate(3deg);
+  }
+  40%,
+  60%,
+  80% {
+    transform: scale(1.1) rotate(-3deg);
+  }
+  to {
+    transform: scale(1) rotate(0);
+  }
 }
-#portal-overlay .\[\&\.is-active\]\:tw-bg-community-accent-bg.is-active {
-  background-color: var(--p-accent-bg);
+@keyframes motion-rubber {
+  0% {
+    transform: scaleX(1);
+  }
+  30% {
+    transform: scale(1.25, 0.75);
+  }
+  40% {
+    transform: scale(0.75, 1.25);
+  }
+  50% {
+    transform: scale(1.15, 0.85);
+  }
+  65% {
+    transform: scale(0.95, 1.05);
+  }
+  75% {
+    transform: scale(1.05, 0.95);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
-#portal-overlay .\[\&\.is-active\]\:tw-text-community-accent-light.is-active {
-  color: var(--p-accent-light);
-}
-#portal-overlay .\[\&\.is-active\]\:tw-text-community-danger.is-active {
-  color: var(--p-danger, #e54867);
-}
-#portal-overlay
-  .\[\&\.is-active\]\:tw-shadow-\[0_0_0_1px_color-mix\(in_srgb\,var\(--p-accent\)_22\%\,transparent\)\].is-active {
-  --tw-shadow: 0 0 0 1px color-mix(in srgb, var(--p-accent) 22%, transparent);
-  --tw-shadow-colored: 0 0 0 1px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay
-  .\[\&\.is-active\]\:tw-shadow-\[0_0_0_1px_color-mix\(in_srgb\,var\(--p-danger\,\#e54867\)_22\%\,transparent\)\].is-active {
-  --tw-shadow: 0 0 0 1px
-    color-mix(in srgb, var(--p-danger, #e54867) 22%, transparent);
-  --tw-shadow-colored: 0 0 0 1px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay :is(.\[\&\.is-active_svg\]\:tw-fill-current.is-active svg) {
-  fill: currentColor;
-}
-@keyframes tw-community-action-pop {
+@keyframes motion-press {
   0% {
     transform: scale(1);
   }
-  28% {
-    transform: scale(0.7);
-  }
-  58% {
-    transform: scale(1.38);
-  }
-  78% {
+  40% {
     transform: scale(0.92);
   }
   to {
     transform: scale(1);
   }
 }
-#portal-overlay
-  :is(
-    .\[\&\.is-celebrating_svg\]\:tw-animate-community-action-pop.is-celebrating
-      svg
-  ) {
-  animation: 0.52s cubic-bezier(0.2, 0.9, 0.25, 1.25) both
-    tw-community-action-pop;
-}
-#portal-overlay .\[\&\.is-closing\]\:tw-pointer-events-none.is-closing {
-  pointer-events: none;
-}
-@keyframes tw-community-fade-out {
+@keyframes motion-nudge {
+  0%,
   to {
+    transform: translate(0);
+  }
+  50% {
+    transform: translate(2px);
+  }
+}
+@keyframes motion-success {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes motion-pop {
+  0% {
     opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
-#portal-overlay .\[\&\.is-closing\]\:tw-animate-community-fade-out.is-closing {
-  animation: 0.28s both tw-community-fade-out;
+.motion-pulse {
+  animation: motion-pulse 2s var(--motion-ease-in-out) infinite;
 }
-#portal-overlay .\[\&\.is-dragging\]\:tw-scale-95.is-dragging {
-  --tw-scale-x: 0.95;
-  --tw-scale-y: 0.95;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+.motion-spin {
+  animation: 1s linear infinite motion-spin;
 }
-#portal-overlay .\[\&\.is-dragging\]\:tw-opacity-20.is-dragging {
-  opacity: 0.2;
+.motion-bounce {
+  animation: 1s infinite motion-bounce;
 }
-#portal-overlay
-  .\[\&\.is-drop-target\]\:tw-translate-y-\[-3px\].is-drop-target {
-  --tw-translate-y: -3px;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+.motion-ping {
+  animation: motion-ping 1s var(--motion-ease-out) infinite;
 }
-#portal-overlay
-  .\[\&\.is-drop-target\]\:tw-border-community-accent-light.is-drop-target {
-  border-color: var(--p-accent-light);
+.motion-wiggle {
+  animation: motion-wiggle 1s var(--motion-ease-in-out) infinite;
 }
-#portal-overlay .\[\&\.is-drop-target\]\:tw-shadow-lg.is-drop-target {
-  --tw-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a;
-  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color),
-    0 4px 6px -4px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+.motion-flip {
+  animation: motion-flip 2s var(--motion-ease-in-out) infinite;
 }
-#portal-overlay
-  .\[\&\.is-file-dragging\]\:tw-border-community-accent.is-file-dragging {
-  border-color: var(--p-accent);
+.motion-heartbeat {
+  animation: motion-heartbeat 1.5s var(--motion-ease-in-out) infinite;
 }
-#portal-overlay
-  .\[\&\.is-file-dragging\]\:tw-bg-community-accent-bg.is-file-dragging {
-  background-color: var(--p-accent-bg);
+.motion-shake {
+  animation: motion-shake 0.5s var(--motion-ease-in-out);
 }
-#portal-overlay .\[\&\.is-file-dragging\]\:tw-ring-2.is-file-dragging {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 #0000);
+.motion-swing {
+  animation: motion-swing 1s var(--motion-ease-in-out);
 }
-#portal-overlay
-  .\[\&\.is-file-dragging\]\:tw-ring-community-accent-bg.is-file-dragging {
-  --tw-ring-color: var(--p-accent-bg);
+.motion-tada {
+  animation: motion-tada 1s var(--motion-ease-in-out);
 }
-#portal-overlay .\[\&\.is-hatena\]\:tw-bg-\[\#00a4de\].is-hatena {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 164 222 / var(--tw-bg-opacity, 1));
+.motion-rubber {
+  animation: motion-rubber 1s var(--motion-ease-in-out);
 }
-#portal-overlay .\[\&\.is-hatena\]\:tw-text-white.is-hatena {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+.motion-press {
+  animation: motion-press 0.16s var(--motion-ease-out);
 }
-#portal-overlay .\[\&\.is-large\]\:tw-h-\[84px\].is-large {
-  height: 84px;
+.motion-nudge {
+  animation: motion-nudge 0.2s var(--motion-ease-out);
 }
-#portal-overlay .\[\&\.is-large\]\:tw-w-\[84px\].is-large {
-  width: 84px;
+.motion-success {
+  animation: motion-success 0.22s var(--motion-ease-spring);
 }
-#portal-overlay .\[\&\.is-large\]\:tw-flex-\[0_0_84px\].is-large {
-  flex: 0 0 84px;
+.motion-pop {
+  animation: motion-pop 0.2s var(--motion-ease-out);
 }
-#portal-overlay .\[\&\.is-large\]\:tw-text-\[28px\].is-large {
-  font-size: 28px;
-}
-@media (width<=620px) {
-  #portal-overlay .max-\[620px\]\:\[\&\.is-large\]\:tw-h-\[76px\].is-large {
-    height: 76px;
-  }
-  #portal-overlay .max-\[620px\]\:\[\&\.is-large\]\:tw-w-\[76px\].is-large {
-    width: 76px;
-  }
-  #portal-overlay
-    .max-\[620px\]\:\[\&\.is-large\]\:tw-flex-\[0_0_76px\].is-large {
-    flex: 0 0 76px;
-  }
-}
-#portal-overlay .\[\&\.is-pixiv\]\:tw-bg-\[\#0096fa\].is-pixiv {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 150 250 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay .\[\&\.is-pixiv\]\:tw-text-white.is-pixiv {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay .\[\&\.is-profile-tags\]\:tw-static.is-profile-tags {
-  position: static;
-}
-#portal-overlay .\[\&\.is-profile-tags\]\:tw-mt-\[-8px\].is-profile-tags {
-  margin-top: -8px;
-}
-#portal-overlay .\[\&\.is-qiita\]\:tw-bg-\[\#55c500\].is-qiita {
-  --tw-bg-opacity: 1;
-  background-color: rgb(85 197 0 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay .\[\&\.is-qiita\]\:tw-text-white.is-qiita {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay .\[\&\.is-selected\]\:tw-border-community-accent.is-selected {
-  border-color: var(--p-accent);
-}
-#portal-overlay .\[\&\.is-selected\]\:tw-ring-2.is-selected {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 #0000);
-}
-#portal-overlay .\[\&\.is-selected\]\:tw-ring-community-accent-bg.is-selected {
-  --tw-ring-color: var(--p-accent-bg);
-}
-#portal-overlay .\[\&\.is-unityroom\]\:tw-border.is-unityroom {
-  border-width: 1px;
-}
-#portal-overlay .\[\&\.is-unityroom\]\:tw-border-\[\#d9e0e8\].is-unityroom {
-  --tw-border-opacity: 1;
-  border-color: rgb(217 224 232 / var(--tw-border-opacity, 1));
-}
-#portal-overlay .\[\&\.is-unityroom\]\:tw-bg-white.is-unityroom {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay :is(.\[\&\.is-unityroom_svg\]\:tw-h-\[21px\].is-unityroom svg) {
-  height: 21px;
-}
-#portal-overlay :is(.\[\&\.is-unityroom_svg\]\:tw-w-\[15px\].is-unityroom svg) {
-  width: 15px;
-}
-#portal-overlay .\[\&\.is-x\]\:tw-bg-\[\#111\].is-x {
-  --tw-bg-opacity: 1;
-  background-color: rgb(17 17 17 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay .\[\&\.is-x\]\:tw-text-white.is-x {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay .\[\&\.is-zenn\]\:tw-bg-\[\#3ea8ff\].is-zenn {
-  --tw-bg-opacity: 1;
-  background-color: rgb(62 168 255 / var(--tw-bg-opacity, 1));
-}
-#portal-overlay .\[\&\.is-zenn\]\:tw-text-white.is-zenn {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay :is(.\[\&\>\*\:last-child\]\:tw-border-b-0 > :last-child) {
-  border-bottom-width: 0;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-avatar\]\:tw-relative > .community-avatar) {
-  position: relative;
-}
-#portal-overlay :is(.\[\&\>\.community-avatar\]\:tw-z-30 > .community-avatar) {
-  z-index: 30;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-avatar\]\:tw-mt-\[-42px\] > .community-avatar) {
-  margin-top: -42px;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-avatar\]\:tw-shadow-\[0_0_0_5px_var\(--p-bg2\)\]
-      > .community-avatar
-  ) {
-  --tw-shadow: 0 0 0 5px var(--p-bg2);
-  --tw-shadow-colored: 0 0 0 5px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay
-  :is(.\[\&\>\.community-field-label\]\:tw-flex > .community-field-label) {
-  display: flex;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-field-label\]\:tw-min-w-0 > .community-field-label) {
-  min-width: 0;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-field-label\]\:tw-items-center > .community-field-label
-  ) {
-  align-items: center;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-field-label\]\:tw-justify-between
-      > .community-field-label
-  ) {
-  justify-content: space-between;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-field-label\]\:tw-gap-3 > .community-field-label) {
-  gap: 0.75rem;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-field-label\]\:tw-text-\[13px\] > .community-field-label
-  ) {
-  font-size: 13px;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-field-label\]\:tw-font-bold > .community-field-label) {
-  font-weight: 700;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-field-label\]\:tw-text-community-bright
-      > .community-field-label
-  ) {
-  color: var(--p-text-bright);
-}
-#portal-overlay :is(.\[\&\>\.community-fields\]\:tw-flex > .community-fields) {
-  display: flex;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-fields\]\:tw-flex-col > .community-fields) {
-  flex-direction: column;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-fields\]\:tw-rounded-xl > .community-fields) {
-  border-radius: 0.75rem;
-}
-#portal-overlay
-  :is(.\[\&\>\.community-fields\]\:tw-border > .community-fields) {
-  border-width: 1px;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-fields\]\:tw-border-community-border-light
-      > .community-fields
-  ) {
-  border-color: var(--p-border-light);
-}
-#portal-overlay
-  :is(.\[\&\>\.community-fields\]\:tw-bg-community-bg2 > .community-fields) {
-  background-color: var(--p-bg2);
-}
-#portal-overlay :is(.\[\&\>\.community-fields\]\:tw-p-4 > .community-fields) {
-  padding: 1rem;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-profile-editor-header-empty\]\:tw-h-full
-      > .community-profile-editor-header-empty
-  ) {
-  height: 100%;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-profile-editor-header-empty\]\:tw-w-full
-      > .community-profile-editor-header-empty
-  ) {
-  width: 100%;
-}
-#portal-overlay
-  :is(
-    .\[\&\>\.community-profile-editor-section-head\]\:tw-col-span-full
-      > .community-profile-editor-section-head
-  ) {
-  grid-column: 1/-1;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-inline-flex > a) {
-  display: inline-flex;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-min-h-\[34px\] > a) {
-  min-height: 34px;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-items-center > a) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-gap-2 > a) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-rounded-full > a) {
-  border-radius: 9999px;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-border > a) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-border-community-border > a) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-bg-community-bg3 > a) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-py-0 > a) {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-pl-2 > a) {
-  padding-left: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-pr-3 > a) {
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-text-\[13px\] > a) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-font-bold > a) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-text-community-text > a) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.\[\&\>a\]\:tw-no-underline > a) {
-  text-decoration-line: none;
-}
-#portal-overlay :is(.hover\:\[\&\>a\]\:tw-border-community-accent > a:hover) {
-  border-color: var(--p-accent);
-}
-#portal-overlay
-  :is(.hover\:\[\&\>a\]\:tw-text-community-accent-light > a:hover) {
-  color: var(--p-accent-light);
-}
-#portal-overlay
-  :is(
-    .\[\&\>article\.is-unread\]\:tw-border-community-accent > article.is-unread
-  ) {
-  border-color: var(--p-accent);
-}
-#portal-overlay
-  :is(
-    .\[\&\>article\.is-unread\]\:tw-bg-community-accent-bg > article.is-unread
-  ) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-grid > article) {
-  display: grid;
-}
-#portal-overlay
-  :is(.\[\&\>article\]\:tw-grid-cols-\[minmax\(0\,1fr\)_auto\] > article) {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-items-center > article) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-gap-4 > article) {
-  gap: 1rem;
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-rounded-xl > article) {
-  border-radius: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-border > article) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-border-community-border > article) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-bg-community-bg2 > article) {
-  background-color: var(--p-bg2);
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-p-4 > article) {
-  padding: 1rem;
-}
-#portal-overlay :is(.\[\&\>article\]\:tw-transition > article) {
-  transition-property:
-    color,
-    background-color,
-    border-color,
-    text-decoration-color,
-    fill,
-    stroke,
-    opacity,
-    box-shadow,
-    transform,
-    filter,
-    -webkit-backdrop-filter,
-    backdrop-filter;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay
-  :is(
-    .hover\:\[\&\>article\]\:tw-border-\[var\(--p-border-hover\)\]
-      > article:hover
-  ) {
-  border-color: var(--p-border-hover);
-}
-#portal-overlay
-  :is(.hover\:\[\&\>article\]\:tw-bg-community-bg3 > article:hover) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\.is-active\]\:tw-border-community-accent > button.is-active
-  ) {
-  border-color: var(--p-accent);
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\.is-active\]\:tw-bg-community-accent-bg > button.is-active
-  ) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\.is-active\]\:tw-text-community-accent-light
-      > button.is-active
-  ) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&\>button\.is-next\]\:tw-right-3 > button.is-next) {
-  right: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>button\.is-prev\]\:tw-left-3 > button.is-prev) {
-  left: 0.75rem;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\.is-primary\]\:tw-border-community-accent > button.is-primary
-  ) {
-  border-color: var(--p-accent);
-}
-#portal-overlay
-  :is(.\[\&\>button\.is-primary\]\:tw-bg-community-accent > button.is-primary) {
-  background-color: var(--p-accent);
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\.is-primary\]\:tw-text-community-on-accent > button.is-primary
-  ) {
-  color: var(--p-on-accent);
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-flex
-      > button:not(.community-account-user)
-  ) {
-  display: flex;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-min-h-\[38px\]
-      > button:not(.community-account-user)
-  ) {
-  min-height: 38px;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-w-full
-      > button:not(.community-account-user)
-  ) {
-  width: 100%;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-items-center
-      > button:not(.community-account-user)
-  ) {
-  align-items: center;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-justify-center
-      > button:not(.community-account-user)
-  ) {
-  justify-content: center;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-rounded-xl
-      > button:not(.community-account-user)
-  ) {
-  border-radius: 0.75rem;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-border
-      > button:not(.community-account-user)
-  ) {
-  border-width: 1px;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-border-community-border
-      > button:not(.community-account-user)
-  ) {
-  border-color: var(--p-border);
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-bg-community-bg3
-      > button:not(.community-account-user)
-  ) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-font-bold
-      > button:not(.community-account-user)
-  ) {
-  font-weight: 700;
-}
-#portal-overlay
-  :is(
-    .\[\&\>button\:not\(\.community-account-user\)\]\:tw-text-community-accent-light
-      > button:not(.community-account-user)
-  ) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-absolute > button) {
-  position: absolute;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-relative > button) {
-  position: relative;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-bottom-3 > button) {
-  bottom: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-right-3 > button) {
-  right: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-top-1\/2 > button) {
-  top: 50%;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-z-\[2\] > button) {
-  z-index: 2;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-mt-4 > button) {
-  margin-top: 1rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-flex > button) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-inline-flex > button) {
-  display: inline-flex;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-grid > button) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-h-10 > button) {
-  height: 2.5rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-min-h-10 > button) {
-  min-height: 2.5rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-min-h-9 > button) {
-  min-height: 2.25rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-min-h-\[50px\] > button) {
-  min-height: 50px;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-w-10 > button) {
-  width: 2.5rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-min-w-0 > button) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-min-w-\[112px\] > button) {
-  min-width: 112px;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-flex-none > button) {
-  flex: none;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-translate-y-\[-50\%\] > button) {
-  --tw-translate-y: -50%;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-cursor-pointer > button) {
+.motion-interactive {
   cursor: pointer;
+  transition: transform 0.16s var(--motion-ease-out);
+  will-change: transform;
 }
-#portal-overlay
-  :is(.\[\&\>button\]\:tw-grid-cols-\[auto_minmax\(0\,1fr\)_auto\] > button) {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-flex-col > button) {
-  flex-direction: column;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-place-items-center > button) {
-  place-items: center;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-items-center > button) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-justify-center > button) {
-  justify-content: center;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-justify-between > button) {
-  justify-content: space-between;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-gap-2 > button) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-gap-3 > button) {
-  gap: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-gap-\[3px\] > button) {
-  gap: 3px;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-whitespace-nowrap > button) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-rounded-full > button) {
-  border-radius: 9999px;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-rounded-lg > button) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-border > button) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-border-0 > button) {
-  border-width: 0;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-border-b > button) {
-  border-bottom-width: 1px;
-}
-#portal-overlay
-  :is(.\[\&\>button\]\:tw-border-\[var\(--p-accent-border\)\] > button) {
-  border-color: var(--p-accent-border);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-border-community-border > button) {
-  border-color: var(--p-border);
-}
-#portal-overlay
-  :is(.\[\&\>button\]\:tw-border-community-border-light > button) {
-  border-color: var(--p-border-light);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-border-white\/50 > button) {
-  border-color: #ffffff80;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-bg-black\/70 > button) {
-  background-color: #000000b3;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-bg-community-accent > button) {
-  background-color: var(--p-accent);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-bg-community-accent-bg > button) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-bg-community-bg2 > button) {
-  background-color: var(--p-bg2);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-bg-community-bg3 > button) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-bg-transparent > button) {
-  background-color: #0000;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-p-3 > button) {
-  padding: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-px-1 > button) {
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-px-2\.5 > button) {
-  padding-left: 0.625rem;
-  padding-right: 0.625rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-px-3 > button) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-px-4 > button) {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-py-1 > button) {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-left > button) {
-  text-align: left;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-\[13px\] > button) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-xs > button) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-font-bold > button) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-font-normal > button) {
-  font-weight: 400;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-font-semibold > button) {
-  font-weight: 600;
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-community-accent-light > button) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-community-muted > button) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-community-on-accent > button) {
-  color: var(--p-on-accent);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-community-text > button) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-text-white > button) {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay :is(.\[\&\>button\]\:tw-shadow-lg > button) {
-  --tw-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a;
-  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color),
-    0 4px 6px -4px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay
-  :is(.hover\:\[\&\>button\]\:tw-translate-y-\[-1px\] > button:hover) {
-  --tw-translate-y: -1px;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay :is(.hover\:\[\&\>button\]\:tw-scale-110 > button:hover) {
-  --tw-scale-x: 1.1;
-  --tw-scale-y: 1.1;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay
-  :is(.hover\:\[\&\>button\]\:tw-border-community-accent > button:hover) {
-  border-color: var(--p-accent);
-}
-#portal-overlay
-  :is(.hover\:\[\&\>button\]\:tw-border-white\/80 > button:hover) {
-  border-color: #fffc;
-}
-#portal-overlay :is(.hover\:\[\&\>button\]\:tw-bg-black\/85 > button:hover) {
-  background-color: #000000d9;
-}
-#portal-overlay
-  :is(.hover\:\[\&\>button\]\:tw-bg-community-accent-bg > button:hover) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay
-  :is(.hover\:\[\&\>button\]\:tw-text-community-accent-light > button:hover) {
-  color: var(--p-accent-light);
-}
-#portal-overlay
-  :is(.hover\:\[\&\>button\]\:tw-shadow-community-card > button:hover) {
-  --tw-shadow: 0 8px 24px #00000021;
-  --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay :is(.hover\:\[\&\>button\]\:tw-brightness-110 > button:hover) {
-  --tw-brightness: brightness(1.1);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast)
-    var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate)
-    var(--tw-sepia) var(--tw-drop-shadow);
-}
-@media (width<=620px) {
-  #portal-overlay
-    :is(.max-\[620px\]\:\[\&\>button\]\:tw-col-span-full > button) {
-    grid-column: 1/-1;
-  }
-  #portal-overlay :is(.max-\[620px\]\:\[\&\>button\]\:tw-w-10 > button) {
-    width: 2.5rem;
-  }
-  #portal-overlay :is(.max-\[620px\]\:\[\&\>button\]\:tw-w-full > button) {
-    width: 100%;
-  }
-  #portal-overlay
-    :is(.max-\[620px\]\:\[\&\>button\]\:tw-overflow-hidden > button) {
-    overflow: hidden;
-  }
-  #portal-overlay :is(.max-\[620px\]\:\[\&\>button\]\:tw-px-1 > button) {
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-  }
-  #portal-overlay :is(.max-\[620px\]\:\[\&\>button\]\:tw-text-xs > button) {
-    font-size: 0.75rem;
-    line-height: 1rem;
+@media (hover: hover) and (pointer: fine) {
+  .motion-interactive:hover {
+    transform: scale(1.08);
   }
 }
-@media (width<=420px) {
-  #portal-overlay
-    :is(
-      .max-\[420px\]\:\[\&\>button\]\:tw-grid-cols-\[auto_minmax\(0\,1fr\)\]
-        > button
-    ) {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  #portal-overlay
-    :is(.max-\[420px\]\:\[\&\>button\]\:tw-justify-self-start > button) {
-    justify-self: start;
-  }
-}
-#portal-overlay :is(.\[\&\>button_svg\]\:tw-h-4 > button svg) {
-  height: 1rem;
-}
-#portal-overlay :is(.\[\&\>button_svg\]\:tw-h-5 > button svg) {
-  height: 1.25rem;
-}
-#portal-overlay :is(.\[\&\>button_svg\]\:tw-w-4 > button svg) {
-  width: 1rem;
-}
-#portal-overlay :is(.\[\&\>button_svg\]\:tw-w-5 > button svg) {
-  width: 1.25rem;
-}
-#portal-overlay :is(.\[\&\>button_svg\]\:tw-fill-none > button svg) {
-  fill: none;
-}
-#portal-overlay :is(.\[\&\>button_svg\]\:tw-stroke-current > button svg) {
-  stroke: currentColor;
-}
-#portal-overlay :is(.\[\&\>button_svg\]\:tw-stroke-\[2\.5\] > button svg) {
-  stroke-width: 2.5px;
-}
-#portal-overlay
-  :is(.\[\&\>button_svg\]\:\[stroke-linecap\:round\] > button svg) {
-  stroke-linecap: round;
-}
-#portal-overlay
-  :is(.\[\&\>button_svg\]\:\[stroke-linejoin\:round\] > button svg) {
-  stroke-linejoin: round;
-}
-#portal-overlay :is(.\[\&\>div\:first-child\]\:tw-mr-auto > div:first-child) {
-  margin-right: auto;
-}
-#portal-overlay :is(.\[\&\>div\:first-child\]\:tw-min-w-0 > div:first-child) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&\>div\:last-child\]\:tw-flex > div:last-child) {
-  display: flex;
-}
-#portal-overlay
-  :is(.\[\&\>div\:last-child\]\:tw-justify-center > div:last-child) {
-  justify-content: center;
-}
-#portal-overlay :is(.\[\&\>div\:last-child\]\:tw-gap-2 > div:last-child) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-flex > div) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-grid > div) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-min-w-0 > div) {
-  min-width: 0;
-}
-#portal-overlay
-  :is(
-    .\[\&\>div\]\:tw-grid-cols-\[repeat\(auto-fill\,minmax\(220px\,1fr\)\)\]
-      > div
-  ) {
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-items-center > div) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-justify-between > div) {
-  justify-content: space-between;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-gap-0\.5 > div) {
-  gap: 0.125rem;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-gap-2 > div) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-gap-3 > div) {
-  gap: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>div\]\:tw-leading-snug > div) {
-  line-height: 1.375;
-}
-#portal-overlay :is(.\[\&\>em\]\:tw-overflow-hidden > em) {
-  overflow: hidden;
-}
-#portal-overlay :is(.\[\&\>em\]\:tw-text-ellipsis > em) {
-  text-overflow: ellipsis;
-}
-#portal-overlay :is(.\[\&\>em\]\:tw-whitespace-nowrap > em) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&\>em\]\:tw-text-\[13px\] > em) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>em\]\:tw-not-italic > em) {
-  font-style: normal;
-}
-#portal-overlay :is(.\[\&\>em\]\:tw-text-community-text > em) {
-  color: var(--p-text);
-}
-#portal-overlay
-  :is(
-    .\[\&\>footer\>button\.is-primary\]\:tw-border-community-accent
-      > footer
-      > button.is-primary
-  ) {
-  border-color: var(--p-accent);
-}
-#portal-overlay
-  :is(
-    .\[\&\>footer\>button\.is-primary\]\:tw-bg-community-accent
-      > footer
-      > button.is-primary
-  ) {
-  background-color: var(--p-accent);
-}
-#portal-overlay
-  :is(
-    .\[\&\>footer\>button\.is-primary\]\:tw-text-community-on-accent
-      > footer
-      > button.is-primary
-  ) {
-  color: var(--p-on-accent);
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-inline-flex > footer > button) {
-  display: inline-flex;
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-min-h-10 > footer > button) {
-  min-height: 2.5rem;
-}
-#portal-overlay
-  :is(.\[\&\>footer\>button\]\:tw-cursor-pointer > footer > button) {
-  cursor: pointer;
-}
-#portal-overlay
-  :is(.\[\&\>footer\>button\]\:tw-appearance-none > footer > button) {
-  appearance: none;
-}
-#portal-overlay
-  :is(.\[\&\>footer\>button\]\:tw-items-center > footer > button) {
-  align-items: center;
-}
-#portal-overlay
-  :is(.\[\&\>footer\>button\]\:tw-justify-center > footer > button) {
-  justify-content: center;
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-gap-2 > footer > button) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-rounded-lg > footer > button) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-border > footer > button) {
-  border-width: 1px;
-}
-#portal-overlay
-  :is(.\[\&\>footer\>button\]\:tw-border-community-border > footer > button) {
-  border-color: var(--p-border);
-}
-#portal-overlay
-  :is(.\[\&\>footer\>button\]\:tw-bg-community-bg3 > footer > button) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-px-4 > footer > button) {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-text-sm > footer > button) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&\>footer\>button\]\:tw-font-bold > footer > button) {
-  font-weight: 700;
-}
-#portal-overlay
-  :is(.\[\&\>footer\>button\]\:tw-text-community-text > footer > button) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-mt-2 > footer) {
-  margin-top: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-flex > footer) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-items-center > footer) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-justify-end > footer) {
-  justify-content: flex-end;
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-justify-between > footer) {
-  justify-content: space-between;
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-gap-2 > footer) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-border-t > footer) {
-  border-top-width: 1px;
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-border-community-border > footer) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-bg-community-bg2 > footer) {
-  background-color: var(--p-bg2);
-}
-#portal-overlay :is(.\[\&\>footer\]\:tw-p-4 > footer) {
-  padding: 1rem;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-m-0 > h2) {
-  margin: 0;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-min-w-0 > h2) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-flex-1 > h2) {
-  flex: 1;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-overflow-hidden > h2) {
-  overflow: hidden;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-text-ellipsis > h2) {
-  text-overflow: ellipsis;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-whitespace-nowrap > h2) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-text-sm > h2) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&\>h2\]\:tw-text-community-bright > h2) {
-  color: var(--p-text-bright);
-}
-#portal-overlay :is(.\[\&\>header\]\:tw-flex > header) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&\>header\]\:tw-items-start > header) {
-  align-items: flex-start;
-}
-#portal-overlay :is(.\[\&\>header\]\:tw-justify-between > header) {
-  justify-content: space-between;
-}
-#portal-overlay :is(.\[\&\>header\]\:tw-gap-2 > header) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>header\]\:tw-text-\[13px\] > header) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>header\]\:tw-text-community-muted > header) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-absolute > img) {
-  position: absolute;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-relative > img) {
-  position: relative;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-inset-0 > img) {
-  inset: 0;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-inset-4 > img) {
-  inset: 1rem;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-z-10 > img) {
-  z-index: 10;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-z-\[2\] > img) {
-  z-index: 2;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-block > img) {
-  display: block;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-h-9 > img) {
-  height: 2.25rem;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-h-\[calc\(100\%-32px\)\] > img) {
-  height: calc(100% - 32px);
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-h-full > img) {
-  height: 100%;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-w-9 > img) {
-  width: 2.25rem;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-w-\[calc\(100\%-32px\)\] > img) {
-  width: calc(100% - 32px);
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-w-full > img) {
-  width: 100%;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-flex-none > img) {
-  flex: none;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-object-contain > img) {
-  -o-object-fit: contain;
-  object-fit: contain;
-}
-#portal-overlay :is(.\[\&\>img\]\:tw-object-cover > img) {
-  -o-object-fit: cover;
-  object-fit: cover;
-}
-@media (width<=960px) {
-  #portal-overlay :is(.max-\[960px\]\:\[\&\>img\]\:tw-h-8 > img) {
-    height: 2rem;
-  }
-  #portal-overlay :is(.max-\[960px\]\:\[\&\>img\]\:tw-w-8 > img) {
-    width: 2rem;
-  }
-}
-@media (width<=620px) {
-  #portal-overlay :is(.max-\[620px\]\:\[\&\>img\]\:tw-inset-2 > img) {
-    inset: 0.5rem;
-  }
-  #portal-overlay
-    :is(.max-\[620px\]\:\[\&\>img\]\:tw-h-\[calc\(100\%-16px\)\] > img) {
-    height: calc(100% - 16px);
-  }
-  #portal-overlay
-    :is(.max-\[620px\]\:\[\&\>img\]\:tw-w-\[calc\(100\%-16px\)\] > img) {
-    width: calc(100% - 16px);
-  }
-}
-#portal-overlay :is(.\[\&\>input\]\:tw-sr-only > input) {
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  position: absolute;
-  overflow: hidden;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-inline-flex > label) {
-  display: inline-flex;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-min-h-9 > label) {
-  min-height: 2.25rem;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-cursor-pointer > label) {
-  cursor: pointer;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-items-center > label) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-gap-1 > label) {
-  gap: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-rounded-lg > label) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-border > label) {
-  border-width: 1px;
-}
-#portal-overlay
-  :is(.\[\&\>label\]\:tw-border-\[var\(--p-accent-border\)\] > label) {
-  border-color: var(--p-accent-border);
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-bg-community-accent-bg > label) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-px-3 > label) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-text-\[13px\] > label) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-font-bold > label) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-text-community-accent-light > label) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&\>label\]\:tw-text-community-bright > label) {
-  color: var(--p-text-bright);
-}
-#portal-overlay :is(.\[\&\>nav\]\:tw-mt-1 > nav) {
-  margin-top: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>nav\]\:tw-grid > nav) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&\>nav\]\:tw-gap-1 > nav) {
-  gap: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-m-0 > p) {
-  margin: 0;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-mb-0 > p) {
-  margin-bottom: 0;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-mb-2 > p) {
-  margin-bottom: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-mt-0 > p) {
-  margin-top: 0;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-mt-0\.5 > p) {
-  margin-top: 0.125rem;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-mt-2 > p) {
-  margin-top: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-flex > p) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-items-center > p) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-justify-center > p) {
-  justify-content: center;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-gap-1 > p) {
-  gap: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-overflow-hidden > p) {
-  overflow: hidden;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-text-ellipsis > p) {
-  text-overflow: ellipsis;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-whitespace-nowrap > p) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-whitespace-pre-wrap > p) {
-  white-space: pre-wrap;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-break-words > p) {
-  overflow-wrap: break-word;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-text-\[13px\] > p) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-text-xs > p) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&\>p\]\:tw-text-community-muted > p) {
-  color: var(--p-text-muted);
-}
-@media (width<=960px) {
-  #portal-overlay :is(.max-\[960px\]\:\[\&\>p\]\:tw-hidden > p) {
-    display: none;
-  }
-}
-#portal-overlay
-  :is(.\[\&\>section\:last-child\]\:tw-border-b-0 > section:last-child) {
-  border-bottom-width: 0;
-}
-#portal-overlay :is(.\[\&\>section\]\:tw-max-w-none > section) {
-  max-width: none;
-}
-#portal-overlay :is(.\[\&\>section\]\:tw-border-0 > section) {
-  border-width: 0;
-}
-#portal-overlay :is(.\[\&\>section\]\:tw-border-b > section) {
-  border-bottom-width: 1px;
-}
-#portal-overlay
-  :is(.\[\&\>section\]\:tw-border-community-border-light > section) {
-  border-color: var(--p-border-light);
-}
-#portal-overlay :is(.\[\&\>section\]\:tw-bg-transparent > section) {
-  background-color: #0000;
-}
-#portal-overlay :is(.\[\&\>section\]\:tw-px-4 > section) {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-#portal-overlay :is(.\[\&\>section\]\:tw-py-3\.5 > section) {
-  padding-top: 0.875rem;
-  padding-bottom: 0.875rem;
-}
-#portal-overlay :is(.\[\&\>small\]\:tw-mt-2 > small) {
-  margin-top: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>small\]\:tw-block > small) {
-  display: block;
-}
-#portal-overlay :is(.\[\&\>small\]\:tw-text-xs > small) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&\>small\]\:tw-text-community-muted > small) {
-  color: var(--p-text-muted);
-}
-#portal-overlay
-  :is(.\[\&\>span\.is-pending\]\:tw-text-\[\#e7a92f\] > span.is-pending) {
-  --tw-text-opacity: 1;
-  color: rgb(231 169 47 / var(--tw-text-opacity, 1));
-}
-#portal-overlay
-  :is(.\[\&\>span\.is-rejected\]\:tw-text-community-danger > span.is-rejected) {
-  color: var(--p-danger, #e54867);
-}
-#portal-overlay :is(.\[\&\>span\:last-child\]\:tw-grid > span:last-child) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&\>span\:last-child\]\:tw-min-w-0 > span:last-child) {
-  min-width: 0;
-}
-@media (width<=960px) {
-  #portal-overlay
-    :is(.max-\[960px\]\:\[\&\>span\:last-child\]\:tw-hidden > span:last-child) {
-    display: none;
-  }
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-absolute > span) {
-  position: absolute;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-relative > span) {
-  position: relative;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-bottom-3 > span) {
-  bottom: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-left-1\/2 > span) {
-  left: 50%;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-right-3 > span) {
-  right: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-top-3 > span) {
-  top: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-z-\[1\] > span) {
-  z-index: 1;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-z-\[2\] > span) {
-  z-index: 2;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-mx-auto > span) {
-  margin-left: auto;
-  margin-right: auto;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-mb-3 > span) {
-  margin-bottom: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-mb-4 > span) {
-  margin-bottom: 1rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-flex > span) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-grid > span) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-h-11 > span) {
-  height: 2.75rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-h-\[52px\] > span) {
-  height: 52px;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-min-h-\[50px\] > span) {
-  min-height: 50px;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-w-11 > span) {
-  width: 2.75rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-w-\[52px\] > span) {
-  width: 52px;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-min-w-0 > span) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-translate-x-\[-50\%\] > span) {
-  --tw-translate-x: -50%;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-place-items-center > span) {
-  place-items: center;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-items-center > span) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-justify-between > span) {
-  justify-content: space-between;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-gap-3 > span) {
-  gap: 0.75rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-whitespace-nowrap > span) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-rounded-full > span) {
-  border-radius: 9999px;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-border > span) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-border-b > span) {
-  border-bottom-width: 1px;
-}
-#portal-overlay
-  :is(.\[\&\>span\]\:tw-border-\[var\(--p-accent-border\)\] > span) {
-  border-color: var(--p-accent-border);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-border-community-border-light > span) {
-  border-color: var(--p-border-light);
-}
-#portal-overlay
-  :is(
-    .\[\&\>span\]\:tw-bg-\[color-mix\(in_srgb\,var\(--p-bg\)_88\%\,transparent\)\]
-      > span
-  ) {
-  background-color: color-mix(in srgb, var(--p-bg) 88%, transparent);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-bg-black\/70 > span) {
-  background-color: #000000b3;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-bg-community-accent-bg > span) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-bg-community-bg3 > span) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-px-2 > span) {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-px-2\.5 > span) {
-  padding-left: 0.625rem;
-  padding-right: 0.625rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-px-4 > span) {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-py-1 > span) {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-pt-1 > span) {
-  padding-top: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-2xl > span) {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-\[11px\] > span) {
-  font-size: 11px;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-\[13px\] > span) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-sm > span) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-xs > span) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-font-bold > span) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-font-extrabold > span) {
-  font-weight: 800;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-leading-none > span) {
-  line-height: 1;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-tracking-\[\.08em\] > span) {
-  letter-spacing: 0.08em;
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-community-accent-light > span) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-community-bright > span) {
-  color: var(--p-text-bright);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-community-danger > span) {
-  color: var(--p-danger, #e54867);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-community-muted > span) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-text-white > span) {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay :is(.\[\&\>span\]\:tw-backdrop-blur > span) {
-  --tw-backdrop-blur: blur(8px);
-  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness)
-    var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale)
-    var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert)
-    var(--tw-backdrop-opacity) var(--tw-backdrop-saturate)
-    var(--tw-backdrop-sepia);
-  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness)
-    var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale)
-    var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert)
-    var(--tw-backdrop-opacity) var(--tw-backdrop-saturate)
-    var(--tw-backdrop-sepia);
-}
-@media (width<=960px) {
-  #portal-overlay :is(.max-\[960px\]\:\[\&\>span\]\:tw-hidden > span) {
-    display: none;
-  }
-}
-@media (width<=620px) {
-  #portal-overlay :is(.max-\[620px\]\:\[\&\>span\]\:tw-hidden > span) {
-    display: none;
-  }
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-min-w-0 > strong) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-overflow-hidden > strong) {
-  overflow: hidden;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-text-ellipsis > strong) {
-  text-overflow: ellipsis;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-whitespace-nowrap > strong) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-text-\[13px\] > strong) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-text-\[15px\] > strong) {
-  font-size: 15px;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-text-sm > strong) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-font-bold > strong) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-font-semibold > strong) {
-  font-weight: 600;
-}
-#portal-overlay :is(.\[\&\>strong\]\:tw-text-community-bright > strong) {
-  color: var(--p-text-bright);
-}
-@media (width<=960px) {
-  #portal-overlay :is(.max-\[960px\]\:\[\&\>strong\]\:tw-hidden > strong) {
-    display: none;
-  }
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-h-\[18px\] > svg) {
-  height: 18px;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-h-\[19px\] > svg) {
-  height: 19px;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-w-\[18px\] > svg) {
-  width: 18px;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-w-\[19px\] > svg) {
-  width: 19px;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-flex-none > svg) {
-  flex: none;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-fill-none > svg) {
-  fill: none;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-stroke-current > svg) {
-  stroke: currentColor;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-stroke-\[1\.9\] > svg) {
-  stroke-width: 1.9px;
-}
-#portal-overlay :is(.\[\&\>svg\]\:tw-stroke-\[2\.4\] > svg) {
-  stroke-width: 2.4px;
-}
-#portal-overlay :is(.\[\&\>time\]\:tw-mr-1 > time) {
-  margin-right: 0.25rem;
-}
-#portal-overlay :is(.\[\&\>time\]\:tw-flex-none > time) {
-  flex: none;
-}
-#portal-overlay :is(.\[\&\>time\]\:tw-whitespace-nowrap > time) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&\>time\]\:tw-text-xs > time) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&\>time\]\:tw-text-community-muted > time) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&_\*\]\:tw-box-border *) {
-  box-sizing: border-box;
-}
-#portal-overlay :is(.\[\&_\*\]\:tw-border-0 *) {
-  border-width: 0;
-}
-#portal-overlay :is(.\[\&_\*\]\:tw-border-solid *) {
-  border-style: solid;
+.motion-interactive:active {
+  transform: scale(0.97);
 }
 @media (prefers-reduced-motion: reduce) {
-  #portal-overlay :is(.motion-reduce\:\[\&_\*\]\:tw-animate-none *) {
-    animation: none;
+  .motion-interactive {
+    transition: none;
   }
-  #portal-overlay :is(.motion-reduce\:\[\&_\*\]\:tw-transition-none *) {
-    transition-property: none;
-  }
-}
-#portal-overlay
-  :is(.\[\&_\.community-avatar\]\:tw-h-\[26px\] .community-avatar) {
-  height: 26px;
-}
-#portal-overlay
-  :is(.\[\&_\.community-avatar\]\:tw-w-\[26px\] .community-avatar) {
-  width: 26px;
-}
-#portal-overlay
-  :is(.\[\&_\.community-avatar\]\:tw-flex-\[0_0_26px\] .community-avatar) {
-  flex: 0 0 26px;
-}
-#portal-overlay :is(.\[\&_\.tw-border-2\]\:tw-border-2 .tw-border-2) {
-  border-width: 2px;
-}
-#portal-overlay :is(.\[\&_\.tw-border-b\]\:tw-border-b .tw-border-b) {
-  border-bottom-width: 1px;
-}
-#portal-overlay
-  :is(.\[\&_\.tw-border-dashed\]\:tw-border-dashed .tw-border-dashed) {
-  border-style: dashed;
-}
-#portal-overlay :is(.\[\&_\.tw-border-l\]\:tw-border-l .tw-border-l) {
-  border-left-width: 1px;
-}
-#portal-overlay :is(.\[\&_\.tw-border-r\]\:tw-border-r .tw-border-r) {
-  border-right-width: 1px;
-}
-#portal-overlay :is(.\[\&_\.tw-border-t\]\:tw-border-t .tw-border-t) {
-  border-top-width: 1px;
-}
-#portal-overlay :is(.\[\&_\.tw-border-y\]\:tw-border-y .tw-border-y) {
-  border-top-width: 1px;
-  border-bottom-width: 1px;
-}
-#portal-overlay :is(.\[\&_\.tw-border\]\:tw-border .tw-border) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&_a\:focus-visible\]\:tw-outline a:focus-visible) {
-  outline-style: solid;
-}
-#portal-overlay :is(.\[\&_a\:focus-visible\]\:tw-outline-2 a:focus-visible) {
-  outline-width: 2px;
-}
-#portal-overlay
-  :is(.\[\&_a\:focus-visible\]\:tw-outline-offset-2 a:focus-visible) {
-  outline-offset: 2px;
-}
-#portal-overlay
-  :is(.\[\&_a\:focus-visible\]\:tw-outline-community-accent a:focus-visible) {
-  outline-color: var(--p-accent);
-}
-#portal-overlay :is(.\[\&_article\>button\]\:tw-flex article > button) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&_article\>button\]\:tw-min-w-0 article > button) {
-  min-width: 0;
-}
-#portal-overlay
-  :is(.\[\&_article\>button\]\:tw-cursor-pointer article > button) {
-  cursor: pointer;
-}
-#portal-overlay :is(.\[\&_article\>button\]\:tw-items-center article > button) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&_article\>button\]\:tw-gap-3 article > button) {
-  gap: 0.75rem;
-}
-#portal-overlay :is(.\[\&_article\>button\]\:tw-border-0 article > button) {
-  border-width: 0;
-}
-#portal-overlay
-  :is(.\[\&_article\>button\]\:tw-bg-transparent article > button) {
-  background-color: #0000;
-}
-#portal-overlay :is(.\[\&_article\>button\]\:tw-p-0 article > button) {
-  padding: 0;
-}
-#portal-overlay :is(.\[\&_article\>button\]\:tw-text-left article > button) {
-  text-align: left;
-}
-#portal-overlay :is(.\[\&_article\>img\]\:tw-h-14 article > img) {
-  height: 3.5rem;
-}
-#portal-overlay :is(.\[\&_article\>img\]\:tw-w-\[76px\] article > img) {
-  width: 76px;
-}
-#portal-overlay :is(.\[\&_article\>img\]\:tw-rounded-lg article > img) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&_article\>img\]\:tw-object-cover article > img) {
-  -o-object-fit: cover;
-  object-fit: cover;
-}
-#portal-overlay :is(.\[\&_b\]\:tw-text-community-accent-light b) {
-  color: var(--p-accent-light);
-}
-#portal-overlay
-  :is(.\[\&_button\.is-active\]\:tw-bg-community-accent-bg button.is-active) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay
-  :is(.\[\&_button\.is-active\]\:tw-text-community-bright button.is-active) {
-  color: var(--p-text-bright);
-}
-#portal-overlay
-  :is(.after\:\[\&_button\.is-active\]\:tw-scale-x-100 button.is-active):after {
-  content: var(--tw-content);
-  --tw-scale-x: 1;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay :is(.\[\&_button\.is-danger\]\:tw-text-white button.is-danger) {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay
-  :is(
-    .hover\:\[\&_button\.is-danger\]\:tw-brightness-110 button.is-danger:hover
-  ) {
-  --tw-brightness: brightness(1.1);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast)
-    var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate)
-    var(--tw-sepia) var(--tw-drop-shadow);
-}
-#portal-overlay
-  :is(.\[\&_button\.is-following\]\:tw-bg-community-bg3 button.is-following) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay
-  :is(
-    .\[\&_button\.is-following\]\:tw-text-community-accent-light
-      button.is-following
-  ) {
-  color: var(--p-accent-light);
-}
-#portal-overlay
-  :is(.\[\&_button\:disabled\]\:tw-cursor-not-allowed button:disabled) {
-  cursor: not-allowed;
-}
-#portal-overlay :is(.\[\&_button\:disabled\]\:tw-cursor-wait button:disabled) {
-  cursor: wait;
-}
-#portal-overlay :is(.\[\&_button\:disabled\]\:tw-opacity-60 button:disabled) {
-  opacity: 0.6;
-}
-#portal-overlay
-  :is(.\[\&_button\:disabled\]\:tw-opacity-\[\.55\] button:disabled) {
-  opacity: 0.55;
-}
-#portal-overlay
-  :is(.\[\&_button\:focus-visible\]\:tw-outline button:focus-visible) {
-  outline-style: solid;
-}
-#portal-overlay
-  :is(.\[\&_button\:focus-visible\]\:tw-outline-2 button:focus-visible) {
-  outline-width: 2px;
-}
-#portal-overlay
-  :is(.\[\&_button\:focus-visible\]\:tw-outline-offset-2 button:focus-visible) {
-  outline-offset: 2px;
-}
-#portal-overlay
-  :is(
-    .\[\&_button\:focus-visible\]\:tw-outline-community-accent
-      button:focus-visible
-  ) {
-  outline-color: var(--p-accent);
-}
-#portal-overlay
-  :is(
-    .hover\:\[\&_button\:not\(\:disabled\)\]\:tw-translate-y-\[-1px\]
-      button:not(:disabled):hover
-  ) {
-  --tw-translate-y: -1px;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay
-  :is(
-    .hover\:\[\&_button\:not\(\:disabled\)\]\:tw-shadow-community-card
-      button:not(:disabled):hover
-  ) {
-  --tw-shadow: 0 8px 24px #00000021;
-  --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay
-  :is(
-    .hover\:\[\&_button\:not\(\:disabled\)\]\:tw-brightness-110
-      button:not(:disabled):hover
-  ) {
-  --tw-brightness: brightness(1.1);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast)
-    var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate)
-    var(--tw-sepia) var(--tw-drop-shadow);
-}
-#portal-overlay
-  :is(
-    .active\:\[\&_button\:not\(\:disabled\)\]\:tw-scale-\[\.98\]
-      button:not(:disabled):active
-  ) {
-  --tw-scale-x: 0.98;
-  --tw-scale-y: 0.98;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay :is(.\[\&_button\>span\]\:tw-grid button > span) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&_button\>span\]\:tw-min-w-0 button > span) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&_button\>span\]\:tw-gap-0\.5 button > span) {
-  gap: 0.125rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-absolute button) {
-  position: absolute;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-relative button) {
-  position: relative;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-bottom-1 button) {
-  bottom: 0.25rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-right-1 button) {
-  right: 0.25rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-flex button) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-inline-flex button) {
-  display: inline-flex;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-grid button) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-h-10 button) {
-  height: 2.5rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-h-8 button) {
-  height: 2rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-min-h-10 button) {
-  min-height: 2.5rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-min-h-9 button) {
-  min-height: 2.25rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-w-10 button) {
-  width: 2.5rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-w-full button) {
-  width: 100%;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-min-w-0 button) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-min-w-\[96px\] button) {
-  min-width: 96px;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-flex-none button) {
-  flex: none;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-cursor-pointer button) {
-  cursor: pointer;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-appearance-none button) {
-  appearance: none;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-place-items-center button) {
-  place-items: center;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-items-center button) {
-  align-items: center;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-justify-center button) {
-  justify-content: center;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-gap-1\.5 button) {
-  gap: 0.375rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-gap-2 button) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-gap-3 button) {
-  gap: 0.75rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-whitespace-nowrap button) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-rounded-lg button) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-rounded-md button) {
-  border-radius: 0.375rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-border button) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-border-0 button) {
-  border-width: 0;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-border-community-accent button) {
-  border-color: var(--p-accent);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-border-community-border button) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-border-transparent button) {
-  border-color: #0000;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-bg-community-accent button) {
-  background-color: var(--p-accent);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-bg-community-bg3 button) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-bg-transparent button) {
-  background-color: #0000;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-p-0 button) {
-  padding: 0;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-p-3 button) {
-  padding: 0.75rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-px-0 button) {
-  padding-left: 0;
-  padding-right: 0;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-px-2 button) {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-px-3 button) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-px-4 button) {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-pb-2 button) {
-  padding-bottom: 0.5rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-left button) {
-  text-align: left;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-\[13px\] button) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-sm button) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-xs button) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-font-bold button) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-community-accent-light button) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-community-danger button) {
-  color: var(--p-danger, #e54867);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-community-muted button) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-community-on-accent button) {
-  color: var(--p-on-accent);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-text-community-text button) {
-  color: var(--p-text);
-}
-#portal-overlay
-  :is(
-    .\[\&_button\]\:tw-transition-\[background-color\,border-color\,color\,box-shadow\,opacity\,filter\,transform\]
-      button
-  ) {
-  transition-property: background-color, border-color, color, box-shadow,
-    opacity, filter, transform;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay :is(.\[\&_button\]\:tw-duration-200 button) {
-  transition-duration: 0.2s;
-}
-#portal-overlay :is(.\[\&_button\]\:tw-ease-out button) {
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-}
-#portal-overlay :is(.after\:\[\&_button\]\:tw-absolute button):after {
-  content: var(--tw-content);
-  position: absolute;
-}
-#portal-overlay :is(.after\:\[\&_button\]\:tw-inset-x-0 button):after {
-  content: var(--tw-content);
-  left: 0;
-  right: 0;
-}
-#portal-overlay :is(.after\:\[\&_button\]\:tw-bottom-\[-1px\] button):after {
-  content: var(--tw-content);
-  bottom: -1px;
-}
-#portal-overlay :is(.after\:\[\&_button\]\:tw-h-0\.5 button):after {
-  content: var(--tw-content);
-  height: 0.125rem;
-}
-#portal-overlay :is(.after\:\[\&_button\]\:tw-scale-x-0 button):after {
-  content: var(--tw-content);
-  --tw-scale-x: 0;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay
-  :is(.after\:\[\&_button\]\:tw-bg-community-accent button):after {
-  content: var(--tw-content);
-  background-color: var(--p-accent);
-}
-#portal-overlay
-  :is(.after\:\[\&_button\]\:tw-transition-transform button):after {
-  content: var(--tw-content);
-  transition-property: transform;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-#portal-overlay
-  :is(.hover\:\[\&_button\]\:tw-translate-y-\[-1px\] button:hover) {
-  --tw-translate-y: -1px;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
-    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
-    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-#portal-overlay
-  :is(.hover\:\[\&_button\]\:tw-border-community-accent button:hover) {
-  border-color: var(--p-accent);
-}
-#portal-overlay
-  :is(.hover\:\[\&_button\]\:tw-bg-community-accent-bg button:hover) {
-  background-color: var(--p-accent-bg);
-}
-#portal-overlay :is(.hover\:\[\&_button\]\:tw-bg-community-bg3 button:hover) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay
-  :is(.hover\:\[\&_button\]\:tw-text-community-bright button:hover) {
-  color: var(--p-text-bright);
-}
-#portal-overlay
-  :is(.hover\:\[\&_button\]\:tw-text-community-text button:hover) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.hover\:\[\&_button\]\:tw-underline button:hover) {
-  text-decoration-line: underline;
-}
-#portal-overlay
-  :is(.hover\:\[\&_button\]\:tw-shadow-community-card button:hover) {
-  --tw-shadow: 0 8px 24px #00000021;
-  --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-#portal-overlay :is(.hover\:\[\&_button\]\:tw-brightness-110 button:hover) {
-  --tw-brightness: brightness(1.1);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast)
-    var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate)
-    var(--tw-sepia) var(--tw-drop-shadow);
-}
-#portal-overlay
-  :is(.focus-visible\:\[\&_button\]\:tw-rounded-sm button:focus-visible) {
-  border-radius: 0.125rem;
-}
-#portal-overlay
-  :is(.focus-visible\:\[\&_button\]\:tw-outline-none button:focus-visible) {
-  outline-offset: 2px;
-  outline: 2px solid #0000;
-}
-#portal-overlay
-  :is(.focus-visible\:\[\&_button\]\:tw-ring-2 button:focus-visible) {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 #0000);
-}
-#portal-overlay
-  :is(
-    .focus-visible\:\[\&_button\]\:tw-ring-community-accent-bg
-      button:focus-visible
-  ) {
-  --tw-ring-color: var(--p-accent-bg);
-}
-#portal-overlay :is(.disabled\:\[\&_button\]\:tw-opacity-55 button:disabled) {
-  opacity: 0.55;
-}
-@media (width<=620px) {
-  #portal-overlay :is(.max-\[620px\]\:\[\&_button\]\:tw-w-full button) {
-    width: 100%;
+  .motion-interactive:hover,
+  .motion-interactive:active {
+    transform: none;
   }
 }
-#portal-overlay
-  :is(.\[\&_em\.is-rejected\]\:tw-text-community-danger em.is-rejected) {
-  color: var(--p-danger, #e54867);
-}
-#portal-overlay :is(.\[\&_em\]\:tw-overflow-hidden em) {
-  overflow: hidden;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-text-ellipsis em) {
-  text-overflow: ellipsis;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-whitespace-nowrap em) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-rounded-full em) {
-  border-radius: 9999px;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-bg-\[\#e7a92f\]\/10 em) {
-  background-color: #e7a92f1a;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-px-2 em) {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-py-0\.5 em) {
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-text-xs em) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-not-italic em) {
-  font-style: normal;
-}
-#portal-overlay :is(.\[\&_em\]\:tw-text-\[\#e7a92f\] em) {
-  --tw-text-opacity: 1;
-  color: rgb(231 169 47 / var(--tw-text-opacity, 1));
-}
-#portal-overlay :is(.\[\&_em\]\:tw-text-community-accent-light em) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&_em\]\:tw-text-community-muted em) {
-  color: var(--p-text-muted);
-}
-@media (width<=420px) {
-  #portal-overlay :is(.max-\[420px\]\:\[\&_em\]\:tw-hidden em) {
-    display: none;
+@keyframes motion-fade-in {
+  0% {
+    opacity: 0;
   }
-}
-#portal-overlay :is(.\[\&_footer\]\:tw-flex footer) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&_footer\]\:tw-justify-end footer) {
-  justify-content: flex-end;
-}
-#portal-overlay :is(.\[\&_footer\]\:tw-gap-2 footer) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&_h1\]\:tw-m-0 h1) {
-  margin: 0;
-}
-#portal-overlay :is(.\[\&_h1\]\:tw-text-\[clamp\(22px\,2\.5vw\,28px\)\] h1) {
-  font-size: clamp(22px, 2.5vw, 28px);
-}
-#portal-overlay :is(.\[\&_h1\]\:tw-text-\[clamp\(24px\,2\.4vw\,32px\)\] h1) {
-  font-size: clamp(24px, 2.4vw, 32px);
-}
-#portal-overlay :is(.\[\&_h1\]\:tw-font-bold h1) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&_h1\]\:tw-leading-tight h1) {
-  line-height: 1.25;
-}
-#portal-overlay :is(.\[\&_h1\]\:tw-tracking-\[-\.02em\] h1) {
-  letter-spacing: -0.02em;
-}
-#portal-overlay :is(.\[\&_h1\]\:tw-text-community-bright h1) {
-  color: var(--p-text-bright);
-}
-@media (width<=620px) {
-  #portal-overlay :is(.max-\[620px\]\:\[\&_h1\]\:tw-text-2xl h1) {
-    font-size: 1.5rem;
-    line-height: 2rem;
-  }
-  #portal-overlay :is(.max-\[620px\]\:\[\&_h1\]\:tw-text-xl h1) {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-  }
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-m-0 h2) {
-  margin: 0;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-mb-2 h2) {
-  margin-bottom: 0.5rem;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-mt-3 h2) {
-  margin-top: 0.75rem;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-break-words h2) {
-  overflow-wrap: break-word;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-text-2xl h2) {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-text-\[22px\] h2) {
-  font-size: 22px;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-text-lg h2) {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-text-xl h2) {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-leading-snug h2) {
-  line-height: 1.375;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-leading-tight h2) {
-  line-height: 1.25;
-}
-#portal-overlay :is(.\[\&_h2\]\:tw-text-community-bright h2) {
-  color: var(--p-text-bright);
-}
-#portal-overlay :is(.\[\&_header\]\:tw-flex header) {
-  display: flex;
-}
-#portal-overlay :is(.\[\&_header\]\:tw-justify-between header) {
-  justify-content: space-between;
-}
-#portal-overlay :is(.\[\&_header\]\:tw-gap-2 header) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&_header\]\:tw-border-b header) {
-  border-bottom-width: 1px;
-}
-#portal-overlay :is(.\[\&_header\]\:tw-border-community-border header) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&_header\]\:tw-px-3 header) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&_header\]\:tw-py-2 header) {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-#portal-overlay :is(.\[\&_header\]\:tw-text-xs header) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&_header\]\:tw-text-community-muted header) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&_img\]\:tw-block img) {
-  display: block;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-h-10 img) {
-  height: 2.5rem;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-h-9 img) {
-  height: 2.25rem;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-h-full img) {
-  height: 100%;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-w-10 img) {
-  width: 2.5rem;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-w-9 img) {
-  width: 2.25rem;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-w-full img) {
-  width: 100%;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-flex-\[0_0_100\%\] img) {
-  flex: 0 0 100%;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-object-contain img) {
-  -o-object-fit: contain;
-  object-fit: contain;
-}
-#portal-overlay :is(.\[\&_img\]\:tw-object-cover img) {
-  -o-object-fit: cover;
-  object-fit: cover;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-min-h-10 input) {
-  min-height: 2.5rem;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-w-full input) {
-  width: 100%;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-min-w-0 input) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-flex-1 input) {
-  flex: 1;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-rounded-lg input) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-border input) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-border-0 input) {
-  border-width: 0;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-border-community-border input) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&_input\]\:tw-bg-community-bg2 input) {
-  background-color: var(--p-bg2);
-}
-#portal-overlay :is(.\[\&_input\]\:tw-bg-transparent input) {
-  background-color: #0000;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-px-3 input) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-py-2 input) {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-pr-\[52px\] input) {
-  padding-right: 52px;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-text-sm input) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-text-community-text input) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.\[\&_input\]\:tw-outline-none input) {
-  outline-offset: 2px;
-  outline: 2px solid #0000;
-}
-#portal-overlay :is(.\[\&_input\]\:tw-ring-0 input) {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 #0000);
-}
-#portal-overlay
-  :is(.focus\:\[\&_input\]\:tw-border-community-accent input:focus) {
-  border-color: var(--p-accent);
-}
-#portal-overlay :is(.focus\:\[\&_input\]\:tw-ring-2 input:focus) {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 #0000);
-}
-#portal-overlay
-  :is(.focus\:\[\&_input\]\:tw-ring-community-accent-bg input:focus) {
-  --tw-ring-color: var(--p-accent-bg);
-}
-#portal-overlay :is(.\[\&_label\]\:tw-grid label) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&_label\]\:tw-gap-2 label) {
-  gap: 0.5rem;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-m-0 p) {
-  margin: 0;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-mx-0 p) {
-  margin-left: 0;
-  margin-right: 0;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-mb-0 p) {
-  margin-bottom: 0;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-mb-4 p) {
-  margin-bottom: 1rem;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-mb-6 p) {
-  margin-bottom: 1.5rem;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-mt-1 p) {
-  margin-top: 0.25rem;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-mt-2 p) {
-  margin-top: 0.5rem;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-max-w-\[720px\] p) {
-  max-width: 720px;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-text-\[13px\] p) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-text-sm p) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-leading-7 p) {
-  line-height: 1.75rem;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-leading-relaxed p) {
-  line-height: 1.625;
-}
-#portal-overlay :is(.\[\&_p\]\:tw-text-community-muted p) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&_p\]\:tw-text-community-text p) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.\[\&_select\]\:tw-min-h-10 select) {
-  min-height: 2.5rem;
-}
-#portal-overlay :is(.\[\&_select\]\:tw-w-full select) {
-  width: 100%;
-}
-#portal-overlay :is(.\[\&_select\]\:tw-min-w-0 select) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&_select\]\:tw-rounded-lg select) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&_select\]\:tw-border select) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&_select\]\:tw-border-community-border select) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&_select\]\:tw-bg-community-bg2 select) {
-  background-color: var(--p-bg2);
-}
-#portal-overlay :is(.\[\&_select\]\:tw-px-3 select) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&_select\]\:tw-text-sm select) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&_select\]\:tw-text-community-text select) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.\[\&_select\]\:tw-outline-none select) {
-  outline-offset: 2px;
-  outline: 2px solid #0000;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-block small) {
-  display: block;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-whitespace-nowrap small) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-break-words small) {
-  overflow-wrap: break-word;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-text-\[10px\] small) {
-  font-size: 10px;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-text-\[11px\] small) {
-  font-size: 11px;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-text-\[13px\] small) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-text-xs small) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-font-bold small) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-tracking-\[\.08em\] small) {
-  letter-spacing: 0.08em;
-}
-#portal-overlay :is(.\[\&_small\]\:tw-text-community-accent-light small) {
-  color: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&_small\]\:tw-text-community-muted small) {
-  color: var(--p-text-muted);
-}
-@media (width<=620px) {
-  #portal-overlay :is(.max-\[620px\]\:\[\&_small\]\:tw-hidden small) {
-    display: none;
-  }
-}
-#portal-overlay :is(.\[\&_span\]\:tw-absolute span) {
-  position: absolute;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-bottom-1 span) {
-  bottom: 0.25rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-left-1 span) {
-  left: 0.25rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-left-1\.5 span) {
-  left: 0.375rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-top-1\.5 span) {
-  top: 0.375rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-ml-2 span) {
-  margin-left: 0.5rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-grid span) {
-  display: grid;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-min-w-0 span) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-min-w-5 span) {
-  min-width: 1.25rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-rounded-full span) {
-  border-radius: 9999px;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-rounded-md span) {
-  border-radius: 0.375rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-bg-black\/70 span) {
-  background-color: #000000b3;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-bg-black\/75 span) {
-  background-color: #000000bf;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-bg-community-bg3 span) {
-  background-color: var(--p-bg3);
-}
-#portal-overlay :is(.\[\&_span\]\:tw-px-1\.5 span) {
-  padding-left: 0.375rem;
-  padding-right: 0.375rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-px-2 span) {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-py-0\.5 span) {
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-py-px span) {
-  padding-top: 1px;
-  padding-bottom: 1px;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-text-\[13px\] span) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-text-xs span) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-font-bold span) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-leading-\[18px\] span) {
-  line-height: 18px;
-}
-#portal-overlay :is(.\[\&_span\]\:tw-text-community-bright span) {
-  color: var(--p-text-bright);
-}
-#portal-overlay :is(.\[\&_span\]\:tw-text-community-muted span) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&_span\]\:tw-text-white span) {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-block strong) {
-  display: block;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-overflow-hidden strong) {
-  overflow: hidden;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-text-ellipsis strong) {
-  text-overflow: ellipsis;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-whitespace-nowrap strong) {
-  white-space: nowrap;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-break-words strong) {
-  overflow-wrap: break-word;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-text-\[13px\] strong) {
-  font-size: 13px;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-text-base strong) {
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-text-sm strong) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-font-bold strong) {
-  font-weight: 700;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-leading-tight strong) {
-  line-height: 1.25;
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-text-community-bright strong) {
-  color: var(--p-text-bright);
-}
-#portal-overlay :is(.\[\&_strong\]\:tw-text-community-danger strong) {
-  color: var(--p-danger, #e54867);
-}
-@media (width<=420px) {
-  #portal-overlay
-    :is(.max-\[420px\]\:\[\&_strong\]\:tw-max-w-\[120px\] strong) {
-    max-width: 120px;
-  }
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-mb-1 svg) {
-  margin-bottom: 0.25rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-block svg) {
-  display: block;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-h-3 svg) {
-  height: 0.75rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-h-3\.5 svg) {
-  height: 0.875rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-h-4 svg) {
-  height: 1rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-h-5 svg) {
-  height: 1.25rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-h-\[18px\] svg) {
-  height: 18px;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-h-\[38px\] svg) {
-  height: 38px;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-w-3 svg) {
-  width: 0.75rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-w-3\.5 svg) {
-  width: 0.875rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-w-4 svg) {
-  width: 1rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-w-5 svg) {
-  width: 1.25rem;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-w-\[18px\] svg) {
-  width: 18px;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-w-\[38px\] svg) {
-  width: 38px;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-flex-none svg) {
-  flex: none;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-fill-current svg) {
-  fill: currentColor;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-fill-none svg) {
-  fill: none;
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-stroke-community-accent-light svg) {
-  stroke: var(--p-accent-light);
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-stroke-community-muted svg) {
-  stroke: var(--p-text-muted);
-}
-#portal-overlay :is(.\[\&_svg\]\:tw-stroke-current svg) {
-  stroke: currentColor;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-min-h-24 textarea) {
-  min-height: 6rem;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-min-h-28 textarea) {
-  min-height: 7rem;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-w-full textarea) {
-  width: 100%;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-min-w-0 textarea) {
-  min-width: 0;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-resize-y textarea) {
-  resize: vertical;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-rounded-lg textarea) {
-  border-radius: 0.5rem;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-border textarea) {
-  border-width: 1px;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-border-community-border textarea) {
-  border-color: var(--p-border);
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-bg-community-bg textarea) {
-  background-color: var(--p-bg);
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-bg-community-bg2 textarea) {
-  background-color: var(--p-bg2);
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-px-3 textarea) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-py-2 textarea) {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-py-2\.5 textarea) {
-  padding-top: 0.625rem;
-  padding-bottom: 0.625rem;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-text-sm textarea) {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-leading-relaxed textarea) {
-  line-height: 1.625;
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-text-community-text textarea) {
-  color: var(--p-text);
-}
-#portal-overlay :is(.\[\&_textarea\]\:tw-outline-none textarea) {
-  outline-offset: 2px;
-  outline: 2px solid #0000;
-}
-#portal-overlay
-  :is(.focus\:\[\&_textarea\]\:tw-border-community-accent textarea:focus) {
-  border-color: var(--p-accent);
-}
-#portal-overlay :is(.\[\&_time\]\:tw-text-xs time) {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-#portal-overlay :is(.\[\&_time\]\:tw-text-community-muted time) {
-  color: var(--p-text-muted);
-}
-#portal-overlay :is(.is-active .\[\.is-active_\&\]\:tw-bg-community-accent) {
-  background-color: var(--p-accent);
-}
-#portal-overlay :is(.is-active .\[\.is-active_\&\]\:tw-bg-community-danger) {
-  background-color: var(--p-danger, #e54867);
-}
-#portal-overlay
-  :is(.is-active .\[\.is-active_\&\]\:tw-text-community-on-accent) {
-  color: var(--p-on-accent);
-}
-#portal-overlay :is(.is-active .\[\.is-active_\&\]\:tw-text-white) {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-#portal-overlay :is(.is-active .\[\.is-active_\&_svg\]\:tw-fill-current svg) {
-  fill: currentColor;
-}
-#portal-overlay
-  :is(
-    .is-celebrating
-      .\[\.is-celebrating_\&_svg\]\:tw-animate-community-action-pop
-      svg
-  ) {
-  animation: 0.52s cubic-bezier(0.2, 0.9, 0.25, 1.25) both
-    tw-community-action-pop;
-}
-@keyframes tw-community-slide-out {
   to {
-    transform: translate(5%);
+    opacity: 1;
   }
 }
-#portal-overlay
-  :is(.is-closing .\[\.is-closing_\&\]\:tw-animate-community-slide-out) {
-  animation: 0.28s both tw-community-slide-out;
+@keyframes motion-fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-#portal-overlay :is(.is-pending .\[\.is-pending_\&\]\:tw-border) {
-  border-width: 1px;
+@keyframes motion-fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-#portal-overlay :is(.is-pending .\[\.is-pending_\&\]\:tw-border-\[\#e7a92f\]) {
-  --tw-border-opacity: 1;
-  border-color: rgb(231 169 47 / var(--tw-border-opacity, 1));
+@keyframes motion-fade-in-left {
+  0% {
+    opacity: 0;
+    transform: translate(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0);
+  }
 }
-#portal-overlay :is(.is-rejected .\[\.is-rejected_\&\]\:tw-border) {
-  border-width: 1px;
+@keyframes motion-fade-in-right {
+  0% {
+    opacity: 0;
+    transform: translate(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0);
+  }
 }
-#portal-overlay
-  :is(.is-rejected .\[\.is-rejected_\&\]\:tw-border-community-danger) {
-  border-color: var(--p-danger, #e54867);
+@keyframes motion-scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes motion-slide-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes motion-slide-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes motion-rotate-in {
+  0% {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+@keyframes motion-zoom-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.motion-fade-in {
+  animation: motion-fade-in 0.24s
+    var(--motion-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+}
+.motion-fade-in-up {
+  animation: motion-fade-in-up 0.28s
+    var(--motion-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+}
+.motion-fade-in-down {
+  animation: motion-fade-in-down 0.28s
+    var(--motion-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+}
+.motion-fade-in-left {
+  animation: motion-fade-in-left 0.28s
+    var(--motion-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+}
+.motion-fade-in-right {
+  animation: motion-fade-in-right 0.28s
+    var(--motion-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+}
+.motion-scale-in {
+  animation: motion-scale-in 0.26s
+    var(--motion-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) forwards;
+}
+.motion-slide-in-up {
+  animation: motion-slide-in-up 0.32s
+    var(--motion-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+}
+.motion-slide-in-down {
+  animation: motion-slide-in-down 0.32s
+    var(--motion-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+}
+.motion-rotate-in {
+  animation: motion-rotate-in 0.32s
+    var(--motion-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) forwards;
+}
+.motion-zoom-in {
+  animation: motion-zoom-in 0.24s
+    var(--motion-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) forwards;
+}
+.community-connection-status .motion-pulse {
+  animation-name: community-connection-pulse;
+  animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+.community-connection-status .motion-spin {
+  animation-name: community-connection-spin;
+  animation-timing-function: linear;
+}
+@keyframes community-connection-pulse {
+  0%,
+  to {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes community-connection-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .community-connection-status .motion-pulse,
+  .community-connection-status .motion-spin {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
 }

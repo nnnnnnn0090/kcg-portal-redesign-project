@@ -110,6 +110,38 @@ export const viMessages: typeof jaMessages = {
     profileTitle: 'Hồ sơ',
     communityActivity: 'Hoạt động cộng đồng',
   },
+  community: {
+    drawerTitle: 'Hoạt động cộng đồng',
+    close: 'Close',
+    consent: {
+      preamble: 'Please read before continuing',
+      title: 'Campus Community is not an official school service',
+      body: 'This community is independently provided by this extension. The school and its staff do not operate, review, endorse, or support it.',
+      bullets: [
+        'Posts and profile information are sent to a separate community server.',
+        'Never enter or reuse your school login ID or password.',
+        'Use posting and social features at your own discretion and responsibility.',
+      ],
+      checkbox:
+        'I understand this is an independent service unrelated to the school and choose to use it.',
+      cancel: 'Cancel',
+      accept: 'Agree and continue',
+    },
+    connection: {
+      reconnecting: 'Reconnecting…',
+      serverUnavailable: 'Could not reach the community server',
+      gateFailed: 'Could not verify community access',
+      readyTimeout: 'Community loading timed out',
+      disconnected: 'Disconnected from the community server',
+      checkingNetwork: 'Checking the network. Please wait a moment.',
+      maintenanceHint: 'The service may be under maintenance. Please try again in a little while.',
+      bulletOutage: 'A temporary outage or maintenance may be in progress',
+      bulletNetwork: 'Also check campus network or VPN connectivity',
+      reconnect: 'Reconnect',
+      connecting: 'Connecting…',
+      close: 'Close community',
+    },
+  },
   footer: {
     aria: 'Chân trang',
   },

@@ -28,10 +28,6 @@ export {
 } from '../contract/zindex';
 
 export {
-  COMMUNITY_INPUT_LIMITS,
-} from '../contract/limits';
-
-export {
   KING_LMS_SAML_LOGIN_PATH,
   KING_LMS_SAML_APP_ID,
   KING_LMS_HOME_URL,

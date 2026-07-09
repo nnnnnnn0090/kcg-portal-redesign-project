@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { communityFrame } from './community-frame';
 import { waitForCommunityActivityEntry } from './real-server-helpers';
 
 export function communityCredentialsReady(): boolean {
@@ -30,7 +31,8 @@ export async function loginCommunityIfNeeded(page: Page): Promise<void> {
   const creds = communityCredentials();
   if (!creds) return;
 
-  const authForm = page.locator('form.community-auth');
+  const frame = communityFrame(page);
+  const authForm = frame.locator('form.community-auth');
   if (!(await authForm.isVisible({ timeout: 3_000 }).catch(() => false))) return;
 
   await authForm.getByRole('tab', { name: /ログイン|Log in|Sign in/ }).click();

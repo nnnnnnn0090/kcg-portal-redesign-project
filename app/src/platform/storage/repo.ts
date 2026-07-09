@@ -162,10 +162,6 @@ export const storageRepo = {
   getClientLastKnownVersion: () => readKey(SK.clientLastKnownVersion, parseOptionalString),
   setClientLastKnownVersion: (v: string) => writeKey(SK.clientLastKnownVersion, v),
 
-  getCommunityAuthToken: () => readKey(SK.communityAuthToken, parseOptionalString),
-  setCommunityAuthToken: (v: string | undefined) =>
-    v ? writeKey(SK.communityAuthToken, v) : storageClient.remove(SK.communityAuthToken),
-
   getCommunityDisclaimerAccepted: () =>
     readKey(SK.communityDisclaimerAccepted, (r) => parseStorageBool(SK.communityDisclaimerAccepted, r)),
   setCommunityDisclaimerAccepted: (v: boolean) => writeKey(SK.communityDisclaimerAccepted, v),

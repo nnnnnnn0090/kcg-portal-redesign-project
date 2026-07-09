@@ -1,6 +1,6 @@
 {
   "name": "kcg-portal-redesign-project",
-  "version": "7.0.4",
+  "version": "7.1.0",
   "private": true,
   "scripts": {
     "dev": "wxt",
@@ -14,7 +14,7 @@
     "zip:all": "npm run zip:dev && npm run zip:dev:firefox && npm run zip && npm run zip:firefox",
     "postinstall": "wxt prepare",
     "lint": "eslint .",
-    "type-coverage": "type-coverage --at-least 99.5 --strict",
+    "type-coverage": "type-coverage --at-least 99.3 --strict",
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",

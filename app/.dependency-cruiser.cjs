@@ -34,7 +34,7 @@ module.exports = {
       comment: 'services は UI 実装に依存しない（§5.1）',
       from: {
         path: '^src/services',
-        pathNot: '^src/services/(portal-boot|community-api)\\.ts$',
+        pathNot: '^src/services/portal-boot\\.ts$',
       },
       to: {
         path: '^src/ui',
@@ -88,7 +88,6 @@ module.exports = {
           '^src/ui/app/index\\.ts$',
           '^src/ui/components/index\\.ts$',
           '^src/ui/pages/index\\.ts$',
-          '^src/ui/community/index\\.ts$',
         ],
       },
       to: {},

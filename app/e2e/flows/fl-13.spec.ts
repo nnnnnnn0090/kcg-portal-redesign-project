@@ -17,6 +17,6 @@ test.describe('FL-13 extension update', () => {
     await expect(page.locator('#p-toast')).toBeVisible({ timeout: 60_000 });
 
     const storage = await readExtensionStorage(worker, [SK.extensionVersionSeen]);
-    expect(storage[SK.extensionVersionSeen]).toBe('7.0.4');
+    expect(storage[SK.extensionVersionSeen]).toBe('7.1.0');
   });
 });

@@ -16,6 +16,7 @@ import { findHostLogoffAnchor, requestHostPortalLogoff } from '../../../services
 import { resolvePortalNavLabel } from '../../../lib/portal-nav-labels';
 import { useI18n } from '../../../i18n';
 import type { AppLanguage, I18nMessages } from '../../../i18n/messages';
+import { messagesForLanguage } from '../../../i18n/messages';
 import { useExtensionUpdateAvailable } from '../../../hooks/useExtensionUpdateAvailable';
 import { CommunityActivityDrawer } from './CommunityActivityDrawer';
 import {
@@ -23,10 +24,11 @@ import {
   fetchCommunityAccess,
   getCommunityDisclaimerAccepted,
 } from '../../../services/community-access';
+import { readPortalStudentKeyProof } from '../../../services/portal-student-key';
 import {
   clearCommunityUrlParams,
   hasCommunityUrlParams,
-} from '../../community/state/community-url';
+} from '../../../services/community-url-params';
 
 // ─── ナビゲーション型 ─────────────────────────────────────────────────────
 
@@ -282,6 +284,7 @@ export function Header({
   const [activityConsentOpen, setActivityConsentOpen] = useState(false);
   const [communityEnabled, setCommunityEnabled] = useState(false);
   const [communityApiOrigin, setCommunityApiOrigin] = useState('');
+  const [portalStudentKeyProof, setPortalStudentKeyProof] = useState<string | null>(null);
   const profile = usePortalProfile(t.header.profileTitle);
 
   const navItems = useMemo(() => {
@@ -317,6 +320,24 @@ export function Header({
 
   useEffect(() => {
     if (navSource !== 'portal') {
+      setPortalStudentKeyProof(null);
+      return;
+    }
+    let cancelled = false;
+    void readPortalStudentKeyProof()
+      .then((proof) => {
+        if (!cancelled) setPortalStudentKeyProof(proof);
+      })
+      .catch(() => {
+        if (!cancelled) setPortalStudentKeyProof(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [navSource]);
+
+  useEffect(() => {
+    if (navSource !== 'portal') {
       setCommunityEnabled(false);
       setCommunityApiOrigin('');
       return;
@@ -337,13 +358,26 @@ export function Header({
   }, [navSource]);
 
   useEffect(() => {
-    if (navSource !== 'portal' || !communityEnabled || !communityApiOrigin) return;
+    if (navSource !== 'portal' || !communityEnabled || !communityApiOrigin || !portalStudentKeyProof)
+      return;
     if (!hasCommunityUrlParams()) return;
+    let cancelled = false;
     void (async () => {
       const accepted = await getCommunityDisclaimerAccepted().catch(() => false);
+      if (cancelled) return;
       if (accepted) setActivityOpen(true);
+      else setActivityConsentOpen(true);
     })();
-  }, [navSource, communityEnabled, communityApiOrigin]);
+    return () => {
+      cancelled = true;
+    };
+  }, [navSource, communityEnabled, communityApiOrigin, portalStudentKeyProof]);
+
+  function closeCommunityShell() {
+    setActivityOpen(false);
+    setActivityConsentOpen(false);
+    clearCommunityUrlParams();
+  }
 
   /**
    * `href` が実URLのときだけ location 遷移する。`#` / `javascript:` / PostBack 等は click に任せる。
@@ -362,6 +396,7 @@ export function Header({
   }
 
   function handleLogout() {
+    closeCommunityShell();
     if (navSource === 'home2-mail') {
       const webLo = document.getElementById('MainContent_butLogout');
       if (webLo instanceof HTMLInputElement && !webLo.closest(`#${PORTAL_DOM.overlayRoot}`)) {
@@ -383,7 +418,7 @@ export function Header({
   const navLabel = navSource === 'home2-mail' ? t.header.home2Menu : t.header.portalMenu;
 
   async function openCommunityActivity() {
-    if (!communityApiOrigin) return;
+    if (!communityApiOrigin || !portalStudentKeyProof) return;
     const accepted = await getCommunityDisclaimerAccepted().catch(() => false);
     if (accepted) setActivityOpen(true);
     else setActivityConsentOpen(true);
@@ -427,7 +462,7 @@ export function Header({
             </nav>
           )}
 
-          {navSource === 'portal' && language === 'ja' && communityEnabled ? (
+          {navSource === 'portal' && communityEnabled && portalStudentKeyProof ? (
             <button
               type="button"
               className="p-community-activity-entry inline-flex items-center gap-2 whitespace-nowrap"
@@ -505,10 +540,7 @@ export function Header({
             <CommunityActivityDrawer
               language={language}
               apiOrigin={communityApiOrigin}
-              onClose={() => {
-                clearCommunityUrlParams();
-                setActivityOpen(false);
-              }}
+              onClose={closeCommunityShell}
             />,
             document.getElementById(PORTAL_DOM.overlayRoot) ?? document.body,
           )
@@ -517,7 +549,7 @@ export function Header({
         ? createPortal(
             <CommunityConsentDialog
               language={language}
-              onCancel={() => setActivityConsentOpen(false)}
+              onCancel={closeCommunityShell}
               onAccept={() => void onAcceptCommunityDisclaimer()}
             />,
             document.getElementById(PORTAL_DOM.overlayRoot) ?? document.body,
@@ -536,7 +568,7 @@ function CommunityConsentDialog({
   onCancel: () => void;
   onAccept: () => void;
 }) {
-  const ja = language === 'ja';
+  const consent = messagesForLanguage(language).community.consent;
   const [confirmed, setConfirmed] = useState(false);
   return (
     <div className="p-community-consent-layer" role="presentation">
@@ -549,33 +581,13 @@ function CommunityConsentDialog({
         <div className="p-community-consent-mark" aria-hidden="true">
           !
         </div>
-        <small>{ja ? 'ご利用前に必ずご確認ください' : 'Please read before continuing'}</small>
-        <h2 id="p-community-consent-title">
-          {ja
-            ? '「みんなの活動」は学校の公式サービスではありません'
-            : 'Campus Community is not an official school service'}
-        </h2>
-        <p>
-          {ja
-            ? 'この機能は本拡張機能が独自に提供するコミュニティ機能です。KCGおよび学校関係者は、運営・審査・サポートに関与していません。'
-            : 'This community is independently provided by this extension. The school and its staff do not operate, review, endorse, or support it.'}
-        </p>
+        <small>{consent.preamble}</small>
+        <h2 id="p-community-consent-title">{consent.title}</h2>
+        <p>{consent.body}</p>
         <ul>
-          <li>
-            {ja
-              ? '投稿内容やプロフィール情報は、学校とは別のコミュニティサーバーへ送信されます。'
-              : 'Posts and profile information are sent to a separate community server.'}
-          </li>
-          <li>
-            {ja
-              ? '学校のログインID・パスワードは絶対に入力しないでください。'
-              : 'Never enter or reuse your school login ID or password.'}
-          </li>
-          <li>
-            {ja
-              ? '投稿や交流は、ご自身の判断と責任で行ってください。'
-              : 'Use posting and social features at your own discretion and responsibility.'}
-          </li>
+          {consent.bullets.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
         <label className="p-community-consent-check">
           <input
@@ -583,18 +595,14 @@ function CommunityConsentDialog({
             checked={confirmed}
             onChange={(event) => setConfirmed(event.currentTarget.checked)}
           />
-          <span>
-            {ja
-              ? '学校とは無関係の独立したサービスであることを理解し、自分の判断で利用します。'
-              : 'I understand this is an independent service unrelated to the school and choose to use it.'}
-          </span>
+          <span>{consent.checkbox}</span>
         </label>
         <footer>
           <button type="button" onClick={onCancel}>
-            {ja ? '利用しない' : 'Cancel'}
+            {consent.cancel}
           </button>
           <button className="is-primary" type="button" disabled={!confirmed} onClick={onAccept}>
-            {ja ? '同意して開く' : 'Agree and continue'}
+            {consent.accept}
           </button>
         </footer>
       </section>

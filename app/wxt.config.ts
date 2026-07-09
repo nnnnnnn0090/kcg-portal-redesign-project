@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'wxt';
 import {
   COMMUNITY_API_ORIGIN,
@@ -7,6 +9,9 @@ import {
   KING_LMS_ORIGIN,
   PORTAL_ORIGIN,
 } from './src/shared/constants';
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const communityBoundaryDir = path.resolve(rootDir, '../../shared/community-boundary');
 
 const { version } = JSON.parse(readFileSync(new URL('./version.json', import.meta.url), 'utf8')) as {
   version: string;
@@ -37,6 +42,13 @@ export default defineConfig({
   srcDir: 'src',
   manifestVersion: 3,
   modules: ['@wxt-dev/module-react'],
+  vite: () => ({
+    resolve: {
+      alias: {
+        '@community-boundary': communityBoundaryDir,
+      },
+    },
+  }),
   zip: {
     zipSources: false,
     artifactTemplate:

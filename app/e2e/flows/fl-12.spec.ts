@@ -1,4 +1,4 @@
-import path from 'node:path';
+import { communityFrame } from '../support/community-frame';
 import { openPortalHome } from '../support/flow-helpers';
 import { openCommunityActivity } from '../support/real-server-helpers';
 import {
@@ -20,21 +20,21 @@ test.describe('FL-12 report flow', () => {
     await loginCommunityIfNeeded(page);
     await expect(page.locator('#p-community-activity-drawer')).toBeVisible({ timeout: 60_000 });
 
-    const drawer = page.locator('#p-community-activity-drawer');
-    await drawer.getByRole('button', { name: /見つける|Explore/ }).click();
-    const firstPost = drawer.locator('article.community-post').first();
+    const frame = communityFrame(page);
+    await frame.getByRole('button', { name: /見つける|Explore/ }).click();
+    const firstPost = frame.locator('article.community-post').first();
     await expect(firstPost).toBeVisible({ timeout: 60_000 });
 
     const dialogPromise = page.waitForEvent('dialog', { timeout: 60_000 });
     await firstPost.click();
 
-    const postDialog = page.locator('article.community-post-dialog');
+    const postDialog = frame.locator('article.community-post-dialog');
     await expect(postDialog).toBeVisible({ timeout: 60_000 });
     await postDialog.getByRole('button', { name: /^通報$|^Report$/ }).click();
 
-    const reportTextarea = page.locator('.community-report-form textarea');
+    const reportTextarea = frame.locator('.community-report-form textarea');
     await reportTextarea.fill('Inappropriate content for E2E.');
-    const reportSubmit = page.locator('.community-report-form button', { hasText: /送信|Submit/ });
+    const reportSubmit = frame.locator('.community-report-form button', { hasText: /送信|Submit/ });
     await expect(reportSubmit).toBeEnabled({ timeout: 10_000 });
     await reportSubmit.click();
 
