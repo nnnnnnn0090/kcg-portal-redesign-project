@@ -4,7 +4,6 @@
 
 import { SK } from '../contract/storage-keys';
 import storage from '../lib/storage';
-import { schedulePortalExtensionSync } from './portal-settings-sync';
 
 export interface ShortcutLayout {
   order:  string[];
@@ -41,5 +40,4 @@ export async function saveShortcutLayout(layout: ShortcutLayout): Promise<void> 
       custom: [],
     },
   });
-  schedulePortalExtensionSync();
 }

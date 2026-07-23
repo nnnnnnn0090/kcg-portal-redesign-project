@@ -1,6 +1,6 @@
 /**
  * 設定の React コンテキスト。
- * 拡張状態はポータル「マイリンク」に同期し、セッション内メモリのみ保持する。
+ * 端末キャッシュを即時利用し、ポータル上ではマイリンクとも同期する。
  */
 
 import {
@@ -21,16 +21,12 @@ import {
   type StoredCustomThemeCollection,
 } from '../domain/themes/custom-themes';
 import type { CalendarWeekStart } from '../lib/date';
-import {
-  DEFAULT_LANGUAGE,
-  type AppLanguage,
-} from '../i18n/messages';
-import { getPortalExtensionMemorySnapshot } from '../platform/storage/portal-extension-store';
+import { DEFAULT_LANGUAGE, type AppLanguage } from '../i18n/messages';
+import { PORTAL_SYNCED_STORAGE_KEYS } from '../contract/portal-synced-storage';
 import {
   ensurePortalExtensionBootstrapped,
   parseCustomThemesFromExtensionStorage,
   parseSettingsFromExtensionStorage,
-  schedulePortalExtensionSync,
 } from '../services/portal-settings-sync';
 
 // ─── 型 ───────────────────────────────────────────────────────────────────
@@ -50,7 +46,7 @@ export interface Settings {
 export interface SettingsContextValue {
   settings: Settings;
   settingsReady: boolean;
-  updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => Promise<void>;
   updateTheme: (name: string) => void;
   customThemes: StoredCustomThemeCollection;
   saveCustomTheme: (theme: CustomTheme) => void;
@@ -123,7 +119,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       await ensurePortalExtensionBootstrapped();
       if (cancelled) return;
 
-      applyStorageToUi(getPortalExtensionMemorySnapshot().storage);
+      const stored = await storage.get([...PORTAL_SYNCED_STORAGE_KEYS]);
+      if (cancelled) return;
+      applyStorageToUi(stored);
 
       if (!cancelled) setSettingsReady(true);
     })();
@@ -133,18 +131,17 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     };
   }, [applyStorageToUi]);
 
-  const updateSetting = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
-    setSettings((prev) => {
-      const next = { ...prev, [key]: value };
-      void storage.set({ [SETTINGS_TO_SK[key]]: value });
-      schedulePortalExtensionSync();
-      return next;
-    });
-  }, []);
+  const updateSetting = useCallback(
+    async <K extends keyof Settings>(key: K, value: Settings[K]) => {
+      setSettings((prev) => ({ ...prev, [key]: value }));
+      await storage.set({ [SETTINGS_TO_SK[key]]: value });
+    },
+    [],
+  );
 
   const updateTheme = useCallback(
     (name: string) => {
-      updateSetting('theme', name);
+      void updateSetting('theme', name);
       syncPortalTheme(name, customThemesRef.current);
     },
     [updateSetting, customThemesRef],
@@ -157,7 +154,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         : [...previous.themes, theme];
       const next = { schemaVersion: 1 as const, themes };
       void storage.set({ [SK.customThemes]: next });
-      schedulePortalExtensionSync();
       return next;
     });
   }, []);
@@ -169,7 +165,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         themes: previous.themes.filter((theme) => theme.id !== id),
       };
       void storage.set({ [SK.customThemes]: next });
-      schedulePortalExtensionSync();
       return next;
     });
   }, []);
@@ -195,7 +190,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     ],
   );
 
-  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
+  return (
+    <SettingsContext.Provider value={value}>
+      {settingsReady ? children : null}
+    </SettingsContext.Provider>
+  );
 }
 
 export function useSettings(): SettingsContextValue {

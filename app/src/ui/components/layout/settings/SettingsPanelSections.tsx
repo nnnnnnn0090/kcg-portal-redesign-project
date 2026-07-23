@@ -2,7 +2,6 @@
  * 設定パネル内のセクション単位 UI（テーマ・ポータル専用・Web メール・フィードバック等）。
  */
 
-import { useState } from 'react';
 import {
   THEMES,
   createCustomTheme,
@@ -19,13 +18,13 @@ import {
 } from '../../../../shared/constants';
 import { MascotDecorationSetting } from './MascotDecorationSetting';
 import { SettingsSwitch } from './SettingsSwitch';
-import { ThemeStudio, downloadTheme } from './ThemeStudio';
+import { downloadTheme } from './ThemeStudio';
 import { ColorSwatch } from '../../ui/ColorSwatch';
 import { SettingsClientUserIdBlock } from './SettingsClientUserId';
 
 interface SettingsLanguageSectionProps {
   settings: Settings;
-  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void | Promise<void>;
 }
 
 export function SettingsLanguageSection({
@@ -58,7 +57,8 @@ export function SettingsLanguageSection({
 interface SettingsThemeSectionProps {
   settings: Settings;
   onThemeChange: (name: string) => void;
-  onEditorOpen?: () => void;
+  /** テーマスタジオを開く（親でマウントし、設定パネル閉鎖後も維持する） */
+  onEditorOpen: (theme: CustomTheme | 'new') => void;
 }
 
 export function SettingsThemeSection({
@@ -68,13 +68,7 @@ export function SettingsThemeSection({
 }: SettingsThemeSectionProps) {
   const { language, t } = useI18n();
   const { customThemes, saveCustomTheme, deleteCustomTheme } = useSettings();
-  const [editing, setEditing] = useState<CustomTheme | 'new' | null>(null);
   const ja = language === 'ja';
-
-  const openEditor = (theme: CustomTheme | 'new') => {
-    setEditing(theme);
-    onEditorOpen?.();
-  };
 
   const removeTheme = (theme: CustomTheme) => {
     if (!window.confirm(ja ? `「${theme.name}」を削除しますか？` : `Delete “${theme.name}”?`))
@@ -96,7 +90,7 @@ export function SettingsThemeSection({
     <div className="p-settings-section p-settings-section--theme">
       <div className="p-settings-section-title p-theme-section-title">
         <span>{t.settings.colorTheme}</span>
-        <button type="button" onClick={() => openEditor('new')}>
+        <button type="button" onClick={() => onEditorOpen('new')}>
           ＋ {ja ? '独自テーマ' : 'Custom'}
         </button>
       </div>
@@ -136,7 +130,7 @@ export function SettingsThemeSection({
                 <span className="p-theme-btn-label">{theme.name}</span>
               </button>
               <div className="p-theme-custom-actions">
-                <button type="button" onClick={() => openEditor(theme)}>
+                <button type="button" onClick={() => onEditorOpen(theme)}>
                   {ja ? '編集' : 'Edit'}
                 </button>
                 <button type="button" onClick={() => duplicateTheme(theme)}>
@@ -153,13 +147,6 @@ export function SettingsThemeSection({
           );
         })}
       </div>
-      {editing ? (
-        <ThemeStudio
-          theme={editing === 'new' ? undefined : editing}
-          baseRef={settings.theme}
-          onClose={() => setEditing(null)}
-        />
-      ) : null}
     </div>
   );
 }
@@ -167,7 +154,7 @@ export function SettingsThemeSection({
 interface SettingsPortalOnlySectionsProps {
   settings: Settings;
   group: 'appearance' | 'connections' | 'support';
-  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void | Promise<void>;
   onReplayGuidedTour: () => void;
   onOpenChangelog: () => void;
 }
@@ -281,7 +268,7 @@ export function SettingsPortalOnlySections({
 interface SettingsWebMailSectionProps {
   settings: Settings;
   variant: 'portal' | 'home2';
-  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void | Promise<void>;
 }
 
 export function SettingsWebMailSection({
@@ -297,8 +284,10 @@ export function SettingsWebMailSection({
         checked={settings.home2WebMailOverlay}
         label={t.settings.webMailOverlay}
         onChange={(next) => {
-          onSettingChange('home2WebMailOverlay', next);
-          if (variant === 'home2' && !next) window.location.reload();
+          const saved = onSettingChange('home2WebMailOverlay', next);
+          if (variant === 'home2' && !next) {
+            void Promise.resolve(saved).finally(() => window.location.reload());
+          }
         }}
       />
       <p className="p-settings-hint">{t.settings.webMailReloadHint}</p>

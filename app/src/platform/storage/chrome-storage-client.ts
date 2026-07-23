@@ -1,6 +1,4 @@
-/**
- * `browser.storage.local` への直接アクセス（ポータル同期キー以外専用）。
- */
+/** `browser.storage.local` への直接アクセス。 */
 
 export const chromeStorageClient = {
   get(keys: string | string[]): Promise<Record<string, unknown>> {

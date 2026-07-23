@@ -9,15 +9,18 @@ import type { Settings } from '../domain/settings';
 import { SK } from '../contract/storage-keys';
 import { PORTAL_HOSTNAME } from '../contract/origins';
 import {
+  isPortalSyncedStorageKey,
   pickPortalSyncedStorage,
   PORTAL_SYNCED_STORAGE_KEYS,
 } from '../contract/portal-synced-storage';
+import { storageClient } from '../platform/storage/client';
 import {
-  getPortalExtensionMemorySnapshot,
-  hydratePortalExtensionStore,
-  registerPortalExtensionStoreMutator,
-  setPortalExtensionStoreUpdatedAt,
-} from '../platform/storage/portal-extension-store';
+  decidePortalSyncBootstrap,
+  markPortalSyncCacheClean,
+  PORTAL_SYNC_CACHE_META_KEY,
+  readPortalSyncCache,
+  replacePortalSyncCache,
+} from '../platform/storage/portal-sync-cache';
 import {
   EMPTY_CUSTOM_THEMES,
   parseCustomThemeCollection,
@@ -25,11 +28,7 @@ import {
 } from '../domain/themes/custom-themes';
 import type { CalendarWeekStart } from '../lib/date';
 import { parseCalendarWeekStart } from '../lib/date';
-import {
-  DEFAULT_LANGUAGE,
-  normalizeLanguage,
-  type AppLanguage,
-} from '../i18n/messages';
+import { DEFAULT_LANGUAGE, normalizeLanguage, type AppLanguage } from '../i18n/messages';
 import {
   decodePortalSyncCompactPayload,
   encodePortalSyncCompactPayload,
@@ -39,7 +38,7 @@ import {
   encryptPortalSyncPayload,
   isEncryptedPortalSyncWire,
 } from '../lib/portal-sync-crypto';
-import { ensureClientUserIdInMemory } from '../lib/client-user-id';
+import { ensureClientUserIdInMemory, normalizeClientUserId } from '../lib/client-user-id';
 import {
   fetchPortalUserLinks,
   nextPortalLinkNo,
@@ -61,7 +60,7 @@ const PORTAL_SETTINGS_URL_PREFIX = 'https://home.kcg.ac.jp/portal/_kcglms/';
 const PORTAL_EXTENSION_PAYLOAD_VERSION = 3 as const;
 const PORTAL_SETTINGS_PAYLOAD_VERSION = 2 as const;
 
-export { PORTAL_SYNCED_STORAGE_KEYS, isPortalSyncedStorageKey } from '../contract/portal-synced-storage';
+export { PORTAL_SYNCED_STORAGE_KEYS, isPortalSyncedStorageKey };
 
 export interface PortalExtensionSnapshot {
   updatedAt: number;
@@ -109,18 +108,23 @@ let suppressPortalSync = false;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let listenerInstalled = false;
 let bootstrapPromise: Promise<void> | null = null;
+let portalSyncReady = false;
 
 const PORTAL_EXTENSION_SAVE_DELAY_MS = 800;
 
-export function isPortalSettingsMarkerLink(
-  link: Pick<PortalUserLink, 'midashi' | 'url'>,
-): boolean {
-  return link.midashi.startsWith(PORTAL_SETTINGS_MARKER_PREFIX)
-    || link.url.startsWith(PORTAL_SETTINGS_URL_PREFIX);
+export function isPortalSettingsMarkerLink(link: Pick<PortalUserLink, 'midashi' | 'url'>): boolean {
+  return (
+    link.midashi.startsWith(PORTAL_SETTINGS_MARKER_PREFIX) ||
+    link.url.startsWith(PORTAL_SETTINGS_URL_PREFIX)
+  );
 }
 
 function canSyncPortalExtension(): boolean {
   return typeof location !== 'undefined' && location.hostname === PORTAL_HOSTNAME;
+}
+
+function snapshotOwnerId(snapshot: PortalExtensionSnapshot | null): string | null {
+  return normalizeClientUserId(snapshot?.storage[SK.clientUserId]);
 }
 
 function fromBit(value: unknown, fallback: boolean): boolean {
@@ -149,10 +153,7 @@ function markerIndex(link: PortalUserLink): number {
 export async function writeSyncedLocalStorage(snapshot: PortalExtensionSnapshot): Promise<void> {
   suppressPortalSync = true;
   try {
-    hydratePortalExtensionStore({
-      updatedAt: snapshot.updatedAt,
-      storage: pickPortalSyncedStorage(snapshot.storage),
-    });
+    await replacePortalSyncCache(snapshot, snapshotOwnerId(snapshot), false);
   } finally {
     suppressPortalSync = false;
   }
@@ -172,9 +173,7 @@ function settingsFromStorage(storageMap: Record<string, unknown>): Settings {
   };
 }
 
-function settingsSnapshotToStorage(
-  snapshot: PortalSettingsSnapshot,
-): Record<string, unknown> {
+function settingsSnapshotToStorage(snapshot: PortalSettingsSnapshot): Record<string, unknown> {
   return {
     [SK.theme]: snapshot.settings.theme,
     [SK.hideProfileName]: snapshot.settings.hideProfileName,
@@ -187,6 +186,24 @@ function settingsSnapshotToStorage(
     [SK.language]: snapshot.settings.language,
     [SK.customThemes]: snapshot.customThemes,
   };
+}
+
+function defaultPortalSettingsStorage(): Record<string, unknown> {
+  return settingsSnapshotToStorage({
+    updatedAt: 0,
+    settings: {
+      theme: 'dark',
+      hideProfileName: false,
+      showKogiCalMascot: false,
+      showHomeCornerCharacter: false,
+      hideAssignmentCalendar: false,
+      home2WebMailOverlay: true,
+      cplanOverlay: true,
+      calendarWeekStart: 'monday',
+      language: DEFAULT_LANGUAGE,
+    },
+    customThemes: EMPTY_CUSTOM_THEMES,
+  });
 }
 
 function decodeLegacyV1(raw: PortalSettingsPayloadLegacyV1): PortalExtensionSnapshot | null {
@@ -329,7 +346,9 @@ export async function decodePortalSettingsSnapshot(
   return {
     updatedAt: snapshot.updatedAt,
     settings: settingsFromStorage(snapshot.storage),
-    customThemes: parseCustomThemeCollection(snapshot.storage[SK.customThemes] ?? EMPTY_CUSTOM_THEMES),
+    customThemes: parseCustomThemeCollection(
+      snapshot.storage[SK.customThemes] ?? EMPTY_CUSTOM_THEMES,
+    ),
   };
 }
 
@@ -381,40 +400,45 @@ export async function fetchPortalExtensionSnapshot(): Promise<PortalExtensionSna
   return decodePortalExtensionSnapshot(links);
 }
 
-export async function savePortalExtensionSnapshot(snapshot: PortalExtensionSnapshot): Promise<void> {
+export async function savePortalExtensionSnapshot(
+  snapshot: PortalExtensionSnapshot,
+): Promise<void> {
   const links = await fetchPortalUserLinks();
   const next = await applyPortalExtensionMarkers(links, snapshot);
   await savePortalUserLinks(next);
 }
 
-async function snapshotFromSyncedLocalStorage(
-  updatedAt = Date.now(),
-): Promise<PortalExtensionSnapshot> {
-  const memory = getPortalExtensionMemorySnapshot();
-  return {
-    updatedAt: updatedAt || memory.updatedAt || Date.now(),
-    storage: pickPortalSyncedStorage(memory.storage),
-  };
-}
-
-export async function savePortalExtensionSyncNow(): Promise<void> {
-  if (!canSyncPortalExtension()) return;
+export async function persistDirtyPortalSyncCache(
+  saveSnapshot: (snapshot: PortalExtensionSnapshot) => Promise<void>,
+): Promise<boolean> {
   try {
-    const snapshot = await snapshotFromSyncedLocalStorage(Date.now());
-    await savePortalExtensionSnapshot(snapshot);
+    const cache = await readPortalSyncCache();
+    if (!cache.meta.dirty) return true;
+    const snapshot: PortalExtensionSnapshot = {
+      updatedAt: cache.meta.updatedAt || Date.now(),
+      storage: pickPortalSyncedStorage(cache.storage),
+    };
+    await saveSnapshot(snapshot);
     suppressPortalSync = true;
     try {
-      setPortalExtensionStoreUpdatedAt(snapshot.updatedAt);
+      await markPortalSyncCacheClean(snapshot.updatedAt, snapshotOwnerId(snapshot));
     } finally {
       suppressPortalSync = false;
     }
+    return true;
   } catch {
     /* 未ログイン等 */
+    return false;
   }
 }
 
+export async function savePortalExtensionSyncNow(): Promise<boolean> {
+  if (!canSyncPortalExtension()) return false;
+  return persistDirtyPortalSyncCache(savePortalExtensionSnapshot);
+}
+
 export function schedulePortalExtensionSync(): void {
-  if (suppressPortalSync || !canSyncPortalExtension()) return;
+  if (suppressPortalSync || !portalSyncReady || !canSyncPortalExtension()) return;
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     saveTimer = null;
@@ -425,8 +449,15 @@ export function schedulePortalExtensionSync(): void {
 export function installPortalExtensionSyncListener(): () => void {
   if (listenerInstalled) return () => undefined;
   listenerInstalled = true;
-  return registerPortalExtensionStoreMutator(() => {
-    if (!suppressPortalSync) schedulePortalExtensionSync();
+  return storageClient.onChanged((changes, area) => {
+    if (area !== 'local' || suppressPortalSync) return;
+    const relevant = Object.keys(changes).some(
+      (key) => key === PORTAL_SYNC_CACHE_META_KEY || isPortalSyncedStorageKey(key),
+    );
+    if (!relevant) return;
+    void readPortalSyncCache().then((cache) => {
+      if (cache.meta.dirty) schedulePortalExtensionSync();
+    });
   });
 }
 
@@ -444,63 +475,65 @@ export async function bootstrapPortalExtensionSync(): Promise<void> {
 }
 
 async function runPortalExtensionBootstrap(): Promise<void> {
-  installPortalExtensionSyncListener();
-
-  let portal: PortalExtensionSnapshot | null = null;
-  if (canSyncPortalExtension()) {
-    try {
-      portal = await fetchPortalExtensionSnapshot();
-    } catch {
-      portal = null;
-    }
-  }
-
-  const memory = getPortalExtensionMemorySnapshot();
-  if (portal && portal.updatedAt >= memory.updatedAt) {
-    await writeSyncedLocalStorage(portal);
-  } else if (
-    Object.keys(memory.storage).length > 0
-    && (!portal || memory.updatedAt > portal.updatedAt)
-  ) {
-    const toUpload: PortalExtensionSnapshot = {
-      updatedAt: Date.now(),
-      storage: memory.storage,
-    };
-    suppressPortalSync = true;
-    try {
-      await savePortalExtensionSnapshot(toUpload);
-      setPortalExtensionStoreUpdatedAt(toUpload.updatedAt);
-    } finally {
-      suppressPortalSync = false;
-    }
-  }
-
-  await ensureClientUserIdInMemory();
-
   if (!canSyncPortalExtension()) return;
 
-  const after = getPortalExtensionMemorySnapshot();
-  const portalHadId = Boolean(portal?.storage[SK.clientUserId]);
-  const shouldPersist = !portal
-    || after.updatedAt > (portal?.updatedAt ?? 0)
-    || !portalHadId;
-  if (!shouldPersist) return;
+  installPortalExtensionSyncListener();
 
-  suppressPortalSync = true;
-  try {
-    const snapshot = await snapshotFromSyncedLocalStorage(Date.now());
-    await savePortalExtensionSnapshot(snapshot);
-    setPortalExtensionStoreUpdatedAt(snapshot.updatedAt);
-  } catch {
-    /* 未ログイン等 */
-  } finally {
-    suppressPortalSync = false;
-  }
+  portalSyncReady = await reconcilePortalExtensionCache(
+    fetchPortalExtensionSnapshot,
+    savePortalExtensionSnapshot,
+  );
 }
 
-export function parseSettingsFromExtensionStorage(
-  storageMap: Record<string, unknown>,
-): Settings {
+/** ポータルAPIと端末キャッシュを照合する。戻り値はAPI取得に成功したか。 */
+export async function reconcilePortalExtensionCache(
+  fetchSnapshot: () => Promise<PortalExtensionSnapshot | null>,
+  saveSnapshot: (snapshot: PortalExtensionSnapshot) => Promise<void>,
+): Promise<boolean> {
+  let portal: PortalExtensionSnapshot | null = null;
+  try {
+    portal = await fetchSnapshot();
+  } catch {
+    // API 取得失敗時は端末キャッシュだけで起動し、このページではアップロードしない。
+    return false;
+  }
+
+  const cache = await readPortalSyncCache();
+  const portalOwnerId = snapshotOwnerId(portal);
+  const decision = decidePortalSyncBootstrap(portal, portalOwnerId, cache);
+
+  if (portal) {
+    if (decision === 'upload-local') {
+      await persistDirtyPortalSyncCache(saveSnapshot);
+      return true;
+    }
+
+    // マイリンクが新しい、所有者不一致、または旧版キャッシュならマイリンクを優先する。
+    await writeSyncedLocalStorage(portal);
+    if (!portalOwnerId) {
+      await ensureClientUserIdInMemory();
+      await persistDirtyPortalSyncCache(saveSnapshot);
+    }
+    return true;
+  }
+
+  // マーカーがない初回利用は旧版のローカル設定を移行し、空なら既定値を作成する。
+  const initialStorage =
+    Object.keys(cache.storage).length > 0 ? cache.storage : defaultPortalSettingsStorage();
+  await replacePortalSyncCache(
+    {
+      updatedAt: Math.max(Date.now(), cache.meta.updatedAt + 1),
+      storage: initialStorage,
+    },
+    cache.meta.ownerId,
+    true,
+  );
+  await ensureClientUserIdInMemory();
+  await persistDirtyPortalSyncCache(saveSnapshot);
+  return true;
+}
+
+export function parseSettingsFromExtensionStorage(storageMap: Record<string, unknown>): Settings {
   return settingsFromStorage(storageMap);
 }
 

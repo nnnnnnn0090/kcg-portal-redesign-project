@@ -18,6 +18,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import type { Settings } from '../../../../context/settings';
+import type { CustomTheme } from '../../../../domain/themes';
 import { readExtensionVersion } from '../../../../lib/extension-version';
 import { CHANGELOG_JSON_URL, PORTAL_DOM } from '../../../../shared/constants';
 import { useExtensionUpdateAvailable } from '../../../../hooks/useExtensionUpdateAvailable';
@@ -34,6 +35,7 @@ import {
   SettingsThemeSection,
   SettingsWebMailSection,
 } from './SettingsPanelSections';
+import { ThemeStudio } from './ThemeStudio';
 import {
   clearSettingsPopoverLayout,
   layoutSettingsPopover,
@@ -51,7 +53,7 @@ interface SettingsPanelProps {
   settings: Settings;
   onClose: () => void;
   onThemeChange: (name: string) => void;
-  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  onSettingChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void | Promise<void>;
   /** 初回案内チュートリアルを先頭から再表示する */
   onReplayGuidedTour: () => void;
   /** Home2 Mail ではカラーテーマとバージョンのみ */
@@ -96,6 +98,8 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     const [changelogErr, setChangelogErr] = useState<string | null>(null);
     const [changelogList, setChangelogList] = useState<ParsedChangelogRelease[] | null>(null);
     const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
+    /** 設定パネル外で保持し、パネル閉鎖後も ThemeStudio を残す */
+    const [themeStudioEditing, setThemeStudioEditing] = useState<CustomTheme | 'new' | null>(null);
 
     const resetChangelogModal = useCallback(() => {
       changelogFetchGenRef.current += 1;
@@ -164,6 +168,17 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
       if (!licensesModalOpen || licensesModalClosing) return;
       setLicensesModalClosing(true);
     }, [licensesModalOpen, licensesModalClosing]);
+
+    const openThemeStudio = useCallback(
+      (theme: CustomTheme | 'new') => {
+        setThemeStudioEditing(theme);
+        // 実画面プレビューのため設定ポップを閉じる（スタジオは親 state で維持）
+        resetChangelogModal();
+        resetLicensesModal();
+        if (isOpen && !closing) setClosing(true);
+      },
+      [isOpen, closing, resetChangelogModal, resetLicensesModal],
+    );
 
     useEffect(() => {
       if (!changelogModalClosing) return;
@@ -494,7 +509,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
                       <SettingsThemeSection
                         settings={settings}
                         onThemeChange={onThemeChange}
-                        onEditorOpen={requestClose}
+                        onEditorOpen={openThemeStudio}
                       />
                       <SettingsLanguageSection
                         settings={settings}
@@ -549,7 +564,7 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
                 <SettingsThemeSection
                   settings={settings}
                   onThemeChange={onThemeChange}
-                  onEditorOpen={requestClose}
+                  onEditorOpen={openThemeStudio}
                 />
                 <SettingsWebMailSection
                   settings={settings}
@@ -587,6 +602,13 @@ export const SettingsPanel = forwardRef<SettingsPanelHandle, SettingsPanelProps>
     return (
       <>
         {settingsPop && overlayEl ? createPortal(settingsPop, overlayEl) : null}
+        {themeStudioEditing ? (
+          <ThemeStudio
+            theme={themeStudioEditing === 'new' ? undefined : themeStudioEditing}
+            baseRef={settings.theme}
+            onClose={() => setThemeStudioEditing(null)}
+          />
+        ) : null}
         {changelogModal}
         {licensesModal}
       </>
